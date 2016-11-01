@@ -20,6 +20,7 @@ import com.android.volley.Response;
 import com.android.volley.toolbox.StringRequest;
 import com.woyuce.activity.Activity.AboutUsActivity;
 import com.woyuce.activity.Activity.LoginActivity;
+import com.woyuce.activity.Activity.StoreActivity;
 import com.woyuce.activity.Activity.SuggestionActivity;
 import com.woyuce.activity.Activity.WebActivity;
 import com.woyuce.activity.Application.AppContext;
@@ -41,7 +42,7 @@ import java.util.Map;
 
 public class Fragmentfive extends Fragment implements View.OnClickListener {
 
-    private TextView txtName, txtMoney, txtAboutUs, txtUpdate, txtSuggestion, txtRoom, txtSubject, txtClassTable;
+    private TextView txtName, txtMoney, txtAboutUs, txtUpdate, txtSuggestion, txtRoom, txtSubject, txtClassTable, txtStore;
     private ImageView imgIcon;
     // 暂做课表的入口
     private TextView mCourseTable;
@@ -78,6 +79,7 @@ public class Fragmentfive extends Fragment implements View.OnClickListener {
         txtSuggestion = (TextView) view.findViewById(R.id.txt_to_suggestion);
         txtRoom = (TextView) view.findViewById(R.id.txt_tab5_localroom);
         txtSubject = (TextView) view.findViewById(R.id.txt_tab5_localsubject);
+        txtStore = (TextView) view.findViewById(R.id.txt_to_store);
         mCourseTable = (TextView) view.findViewById(R.id.txt_tab5_localmessage);
 
         mCourseTable.setOnClickListener(this);
@@ -87,6 +89,7 @@ public class Fragmentfive extends Fragment implements View.OnClickListener {
         txtSuggestion.setOnClickListener(this);
         txtRoom.setOnClickListener(this);
         txtSubject.setOnClickListener(this);
+        txtStore.setOnClickListener(this);
     }
 
     // fragment 生命周期，打开时
@@ -240,6 +243,9 @@ public class Fragmentfive extends Fragment implements View.OnClickListener {
                 }
             case R.id.txt_to_suggestion:
                 startActivity(new Intent(getActivity(), SuggestionActivity.class));
+                break;
+            case R.id.txt_to_store:
+                startActivity(new Intent(getActivity(), StoreActivity.class));
                 break;
         }
     }
