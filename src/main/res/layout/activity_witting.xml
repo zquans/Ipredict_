@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#ffffff"
+    android:orientation="vertical" >
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+        <TextView
+            android:id="@+id/txt_gongyi_title"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:background="#9f6eaf"
+            android:gravity="center"
+            android:text="写作题库"
+            android:textColor="#ffffff"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <ImageView
+            android:id="@+id/arrow_back"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:src="@mipmap/arrow_white_back" />
+    </FrameLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_marginLeft="24dp"
+        android:layout_marginRight="24dp"
+        android:layout_marginTop="8dp"
+        android:orientation="horizontal" >
+
+        <AutoCompleteTextView
+            android:id="@+id/auto_writting"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="0.5"
+            android:background="@drawable/buttonstyle_littlegray"
+            android:drawableLeft="@mipmap/icon_search"
+            android:hint="  请输入搜索内容"
+            android:imeOptions="actionSearch"
+            android:paddingLeft="4dp"
+            android:singleLine="true"
+            android:textSize="14sp" />
+
+        <Button
+            android:id="@+id/btn_writting_search"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="0.1"
+            android:background="@drawable/spinnerstyle"
+            android:text="搜 索"
+            android:textColor="#ffffff"
+            android:textSize="14sp" />
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginTop="8dp"
+        android:background="#9f6eaf" />
+
+    <GridView
+        android:id="@+id/gridview_writting"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:layout_marginTop="32dp"
+        android:horizontalSpacing="40dp"
+        android:numColumns="3"
+        android:padding="16dp"
+        android:scrollbars="none"
+        android:verticalSpacing="64dp" >
+    </GridView>
+
+</LinearLayout>

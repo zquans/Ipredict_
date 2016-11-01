@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#ffffff"
+    android:orientation="vertical" >
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+        <TextView
+            android:id="@+id/txt_audiolesson_back"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:background="#33999f"
+            android:gravity="center"
+            android:text="音频课堂"
+            android:textColor="#ffffff"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:src="@mipmap/arrow_white_back" />
+    </FrameLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="60.0dp"
+        android:background="#0088"
+        android:focusable="true"
+        android:focusableInTouchMode="true" >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="40.0dp"
+            android:layout_gravity="center"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:orientation="horizontal" >
+
+            <Button
+                android:id="@+id/btn_audiolesson_listening"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="8dp"
+                android:layout_weight="1"
+                android:background="@drawable/buttonstyle_greenstroke"
+                android:text="听力"
+                android:textColor="#30999f"
+                android:textSize="16sp" />
+
+            <Button
+                android:id="@+id/btn_audiolesson_speaking"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="8dp"
+                android:layout_weight="1"
+                android:background="@drawable/buttonstyle_greenstroke"
+                android:text="口语"
+                android:textColor="#30999f"
+                android:textSize="16sp" />
+
+            <Button
+                android:id="@+id/btn_audiolesson_reading"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="8dp"
+                android:layout_weight="1"
+                android:background="@drawable/buttonstyle_greenstroke"
+                android:text="阅读"
+                android:textColor="#30999f"
+                android:textSize="16sp" />
+
+            <Button
+                android:id="@+id/btn_audiolesson_writting"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:layout_weight="1"
+                android:background="@drawable/buttonstyle_greenstroke"
+                android:text="写作"
+                android:textColor="#30999f"
+                android:textSize="16sp" />
+        </LinearLayout>
+    </FrameLayout>
+
+    <ListView
+        android:id="@+id/listview_audiolesson"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:fadingEdgeLength="0dp"
+        android:padding="8dp"
+        android:scrollbars="none" />
+
+</LinearLayout>

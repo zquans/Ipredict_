@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#ffffff"
+    android:orientation="vertical">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/txt_page_title"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:background="#f25f11"
+            android:gravity="center"
+            android:textColor="#ffffff"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <ImageView
+            android:id="@+id/arrow_back"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:src="@mipmap/arrow_white_back" />
+    </FrameLayout>
+
+    <ImageView
+        android:id="@+id/img_page_guidemap"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:paddingBottom="16dp"
+        android:paddingTop="16dp"
+        android:scaleType="centerCrop" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="2dp"
+        android:layout_marginLeft="32dp"
+        android:layout_marginRight="32dp"
+        android:layout_marginTop="4dp"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:padding="4dp">
+
+        <TextView
+            android:id="@+id/txt_page_all"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_marginLeft="2dp"
+            android:layout_weight="1"
+            android:background="@drawable/buttonstyle_orangestroke"
+            android:gravity="center"
+            android:paddingLeft="4dp"
+            android:paddingRight="4dp"
+            android:text="查看全部"
+            android:textColor="#ff5e02"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/txt_page_important"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_marginLeft="4dp"
+            android:layout_weight="1"
+            android:background="@drawable/buttonstyle_orangestroke"
+            android:gravity="center"
+            android:paddingLeft="4dp"
+            android:paddingRight="4dp"
+            android:text="只看重点"
+            android:textColor="#ff5e02"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/txt_page_imptnothold"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_marginLeft="4dp"
+            android:layout_weight="1"
+            android:background="@drawable/buttonstyle_orangestroke"
+            android:gravity="center"
+            android:paddingLeft="4dp"
+            android:paddingRight="4dp"
+            android:text="只看已会重点"
+            android:textColor="#ff5e02"
+            android:textSize="16sp"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/txt_page_importantnothold"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_marginLeft="4dp"
+            android:layout_weight="1"
+            android:background="@drawable/buttonstyle_orangestroke"
+            android:gravity="center"
+            android:paddingLeft="4dp"
+            android:paddingRight="4dp"
+            android:text="只看不会重点"
+            android:textColor="#ff5e02"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/txt_page_canceltag"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_marginLeft="4dp"
+            android:layout_weight="1"
+            android:background="@drawable/buttonstyle_orangestroke"
+            android:gravity="center"
+            android:paddingLeft="4dp"
+            android:paddingRight="4dp"
+            android:text="取消已会重点"
+            android:textColor="#ff5e02"
+            android:textSize="16sp" />
+    </LinearLayout>
+
+    <FrameLayout
+        android:id="@+id/fl_section"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="5.0dp"
+        android:layout_marginLeft="5.0dp"
+        android:layout_marginRight="5.0dp"
+        android:layout_marginTop="8dp"
+        android:background="#15000000"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10.0dp"
+            android:layout_marginLeft="10.0dp"
+            android:layout_marginTop="10.0dp"
+            android:gravity="center_vertical"
+            android:text="篇目(阅读的重点范围以篇目颜色为准)" />
+
+        <GridView
+            android:id="@+id/gridview_section"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:layout_marginTop="32dp"
+            android:columnWidth="60dp"
+            android:horizontalSpacing="16dp"
+            android:numColumns="auto_fit"
+            android:verticalSpacing="16dp" />
+    </FrameLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp"
+        android:drawablePadding="20dp"
+        android:gravity="center_vertical"
+        android:text="页码" />
+
+    <GridView
+        android:id="@+id/gridview_page"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:layout_marginTop="5dp"
+        android:columnWidth="45dp"
+        android:numColumns="auto_fit"
+        android:verticalSpacing="15dp" />
+
+</LinearLayout>

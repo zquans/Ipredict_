@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#ffffff"
+    android:orientation="vertical">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#e7604a"
+        android:gravity="center_vertical">
+
+        <ImageView
+            android:id="@+id/arrow_back"
+            android:layout_width="40.0dp"
+            android:layout_height="40.0dp"
+            android:scaleType="center"
+            android:src="@mipmap/arrow_white_back" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="40.0dp"
+            android:gravity="center"
+            android:text="网络班专属"
+            android:textColor="#ffffff"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+    </FrameLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="240dp"
+        android:layout_marginTop="16dp"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginRight="8dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.7"
+                android:gravity="center"
+                android:text="考试日期"
+                android:textColor="#e7604a"
+                android:textSize="14sp" />
+
+            <Spinner
+                android:id="@+id/spn_wangluoban_time"
+                android:layout_width="0dp"
+                android:layout_height="36dp"
+                android:layout_marginBottom="2dp"
+                android:layout_marginTop="2dp"
+                android:layout_weight="1"
+                android:background="@mipmap/style_spinner"
+                android:paddingLeft="4dp"
+                android:prompt="@string/datechoose" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="4dp"
+                android:layout_weight="0.7"
+                android:gravity="center"
+                android:text="班级类型"
+                android:textColor="#e7604a"
+                android:textSize="14sp" />
+
+            <Spinner
+                android:id="@+id/spn_wangluoban_class"
+                android:layout_width="0dp"
+                android:layout_height="36dp"
+                android:layout_marginBottom="2dp"
+                android:layout_marginTop="2dp"
+                android:layout_weight="1"
+                android:background="@mipmap/style_spinner"
+                android:prompt="@string/classchoose" />
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="16dp"
+            android:layout_marginTop="8dp"
+            android:drawableLeft="@mipmap/icon_broadcast"
+            android:text="   本场考试的复习计划如下:"
+            android:textColor="#e7604a" />
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginTop="16dp"
+            android:layout_weight="1"
+            android:background="@drawable/buttonstyle_orangestroke"
+            android:scrollbars="none">
+
+            <TextView
+                android:id="@+id/txt_wangluoban_content"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:paddingBottom="8dp"
+                android:paddingTop="8dp"
+                android:textColor="#666666" />
+        </ScrollView>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginTop="8dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/btn_wangluoban_zhibo"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:layout_margin="4dp"
+            android:layout_weight="1"
+            android:background="@drawable/buttonstyle_orangestroke"
+            android:paddingBottom="4dp"
+            android:paddingTop="4dp"
+            android:text="网络班直播报名"
+            android:textSize="16sp" />
+
+        <Button
+            android:id="@+id/btn_wangluoban_lubo"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:layout_margin="4dp"
+            android:layout_weight="1"
+            android:background="@drawable/buttonstyle_orangestroke"
+            android:paddingBottom="4dp"
+            android:paddingTop="4dp"
+            android:text="网络班录播报名"
+            android:textSize="16sp" />
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginTop="8dp"
+        android:background="#e7604a" />
+
+    <GridView
+        android:id="@+id/gridview_activity_wangluoban"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="16dp"
+        android:gravity="center"
+        android:numColumns="2"
+        android:verticalSpacing="40dp" />
+
+</LinearLayout>

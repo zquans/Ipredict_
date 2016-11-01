@@ -1,0 +1,35 @@
+<resources>
+    <string name="app_name">我预测</string>
+    <string name="aiyoupuintroduce"> \t\t我预测，你高分！\n\n\t\t厦门爱优普教育咨询有限公司是经国家工商行政管理部门依法批准的专业化教育咨询公司。 \n\n\t\t我们是专注于英语技巧培养提升的教育机构，旨在为广大考生提供丰富、准确的信息。  </string>
+    <string name="welcome">Welcome To Ipredicting</string>
+    <string name="username">Username:</string>
+    <string name="password">Password:</string>
+    <string name="prompt">提示</string>
+    <string name="acount">账户</string>
+    <string name="ok">确定</string>
+    <string name="cancel">取消</string>
+    <string name="more">更多</string>
+    <string name="search">搜索</string>
+    <string name="loading">正在加载中...</string>
+    <string name="partchoose">请选择part</string>
+    <string name="classchoose">请选择班级</string>
+    <string name="datechoose">请选择日期</string>
+    <string name="citychoose">请选择城市</string>
+    <string name="roomchoose">请选择考场</string>
+    <string name="areachoose">请选择地区</string>
+    <string name="categorychoose">请选择类别</string>
+    <string name="registerPromp1">提示：</string>
+    <string name="registerPromp2">1.请前往短信箱查看验证码。 </string>
+    <string name="registerPromp3">2.若未收到短信，可能被拦截屏蔽到垃圾短信 </string>
+    <string name="registerPromp4">3.已注册的手机号无法再进行注册,请更换手机号码</string>
+    <string name="aaaa">TODO</string>
+    <string name="share">我在i预测超燃，一起来show吧</string>
+    <string name="gongyi_lesson">公益课堂</string>
+    <string name="gongyi_audio">我预测公开课音频回放</string>
+    <string name="gongyi_tecentlesson">我预测腾讯课堂</string>
+    <string name="company_phone">客服电话： 0592-5895791</string>
+    <string name="company_web">我预测网站：www.iyuce.com</string>
+    <string name="share_exam">分享考题</string>
+    <string name="search_prompt">大家都在搜索</string>
+
+</resources>

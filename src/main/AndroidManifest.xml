@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.woyuce.activity">
+
+    <!--<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />-->
+    <uses-permission android:name="android.permission.WRITE_SETTINGS" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.GET_TASKS" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.MANAGE_ACCOUNTS" />
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <!-- 蓝牙分享所需的权限 -->
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+
+    <application
+        android:name=".Application.AppContext"
+        android:allowBackup="false"
+        android:icon="@mipmap/icon_logo"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+        <activity
+            android:name=".Activity.WelcomeActivity"
+            android:launchMode="singleTop"
+            android:windowSoftInputMode="adjustPan">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".Activity.LoginActivity"
+            android:launchMode="singleTop"
+            android:windowSoftInputMode="adjustPan"></activity>
+        <activity
+            android:name=".Activity.LoginRegisterActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".Activity.LoginRegisterInfoActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".Activity.MainActivity"
+            android:launchMode="singleTask"
+            android:windowSoftInputMode="adjustPan" />
+
+        <!-- Tab1 -->
+        <!-- 第一模块 口语高频 的Activity -->
+        <activity
+            android:name=".Activity.SpeakingActivity"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".Activity.SpeakingDetailActivity"
+            android:launchMode="standard"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".Activity.SpeakingShare1Activity"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".Activity.SpeakingChooseRoomActivity"
+            android:launchMode="standard"
+            android:screenOrientation="portrait"
+            android:theme="@style/dialogActivity" />
+        <activity
+            android:name=".Activity.SpeakingShare2Activity"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".Activity.SpeakingShare3Activity"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".Activity.SpeakingShare4Activity"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".Activity.SpeakingStatisActivity"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".Activity.SpeakingMoreActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".Activity.SpeakingContentActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".Activity.SpeakingSearchActivity"
+            android:launchMode="standard"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".Activity.SpeakingVoteActivity"
+            android:launchMode="standard"
+            android:screenOrientation="portrait"
+            android:theme="@style/dialogActivity" />
+
+        <!-- 第二模块 免费范围/笔试预测 的Activity -->
+        <activity
+            android:name=".Activity.FreeRangeActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".Activity.FreeLessonActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".Activity.FreeBookActivity"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".Activity.FreePageActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".Activity.FreeContentActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateAlwaysHidden|adjustPan" />
+
+        <!-- 第三模块公益课堂 的Activity -->
+        <activity
+            android:name=".Activity.GongyiActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".Activity.GongyiLessonActivity"
+            android:launchMode="standard"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".Activity.GongyiContentActivity"
+            android:launchMode="standard"
+            android:screenOrientation="portrait" />
+
+        <!-- 第四模块网络班专属 的Activity -->
+        <activity
+            android:name=".Activity.NetClassActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".Activity.NetClassLessonActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" />
+
+        <!-- 第五模块 写作题库 的Activity -->
+        <activity
+            android:name=".Activity.WitActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".Activity.WitSubcategoryActivity"
+            android:launchMode="standard"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".Activity.WitSearchActivity"
+            android:launchMode="standard"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".Activity.WitContentActivity"
+            android:launchMode="standard"
+            android:screenOrientation="portrait" />
+
+        <!-- <activity -->
+        <!-- android:name=".Activity.WeiboActivity" -->
+        <!-- android:launchMode="standard" -->
+        <!-- android:screenOrientation="portrait" /> -->
+
+
+        <!-- <activity -->
+        <!-- android:name=".Activity.WeiboPhotoWallActivity" -->
+        <!-- android:launchMode="singleTop" -->
+        <!-- android:screenOrientation="portrait" /> -->
+
+
+        <!-- <activity -->
+        <!-- android:name=".Activity.WeiboPulishActivity2" -->
+        <!-- android:launchMode="singleTop" -->
+        <!-- android:screenOrientation="portrait" /> -->
+
+
+        <!-- Tab3 -->
+        <activity
+            android:name=".Activity.WeiboPublishActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".Activity.WeiboAlbumActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".Activity.WeiboAlbumDetailActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".Activity.WeiboInfoActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".Activity.WeiboGroupActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" />
+
+        <!-- Tab5 -->
+        <!-- 意见反馈Activity -->
+        <activity
+            android:name=".Activity.SuggestionActivity"
+            android:launchMode="standard"
+            android:screenOrientation="portrait" />
+        <!-- 关于我们Activity -->
+        <activity
+            android:name=".Activity.AboutUsActivity"
+            android:launchMode="standard"
+            android:screenOrientation="portrait" />
+
+        <!-- WebView专用Activity -->
+        <activity
+            android:name=".Activity.WebActivity"
+            android:launchMode="standard"
+            android:screenOrientation="portrait" />
+
+        <service
+            android:name=".Services.UpdateService"
+            android:screenOrientation="portrait" />
+
+        <!-- MOB分享 -->
+        <activity
+            android:name="com.mob.tools.MobUIShell"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar"
+            android:windowSoftInputMode="stateHidden|adjustResize">
+
+            <!-- QQ和QQ空间分享 QQ登录的回调必须要配置的 -->
+            <intent-filter>
+                <data android:scheme="tencent100371282" />
+
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.BROWSABLE" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+
+            <!-- 新浪微博客户端分享回调必须配置 -->
+            <intent-filter>
+                <action android:name="com.sina.weibo.sdk.action.ACTION_SDK_REQ_ACTIVITY" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        <!-- 微信分享回调 -->
+        <activity
+            android:name="cn.sharesdk.onekeyshare.WXEntryActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:exported="true"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+
+        <!-- 友盟参数 -->
+        <meta-data
+            android:name="UMENG_APPKEY"
+            android:value="5396699556240b03bc0906ff" />
+        <meta-data
+            android:name="UMENG_CHANNEL"
+            android:value="update" />
+
+    </application>
+
+</manifest>
