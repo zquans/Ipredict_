@@ -131,7 +131,7 @@ public class Fragmentthree extends Fragment implements View.OnClickListener, Ada
 //                                weibo.pulish_image = obj.getString("source_url");
 //                            }
                             dataList.add(weibo);
-                            LogUtil.i("dataList = " + weibo.toString());
+//                            LogUtil.i("dataList = " + weibo.toString());
                         }
                     } else {
                         LogUtil.e("code!=0 Data-BACK", "读取页面失败： " + obj.getString("message"));
