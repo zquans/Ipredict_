@@ -1,6 +1,7 @@
 package com.woyuce.activity.Adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -8,8 +9,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.woyuce.activity.Activity.StoreGoodsActivity;
 import com.woyuce.activity.Bean.StoreBean;
 import com.woyuce.activity.R;
+import com.woyuce.activity.Utils.RecyclerItemClickListener;
+import com.woyuce.activity.Utils.ToastUtil;
 
 import java.util.List;
 
@@ -36,11 +40,28 @@ public class StoreHomeAdapter extends RecyclerView.Adapter<StoreHomeAdapter.MyVi
     }
 
     @Override
-    public void onBindViewHolder(MyViewHolder holder, int position) {
-        holder.mTxt.setText("---------" + mDatas.get(position).getTitle() + "---------");
+    public void onBindViewHolder(MyViewHolder holder, final int pos) {
+        holder.mTxt.setText("---------" + mDatas.get(pos).getTitle() + "---------");
         holder.mRecycler.setLayoutManager(new GridLayoutManager(context, 2));
-        RecyclerView.Adapter mmAdapter = new StoreGoodsAdapter(context, mDatas.get(position).getGoods_result());
+        RecyclerView.Adapter mmAdapter = new StoreGoodsAdapter(context, mDatas.get(pos).getGoods_result());
         holder.mRecycler.setAdapter(mmAdapter);
+        //加入Item点击事件
+        holder.mRecycler.addOnItemTouchListener(new RecyclerItemClickListener(context, holder.mRecycler, new RecyclerItemClickListener.OnItemClickListener() {
+            @Override
+            public void onItemClick(View view, int position) {
+                ToastUtil.showMessage(context, "what ? = " + position + pos);
+                //通过反向获取嵌套数组,拿到所需的参数
+                Intent intent = new Intent(context, StoreGoodsActivity.class);
+                intent.putExtra("goods_id", mDatas.get(pos).getGoods_result().get(position).getGoods_id());
+                intent.putExtra("goods_sku_id", mDatas.get(pos).getGoods_result().get(position).getGoods_sku_id());
+                context.startActivity(intent);
+            }
+
+            @Override
+            public void onItemLongClick(View view, int position) {
+                ToastUtil.showMessage(context, "what ?? = " + position);
+            }
+        }));
     }
 
     @Override

@@ -60,4 +60,5 @@ public class StoreGoodsAdapter extends RecyclerView.Adapter<StoreGoodsAdapter.MV
             mTxt = (TextView) itemView.findViewById(R.id.txt_item_recycler_goods);
         }
     }
+
 }

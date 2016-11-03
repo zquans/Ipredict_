@@ -124,6 +124,9 @@ public class FragmentStore1 extends Fragment {
                             goods = new StoreGoods();
                             obj_goods = arr_goods_result.getJSONObject(j);
                             goods.setSales_price(obj_goods.getString("sales_price"));
+                            goods.setThumb_img(obj_goods.getString("original_img"));
+                            goods.setGoods_id(obj_goods.getString("goods_id"));
+                            goods.setGoods_sku_id(obj_goods.getString("goods_sku_id"));
                             goodsList.add(goods);
                         }
                         store.setGoods_result((ArrayList<StoreGoods>) goodsList);
