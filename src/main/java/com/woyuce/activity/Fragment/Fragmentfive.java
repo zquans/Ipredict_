@@ -20,7 +20,7 @@ import com.android.volley.Response;
 import com.android.volley.toolbox.StringRequest;
 import com.woyuce.activity.Activity.AboutUsActivity;
 import com.woyuce.activity.Activity.LoginActivity;
-import com.woyuce.activity.Activity.StoreActivity;
+import com.woyuce.activity.Activity.StoreHomeActivity;
 import com.woyuce.activity.Activity.SuggestionActivity;
 import com.woyuce.activity.Activity.WebActivity;
 import com.woyuce.activity.Application.AppContext;
@@ -245,7 +245,7 @@ public class Fragmentfive extends Fragment implements View.OnClickListener {
                 startActivity(new Intent(getActivity(), SuggestionActivity.class));
                 break;
             case R.id.txt_to_store:
-                startActivity(new Intent(getActivity(), StoreActivity.class));
+                startActivity(new Intent(getActivity(), StoreHomeActivity.class));
                 break;
         }
     }

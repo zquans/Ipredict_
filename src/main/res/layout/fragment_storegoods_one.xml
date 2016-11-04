@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#f0f2f5"
+    android:orientation="vertical"
+    tools:context="com.woyuce.activity.Activity.StoreGoodsActivity">
+
+    <ViewFlipper
+        android:id="@+id/viewflip_activity_storegoods"
+        android:layout_width="match_parent"
+        android:layout_height="240dp" />
+
+    <TextView
+        android:id="@+id/txt_activity_storegoods_goodstitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:background="#ffffff"
+        android:paddingLeft="16sp"
+        android:textColor="#f7941d"
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/txt_activity_storegoods_goodsprice"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:background="#ffffff"
+        android:paddingLeft="16sp"
+        android:text="商品价格（还没有这个字段）"
+        android:textColor="#f23030"
+        android:textSize="18sp" />
+
+</LinearLayout>

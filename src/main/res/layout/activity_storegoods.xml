@@ -7,78 +7,9 @@
     android:orientation="vertical"
     tools:context="com.woyuce.activity.Activity.StoreGoodsActivity">
 
-    <ViewFlipper
-        android:id="@+id/viewflip_activity_storegoods"
-        android:layout_width="match_parent"
-        android:layout_height="240dp" />
-
-
-    <TextView
-        android:id="@+id/txt_activity_storegoods_goodstitle"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:background="#ffffff"
-        android:paddingLeft="16sp"
-        android:textColor="#f7941d"
-        android:textSize="16sp" />
-
-    <TextView
-        android:id="@+id/txt_activity_storegoods_goodsprice"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:background="#ffffff"
-        android:paddingLeft="16sp"
-        android:text="商品价格（还没有这个字段）"
-        android:textColor="#f23030"
-        android:textSize="18sp" />
-
-    <LinearLayout
-        android:id="@+id/linearlayout_activity_storegoods"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:background="#ffffff"
-        android:orientation="horizontal"
-        android:paddingLeft="16sp">
-
-        <TextView
-            android:id="@+id/txt_activity_storegoods_total_sales_volume"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center_vertical"
-            android:text="销量" />
-
-        <TextView
-            android:id="@+id/txt_activity_storegoods_total_good_volume"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center_vertical"
-            android:text="好评" />
-
-        <TextView
-            android:id="@+id/txt_activity_storegoods_total_show_order_volume"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center_vertical"
-            android:text="晒单" />
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center_vertical"
-            android:text="赠送金币" />
-    </LinearLayout>
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="48dp"
-        android:layout_marginTop="8dp"
         android:background="#f0f2f5"
         android:orientation="horizontal">
 

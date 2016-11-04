@@ -10,7 +10,7 @@ import android.widget.LinearLayout;
 
 import com.woyuce.activity.R;
 
-public class Fragment_Store_Two extends Fragment {
+public class Fragment_StoreGoods_Two extends Fragment {
 
     private LinearLayout mLinearLayout;
 

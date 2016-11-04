@@ -33,7 +33,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FragmentStore1 extends Fragment {
+public class Fragment_StoreHome_Tab1 extends Fragment {
 
     private ViewFlipper mViewFlipper;
 

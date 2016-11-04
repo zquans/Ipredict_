@@ -22,7 +22,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-public class Fragment_Store_Three extends Fragment implements View.OnClickListener {
+public class Fragment_StoreGoods_Three extends Fragment implements View.OnClickListener {
 
     private TextView mTxtAll, mTxtGood, mTxtMiddle, mTxtBad, mTxtShowOrder;
 
@@ -60,7 +60,8 @@ public class Fragment_Store_Three extends Fragment implements View.OnClickListen
     }
 
     private void requestData() {
-        URL = URL + "?goodsid=" + "2" + "&pageindex=" + "1" + "&pagesize=" + "10";
+        //Fragment传递参数
+        URL = URL + "?goodsid=" + getArguments().getString("goods_id") + "&pageindex=" + "1" + "&pagesize=" + "10";
         StringRequest goodsCommentRequest = new StringRequest(Request.Method.GET, URL,
                 new Response.Listener<String>() {
                     @Override

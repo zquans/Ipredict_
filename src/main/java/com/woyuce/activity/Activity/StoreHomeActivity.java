@@ -12,7 +12,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.woyuce.activity.Fragment.FragmentStore1;
+import com.woyuce.activity.Fragment.Fragment_StoreHome_Tab1;
 import com.woyuce.activity.Fragment.Fragmentfive;
 import com.woyuce.activity.Fragment.Fragmentone;
 import com.woyuce.activity.R;
@@ -20,7 +20,7 @@ import com.woyuce.activity.R;
 import java.util.ArrayList;
 import java.util.List;
 
-public class StoreActivity extends FragmentActivity implements View.OnClickListener, ViewPager.OnPageChangeListener {
+public class StoreHomeActivity extends FragmentActivity implements View.OnClickListener, ViewPager.OnPageChangeListener {
 
     private ViewPager mViewPager;
     private FragmentPagerAdapter mAdapter;
@@ -57,7 +57,7 @@ public class StoreActivity extends FragmentActivity implements View.OnClickListe
         mViewPager = (ViewPager) findViewById(R.id.viewpager_activity_store);
         mViewPager.setOnPageChangeListener(this);
         mFragments = new ArrayList<>();
-        Fragment mStore01 = new FragmentStore1();
+        Fragment mStore01 = new Fragment_StoreHome_Tab1();
         Fragment mTab01 = new Fragmentone();
         Fragment mTab03 = new Fragmentfive();
 
