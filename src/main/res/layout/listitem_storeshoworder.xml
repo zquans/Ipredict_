@@ -1,0 +1,56 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:descendantFocusability="blocksDescendants"
+    android:gravity="center_vertical">
+
+    <TextView
+        android:id="@+id/txt_goodscomment_username"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:singleLine="true"
+        android:text="用户名"
+        android:textColor="#3399ff"
+        android:textSize="14sp" />
+
+    <TextView
+        android:id="@+id/txt_goodscomment_comment"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="8dp"
+        android:layout_toRightOf="@+id/txt_goodscomment_username"
+        android:singleLine="true"
+        android:text="晒单"
+        android:textColor="#ff0000"
+        android:textSize="14sp" />
+
+    <TextView
+        android:id="@+id/txt_goodscomment_content"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/txt_goodscomment_username"
+        android:layout_marginTop="2dp"
+        android:minLines="1"
+        android:text="我要一个雅量 在    北京第三十一考场  拿到了很多个鸭粮"
+        android:textColor="#898989"
+        android:textSize="18sp" />
+
+    <TextView
+        android:id="@+id/txt_goodscomment_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/txt_goodscomment_username"
+        android:layout_alignBottom="@+id/txt_goodscomment_username"
+        android:layout_alignRight="@+id/txt_goodscomment_content"
+        android:text="2014-12-12"
+        android:textColor="#898989"
+        android:textSize="14sp" />
+
+    <ImageView
+        android:id="@+id/img_goodscomment_showgoods"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:layout_below="@+id/txt_goodscomment_content"
+        android:layout_marginTop="4dp" />
+
+</RelativeLayout>

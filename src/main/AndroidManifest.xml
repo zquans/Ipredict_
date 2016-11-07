@@ -170,24 +170,6 @@
             android:launchMode="standard"
             android:screenOrientation="portrait" />
 
-        <!-- <activity -->
-        <!-- android:name=".Activity.WeiboActivity" -->
-        <!-- android:launchMode="standard" -->
-        <!-- android:screenOrientation="portrait" /> -->
-
-
-        <!-- <activity -->
-        <!-- android:name=".Activity.WeiboPhotoWallActivity" -->
-        <!-- android:launchMode="singleTop" -->
-        <!-- android:screenOrientation="portrait" /> -->
-
-
-        <!-- <activity -->
-        <!-- android:name=".Activity.WeiboPulishActivity2" -->
-        <!-- android:launchMode="singleTop" -->
-        <!-- android:screenOrientation="portrait" /> -->
-
-
         <!-- Tab3 -->
         <activity
             android:name=".Activity.WeiboPublishActivity"
@@ -213,6 +195,8 @@
         <!-- Tab5 -->
         <activity android:name=".Activity.StoreHomeActivity" />
         <activity android:name=".Activity.StoreGoodsActivity" />
+        <activity android:name=".Activity.StoreCarActivity" />
+        <activity android:name=".Activity.StorePayActivity" />
 
         <!-- 意见反馈Activity -->
         <activity
