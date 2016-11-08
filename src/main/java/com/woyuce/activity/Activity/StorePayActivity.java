@@ -18,6 +18,7 @@ public class StorePayActivity extends BaseActivity {
 
     public void nowPay(View view) {
         ToastUtil.showMessage(this, "去调支付吧");
+
     }
 
 }

@@ -153,16 +153,10 @@ public class StoreGoodsActivity extends BaseActivity implements View.OnClickList
         StoreNum = StoreNum + 1;
 
         Intent intent = new Intent(this, StoreCarActivity.class);
-//                "id":list[i].id,
-//                "name":list[i].name,
-//                "num":list[i].num == null ? 0 : list[i].num,
-//                "price":list[i].price,
-//                "goodsid":list[i].goodsid
-
         intent.putExtra("id", PreferenceUtil.getSharePre(this).getString("userId", ""));
         intent.putExtra("name", mList.get(0));
         intent.putExtra("num", StoreNum);
-        intent.putExtra("price", 88);
+        intent.putExtra("price", 86);
         intent.putExtra("goodsid", getIntent().getStringExtra("goods_id"));
         startActivity(intent);
     }

@@ -13,8 +13,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.woyuce.activity.Fragment.Fragment_StoreHome_Tab1;
+import com.woyuce.activity.Fragment.Fragment_StoreHome_Tab2;
 import com.woyuce.activity.Fragment.Fragmentfive;
-import com.woyuce.activity.Fragment.Fragmentone;
 import com.woyuce.activity.R;
 
 import java.util.ArrayList;
@@ -58,11 +58,11 @@ public class StoreHomeActivity extends FragmentActivity implements View.OnClickL
         mViewPager.setOnPageChangeListener(this);
         mFragments = new ArrayList<>();
         Fragment mStore01 = new Fragment_StoreHome_Tab1();
-        Fragment mTab01 = new Fragmentone();
+        Fragment mStore02 = new Fragment_StoreHome_Tab2();
         Fragment mTab03 = new Fragmentfive();
 
         mFragments.add(mStore01);
-        mFragments.add(mTab01);
+        mFragments.add(mStore02);
         mFragments.add(mTab03);
 
         mAdapter = new FragmentPagerAdapter(getSupportFragmentManager()) {

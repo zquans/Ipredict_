@@ -11,34 +11,93 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:orientation="vertical">
 
             <ListView
                 android:id="@+id/listview_activity_store_car"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:paddingLeft="8dp"
+                android:paddingRight="8dp" />
 
-            <TextView
-                android:id="@+id/txt_storecar_total_num"
+
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="right"
-                android:text="商品件数" />
+                android:layout_marginTop="8dp"
+                android:orientation="horizontal">
 
-            <TextView
-                android:id="@+id/txt_storecar_total_price"
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="right"
+                    android:text="商品件数:" />
+
+                <TextView
+                    android:id="@+id/txt_storecar_total_num"
+                    android:layout_width="64dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="right"
+                    android:layout_marginLeft="36dp"
+                    android:layout_marginRight="16dp"
+                    android:text="商品件数"
+                    android:textColor="#f7941d" />
+
+            </LinearLayout>
+
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="right"
-                android:text="合计金额" />
+                android:layout_marginTop="8dp"
+                android:orientation="horizontal">
 
-            <TextView
-                android:id="@+id/txt_storecar_final_price"
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="right"
+                    android:text="合计金额:" />
+
+                <TextView
+                    android:id="@+id/txt_storecar_total_price"
+                    android:layout_width="64dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="right"
+                    android:layout_marginLeft="36dp"
+                    android:layout_marginRight="16dp"
+                    android:text="商品件数"
+                    android:textColor="#f7941d" />
+
+            </LinearLayout>
+
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="right"
-                android:text="应付金额" />
+                android:layout_marginBottom="16dp"
+                android:layout_marginTop="8dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="right"
+                    android:text="应付金额:" />
+
+                <TextView
+                    android:id="@+id/txt_storecar_final_price"
+                    android:layout_width="64dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="right"
+                    android:layout_marginLeft="36dp"
+                    android:layout_marginRight="16dp"
+                    android:text="商品件数"
+                    android:textColor="#f7941d" />
+
+            </LinearLayout>
+
         </LinearLayout>
     </ScrollView>
 
@@ -48,6 +107,7 @@
         android:layout_gravity="bottom"
         android:background="#f7941d"
         android:onClick="toPay"
-        android:text="去结算" />
+        android:text="去结算"
+        android:textColor="#ffffff" />
 
 </LinearLayout>

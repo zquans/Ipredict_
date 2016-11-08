@@ -11,50 +11,28 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <Button
-                android:id="@+id/btn_activity_store_pay"
+            <ListView
+                android:id="@+id/listview_activity_store_car"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="#fff"
-                android:text="收货地址"
-                android:textColor="#bf7473" />
+                android:paddingLeft="8dp"
+                android:paddingRight="8dp" />
 
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="这里面有些小复杂" />
-
-            </RelativeLayout>
-
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="这里面有些小复杂" />
-
-            </RelativeLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:background="#fff"
                 android:orientation="horizontal">
 
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
+                    android:gravity="right"
                     android:text="商品件数:" />
 
                 <TextView
@@ -65,7 +43,7 @@
                     android:layout_marginLeft="36dp"
                     android:layout_marginRight="16dp"
                     android:text="商品件数"
-                    android:textColor="#bf7473" />
+                    android:textColor="#f7941d" />
 
             </LinearLayout>
 
@@ -73,13 +51,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:background="#fff"
                 android:orientation="horizontal">
 
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
+                    android:gravity="right"
                     android:text="合计金额:" />
 
                 <TextView
@@ -90,7 +68,7 @@
                     android:layout_marginLeft="36dp"
                     android:layout_marginRight="16dp"
                     android:text="商品件数"
-                    android:textColor="#bf7473" />
+                    android:textColor="#f7941d" />
 
             </LinearLayout>
 
@@ -99,13 +77,13 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
                 android:layout_marginTop="8dp"
-                android:background="#fff"
                 android:orientation="horizontal">
 
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
+                    android:gravity="right"
                     android:text="应付金额:" />
 
                 <TextView
@@ -116,39 +94,19 @@
                     android:layout_marginLeft="36dp"
                     android:layout_marginRight="16dp"
                     android:text="商品件数"
-                    android:textColor="#bf7473" />
+                    android:textColor="#f7941d" />
 
             </LinearLayout>
+
         </LinearLayout>
     </ScrollView>
 
-    <RelativeLayout
+    <Button
         android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:layout_gravity="bottom">
-
-        <Button
-            android:id="@+id/btn_activity_storepay"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_alignParentRight="true"
-            android:background="#f7941d"
-            android:onClick="nowPay"
-            android:paddingLeft="16dp"
-            android:paddingRight="16dp"
-            android:text="提交订单"
-            android:textColor="#fff" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_marginRight="8dp"
-            android:layout_toLeftOf="@+id/btn_activity_storepay"
-            android:gravity="center_vertical"
-            android:text="应付总金额:"
-            android:textColor="#bf7473"
-            android:textSize="16sp" />
-
-    </RelativeLayout>
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:background="#f7941d"
+        android:text="去结算"
+        android:textColor="#ffffff" />
 
 </LinearLayout>
