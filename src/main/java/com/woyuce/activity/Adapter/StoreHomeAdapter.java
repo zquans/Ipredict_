@@ -54,6 +54,8 @@ public class StoreHomeAdapter extends RecyclerView.Adapter<StoreHomeAdapter.MyVi
                 Intent intent = new Intent(context, StoreGoodsActivity.class);
                 intent.putExtra("goods_id", mDatas.get(pos).getGoods_result().get(position).getGoods_id());
                 intent.putExtra("goods_sku_id", mDatas.get(pos).getGoods_result().get(position).getGoods_sku_id());
+                intent.putExtra("goods_title", mDatas.get(pos).getGoods_result().get(position).getGoods_title());
+                intent.putExtra("sales_price", mDatas.get(pos).getGoods_result().get(position).getSales_price());
                 context.startActivity(intent);
             }
 

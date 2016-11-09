@@ -28,15 +28,16 @@ public class StoreCarAdapter extends BaseAdapter {
         mLayoutInflater = LayoutInflater.from(context);
     }
 
+    //回调三部曲
     public interface OnMyClickListener {
-        void OnMyAddClick( );
+        void OnMyAddClick(View view, int pos);
 
-        void OnMyMinusClick( );
+        void OnMyMinusClick(View view, int pos);
     }
 
     private OnMyClickListener mListener;
 
-    private void setOnMyClickListener(OnMyClickListener listener) {
+    public void setOnMyClickListener(OnMyClickListener listener) {
         this.mListener = listener;
     }
 
@@ -56,41 +57,47 @@ public class StoreCarAdapter extends BaseAdapter {
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        ViewHolder viewHolder;
+    public View getView(final int position, View convertView, ViewGroup parent) {
+        final ViewHolder viewHolder;
         if (convertView == null) {
             viewHolder = new ViewHolder();
             convertView = mLayoutInflater.inflate(R.layout.listitem_storecar, null);
             viewHolder.mTxtName = (TextView) convertView.findViewById(R.id.txt_listitem_storecar_name);
             viewHolder.mTxtPrice = (TextView) convertView.findViewById(R.id.txt_listitem_storecar_price);
+            viewHolder.mTxtCount = (TextView) convertView.findViewById(R.id.txt_listitem_storecar_count);
 
             viewHolder.btnAdd = (Button) convertView.findViewById(R.id.btn_listitem_storecar_add);
             viewHolder.btnMinus = (Button) convertView.findViewById(R.id.btn_listitem_storecar_minus);
-            //TODO 给Button绑定监听事件
-            viewHolder.btnAdd.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    setOnMyClickListener(mListener);
-                }
-            });
-            viewHolder.btnMinus.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    setOnMyClickListener(mListener);
-                }
-            });
-
             convertView.setTag(viewHolder);
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
         }
         viewHolder.mTxtName.setText(mList.get(position).getName());
         viewHolder.mTxtPrice.setText(mList.get(position).getPrice());
+
+        //TODO 接口的方法
+        //mListener.OnMyAddClick();
+        //mListener.OnMyMinusClick();
+        // 如果设置了回调，则设置点击事件
+        if (mListener != null) {
+            viewHolder.btnAdd.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mListener.OnMyAddClick(viewHolder.btnAdd, position);
+                }
+            });
+            viewHolder.btnMinus.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mListener.OnMyMinusClick(viewHolder.btnMinus, position);
+                }
+            });
+        }
         return convertView;
     }
 
-    class ViewHolder {
-        public TextView mTxtName, mTxtPrice;
+    public class ViewHolder {
+        public TextView mTxtName, mTxtPrice, mTxtCount;
         public Button btnAdd, btnMinus;
     }
 }

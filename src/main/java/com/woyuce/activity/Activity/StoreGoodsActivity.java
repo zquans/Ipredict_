@@ -44,6 +44,8 @@ public class StoreGoodsActivity extends BaseActivity implements View.OnClickList
                     Fragment_StoreGoods_One mFrgOne = new Fragment_StoreGoods_One();
                     bundle.putString("goods_id", getIntent().getStringExtra("goods_id"));
                     bundle.putString("goods_sku_id", getIntent().getStringExtra("goods_sku_id"));
+                    bundle.putString("goods_title", getIntent().getStringExtra("goods_title"));
+                    bundle.putString("sales_price", getIntent().getStringExtra("sales_price"));
                     mFrgOne.setArguments(bundle);
                     bundle.putStringArrayList("mList", (ArrayList<String>) mList);
                     //传递参数给Fragment，始终保持数据最新
@@ -94,8 +96,6 @@ public class StoreGoodsActivity extends BaseActivity implements View.OnClickList
                             obj = new JSONObject(s);
                             if (obj.getString("code").equals("0")) {
                                 obj = obj.getJSONObject("good");
-                                //将商品名放到轮播图数组中一同传递
-                                mList.add(obj.getString("goods_title"));
                                 //给Tab的商品详情多图
                                 mImgList = obj.getString("goods_desc");
                                 //填充轮播图数据
@@ -151,12 +151,11 @@ public class StoreGoodsActivity extends BaseActivity implements View.OnClickList
     //参数传递过去,打开购物车Activity
     public void buyNow(View view) {
         StoreNum = StoreNum + 1;
-
         Intent intent = new Intent(this, StoreCarActivity.class);
         intent.putExtra("id", PreferenceUtil.getSharePre(this).getString("userId", ""));
-        intent.putExtra("name", mList.get(0));
+        intent.putExtra("name", getIntent().getStringExtra("goods_title"));
         intent.putExtra("num", StoreNum);
-        intent.putExtra("price", 86);
+        intent.putExtra("price", getIntent().getStringExtra("sales_price"));
         intent.putExtra("goodsid", getIntent().getStringExtra("goods_id"));
         startActivity(intent);
     }
@@ -170,6 +169,8 @@ public class StoreGoodsActivity extends BaseActivity implements View.OnClickList
                 Fragment_StoreGoods_One mFrgOne = new Fragment_StoreGoods_One();
                 bundle.putString("goods_id", getIntent().getStringExtra("goods_id"));
                 bundle.putString("goods_sku_id", getIntent().getStringExtra("goods_sku_id"));
+                bundle.putString("goods_title", getIntent().getStringExtra("goods_title"));
+                bundle.putString("sales_price", getIntent().getStringExtra("sales_price"));
                 bundle.putStringArrayList("mList", (ArrayList<String>) mList);
                 mFrgOne.setArguments(bundle);
                 //传递参数给Fragment，始终保持数据最新

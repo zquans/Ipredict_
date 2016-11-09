@@ -123,6 +123,7 @@ public class Fragment_StoreHome_Tab1 extends Fragment {
                         for (int j = 0; j < arr_goods_result.length(); j++) {
                             goods = new StoreGoods();
                             obj_goods = arr_goods_result.getJSONObject(j);
+                            goods.setGoods_title(obj_goods.getString("goods_title"));
                             goods.setSales_price(obj_goods.getString("sales_price"));
                             goods.setThumb_img(obj_goods.getString("original_img"));
                             goods.setGoods_id(obj_goods.getString("goods_id"));

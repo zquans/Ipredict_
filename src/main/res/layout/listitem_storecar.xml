@@ -78,6 +78,7 @@
                 android:text="-" />
 
             <TextView
+                android:id="@+id/txt_listitem_storecar_count"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:gravity="center"
