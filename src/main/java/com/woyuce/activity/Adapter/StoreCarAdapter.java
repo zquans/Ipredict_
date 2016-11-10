@@ -74,6 +74,7 @@ public class StoreCarAdapter extends BaseAdapter {
         }
         viewHolder.mTxtName.setText(mList.get(position).getName());
         viewHolder.mTxtPrice.setText(mList.get(position).getPrice());
+        viewHolder.mTxtCount.setText(mList.get(position).getNum());
 
         //TODO 接口的方法
         //mListener.OnMyAddClick();

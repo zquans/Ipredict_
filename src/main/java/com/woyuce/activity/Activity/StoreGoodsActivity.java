@@ -1,6 +1,8 @@
 package com.woyuce.activity.Activity;
 
+import android.content.ContentValues;
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
@@ -18,6 +20,7 @@ import com.woyuce.activity.Fragment.Fragment_StoreGoods_Two;
 import com.woyuce.activity.R;
 import com.woyuce.activity.Utils.LogUtil;
 import com.woyuce.activity.Utils.PreferenceUtil;
+import com.woyuce.activity.Utils.ToastUtil;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -79,6 +82,9 @@ public class StoreGoodsActivity extends BaseActivity implements View.OnClickList
         mTxtTabOne.setTextColor(Color.parseColor("#f7941d"));
     }
 
+    /**
+     * 获取的是轮播图、商品详情的数据
+     */
     private String URL = "http://api.iyuce.com/v1/store/goods";
 
     private void requestData() {
@@ -129,6 +135,29 @@ public class StoreGoodsActivity extends BaseActivity implements View.OnClickList
         txt.setTextColor(Color.parseColor("#f7941d"));
     }
 
+    /**
+     * 开数据库建一张表
+     */
+    private void saveStoreInfo(String id, String goodsid, String name, String num, String price) {
+        SQLiteDatabase mDatabase = openOrCreateDatabase("aipu.db", MODE_PRIVATE, null);
+        mDatabase.execSQL(
+                "create table if not exists storetb(_id integer primary key autoincrement," +
+                        "id text not null,goodsid text not null,name text not null," +
+                        "num text not null,price text not null)");
+        ContentValues mValues = new ContentValues();
+        mValues.put("id", id);
+        mValues.put("goodsid", goodsid);
+        mValues.put("name", name);
+        mValues.put("num", num);
+        mValues.put("price", price);
+        mDatabase.insert("storetb", null, mValues);
+        mValues.clear();
+        mDatabase.close();
+        ToastUtil.showMessage(this, "save success");
+        //权宜之计，做个标识给FavoriteActivity用
+        PreferenceUtil.save(this, "storetb_is_exist", "yes");
+    }
+
     //直接打开购物车Activity，通过SharePre去获取商品信息
     public void goToCar(View view) {
         Intent intent = new Intent(this, StoreCarActivity.class);
@@ -151,13 +180,16 @@ public class StoreGoodsActivity extends BaseActivity implements View.OnClickList
     //参数传递过去,打开购物车Activity
     public void buyNow(View view) {
         StoreNum = StoreNum + 1;
-        Intent intent = new Intent(this, StoreCarActivity.class);
-        intent.putExtra("id", PreferenceUtil.getSharePre(this).getString("userId", ""));
-        intent.putExtra("name", getIntent().getStringExtra("goods_title"));
-        intent.putExtra("num", StoreNum);
-        intent.putExtra("price", getIntent().getStringExtra("sales_price"));
-        intent.putExtra("goodsid", getIntent().getStringExtra("goods_id"));
-        startActivity(intent);
+        String local_id = PreferenceUtil.getSharePre(this).getString("userId", "");
+        String local_goodsid = getIntent().getStringExtra("goods_id");
+        String local_name = getIntent().getStringExtra("goods_title");
+        String local_num = String.valueOf(StoreNum);
+        String local_price = getIntent().getStringExtra("sales_price");
+        LogUtil.i("local_id = " + local_id + local_goodsid + local_name + local_num + local_price);
+        //保存进数据库
+        saveStoreInfo(local_id, local_goodsid, local_name, local_num, local_price);
+        StoreNum = 0;
+        startActivity(new Intent(this, StoreCarActivity.class));
     }
 
     @Override
