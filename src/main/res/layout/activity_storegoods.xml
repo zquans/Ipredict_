@@ -54,27 +54,27 @@
         android:orientation="horizontal">
 
         <Button
+            android:id="@+id/btn_activity_storegoods_tocar"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:background="#ffffff"
-            android:onClick="goToCar"
             android:text="购物车" />
 
         <Button
+            android:id="@+id/btn_activity_storegoods_putincar"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:background="#f7941d"
-            android:onClick="putInCar"
             android:text="加入购物车" />
 
         <Button
+            android:id="@+id/btn_activity_storegoods_buynow"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:background="#f23030"
-            android:onClick="buyNow"
             android:text="立即购买" />
     </LinearLayout>
 

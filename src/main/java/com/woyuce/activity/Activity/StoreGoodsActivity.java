@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.android.volley.Request;
@@ -20,7 +21,6 @@ import com.woyuce.activity.Fragment.Fragment_StoreGoods_Two;
 import com.woyuce.activity.R;
 import com.woyuce.activity.Utils.LogUtil;
 import com.woyuce.activity.Utils.PreferenceUtil;
-import com.woyuce.activity.Utils.ToastUtil;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -32,17 +32,19 @@ import java.util.List;
 public class StoreGoodsActivity extends BaseActivity implements View.OnClickListener {
 
     private TextView mTxtTabOne, mTxtTabTwo, mTxtTabThree;
+    private Button mBtnGoToCar, mBtnPutIntoCar, mBtnBuyNow;
 
     //存放数据
     private List<String> mList = new ArrayList<>();
     private String mImgList = null;//或者是个数组
 
+    private static final int OPEN_FRAGMENT = 0x001;
     private Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
             switch (msg.what) {
-                case 0:
+                case OPEN_FRAGMENT:
                     Bundle bundle = new Bundle();
                     Fragment_StoreGoods_One mFrgOne = new Fragment_StoreGoods_One();
                     bundle.putString("goods_id", getIntent().getStringExtra("goods_id"));
@@ -70,14 +72,19 @@ public class StoreGoodsActivity extends BaseActivity implements View.OnClickList
         mTxtTabOne = (TextView) findViewById(R.id.txt_storegoods_tab_one);
         mTxtTabTwo = (TextView) findViewById(R.id.txt_storegoods_tab_two);
         mTxtTabThree = (TextView) findViewById(R.id.txt_storegoods_tab_three);
-
+        mBtnGoToCar = (Button) findViewById(R.id.btn_activity_storegoods_tocar);
+        mBtnPutIntoCar = (Button) findViewById(R.id.btn_activity_storegoods_putincar);
+        mBtnBuyNow = (Button) findViewById(R.id.btn_activity_storegoods_buynow);
+        mBtnGoToCar.setOnClickListener(this);
+        mBtnPutIntoCar.setOnClickListener(this);
+        mBtnBuyNow.setOnClickListener(this);
         mTxtTabOne.setOnClickListener(this);
         mTxtTabTwo.setOnClickListener(this);
         mTxtTabThree.setOnClickListener(this);
 
         //请求数据
         requestData();
-
+        //重设Tab的样式
         resetTxtTab(mTxtTabOne);
         mTxtTabOne.setTextColor(Color.parseColor("#f7941d"));
     }
@@ -110,9 +117,8 @@ public class StoreGoodsActivity extends BaseActivity implements View.OnClickList
                                     obj = arr.getJSONObject(i);
                                     mList.add(obj.getString("original_img"));
                                 }
-                                //TODO 修改what为静态常量
                                 Message msg = new Message();
-                                msg.what = 0;
+                                msg.what = OPEN_FRAGMENT;
                                 mHandler.sendMessage(msg);
                             } else {
                             }
@@ -153,48 +159,19 @@ public class StoreGoodsActivity extends BaseActivity implements View.OnClickList
         mDatabase.insert("storetb", null, mValues);
         mValues.clear();
         mDatabase.close();
-        ToastUtil.showMessage(this, "save success");
         //权宜之计，做个标识给FavoriteActivity用
         PreferenceUtil.save(this, "storetb_is_exist", "yes");
     }
 
-    //直接打开购物车Activity，通过SharePre去获取商品信息
-    public void goToCar(View view) {
-        Intent intent = new Intent(this, StoreCarActivity.class);
-        startActivity(intent);
-    }
-
-    int StoreNum = 0;//购买的商品数量
-
-    //参数加入SharePre,不打开购物车Activity
-    public void putInCar(View view) {
-        StoreNum = StoreNum + 1;
-        //TODO 保存这些参数到sharePreference，给结账用（需要先调出数据查看，Preference是否冲突字段）
-//        intent.putExtra("id", PreferenceUtil.getSharePre(this).getString("userId", ""));
-//        intent.putExtra("name", mList.get(0));
-//        intent.putExtra("num", 8);
-//        intent.putExtra("price", 88);
-//        intent.putExtra("goodsid", getIntent().getStringExtra("goods_id"));
-    }
-
-    //参数传递过去,打开购物车Activity
-    public void buyNow(View view) {
-        StoreNum = StoreNum + 1;
+    @Override
+    public void onClick(View v) {//前三个case是顶部导航栏，后三个是底部导航栏
+        //这些参数是传递给底部操作栏的，跟购物车相关
+        Bundle bundle = new Bundle();
         String local_id = PreferenceUtil.getSharePre(this).getString("userId", "");
         String local_goodsid = getIntent().getStringExtra("goods_id");
         String local_name = getIntent().getStringExtra("goods_title");
-        String local_num = String.valueOf(StoreNum);
+        String local_num = String.valueOf(1);
         String local_price = getIntent().getStringExtra("sales_price");
-        LogUtil.i("local_id = " + local_id + local_goodsid + local_name + local_num + local_price);
-        //保存进数据库
-        saveStoreInfo(local_id, local_goodsid, local_name, local_num, local_price);
-        StoreNum = 0;
-        startActivity(new Intent(this, StoreCarActivity.class));
-    }
-
-    @Override
-    public void onClick(View v) {
-        Bundle bundle = new Bundle();
         switch (v.getId()) {
             case R.id.txt_storegoods_tab_one:
                 resetTxtTab(mTxtTabOne);
@@ -222,6 +199,18 @@ public class StoreGoodsActivity extends BaseActivity implements View.OnClickList
                 bundle.putString("goods_id", getIntent().getStringExtra("goods_id"));
                 mFrgThree.setArguments(bundle);
                 getFragmentManager().beginTransaction().replace(R.id.frame_activity_storegoods_fragment, mFrgThree).commit();
+                break;
+            case R.id.btn_activity_storegoods_buynow:
+                //保存进数据库
+                saveStoreInfo(local_id, local_goodsid, local_name, local_num, local_price);
+                startActivity(new Intent(this, StoreCarActivity.class));
+                break;
+            case R.id.btn_activity_storegoods_putincar:
+                //保存进数据库
+                saveStoreInfo(local_id, local_goodsid, local_name, local_num, local_price);
+                break;
+            case R.id.btn_activity_storegoods_tocar:
+                startActivity(new Intent(this, StoreCarActivity.class));
                 break;
         }
     }
