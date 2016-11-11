@@ -21,6 +21,7 @@ import com.woyuce.activity.Fragment.Fragment_StoreGoods_Two;
 import com.woyuce.activity.R;
 import com.woyuce.activity.Utils.LogUtil;
 import com.woyuce.activity.Utils.PreferenceUtil;
+import com.woyuce.activity.Utils.ToastUtil;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -51,6 +52,9 @@ public class StoreGoodsActivity extends BaseActivity implements View.OnClickList
                     bundle.putString("goods_sku_id", getIntent().getStringExtra("goods_sku_id"));
                     bundle.putString("goods_title", getIntent().getStringExtra("goods_title"));
                     bundle.putString("sales_price", getIntent().getStringExtra("sales_price"));
+                    bundle.putString("total_sales_volume", total_sales_volume);
+                    bundle.putString("total_good_volume", total_good_volume);
+                    bundle.putString("total_show_order_volume", total_show_order_volume);
                     mFrgOne.setArguments(bundle);
                     bundle.putStringArrayList("mList", (ArrayList<String>) mList);
                     //传递参数给Fragment，始终保持数据最新
@@ -92,6 +96,7 @@ public class StoreGoodsActivity extends BaseActivity implements View.OnClickList
     /**
      * 获取的是轮播图、商品详情的数据
      */
+    private String total_sales_volume, total_good_volume, total_show_order_volume;
     private String URL = "http://api.iyuce.com/v1/store/goods";
 
     private void requestData() {
@@ -111,6 +116,9 @@ public class StoreGoodsActivity extends BaseActivity implements View.OnClickList
                                 obj = obj.getJSONObject("good");
                                 //给Tab的商品详情多图
                                 mImgList = obj.getString("goods_desc");
+                                total_sales_volume = obj.getString("total_sales_volume");
+                                total_good_volume = obj.getString("total_good_volume");
+                                total_show_order_volume = obj.getString("total_show_order_volume");
                                 //填充轮播图数据
                                 arr = obj.getJSONArray("goods_albums");
                                 for (int i = 0; i < arr.length(); i++) {
@@ -180,6 +188,9 @@ public class StoreGoodsActivity extends BaseActivity implements View.OnClickList
                 bundle.putString("goods_sku_id", getIntent().getStringExtra("goods_sku_id"));
                 bundle.putString("goods_title", getIntent().getStringExtra("goods_title"));
                 bundle.putString("sales_price", getIntent().getStringExtra("sales_price"));
+                bundle.putString("total_sales_volume", total_sales_volume);
+                bundle.putString("total_good_volume", total_good_volume);
+                bundle.putString("total_show_order_volume", total_show_order_volume);
                 bundle.putStringArrayList("mList", (ArrayList<String>) mList);
                 mFrgOne.setArguments(bundle);
                 //传递参数给Fragment，始终保持数据最新
@@ -208,6 +219,7 @@ public class StoreGoodsActivity extends BaseActivity implements View.OnClickList
             case R.id.btn_activity_storegoods_putincar:
                 //保存进数据库
                 saveStoreInfo(local_id, local_goodsid, local_name, local_num, local_price);
+                ToastUtil.showMessage(this, "您的商品放入购物车啦!");
                 break;
             case R.id.btn_activity_storegoods_tocar:
                 startActivity(new Intent(this, StoreCarActivity.class));
