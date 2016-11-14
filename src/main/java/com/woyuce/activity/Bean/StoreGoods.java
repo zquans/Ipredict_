@@ -11,6 +11,10 @@ public class StoreGoods {
     private String goods_id;
     private String goods_sku_id;
 
+    //商品规格相关
+    private String attr_id; //晒单图片
+    private String attr_text; //晒单图片
+
     //商品评论相关
     private String comment_text;//评论内容
     private String satisfaction;//好评中评差评
@@ -21,6 +25,22 @@ public class StoreGoods {
     private String show_at; //晒单时间
 
     public StoreGoods() {
+    }
+
+    public String getAttr_id() {
+        return attr_id;
+    }
+
+    public void setAttr_id(String attr_id) {
+        this.attr_id = attr_id;
+    }
+
+    public String getAttr_text() {
+        return attr_text;
+    }
+
+    public void setAttr_text(String attr_text) {
+        this.attr_text = attr_text;
     }
 
     public String getGoods_title() {

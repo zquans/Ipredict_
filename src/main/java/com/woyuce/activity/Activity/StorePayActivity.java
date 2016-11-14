@@ -1,5 +1,6 @@
 package com.woyuce.activity.Activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
@@ -22,6 +23,11 @@ public class StorePayActivity extends BaseActivity {
     private void initView() {
         TextView mTxtPrice = (TextView) this.findViewById(R.id.txt_storecar_final_price);
         mTxtPrice.setText(getIntent().getDoubleExtra("goods_price", -1.00) + "元");
+    }
+
+    public void addAddress(View view) {
+        ToastUtil.showMessage(this, "修改地址的操作");
+        startActivity(new Intent(this,StoreAddressActivity.class));
     }
 
     public void nowPay(View view) {

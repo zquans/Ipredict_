@@ -197,6 +197,7 @@
         <activity android:name=".Activity.StoreGoodsActivity" />
         <activity android:name=".Activity.StoreCarActivity" />
         <activity android:name=".Activity.StorePayActivity" />
+        <activity android:name=".Activity.StoreAddressActivity" />
 
         <!-- 意见反馈Activity -->
         <activity

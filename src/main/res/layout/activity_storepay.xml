@@ -19,6 +19,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="#fff"
+                android:onClick="addAddress"
                 android:text="收货地址"
                 android:textColor="#bf7473" />
 

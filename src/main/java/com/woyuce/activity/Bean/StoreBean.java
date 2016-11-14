@@ -7,6 +7,7 @@ import java.util.ArrayList;
  */
 public class StoreBean {
 
+    //商城目录相关
     private String menudata;
     private String icon_mobile_url;
 

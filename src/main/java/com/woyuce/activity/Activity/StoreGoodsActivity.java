@@ -103,6 +103,7 @@ public class StoreGoodsActivity extends BaseActivity implements View.OnClickList
         URL = URL + "?goodsid=" + getIntent().getStringExtra("goods_id") + "&skuid="
                 + getIntent().getStringExtra("goods_sku_id") + "&userid="
                 + "1357775107029";
+        LogUtil.i("url = " + URL);
         StringRequest goodsDetialRequest = new StringRequest(Request.Method.GET, URL,
                 new Response.Listener<String>() {
                     @Override
