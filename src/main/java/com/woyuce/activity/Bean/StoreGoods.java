@@ -12,8 +12,9 @@ public class StoreGoods {
     private String goods_sku_id;
 
     //商品规格相关
-    private String attr_id; //晒单图片
-    private String attr_text; //晒单图片
+    private String attr_id;
+    private String attr_text;
+    private String attr_clickable;
 
     //商品评论相关
     private String comment_text;//评论内容
@@ -25,6 +26,14 @@ public class StoreGoods {
     private String show_at; //晒单时间
 
     public StoreGoods() {
+    }
+
+    public String getAttr_clickable() {
+        return attr_clickable;
+    }
+
+    public void setAttr_clickable(String attr_clickable) {
+        this.attr_clickable = attr_clickable;
     }
 
     public String getAttr_id() {

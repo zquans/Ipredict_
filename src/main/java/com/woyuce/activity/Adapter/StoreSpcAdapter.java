@@ -1,6 +1,7 @@
 package com.woyuce.activity.Adapter;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,7 +40,7 @@ public class StoreSpcAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        ViewHolder viewHolder = null;
+        ViewHolder viewHolder;
         if (convertView == null) {
             viewHolder = new ViewHolder();
             convertView = mInflater.inflate(R.layout.listitem_storegoodsspc, null);
@@ -49,6 +50,9 @@ public class StoreSpcAdapter extends BaseAdapter {
             viewHolder = (ViewHolder) convertView.getTag();
         }
         viewHolder.txtGoal.setText(mList.get(position).getAttr_text());
+        if (mList.get(position).getAttr_clickable().equals("false")) {
+            viewHolder.txtGoal.setTextColor(Color.parseColor("#ff0000"));//设置不可选的颜色表现
+        }
         return convertView;
     }
 
