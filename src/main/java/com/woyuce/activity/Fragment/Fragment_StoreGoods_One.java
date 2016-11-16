@@ -46,6 +46,13 @@ public class Fragment_StoreGoods_One extends Fragment implements AdapterView.OnI
 
     private String local_goodsid, local_skuid;
 
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        AppContext.getHttpQueue().cancelAll("goodsSpeRequest");
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_storegoods_one, null);
@@ -125,6 +132,7 @@ public class Fragment_StoreGoods_One extends Fragment implements AdapterView.OnI
     private StoreSpcAdapter mAdapterOne, mAdapterTwo, mAdapterThree;
 
     private ArrayList<String> mAllSpcId = new ArrayList<>();
+    private ArrayList<String> mSelectSpcList = new ArrayList<>();
 
     private void requestGoodsSpe(String url, final boolean need_notify) {
         StringRequest goodsSpeRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
@@ -132,14 +140,20 @@ public class Fragment_StoreGoods_One extends Fragment implements AdapterView.OnI
             public void onResponse(String s) {
                 try {
                     JSONObject obj, obj_one, obj_two, obj_three;
-                    JSONArray arr_all_spec_id, arr_all_spec, arr_one, arr_two, arr_three;
+                    JSONArray arr_seleted_specs, arr_all_spec_id, arr_all_spec, arr_one, arr_two, arr_three;
                     obj = new JSONObject(s);
                     if (obj.getString("code").equals("0")) {
                         //拆解JSON对象之一，对象
                         obj = obj.getJSONObject("goods_sku");
                         LogUtil.i("test need =" + obj.getString("spec_texts") + "以及其他的价格、数量等等");//Test
 
-                        //拆解JSON对象之二，数组，所有的规格ID
+                        //拆解JSON对象之二，数组，选中的规格
+                        arr_seleted_specs = obj.getJSONArray("seleted_specs");
+                        for (int i = 0; i < arr_seleted_specs.length(); i++) {
+                            mSelectSpcList.add(arr_seleted_specs.getJSONObject(i).getString("attr_value_id"));
+                        }
+
+                        //拆解JSON对象之三，数组，所有的规格ID
                         arr_all_spec_id = obj.getJSONArray("all_spec_ids");
                         for (int i = 0; i < arr_all_spec_id.length(); i++) {
                             mAllSpcId.add(arr_all_spec_id.get(i).toString());
@@ -147,7 +161,7 @@ public class Fragment_StoreGoods_One extends Fragment implements AdapterView.OnI
 //                        LogUtil.i("arr_all_spec_id =" + mAllSpcId + "...." + mAllSpcId.get(3));
 //                        LogUtil.i("really? = " + mAllSpcId.contains(",17,"));
 
-                        //拆解JSON对象之三，数组，所有的规格。这里需要优化或者封装
+                        //拆解JSON对象之四，数组，所有的规格。这里需要优化或者封装
                         arr_all_spec = obj.getJSONArray("all_specs");
                         if (need_notify == true) {
                             //如果不是第一次请求，则做数据刷新，先清除数据
@@ -201,17 +215,29 @@ public class Fragment_StoreGoods_One extends Fragment implements AdapterView.OnI
                             mAdapterTwo.notifyDataSetChanged();
                             mAdapterThree.notifyDataSetChanged();
                         } else {
-                            mAdapterOne = new StoreSpcAdapter(getActivity(), mListOne);
+                            mAdapterOne = new StoreSpcAdapter(getActivity(), mListOne, mSelectSpcList);
                             mGridOne.setAdapter(mAdapterOne);
-                            mGridOne.setNumColumns(mListOne.size());//设置每行显示的Item数
+                            if (mListOne.size() > 3) {
+                                mGridOne.setNumColumns(3);//设置每行显示的Item数
+                            } else {
+                                mGridOne.setNumColumns(mListOne.size());//设置每行显示的Item数
+                            }
 
-                            mAdapterTwo = new StoreSpcAdapter(getActivity(), mListTwo);
+                            mAdapterTwo = new StoreSpcAdapter(getActivity(), mListTwo, mSelectSpcList);
                             mGridTwo.setAdapter(mAdapterTwo);
-                            mGridTwo.setNumColumns(mListTwo.size());
+                            if (mListTwo.size() > 3) {
+                                mGridTwo.setNumColumns(3);//设置每行显示的Item数
+                            } else {
+                                mGridTwo.setNumColumns(mListTwo.size());//设置每行显示的Item数
+                            }
 
-                            mAdapterThree = new StoreSpcAdapter(getActivity(), mListThree);
+                            mAdapterThree = new StoreSpcAdapter(getActivity(), mListThree, mSelectSpcList);
                             mGridThree.setAdapter(mAdapterThree);
-                            mGridThree.setNumColumns(2);
+                            if (mListThree.size() > 3) {
+                                mGridThree.setNumColumns(3);//设置每行显示的Item数
+                            } else {
+                                mGridThree.setNumColumns(mListThree.size());//设置每行显示的Item数
+                            }
                         }
                     } else {
                         ToastUtil.showMessage(getActivity(), obj.getString("message"));
@@ -257,7 +283,7 @@ public class Fragment_StoreGoods_One extends Fragment implements AdapterView.OnI
             } else {
                 storeGoods.setAttr_clickable("true");
             }
-            LogUtil.e(mAllSpcId + "," + arr.getJSONObject(i).getString("attr_id"));
+//            LogUtil.e(mAllSpcId + "," + arr.getJSONObject(i).getString("attr_id"));
             list.add(storeGoods);
         }
     }
@@ -278,6 +304,7 @@ public class Fragment_StoreGoods_One extends Fragment implements AdapterView.OnI
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         mAllSpcId.clear();
+        mSelectSpcList.clear();
         switch (parent.getId()) {
             case R.id.gridview_fragment_store_one:
                 resetItemView(parent, view, mListOne);
@@ -291,7 +318,7 @@ public class Fragment_StoreGoods_One extends Fragment implements AdapterView.OnI
                 resetItemView(parent, view, mListTwo);
 
                 URL_SPC = URL + "?goodsid=" + local_goodsid + "&skuid="
-                        + "&selected_specs=" + mListTwo.get(position).getAttr_id() + ",7";
+                        + "&selected_specs=" + mListTwo.get(position).getAttr_id() + "," + mSelectSpcList.get(0);
                 LogUtil.e("URL_SPC = " + URL_SPC);
                 requestGoodsSpe(URL_SPC, true);
                 break;
@@ -299,7 +326,7 @@ public class Fragment_StoreGoods_One extends Fragment implements AdapterView.OnI
                 resetItemView(parent, view, mListThree);
 
                 URL_SPC = URL + "?goodsid=" + local_goodsid + "&skuid="
-                        + "&selected_specs=" + mListThree.get(position).getAttr_id() + ",7";
+                        + "&selected_specs=" + mListThree.get(position).getAttr_id() + "," + mSelectSpcList.get(0);
                 LogUtil.e("URL_SPC = " + URL_SPC);
                 requestGoodsSpe(URL_SPC, true);
                 break;

@@ -11,16 +11,19 @@ import android.widget.TextView;
 import com.woyuce.activity.Bean.StoreGoods;
 import com.woyuce.activity.R;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class StoreSpcAdapter extends BaseAdapter {
 
     private List<StoreGoods> mList;
     private LayoutInflater mInflater;
+    private ArrayList<String> mSelectSpcList = new ArrayList<>();
 
-    public StoreSpcAdapter(Context context, List<StoreGoods> data) {
+    public StoreSpcAdapter(Context context, List<StoreGoods> data, ArrayList<String> list) {
         mList = data;
         mInflater = LayoutInflater.from(context);
+        mSelectSpcList = list;
     }
 
     @Override
@@ -52,6 +55,9 @@ public class StoreSpcAdapter extends BaseAdapter {
         viewHolder.txtGoal.setText(mList.get(position).getAttr_text());
         if (mList.get(position).getAttr_clickable().equals("false")) {
             viewHolder.txtGoal.setTextColor(Color.parseColor("#ff0000"));//设置不可选的颜色表现
+        }
+        if (mSelectSpcList.contains(mList.get(position).getAttr_id())) {
+            viewHolder.txtGoal.setBackgroundColor(Color.parseColor("#ff0000"));//设置已选中的的颜色表现
         }
         return convertView;
     }

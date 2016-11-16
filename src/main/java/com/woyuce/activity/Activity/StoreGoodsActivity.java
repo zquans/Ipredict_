@@ -102,7 +102,7 @@ public class StoreGoodsActivity extends BaseActivity implements View.OnClickList
     private void requestData() {
         URL = URL + "?goodsid=" + getIntent().getStringExtra("goods_id") + "&skuid="
                 + getIntent().getStringExtra("goods_sku_id") + "&userid="
-                + "1357775107029";
+                + PreferenceUtil.getSharePre(this).getString("userId", "");
         LogUtil.i("url = " + URL);
         StringRequest goodsDetialRequest = new StringRequest(Request.Method.GET, URL,
                 new Response.Listener<String>() {
@@ -114,6 +114,11 @@ public class StoreGoodsActivity extends BaseActivity implements View.OnClickList
                             JSONArray arr;
                             obj = new JSONObject(s);
                             if (obj.getString("code").equals("0")) {
+                                //保存这个money，到购物车结算时可以抵充金币
+                                String store_user_money = obj.getString("user_money");
+                                LogUtil.i("user_money = " + store_user_money);
+                                PreferenceUtil.save(StoreGoodsActivity.this, "store_user_money", store_user_money);
+                                
                                 obj = obj.getJSONObject("good");
                                 //给Tab的商品详情多图
                                 mImgList = obj.getString("goods_desc");
