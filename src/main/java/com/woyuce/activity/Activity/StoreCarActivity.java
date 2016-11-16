@@ -69,6 +69,22 @@ public class StoreCarActivity extends BaseActivity implements StoreCarAdapter.On
         mTxtFinalPrice.setText(total_price + "元");
     }
 
+
+    /**
+     * 删除数据库中某商品
+     */
+    private void deleteData(String goodsid) {
+        SQLiteDatabase mDatabase;
+        if (!PreferenceUtil.getSharePre(this).getString("storetb_is_exist", "").equals("yes")) {
+            return;
+        }
+        mDatabase = openOrCreateDatabase("aipu.db", MODE_PRIVATE, null);
+        String local_delete = "DELETE FROM storetb WHERE goodsid = '" + goodsid + "'";
+        mDatabase.execSQL(local_delete);
+        mDatabase.close();
+    }
+
+
     /**
      * 初始化商品信息数据
      */
@@ -80,7 +96,6 @@ public class StoreCarActivity extends BaseActivity implements StoreCarAdapter.On
         mDatabase = openOrCreateDatabase("aipu.db", MODE_PRIVATE, null);
         //数据库查询
         Cursor mCursor = mDatabase.query("storetb", null, "_id>?", new String[]{"0"}, null, null, "_id desc");
-//        Cursor mCursor = mDatabase.rawQuery("select count(*)from storetb", null);
         if (mCursor != null) {
             StoreMenu storemenu;
             while (mCursor.moveToNext()) {
@@ -100,13 +115,14 @@ public class StoreCarActivity extends BaseActivity implements StoreCarAdapter.On
         doFilter();
     }
 
-    //TODO 增减的按钮,其中的操作会影响数据库
     // 回调的方法，两个Button的处理
     @Override
     public void OnMyAddClick(View view, final int pos) {
         TextView txtCount = (TextView) getViewByPosition(pos, mListView);
         int local_count = Integer.parseInt(txtCount.getText().toString());
         local_count = local_count + 1;
+        //计算商品总价和总数
+        countPrice("add", mFinalList.get(pos).getPrice());
         txtCount.setText(local_count + "");
     }
 
@@ -116,12 +132,35 @@ public class StoreCarActivity extends BaseActivity implements StoreCarAdapter.On
         TextView txtCount = (TextView) getViewByPosition(pos, mListView);
         int local_count = Integer.parseInt(txtCount.getText().toString());
         local_count = local_count - 1;
+        //计算商品总价和总数
+        countPrice("minus", mFinalList.get(pos).getPrice());
         if (local_count == 0) {
+            //清除数据库该商品
+            deleteData(mFinalList.get(pos).getGoodsid());
+            //同时移除视图
             mFinalList.remove(pos);
             mAdapter.notifyDataSetChanged();
             return;
         }
         txtCount.setText(local_count + "");
+    }
+
+    /**
+     * Button增减时，价格和数量随之变化
+     *
+     * @return
+     */
+    private void countPrice(String add_or_minus, String price) {
+        if (add_or_minus.equals("add")) {
+            total_count = total_count + 1;
+            total_price = total_price + Double.parseDouble(price);
+        } else if (add_or_minus.equals("minus")) {
+            total_count = total_count - 1;
+            total_price = total_price - Double.parseDouble(price);
+        }
+        mTxtTotalNum.setText(total_count + "件");
+        mTxtTotalPrice.setText(total_price + "元");
+        mTxtFinalPrice.setText(total_price + "元");
     }
 
     /**
@@ -206,7 +245,7 @@ public class StoreCarActivity extends BaseActivity implements StoreCarAdapter.On
     }
 
     /**
-     * Button事件结账
+     * Button事件，去结账付款
      */
     private Integer total_count = 0;
     private Double total_price = 0.00;
