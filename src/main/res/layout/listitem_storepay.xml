@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#fff"
+    android:paddingBottom="4dp"
+    android:paddingLeft="16dp"
+    android:paddingRight="16dp"
+    android:paddingTop="4dp">
+
+    <TextView
+        android:id="@+id/txt_listitem_storepay_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="商品名称"
+        android:textColor="#000000"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/txt_listitem_storepay_spec"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/txt_listitem_storepay_name"
+        android:text="规格" />
+
+    <TextView
+        android:id="@+id/txt_listitem_storepay_num"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/txt_listitem_storepay_spec"
+        android:layout_marginTop="4dp"
+        android:text="规格"
+        android:textSize="12sp" />
+
+    <TextView
+        android:id="@+id/txt_listitem_storepay_price"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:text="商品名称"
+        android:textColor="#f00"
+        android:textStyle="bold" />
+
+</RelativeLayout>

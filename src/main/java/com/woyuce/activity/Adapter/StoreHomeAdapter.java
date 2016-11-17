@@ -12,6 +12,7 @@ import android.widget.TextView;
 import com.woyuce.activity.Activity.StoreGoodsActivity;
 import com.woyuce.activity.Bean.StoreBean;
 import com.woyuce.activity.R;
+import com.woyuce.activity.Utils.LogUtil;
 import com.woyuce.activity.Utils.RecyclerItemClickListener;
 import com.woyuce.activity.Utils.ToastUtil;
 
@@ -42,7 +43,17 @@ public class StoreHomeAdapter extends RecyclerView.Adapter<StoreHomeAdapter.MyVi
     @Override
     public void onBindViewHolder(MyViewHolder holder, final int pos) {
         holder.mTxt.setText("---------" + mDatas.get(pos).getTitle() + "---------");
-        holder.mRecycler.setLayoutManager(new GridLayoutManager(context, 2));
+        GridLayoutManager mGridLayoutManager = new GridLayoutManager(context, 2);
+        mGridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+            @Override
+            public int getSpanSize(int position) {
+                if (mDatas.get(pos).getGoods_result().size() == 1) {
+                    return 2;
+                }
+                return 1;
+            }
+        });
+        holder.mRecycler.setLayoutManager(mGridLayoutManager);
         RecyclerView.Adapter mmAdapter = new StoreGoodsAdapter(context, mDatas.get(pos).getGoods_result());
         holder.mRecycler.setAdapter(mmAdapter);
         //加入Item点击事件

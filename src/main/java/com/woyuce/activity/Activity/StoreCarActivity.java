@@ -84,7 +84,6 @@ public class StoreCarActivity extends BaseActivity implements StoreCarAdapter.On
         mDatabase.close();
     }
 
-
     /**
      * 初始化商品信息数据
      */
@@ -252,7 +251,22 @@ public class StoreCarActivity extends BaseActivity implements StoreCarAdapter.On
 
     public void toPay(View view) {
         Intent intent = new Intent(this, StorePayActivity.class);
-        intent.putExtra("goods_price", total_price);
+        ArrayList<String> mGoodsIdList = new ArrayList<>();
+        ArrayList<String> mNameList = new ArrayList<>();
+        ArrayList<String> mPriceList = new ArrayList<>();
+        ArrayList<String> mNumList = new ArrayList<>();
+        for (int i = 0; i < mFinalList.size(); i++) {
+            mGoodsIdList.add(mFinalList.get(i).getGoodsid());
+            mNameList.add(mFinalList.get(i).getName());
+            mPriceList.add(mFinalList.get(i).getPrice());
+            mNumList.add(mFinalList.get(i).getNum());
+        }
+        intent.putStringArrayListExtra("mGoodsIdList", mGoodsIdList);
+        intent.putStringArrayListExtra("mNameList", mNameList);
+        intent.putStringArrayListExtra("mPriceList", mPriceList);
+        intent.putStringArrayListExtra("mNumList", mNumList);
+        intent.putExtra("total_price", total_price);
+        intent.putExtra("total_count", total_count);
         startActivity(intent);
     }
 }

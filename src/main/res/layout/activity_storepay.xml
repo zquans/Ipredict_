@@ -14,34 +14,96 @@
             android:layout_height="match_parent"
             android:orientation="vertical">
 
-            <Button
-                android:id="@+id/btn_activity_store_pay"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="#fff"
-                android:onClick="addAddress"
-                android:text="收货地址"
-                android:textColor="#bf7473" />
-
             <RelativeLayout
+                android:id="@+id/relative_activity_storepay"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
                 <TextView
+                    android:id="@+id/txt_activity_storepay_defoultaddress_one"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="这里面有些小复杂" />
+                    android:background="#fff"
+                    android:paddingLeft="8dp"
+                    android:textColor="#bf7473"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/txt_activity_storepay_defoultaddress_two"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/txt_activity_storepay_defoultaddress_one"
+                    android:background="#fff"
+                    android:paddingLeft="8dp"
+                    android:textColor="#bf7473" />
+
+                <ImageButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:background="@mipmap/arrow_white_go" />
 
             </RelativeLayout>
 
+            <ListView
+                android:id="@+id/listview_actvity_storepay"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp" />
+
             <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp">
 
                 <TextView
+                    android:id="@+id/txt_actvity_storepay_havemoney"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="这里面有些小复杂" />
+                    android:text="你有X个金币,抵扣X元"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/txt_actvity_storepay_hint"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/txt_actvity_storepay_havemoney"
+                    android:layout_marginTop="4dp"
+                    android:text="金额不足￥1，金币按一个算"
+                    android:textColor="#aa0000"
+                    android:textSize="12sp" />
+
+                <Button
+                    android:id="@+id/btn_actvity_storepay_add"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_alignBaseline="@+id/txt_actvity_storepay_havemoney"
+                    android:layout_alignParentRight="true"
+                    android:background="#ffffff"
+                    android:gravity="center"
+                    android:onClick="plusMoney"
+                    android:text="+" />
+
+                <TextView
+                    android:id="@+id/txt_actvity_storepay_middle"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_alignBaseline="@+id/txt_actvity_storepay_havemoney"
+                    android:layout_toLeftOf="@+id/btn_actvity_storepay_add"
+                    android:background="#ffffff"
+                    android:gravity="center" />
+
+                <Button
+                    android:id="@+id/btn_actvity_storepay_minus"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_alignBaseline="@+id/txt_actvity_storepay_havemoney"
+                    android:layout_toLeftOf="@+id/txt_actvity_storepay_middle"
+                    android:background="#ffffff"
+                    android:gravity="center"
+                    android:onClick="minusMoney"
+                    android:text="-" />
 
             </RelativeLayout>
 

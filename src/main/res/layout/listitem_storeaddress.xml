@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#fff"
+    android:paddingBottom="4dp"
+    android:paddingLeft="16dp"
+    android:paddingRight="16dp"
+    android:paddingTop="4dp">
+
+    <TextView
+        android:id="@+id/txt_listitem_storeaddress_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="姓名" />
+
+    <TextView
+        android:id="@+id/txt_listitem_storeaddress_mobile"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="4dp"
+        android:layout_toRightOf="@+id/txt_listitem_storeaddress_name"
+        android:text="电话" />
+
+    <TextView
+        android:id="@+id/txt_listitem_storeaddress_is_default"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="4dp"
+        android:layout_toRightOf="@+id/txt_listitem_storeaddress_mobile"
+        android:textColor="#f00" />
+
+    <TextView
+        android:id="@+id/txt_listitem_storeaddress_qq"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/txt_listitem_storeaddress_name"
+        android:layout_marginTop="4dp"
+        android:text="QQ" />
+
+    <TextView
+        android:id="@+id/txt_listitem_storeaddress_email"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/txt_listitem_storeaddress_name"
+        android:layout_marginLeft="4dp"
+        android:layout_marginTop="4dp"
+        android:layout_toRightOf="@+id/txt_listitem_storeaddress_qq"
+        android:text="QQ" />
+
+    <ImageView
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_alignParentRight="true"
+        android:background="@mipmap/icon_add" />
+</RelativeLayout>
