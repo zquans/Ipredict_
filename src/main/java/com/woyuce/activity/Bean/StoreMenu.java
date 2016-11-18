@@ -10,9 +10,17 @@ public class StoreMenu {
     private String id;
     private String num;
     private String price;
-    private String goodsid;
+    private String goodsskuid;
 
     public StoreMenu() {
+    }
+
+    public String getGoodsskuid() {
+        return goodsskuid;
+    }
+
+    public void setGoodsskuid(String goodsskuid) {
+        this.goodsskuid = goodsskuid;
     }
 
     public String get_id() {
@@ -55,14 +63,6 @@ public class StoreMenu {
         this.price = price;
     }
 
-    public String getGoodsid() {
-        return goodsid;
-    }
-
-    public void setGoodsid(String goodsid) {
-        this.goodsid = goodsid;
-    }
-
     @Override
     public String toString() {
         return "StoreMenu{" +
@@ -71,7 +71,7 @@ public class StoreMenu {
                 ", id='" + id + '\'' +
                 ", num='" + num + '\'' +
                 ", price='" + price + '\'' +
-                ", goodsid='" + goodsid + '\'' +
+                ", goodsskuid='" + goodsskuid + '\'' +
                 '}';
     }
 }

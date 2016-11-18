@@ -39,7 +39,7 @@ public class StorePayActivity extends BaseActivity implements View.OnClickListen
     private ArrayList<StoreMenu> mList = new ArrayList<>();
 
     //有关商品的列表
-    ArrayList<String> mGoodsIdList = new ArrayList<>();
+    ArrayList<String> mGoodsSkuIdList = new ArrayList<>();
     ArrayList<String> mNameList = new ArrayList<>();
     ArrayList<String> mPriceList = new ArrayList<>();
     ArrayList<String> mNumList = new ArrayList<>();
@@ -61,7 +61,7 @@ public class StorePayActivity extends BaseActivity implements View.OnClickListen
     private void initView() {
         //获取到传递来的数据
         Intent intent = getIntent();
-        mGoodsIdList = intent.getStringArrayListExtra("mGoodsIdList");
+        mGoodsSkuIdList = intent.getStringArrayListExtra("mGoodsSkuIdList");
         mNameList = intent.getStringArrayListExtra("mNameList");
         mPriceList = intent.getStringArrayListExtra("mPriceList");
         mNumList = intent.getStringArrayListExtra("mNumList");
@@ -85,9 +85,9 @@ public class StorePayActivity extends BaseActivity implements View.OnClickListen
         mTxtMiddle.setText(local_store_user_money.toString());
 
         StoreMenu storeMenu;
-        for (int i = 0; i < mGoodsIdList.size(); i++) {
+        for (int i = 0; i < mGoodsSkuIdList.size(); i++) {
             storeMenu = new StoreMenu();
-            storeMenu.setGoodsid(mGoodsIdList.get(i));
+            storeMenu.setGoodsskuid(mGoodsSkuIdList.get(i));
             storeMenu.setName(mNameList.get(i));
             storeMenu.setNum(mNumList.get(i));
             storeMenu.setPrice(mPriceList.get(i));

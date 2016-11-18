@@ -39,6 +39,8 @@ public class StoreGoodsActivity extends BaseActivity implements View.OnClickList
     private List<String> mList = new ArrayList<>();
     private String mImgList = null;//或者是个数组
 
+    Fragment_StoreGoods_One mFrgOne;
+
     private static final int OPEN_FRAGMENT = 0x001;
     private Handler mHandler = new Handler() {
         @Override
@@ -47,7 +49,7 @@ public class StoreGoodsActivity extends BaseActivity implements View.OnClickList
             switch (msg.what) {
                 case OPEN_FRAGMENT:
                     Bundle bundle = new Bundle();
-                    Fragment_StoreGoods_One mFrgOne = new Fragment_StoreGoods_One();
+                    mFrgOne = new Fragment_StoreGoods_One();
                     bundle.putString("goods_id", getIntent().getStringExtra("goods_id"));
                     bundle.putString("goods_sku_id", getIntent().getStringExtra("goods_sku_id"));
                     bundle.putString("goods_title", getIntent().getStringExtra("goods_title"));
@@ -118,7 +120,6 @@ public class StoreGoodsActivity extends BaseActivity implements View.OnClickList
                                 String store_user_money = obj.getString("user_money");
                                 LogUtil.i("user_money = " + store_user_money);
                                 PreferenceUtil.save(StoreGoodsActivity.this, "store_user_money", store_user_money);
-                                
                                 obj = obj.getJSONObject("good");
                                 //给Tab的商品详情多图
                                 mImgList = obj.getString("goods_desc");
@@ -158,15 +159,15 @@ public class StoreGoodsActivity extends BaseActivity implements View.OnClickList
     /**
      * 开数据库建一张表
      */
-    private void saveStoreInfo(String id, String goodsid, String name, String num, String price) {
+    private void saveStoreInfo(String id, String goodsid, String goodsskuid, String name, String num, String price) {
         SQLiteDatabase mDatabase = openOrCreateDatabase("aipu.db", MODE_PRIVATE, null);
         mDatabase.execSQL(
                 "create table if not exists storetb(_id integer primary key autoincrement," +
-                        "id text not null,goodsid text not null,name text not null," +
+                        "id text not null,goodsskuid text not null,name text not null," +
                         "num text not null,price text not null)");
         ContentValues mValues = new ContentValues();
         mValues.put("id", id);
-        mValues.put("goodsid", goodsid);
+        mValues.put("goodsskuid", goodsskuid);
         mValues.put("name", name);
         mValues.put("num", num);
         mValues.put("price", price);
@@ -182,10 +183,12 @@ public class StoreGoodsActivity extends BaseActivity implements View.OnClickList
         //这些参数是传递给底部操作栏的，跟购物车相关
         Bundle bundle = new Bundle();
         String local_id = PreferenceUtil.getSharePre(this).getString("userId", "");
-        String local_goodsid = getIntent().getStringExtra("goods_id");
-        String local_name = getIntent().getStringExtra("goods_title");
+        //这些应该从Fragment中获取
+        String local_goodsid = mFrgOne.returenGoodsId();
+        String local_goods_sku_id = mFrgOne.returenGoodsSkuId();
+        String local_name = mFrgOne.returenGoodsName();
+        String local_price = mFrgOne.returenGoodsPrice();
         String local_num = String.valueOf(1);
-        String local_price = getIntent().getStringExtra("sales_price");
         switch (v.getId()) {
             case R.id.txt_storegoods_tab_one:
                 resetTxtTab(mTxtTabOne);
@@ -219,12 +222,12 @@ public class StoreGoodsActivity extends BaseActivity implements View.OnClickList
                 break;
             case R.id.btn_activity_storegoods_buynow:
                 //保存进数据库
-                saveStoreInfo(local_id, local_goodsid, local_name, local_num, local_price);
+                saveStoreInfo(local_id, local_goodsid, local_goods_sku_id, local_name, local_num, local_price);
                 startActivity(new Intent(this, StoreCarActivity.class));
                 break;
             case R.id.btn_activity_storegoods_putincar:
                 //保存进数据库
-                saveStoreInfo(local_id, local_goodsid, local_name, local_num, local_price);
+                saveStoreInfo(local_id, local_goodsid, local_goods_sku_id, local_name, local_num, local_price);
                 ToastUtil.showMessage(this, "您的商品放入购物车啦!");
                 break;
             case R.id.btn_activity_storegoods_tocar:

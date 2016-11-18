@@ -44,8 +44,28 @@ public class Fragment_StoreGoods_One extends Fragment implements AdapterView.OnI
     private String URL = "http://api.iyuce.com/v1/store/goodsdetail";
     private String URL_SPC;//可以做成局部变量
 
-    private String local_goodsid, local_skuid;
+    private String local_skuid, local_goodsid;
+    private String return_local_goodsid,return_local_goods_sku_id, return_local_name, return_local_price;
 
+    public String returenGoodsId() {
+        LogUtil.i("return_local_goodsid = " + return_local_goodsid);
+        return return_local_goodsid;
+    }
+
+    public String returenGoodsSkuId() {
+        LogUtil.i("return_local_goods_sku_id = " + return_local_goods_sku_id);
+        return return_local_goods_sku_id;
+    }
+
+    public String returenGoodsName() {
+        LogUtil.i("return_local_name = " + return_local_name);
+        return return_local_name;
+    }
+
+    public String returenGoodsPrice() {
+        LogUtil.i("return_local_price = " + return_local_price);
+        return return_local_price;
+    }
 
     @Override
     public void onDestroyView() {
@@ -146,6 +166,12 @@ public class Fragment_StoreGoods_One extends Fragment implements AdapterView.OnI
                         //拆解JSON对象之一，对象
                         obj = obj.getJSONObject("goods_sku");
                         LogUtil.i("test need =" + obj.getString("spec_texts") + "以及其他的价格、数量等等");//Test
+                        return_local_goodsid = obj.getString("goods_id");
+                        return_local_goods_sku_id = obj.getString("id");
+                        return_local_name = obj.getString("spec_texts");
+                        return_local_price = obj.getString("sales_price");
+                        mTxtGoodsTitle.setText(return_local_name);
+                        mTxtGoodsPrice.setText(return_local_price);
 
                         //拆解JSON对象之二，数组，选中的规格
                         arr_seleted_specs = obj.getJSONArray("seleted_specs");
@@ -217,24 +243,24 @@ public class Fragment_StoreGoods_One extends Fragment implements AdapterView.OnI
                         } else {
                             mAdapterOne = new StoreSpcAdapter(getActivity(), mListOne, mSelectSpcList);
                             mGridOne.setAdapter(mAdapterOne);
-                            if (mListOne.size() > 3) {
-                                mGridOne.setNumColumns(3);//设置每行显示的Item数
+                            if (mListOne.size() > 2) {
+                                mGridOne.setNumColumns(2);//设置每行显示的Item数
                             } else {
                                 mGridOne.setNumColumns(mListOne.size());//设置每行显示的Item数
                             }
 
                             mAdapterTwo = new StoreSpcAdapter(getActivity(), mListTwo, mSelectSpcList);
                             mGridTwo.setAdapter(mAdapterTwo);
-                            if (mListTwo.size() > 3) {
-                                mGridTwo.setNumColumns(3);//设置每行显示的Item数
+                            if (mListTwo.size() > 2) {
+                                mGridTwo.setNumColumns(2);//设置每行显示的Item数
                             } else {
                                 mGridTwo.setNumColumns(mListTwo.size());//设置每行显示的Item数
                             }
 
                             mAdapterThree = new StoreSpcAdapter(getActivity(), mListThree, mSelectSpcList);
                             mGridThree.setAdapter(mAdapterThree);
-                            if (mListThree.size() > 3) {
-                                mGridThree.setNumColumns(3);//设置每行显示的Item数
+                            if (mListThree.size() > 2) {
+                                mGridThree.setNumColumns(2);//设置每行显示的Item数
                             } else {
                                 mGridThree.setNumColumns(mListThree.size());//设置每行显示的Item数
                             }
