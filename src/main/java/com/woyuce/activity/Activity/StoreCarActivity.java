@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListAdapter;
@@ -13,7 +14,6 @@ import android.widget.TextView;
 import com.woyuce.activity.Adapter.StoreCarAdapter;
 import com.woyuce.activity.Bean.StoreMenu;
 import com.woyuce.activity.R;
-import com.woyuce.activity.Utils.LogUtil;
 import com.woyuce.activity.Utils.PreferenceUtil;
 
 import java.util.ArrayList;
@@ -73,14 +73,21 @@ public class StoreCarActivity extends BaseActivity implements StoreCarAdapter.On
     /**
      * 删除数据库中某商品
      */
-    private void deleteData(String goodsid) {
+    private void deleteData(String arg, String _id_or_goodsid) {
         SQLiteDatabase mDatabase;
         if (!PreferenceUtil.getSharePre(this).getString("storetb_is_exist", "").equals("yes")) {
             return;
         }
         mDatabase = openOrCreateDatabase("aipu.db", MODE_PRIVATE, null);
-        String local_delete = "DELETE FROM storetb WHERE goodsid = '" + goodsid + "'";
-        mDatabase.execSQL(local_delete);
+        String local_delete = null;
+        if (_id_or_goodsid.equals("goodsid")) {
+            local_delete = "DELETE FROM storetb WHERE goodsid = '" + arg + "'";
+        } else if (_id_or_goodsid.equals("_id")) {
+            local_delete = "DELETE FROM storetb WHERE _id = '" + arg + "'";
+        }
+        if (!TextUtils.isEmpty(local_delete)) {
+            mDatabase.execSQL(local_delete);
+        }
         mDatabase.close();
     }
 
@@ -99,6 +106,7 @@ public class StoreCarActivity extends BaseActivity implements StoreCarAdapter.On
             StoreMenu storemenu;
             while (mCursor.moveToNext()) {
                 storemenu = new StoreMenu();
+                storemenu.set_id(mCursor.getString(mCursor.getColumnIndex("_id")));
                 storemenu.setId(mCursor.getString(mCursor.getColumnIndex("id")));
                 storemenu.setGoodsid(mCursor.getString(mCursor.getColumnIndex("goodsid")));
                 storemenu.setName(mCursor.getString(mCursor.getColumnIndex("name")));
@@ -131,11 +139,20 @@ public class StoreCarActivity extends BaseActivity implements StoreCarAdapter.On
         TextView txtCount = (TextView) getViewByPosition(pos, mListView);
         int local_count = Integer.parseInt(txtCount.getText().toString());
         local_count = local_count - 1;
+        //TODO 循环后删除随意一项mList中的商品
+        String local_del_goodsid = mFinalList.get(pos).getGoodsid();
+        for (int i = 0; i < mList.size(); i++) {
+            if (mList.get(i).getGoodsid().equals(local_del_goodsid)) {
+                //删除对应主键ID的那条数据
+                deleteData(mList.get(i).get_id(), "_id");
+                break;
+            }
+        }
         //计算商品总价和总数
         countPrice("minus", mFinalList.get(pos).getPrice());
         if (local_count == 0) {
             //清除数据库该商品
-            deleteData(mFinalList.get(pos).getGoodsid());
+            deleteData(mFinalList.get(pos).getGoodsid(), "goodsid");
             //同时移除视图
             mFinalList.remove(pos);
             mAdapter.notifyDataSetChanged();
@@ -212,7 +229,7 @@ public class StoreCarActivity extends BaseActivity implements StoreCarAdapter.On
         for (int i = 0; i < mList.size(); i++) {
             mIdSet.add(mList.get(i).getGoodsid());
         }
-        LogUtil.e("mIdSet =" + mIdSet);
+//        LogUtil.e("mIdSet =" + mIdSet);
         //转换Set为ArrayList
         ArrayList mIdList = new ArrayList();
         Iterator it = mIdSet.iterator();

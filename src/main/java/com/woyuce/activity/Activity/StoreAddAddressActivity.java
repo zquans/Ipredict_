@@ -10,15 +10,12 @@ import android.widget.EditText;
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.Response;
-import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.woyuce.activity.Application.AppContext;
 import com.woyuce.activity.R;
-import com.woyuce.activity.Utils.LogUtil;
 import com.woyuce.activity.Utils.PreferenceUtil;
 import com.woyuce.activity.Utils.ToastUtil;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -81,31 +78,23 @@ public class StoreAddAddressActivity extends BaseActivity implements View.OnClic
     }
 
     private void operaAddressRequest(String url) {
-        StringRequest addressListRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
+        StringRequest addressOpreaRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String s) {
-                LogUtil.i("s = " + s);
                 JSONObject obj;
-                JSONArray arr;
                 try {
                     obj = new JSONObject(s);
                     if (obj.getString("code").equals("0")) {
                         ToastUtil.showMessage(StoreAddAddressActivity.this, "成功 = " + obj.getString("message"));
-                        LogUtil.i("成功" + obj.toString());
+                        StoreAddAddressActivity.this.finish();
                     } else {
                         ToastUtil.showMessage(StoreAddAddressActivity.this, "操作失败：" + obj.getString("message"));
-                        LogUtil.i("失败" + obj.toString());
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
             }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError volleyError) {
-                LogUtil.i("volleyError = " + volleyError);
-            }
-        }) {
+        }, null) {
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {
                 HashMap<String, String> map = new HashMap<>();
@@ -113,17 +102,18 @@ public class StoreAddAddressActivity extends BaseActivity implements View.OnClic
                 map.put("mobile", mEdtPhone.getText().toString());
                 map.put("qq", mEdtQQ.getText().toString());
                 map.put("email", mEdtEmail.getText().toString());
-                //TODO 修改的时候传id,新增的时候传0或者空
-                map.put("id", local_id);
                 map.put("MobileVeriCodeId", LocalMobileVeriCodeId);
-                LogUtil.i(mEdtName.getText().toString() + mEdtPhone.getText().toString() +
-                        mEdtQQ.getText().toString() + mEdtEmail.getText().toString() +
-                        LocalMobileVeriCodeId);
+                //修改的时候传id,新增的时候传0或者空
+                if (TextUtils.isEmpty(local_id)) {
+                    map.put("id", "");
+                } else {
+                    map.put("id", local_id);
+                }
                 return map;
             }
         };
-        addressListRequest.setTag("storeAddAddressRequest");
-        AppContext.getHttpQueue().add(addressListRequest);
+        addressOpreaRequest.setTag("storeAddAddressRequest");
+        AppContext.getHttpQueue().add(addressOpreaRequest);
     }
 
     /**
@@ -141,7 +131,6 @@ public class StoreAddAddressActivity extends BaseActivity implements View.OnClic
                         } else {
                             ToastUtil.showMessage(StoreAddAddressActivity.this, "验证成功");
                             LocalMobileVeriCodeId = obj.getString("data");
-                            LogUtil.i("LocalMobileVeriCodeId = " + obj + "," + LocalMobileVeriCodeId);
                         }
                     } else {
                         ToastUtil.showMessage(StoreAddAddressActivity.this, obj.getString("message"));
@@ -162,12 +151,10 @@ public class StoreAddAddressActivity extends BaseActivity implements View.OnClic
      */
     public void save(View view) {
         if (TextUtils.isEmpty(local_id)) {
-            LogUtil.e("URL= " + URL + "?operation=save&userid=" + local_user_id);
             operaAddressRequest(URL + "?operation=save&userid=" + local_user_id);
         } else {
             LocalMobileVeriCodeId = local_mobile_veri_code_id;
-            LogUtil.e("URL= " + URL + "?operation=save&id=" + local_id + "&userid=" + local_user_id + ",,," + LocalMobileVeriCodeId);
-            operaAddressRequest(URL + "?operation=save" + "&userid=" + local_user_id);
+            operaAddressRequest(URL + "?operation=save&userid=" + local_user_id);
         }
     }
 

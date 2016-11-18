@@ -37,7 +37,9 @@
             android:id="@+id/edt_activity_storeaddaddress_phone"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1" />
+            android:layout_weight="1"
+            android:inputType="number"
+            android:maxLength="11" />
     </LinearLayout>
 
     <Button
@@ -81,7 +83,9 @@
             android:id="@+id/edt_activity_storeaddaddress_qq"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1" />
+            android:layout_weight="1"
+            android:inputType="number"
+            android:maxLength="11" />
     </LinearLayout>
 
     <LinearLayout

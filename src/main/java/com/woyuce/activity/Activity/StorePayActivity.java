@@ -177,6 +177,7 @@ public class StorePayActivity extends BaseActivity implements View.OnClickListen
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.relative_activity_storepay:
+                //TODO 应该做forResult，因为设置的默认地址应该返回
                 startActivity(new Intent(this, StoreAddressActivity.class));
                 break;
         }

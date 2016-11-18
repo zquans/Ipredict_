@@ -122,7 +122,7 @@ public class SpeakingShare1Activity extends BaseActivity implements View.OnClick
     }
 
     private void setTimeData() {
-        timeAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, timeList);
+        timeAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, timeList);
         timeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spnExamTime.setAdapter(timeAdapter);
         spnExamTime.setOnItemSelectedListener(this);

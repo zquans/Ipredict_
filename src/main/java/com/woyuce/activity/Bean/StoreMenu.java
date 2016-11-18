@@ -5,6 +5,7 @@ package com.woyuce.activity.Bean;
  */
 public class StoreMenu {
 
+    private String _id;
     private String name;
     private String id;
     private String num;
@@ -14,6 +15,13 @@ public class StoreMenu {
     public StoreMenu() {
     }
 
+    public String get_id() {
+        return _id;
+    }
+
+    public void set_id(String _id) {
+        this._id = _id;
+    }
 
     public String getName() {
         return name;
@@ -58,7 +66,8 @@ public class StoreMenu {
     @Override
     public String toString() {
         return "StoreMenu{" +
-                "name='" + name + '\'' +
+                "_id='" + _id + '\'' +
+                ", name='" + name + '\'' +
                 ", id='" + id + '\'' +
                 ", num='" + num + '\'' +
                 ", price='" + price + '\'' +
@@ -66,4 +75,3 @@ public class StoreMenu {
                 '}';
     }
 }
-

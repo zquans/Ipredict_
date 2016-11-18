@@ -9,7 +9,6 @@ import android.widget.TextView;
 
 import com.woyuce.activity.Bean.StoreAddress;
 import com.woyuce.activity.R;
-import com.woyuce.activity.Utils.LogUtil;
 
 import java.util.ArrayList;
 
@@ -61,7 +60,6 @@ public class StoreAddressAdapter extends BaseAdapter {
         viewHolder.mTxtMobile.setText(mList.get(position).getMobile());
         viewHolder.mTxtQQ.setText("QQ:" + (mList.get(position).getQ_q()));
         viewHolder.mTxtEmail.setText("邮箱:" + mList.get(position).getEmail());
-        LogUtil.i(mList.get(position).getIs_default());
         if (mList.get(position).getIs_default().equals("true")) {
             viewHolder.mTxtIsDeault.setText("默认");
         } else {
