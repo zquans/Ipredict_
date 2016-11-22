@@ -37,7 +37,7 @@ import java.util.TimerTask;
 public class LoginRegisterActivity extends BaseActivity implements View.OnClickListener {
 
     private TextView txtback;
-    private EditText mEdtPhonenum, mEdtAcceptMsg, mEdtPassword, mEdtPasswordAgain;
+    private EditText mEdtPhonenum, mEdtAcceptMsg;
     private Button btnSend, btnToNext;
     private String localtoken, localChecknum;
 
@@ -50,6 +50,7 @@ public class LoginRegisterActivity extends BaseActivity implements View.OnClickL
     private String URL_VAILD = "http://api.iyuce.com/v1/account/valid";
 
     private int time_count;
+    private boolean isVarify = false;
 
     @Override
     public void onBackPressed() {
@@ -92,8 +93,6 @@ public class LoginRegisterActivity extends BaseActivity implements View.OnClickL
         txtback = (TextView) findViewById(R.id.txt_register_back);
         mEdtPhonenum = (EditText) findViewById(R.id.edit_register_acceptphonenum);
         mEdtAcceptMsg = (EditText) findViewById(R.id.edit_register_acceptmsg);
-        mEdtPassword = (EditText) findViewById(R.id.edt_activity_loginregister_password);
-        mEdtPasswordAgain = (EditText) findViewById(R.id.edt_activity_loginregister_passwordagain);
 
         btnSend = (Button) findViewById(R.id.btn_register_sendmsg);
         btnToNext = (Button) findViewById(R.id.btn_register_tonext);
@@ -102,12 +101,8 @@ public class LoginRegisterActivity extends BaseActivity implements View.OnClickL
         btnSend.setOnClickListener(this);
         btnToNext.setOnClickListener(this);
 
-        //如果不是找回密码，隐藏后两个EditText
         if (!TextUtils.isEmpty(forget_password)) {
-            mEdtPassword.setVisibility(View.VISIBLE);
-            mEdtPasswordAgain.setVisibility(View.VISIBLE);
-            txtback.setText("找回密码");
-            btnToNext.setText("确认");
+            txtback.setText("找回密码1/2");
         }
         if (email_or_phone.equals("phone")) {
             mEdtPhonenum.setHint("请输入手机号码");
@@ -181,6 +176,7 @@ public class LoginRegisterActivity extends BaseActivity implements View.OnClickL
      * 发送验证码
      */
     private void RequestMsg(String url) {
+        isVarify = true;
         StringRequest MsgRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
@@ -246,12 +242,15 @@ public class LoginRegisterActivity extends BaseActivity implements View.OnClickL
                     jsonObject = new JSONObject(response);
                     int result = jsonObject.getInt("code");
                     if (result == 0) {
+                        ToastUtil.showMessage(LoginRegisterActivity.this, "验证成功啦,亲!");
                         if (arg.equals("forget_password")) {
-                            ToastUtil.showMessage(LoginRegisterActivity.this, "发送一个请求去修改密码");
+                            Intent intent = new Intent(LoginRegisterActivity.this, LoginResetActivity.class);
+                            intent.putExtra("local_phone_or_email", mEdtPhonenum.getText().toString().trim());
+                            startActivity(intent);
+                            finish();
                         } else {
-                            ToastUtil.showMessage(LoginRegisterActivity.this, "验证成功啦,亲!");
                             Intent intent = new Intent(LoginRegisterActivity.this, LoginRegisterInfoActivity.class);
-                            intent.putExtra("email_or_phone",email_or_phone);
+                            intent.putExtra("email_or_phone", email_or_phone);
                             intent.putExtra("local_phone_or_email", mEdtPhonenum.getText().toString().trim());
                             startActivity(intent);
                             finish();
@@ -318,24 +317,16 @@ public class LoginRegisterActivity extends BaseActivity implements View.OnClickL
                 }
                 break;
             case R.id.btn_register_tonext:
-                //找回密码时"确认",注册时，进入下一步
+                if(!isVarify){
+                    ToastUtil.showMessage(this,"请先进行验证");
+                    break;
+                }
                 localChecknum = mEdtAcceptMsg.getText().toString().trim();
                 //是找回密码则进入该if，否则就是正常注册
                 if (!TextUtils.isEmpty(forget_password)) {
-                    //是否输入了需要重置的密码
-                    if (TextUtils.isEmpty(mEdtPassword.getText().toString())
-                            || TextUtils.isEmpty(mEdtPasswordAgain.getText().toString())) {
-                        ToastUtil.showMessage(this, "亲，请输入完整信息哦");
-                        break;
-                    }
-                    if (!mEdtPassword.getText().toString().equals(mEdtPasswordAgain.getText().toString())) {
-                        ToastUtil.showMessage(this, "亲，两次输入的密码不一致哦");
-                        break;
-                    }
                     requeToNext("forget_password");
                     break;
                 }
-                //正常注册，走这里
                 requeToNext("to_validate");
                 break;
         }

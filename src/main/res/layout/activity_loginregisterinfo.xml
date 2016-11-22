@@ -153,13 +153,14 @@
                 android:paddingRight="8dp">
 
                 <TextView
+                    android:id="@+id/txt_registerinfo_email_or_phone"
                     android:layout_width="72dp"
                     android:layout_height="match_parent"
                     android:gravity="center_vertical"
                     android:text="电子邮箱" />
 
                 <EditText
-                    android:id="@+id/edt_registerinfo_email"
+                    android:id="@+id/edt_registerinfo_email_or_phone"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_marginLeft="8dp"
@@ -178,14 +179,22 @@
                     android:visibility="gone" />
             </LinearLayout>
 
-            <LinearLayout
+            <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:gravity="center"
-                android:orientation="horizontal"
                 android:paddingLeft="8dp"
-                android:paddingRight="8dp"></LinearLayout>
+                android:text="以下为选填:"
+                android:textColor="#444"
+                android:textStyle="italic" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="0.5dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginTop="4dp"
+                android:background="#ccc" />
 
             <LinearLayout
                 android:layout_width="match_parent"

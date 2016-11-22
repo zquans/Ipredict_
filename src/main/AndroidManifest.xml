@@ -39,8 +39,12 @@
             android:name=".Activity.LoginActivity"
             android:launchMode="singleTop"
             android:windowSoftInputMode="adjustPan" />
+        <!--<activity-->
+            <!--android:name=".Activity.LoginForgetActivity"-->
+            <!--android:launchMode="standard"-->
+            <!--android:screenOrientation="portrait" />-->
         <activity
-            android:name=".Activity.LoginForgetActivity"
+            android:name=".Activity.LoginResetActivity"
             android:launchMode="standard"
             android:screenOrientation="portrait" />
         <activity

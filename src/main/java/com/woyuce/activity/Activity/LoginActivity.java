@@ -167,7 +167,7 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
     }
 
     /**
-     * 请求网络
+     * 请求登录
      */
     private void doRequest() {
         progressdialogshow(this);
@@ -215,7 +215,7 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
                         finish();
                     } else {
                         progressdialogcancel();
-                        ToastUtil.showMessage(LoginActivity.this, "账号密码错误");
+                        ToastUtil.showMessage(LoginActivity.this, jsonObject.getString("message"));
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -282,17 +282,17 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
                 startActivity(intent);
                 break;
             case R.id.txt_activity_login_forget:
-//                final Intent intent_loginforget = new Intent(this, LoginRegisterActivity.class);
-//                intent_loginforget.putExtra("method", "forget_password");
-//                doAlertDialog(intent_loginforget, "请选择找回方式", "国内请选择手机找回，国外请选择邮箱找回", "手机找回", "邮箱找回");
-                startActivity(new Intent(this, LoginForgetActivity.class));
+                final Intent intent_loginforget = new Intent(this, LoginRegisterActivity.class);
+                intent_loginforget.putExtra("method", "forget_password");
+                doAlertDialog(intent_loginforget, "请选择找回方式", "国内请选择手机找回，国外请选择邮箱找回", "手机找回", "邮箱找回");
+//                startActivity(new Intent(this, LoginForgetActivity.class));
                 break;
             case R.id.btn_register:
                 final Intent intent_loginregister = new Intent(this, LoginRegisterActivity.class);
                 doAlertDialog(intent_loginregister, "请选择注册环境", "国内请选择手机注册，国外请选择邮箱注册", "手机注册", "邮箱注册");
                 break;
             case R.id.img_login_eye:
-                //TODO 登录密码是否可见
+                //登录密码是否可见
                 if (!isEyeCan) {
                     edtPassword.setInputType(InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
                     imgEye.setBackgroundResource(R.mipmap.icon_eye_cannot);

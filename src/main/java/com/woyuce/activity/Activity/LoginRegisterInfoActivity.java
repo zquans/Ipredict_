@@ -4,6 +4,8 @@ import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
+import android.text.InputFilter;
+import android.text.InputType;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.View;
@@ -35,8 +37,8 @@ import java.util.Map;
  */
 public class LoginRegisterInfoActivity extends BaseActivity implements View.OnClickListener {
 
-    private EditText edtNickname, edtPassword, edtRepassword, edtUsername, edtEmail, edtTime, edtCity, edtInvitenum;
-    private TextView txtback;
+    private EditText edtNickname, edtPassword, edtRepassword, edtUsername, edtEmailOrPhone, edtTime, edtCity, edtInvitenum;
+    private TextView txtback, txtPhoneOrEmail;
     private Button btnfinish, btnCheckUsername, btnCheckEmail;
 
     private String localtoken, localPhoneOrEmail, email_or_phone, localtimer;
@@ -72,11 +74,12 @@ public class LoginRegisterInfoActivity extends BaseActivity implements View.OnCl
         localPhoneOrEmail = intent.getStringExtra("local_phone_or_email");
 
         txtback = (TextView) findViewById(R.id.txt_registerinfo_back);
+        txtPhoneOrEmail = (TextView) findViewById(R.id.txt_registerinfo_email_or_phone);
         edtNickname = (EditText) findViewById(R.id.edt_registerinfo_nickname);
         edtPassword = (EditText) findViewById(R.id.edt_registerinfo_password);
         edtRepassword = (EditText) findViewById(R.id.edt_registerinfo_repassword);
         edtUsername = (EditText) findViewById(R.id.edt_registerinfo_username);
-        edtEmail = (EditText) findViewById(R.id.edt_registerinfo_email);
+        edtEmailOrPhone = (EditText) findViewById(R.id.edt_registerinfo_email_or_phone);
         edtCity = (EditText) findViewById(R.id.edt_registerinfo_city);
         edtTime = (EditText) findViewById(R.id.edt_registerinfo_time);
         edtInvitenum = (EditText) findViewById(R.id.edt_registerinfo_invitednum);
@@ -89,33 +92,60 @@ public class LoginRegisterInfoActivity extends BaseActivity implements View.OnCl
         btnfinish.setOnClickListener(this);
         btnCheckUsername.setOnClickListener(this);
         // btnCheckEmail.setOnClickListener(this);
-        edtEmail.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-            }
 
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            }
+        if (email_or_phone.equals("phone")) {
+            txtPhoneOrEmail.setText("电子邮箱");
+            edtEmailOrPhone.setHint("请输入您的电子邮箱");
+        } else {
+            txtPhoneOrEmail.setText("手机号码");
+            edtEmailOrPhone.setHint("请输入您的手机号码");
+        }
+        if (email_or_phone.equals("phone")) {
+            edtEmailOrPhone.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+                }
 
-            @Override
-            public void afterTextChanged(Editable s) {
-                RequestVaild("email", s.toString());
-            }
-        });
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {
+                    RequestVaild("email", s.toString());
+                }
+            });
+        } else {
+            edtEmailOrPhone.setFilters(new InputFilter[]{new InputFilter.LengthFilter(11)});
+            edtEmailOrPhone.setInputType(InputType.TYPE_CLASS_NUMBER);
+            edtEmailOrPhone.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+                }
+
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {
+                    RequestVaild("mobile", s.toString());
+                }
+            });
+        }
     }
 
     private void RequestToNext() {
         StringRequest stringRequest = new StringRequest(Request.Method.POST, URL, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
-                JSONObject jsonObject;
+                JSONObject obj;
                 try {
+                    LogUtil.i("respons = " + response);
                     String parseString = new String(response.getBytes("ISO-8859-1"), "utf-8");
-                    jsonObject = new JSONObject(parseString);
-                    int result = jsonObject.getInt("code");
+                    obj = new JSONObject(parseString);
                     // 成功则Toast，并返回Login界面
-                    if (result == 0) {
+                    if (obj.getString("code").equals("0")) {
                         ToastUtil.showMessage(LoginRegisterInfoActivity.this, "恭喜您,注册成功!");
                         Intent intent = new Intent(LoginRegisterInfoActivity.this, LoginActivity.class);
                         intent.putExtra("username_register", edtUsername.getText().toString());
@@ -124,7 +154,7 @@ public class LoginRegisterInfoActivity extends BaseActivity implements View.OnCl
                         startActivity(intent);
                         finish();
                     } else {
-                        ToastUtil.showMessage(LoginRegisterInfoActivity.this, "用户名/邮箱/电话已注册，请更换");
+                        ToastUtil.showMessage(LoginRegisterInfoActivity.this, obj.getString("message"));
                     }
                 } catch (JSONException | UnsupportedEncodingException e) {
                     e.printStackTrace();
@@ -150,9 +180,9 @@ public class LoginRegisterInfoActivity extends BaseActivity implements View.OnCl
                 HashMap<String, String> map = new HashMap<>();
                 if (email_or_phone.equals("phone")) {
                     map.put("mobile", localPhoneOrEmail);
-                    map.put("email", edtEmail.getText().toString().trim());
+                    map.put("email", edtEmailOrPhone.getText().toString().trim());
                 } else {
-                    map.put("mobile", edtEmail.getText().toString().trim());
+                    map.put("mobile", edtEmailOrPhone.getText().toString().trim());
                     map.put("email", localPhoneOrEmail);
                 }
                 map.put("username", edtUsername.getText().toString().trim());
@@ -171,7 +201,7 @@ public class LoginRegisterInfoActivity extends BaseActivity implements View.OnCl
                 map.put("invite", "");
                 LogUtil.e("mobile = " + localPhoneOrEmail + "," + edtUsername.getText().toString().trim() + ","
                         + edtNickname.getText().toString().trim() + "," + edtPassword.getText().toString().trim() + ","
-                        + edtEmail.getText().toString().trim());
+                        + edtEmailOrPhone.getText().toString().trim());
 
                 return map;
             }
@@ -193,14 +223,8 @@ public class LoginRegisterInfoActivity extends BaseActivity implements View.OnCl
                     obj = new JSONObject(response);
                     int result = obj.getInt("data");
                     if (result == 0) {
-                        if (TextUtils.equals(key, "username")) {
-//                            btnCheckUsername.setText("可以使用");
-                        }
                         ToastUtil.showMessage(LoginRegisterInfoActivity.this, obj.getString("message"));
                     } else {
-                        if (TextUtils.equals(key, "username")) {
-//                            btnCheckUsername.setText("不可使用");
-                        }
                         ToastUtil.showMessage(LoginRegisterInfoActivity.this, obj.getString("message"));
                     }
                 } catch (JSONException e) {
@@ -254,22 +278,26 @@ public class LoginRegisterInfoActivity extends BaseActivity implements View.OnCl
                 RequestVaild("username", localusername);
                 break;
             case R.id.btn_registerinfo_checkemail:
-                String localemail = edtEmail.getText().toString().trim();
+                String localemail = edtEmailOrPhone.getText().toString().trim();
                 if (TextUtils.isEmpty(localemail)) {
-                    ToastUtil.showMessage(LoginRegisterInfoActivity.this, "请输入邮箱");
+                    if (email_or_phone.equals("phone")) {
+                        ToastUtil.showMessage(LoginRegisterInfoActivity.this, "请输入电子邮箱");
+                    } else {
+                        ToastUtil.showMessage(LoginRegisterInfoActivity.this, "请输入手机号码");
+                    }
                     break;
                 }
                 RequestVaild("email", localemail);
                 break;
             case R.id.btn_registerinfo_tonext:
                 LogUtil.e("alledt = " + edtNickname.getText() + edtUsername.getText() + edtPassword.getText()
-                        + edtRepassword.getText() + edtEmail.getText() + localPhoneOrEmail + localtoken);
+                        + edtRepassword.getText() + edtEmailOrPhone.getText() + localPhoneOrEmail + localtoken);
                 // 判断是否填入内容
                 if (TextUtils.isEmpty(edtNickname.getText().toString().trim())
                         || TextUtils.isEmpty(edtUsername.getText().toString().trim())
                         || TextUtils.isEmpty(edtPassword.getText().toString().trim())
                         || TextUtils.isEmpty(edtRepassword.getText().toString().trim())
-                        || TextUtils.isEmpty(edtEmail.getText().toString().trim())) {
+                        || TextUtils.isEmpty(edtEmailOrPhone.getText().toString().trim())) {
                     ToastUtil.showMessage(LoginRegisterInfoActivity.this, "请检查信息是否完整");
                     return;
                 }

@@ -59,29 +59,27 @@
             android:textColor="#fff" />
     </LinearLayout>
 
-    <EditText
-        android:id="@+id/edt_activity_loginregister_password"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
-        android:layout_marginTop="24dp"
-        android:drawableLeft="@mipmap/icon_key"
-        android:drawablePadding="4dp"
-        android:hint="请输入新密码"
-        android:visibility="gone" />
+    <!--<EditText-->
+        <!--android:id="@+id/edt_activity_loginregister_password"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_marginLeft="16dp"-->
+        <!--android:layout_marginRight="16dp"-->
+        <!--android:layout_marginTop="24dp"-->
+        <!--android:drawableLeft="@mipmap/icon_key"-->
+        <!--android:drawablePadding="4dp"-->
+        <!--android:hint="请输入新密码" />-->
 
-    <EditText
-        android:id="@+id/edt_activity_loginregister_passwordagain"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
-        android:layout_marginTop="24dp"
-        android:drawableLeft="@mipmap/icon_key"
-        android:drawablePadding="4dp"
-        android:hint="请再次输入密码"
-        android:visibility="gone" />
+    <!--<EditText-->
+        <!--android:id="@+id/edt_activity_loginregister_passwordagain"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_marginLeft="16dp"-->
+        <!--android:layout_marginRight="16dp"-->
+        <!--android:layout_marginTop="24dp"-->
+        <!--android:drawableLeft="@mipmap/icon_key"-->
+        <!--android:drawablePadding="4dp"-->
+        <!--android:hint="请再次输入密码" />-->
 
     <Button
         android:id="@+id/btn_register_tonext"

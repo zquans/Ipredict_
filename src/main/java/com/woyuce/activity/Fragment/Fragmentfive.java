@@ -42,7 +42,7 @@ import java.util.Map;
 
 public class Fragmentfive extends Fragment implements View.OnClickListener {
 
-    private TextView txtName, txtMoney, txtAboutUs, txtUpdate, txtSuggestion, txtRoom, txtSubject, txtClassTable, txtStore;
+    private TextView txtName, txtMoney, txtAboutUs, txtUpdate, txtSuggestion, txtRoom, txtSubject, txtClassTable, txtStore, txtSignOut;
     private ImageView imgIcon;
     // 暂做课表的入口
     private TextView mCourseTable;
@@ -80,6 +80,7 @@ public class Fragmentfive extends Fragment implements View.OnClickListener {
         txtRoom = (TextView) view.findViewById(R.id.txt_tab5_localroom);
         txtSubject = (TextView) view.findViewById(R.id.txt_tab5_localsubject);
         txtStore = (TextView) view.findViewById(R.id.txt_to_store);
+        txtSignOut = (TextView) view.findViewById(R.id.txt_to_signout);
         mCourseTable = (TextView) view.findViewById(R.id.txt_tab5_localmessage);
 
         mCourseTable.setOnClickListener(this);
@@ -90,6 +91,7 @@ public class Fragmentfive extends Fragment implements View.OnClickListener {
         txtRoom.setOnClickListener(this);
         txtSubject.setOnClickListener(this);
         txtStore.setOnClickListener(this);
+        txtSignOut.setOnClickListener(this);
     }
 
     // fragment 生命周期，打开时
@@ -209,17 +211,7 @@ public class Fragmentfive extends Fragment implements View.OnClickListener {
                 startActivity(intent);
                 break;
             case R.id.img_tab5_icon:
-                new AlertDialog.Builder(getActivity(), AlertDialog.THEME_DEVICE_DEFAULT_LIGHT)
-                        .setTitle("确定要前往登录界面吗？")
-                        .setPositiveButton("确定", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                CookieManager.getInstance().removeAllCookie();
-                                LogUtil.e("CookieManager = " + CookieManager.getInstance().getCookie("iyuce.com") + "");
-                                startActivity(new Intent(getActivity(), LoginActivity.class));
-                            }
-                        }).setNegativeButton("取消", null)
-                        .show();
+                toSignOut();
                 break;
 //			case R.id.txt_tab5_localsubject:
 //				Intent intent = new Intent(getActivity(),MyExamContent.class);
@@ -247,6 +239,26 @@ public class Fragmentfive extends Fragment implements View.OnClickListener {
             case R.id.txt_to_store:
                 startActivity(new Intent(getActivity(), StoreHomeActivity.class));
                 break;
+            case R.id.txt_to_signout:
+                toSignOut();
+                break;
         }
+    }
+
+    /**
+     * 登出操作
+     */
+    private void toSignOut() {
+        new AlertDialog.Builder(getActivity(), AlertDialog.THEME_DEVICE_DEFAULT_LIGHT)
+                .setTitle("确定要前往登录界面吗？")
+                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        CookieManager.getInstance().removeAllCookie();
+                        LogUtil.e("CookieManager = " + CookieManager.getInstance().getCookie("iyuce.com") + "");
+                        startActivity(new Intent(getActivity(), LoginActivity.class));
+                    }
+                }).setNegativeButton("取消", null)
+                .show();
     }
 }

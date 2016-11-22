@@ -20,7 +20,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:text="忘记密码"
+            android:text="修改密码2/2"
             android:textColor="#fff"
             android:textSize="18sp" />
 
@@ -32,7 +32,8 @@
             android:background="@drawable/buttonstyle"
             android:onClick="requestCode"
             android:text="切换为邮箱找回"
-            android:textColor="#fff" />
+            android:textColor="#fff"
+            android:visibility="gone" />
 
     </RelativeLayout>
 
@@ -45,13 +46,15 @@
         android:drawablePadding="4dp"
         android:hint="请输入电话号码"
         android:inputType="number"
-        android:maxLength="11" />
+        android:maxLength="11"
+        android:visibility="gone" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:visibility="gone">
 
         <EditText
             android:id="@+id/edt_activity_loginforget_code"
@@ -78,10 +81,11 @@
         android:id="@+id/edt_activity_loginforget_password"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
+        android:layout_marginTop="16dp"
         android:drawableLeft="@mipmap/icon_key"
         android:drawablePadding="4dp"
-        android:hint="请输入新密码" />
+        android:hint="请输入新密码"
+        android:inputType="textPassword" />
 
     <EditText
         android:id="@+id/edt_activity_loginforget_passwordagain"
@@ -90,7 +94,8 @@
         android:layout_marginTop="4dp"
         android:drawableLeft="@mipmap/icon_key"
         android:drawablePadding="4dp"
-        android:hint="请再次输入密码" />
+        android:hint="请再次输入密码"
+        android:inputType="textPassword" />
 
     <Button
         android:id="@+id/btn_activity_loginforget_submit"
