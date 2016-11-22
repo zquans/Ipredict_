@@ -132,7 +132,7 @@ public class WitContentActivity extends BaseActivity implements OnClickListener 
     }
 
     private void showImage() {
-        DisplayImageOptions options = new DisplayImageOptions.Builder().showImageOnLoading(R.mipmap.img_error)
+        DisplayImageOptions options = new DisplayImageOptions.Builder().showImageOnLoading(R.mipmap.img_loading)
                 .showImageOnFail(R.mipmap.img_error).cacheInMemory(true).cacheOnDisk(false)
                 .bitmapConfig(Bitmap.Config.RGB_565).build();
         ImageLoader.getInstance().displayImage(localimgUrl, photoView, options);

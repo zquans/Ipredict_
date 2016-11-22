@@ -8,7 +8,7 @@
         android:id="@+id/txt_register_back"
         android:layout_width="match_parent"
         android:layout_height="40dp"
-        android:background="#747474"
+        android:background="#f7a900"
         android:drawableLeft="@mipmap/arrow_white_back"
         android:gravity="center"
         android:text="注册页面1/2"
@@ -22,11 +22,10 @@
         android:layout_marginLeft="16dp"
         android:layout_marginRight="16dp"
         android:layout_marginTop="24dp"
-        android:background="#cccccc"
-        android:hint="请输入手机号码"
+        android:drawableLeft="@mipmap/icon_phone"
+        android:drawablePadding="4dp"
+        android:hint="请输入邮箱地址"
         android:imeOptions="actionDone"
-        android:inputType="number"
-        android:maxLength="11"
         android:padding="8dp"
         android:singleLine="true" />
 
@@ -43,7 +42,8 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:background="#cccccc"
+            android:drawableLeft="@mipmap/icon_chain"
+            android:drawablePadding="4dp"
             android:hint="请输入验证码"
             android:imeOptions="actionDone"
             android:maxLength="5"
@@ -54,18 +54,46 @@
             android:layout_width="112dp"
             android:layout_height="match_parent"
             android:layout_marginLeft="16dp"
-            android:text="发送验证码" />
+            android:background="@drawable/buttonstyle_orange"
+            android:text="发送验证码"
+            android:textColor="#fff" />
     </LinearLayout>
 
-    <Button
-        android:id="@+id/btn_register_tonext"
+    <EditText
+        android:id="@+id/edt_activity_loginregister_password"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="16dp"
         android:layout_marginRight="16dp"
         android:layout_marginTop="24dp"
+        android:drawableLeft="@mipmap/icon_key"
+        android:drawablePadding="4dp"
+        android:hint="请输入新密码"
+        android:visibility="gone" />
+
+    <EditText
+        android:id="@+id/edt_activity_loginregister_passwordagain"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginTop="24dp"
+        android:drawableLeft="@mipmap/icon_key"
+        android:drawablePadding="4dp"
+        android:hint="请再次输入密码"
+        android:visibility="gone" />
+
+    <Button
+        android:id="@+id/btn_register_tonext"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="40dp"
+        android:layout_marginRight="40dp"
+        android:layout_marginTop="32dp"
+        android:background="#f55054"
         android:padding="16dp"
-        android:text="进入下一步" />
+        android:text="进入下一步"
+        android:textColor="#fff" />
 
     <TextView
         android:layout_width="match_parent"

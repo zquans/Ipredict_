@@ -140,7 +140,7 @@ public class SpeakingContentActivity extends BaseActivity implements View.OnClic
     }
 
     private void getImageView() {
-        DisplayImageOptions options = new DisplayImageOptions.Builder().showImageOnLoading(R.mipmap.img_error)
+        DisplayImageOptions options = new DisplayImageOptions.Builder().showImageOnLoading(R.mipmap.img_loading)
                 .showImageOnFail(R.mipmap.img_error).cacheInMemory(true).cacheOnDisk(false)
                 .bitmapConfig(Bitmap.Config.RGB_565).build();
         ImageLoader.getInstance().displayImage(localImg, imgSubContent, options);
@@ -154,7 +154,7 @@ public class SpeakingContentActivity extends BaseActivity implements View.OnClic
                 intent.putExtra("localsubID", localsubID);
                 intent.putExtra("localsubName", localsubName);
                 intent.putExtra("local_url", localImg);
-                LogUtil.e("what local_url = " +localImg);
+                LogUtil.e("what local_url = " + localImg);
                 startActivity(intent);
                 break;
             case R.id.btn_subcontent_forshare:
@@ -172,13 +172,13 @@ public class SpeakingContentActivity extends BaseActivity implements View.OnClic
      */
     private void showShare() {
         try {
-            SimpleDateFormat sdf  = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             String mDatetime = sdf.format(new Date());
 //			String encode_title = URLEncoder.encode(localunit_name, "utf-8");
-            String encode_collage = URLEncoder.encode("我在我预测APP学习了口语话题" +  localsubName,"utf-8");
-            String URLcode = encode_collage.replace("+","%20");
+            String encode_collage = URLEncoder.encode("我在我预测APP学习了口语话题" + localsubName, "utf-8");
+            String URLcode = encode_collage.replace("+", "%20");
             LogUtil.e("imgurl = " + localImg);
-            String url = "http://xm.iyuce.com/app/fenxiang.html?viewid=4&img="+localImg+"&title=&collage="+ URLcode +"&datetime=" + mDatetime;
+            String url = "http://xm.iyuce.com/app/fenxiang.html?viewid=4&img=" + localImg + "&title=&collage=" + URLcode + "&datetime=" + mDatetime;
 
             ShareSDK.initSDK(this);
             OnekeyShare oks = new OnekeyShare();

@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@mipmap/background_main"
-    android:orientation="vertical" >
+    android:orientation="vertical">
 
     <ImageView
         android:layout_width="wrap_content"
@@ -20,7 +20,7 @@
         android:background="#00000000"
         android:focusable="true"
         android:gravity="center_horizontal"
-        android:orientation="vertical" >
+        android:orientation="vertical">
 
         <LinearLayout
             android:layout_width="210.0dp"
@@ -30,7 +30,7 @@
             android:focusable="true"
             android:focusableInTouchMode="true"
             android:gravity="center"
-            android:orientation="horizontal" >
+            android:orientation="horizontal">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -52,36 +52,58 @@
                 android:textSize="16sp" />
         </LinearLayout>
 
-        <LinearLayout
+        <FrameLayout
             android:layout_width="210dp"
             android:layout_height="48dp"
-            android:layout_marginTop="8dp"
-            android:background="@drawable/buttonstyle"
-            android:focusable="true"
-            android:focusableInTouchMode="true"
-            android:gravity="center"
-            android:orientation="horizontal" >
+            android:layout_marginTop="8dp">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingLeft="5.0dp"
-                android:text="@string/password" />
+            <LinearLayout
+                android:layout_width="210dp"
+                android:layout_height="48dp"
+                android:background="@drawable/buttonstyle"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:gravity="center"
+                android:orientation="horizontal">
 
-            <EditText
-                android:id="@+id/edt_password"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginLeft="5.0dp"
-                android:layout_marginRight="5.0dp"
-                android:background="@android:color/transparent"
-                android:gravity="left|center"
-                android:imeOptions="actionDone"
-                android:inputType="textPassword"
-                android:maxLength="30"
-                android:singleLine="true"
-                android:textSize="16.0sp" />
-        </LinearLayout>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="5.0dp"
+                    android:text="@string/password" />
+
+                <EditText
+                    android:id="@+id/edt_password"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="5.0dp"
+                    android:layout_marginRight="5.0dp"
+                    android:background="@android:color/transparent"
+                    android:gravity="left|center"
+                    android:imeOptions="actionDone"
+                    android:inputType="textPassword"
+                    android:maxLength="30"
+                    android:singleLine="true"
+                    android:textSize="16.0sp" />
+            </LinearLayout>
+
+            <ImageView
+                android:id="@+id/img_login_eye"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_gravity="right|center_vertical"
+                android:layout_marginRight="4dp"
+                android:background="@mipmap/icon_eye_can" />
+        </FrameLayout>
+
+        <TextView
+            android:id="@+id/txt_activity_login_forget"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right"
+            android:layout_marginTop="4dp"
+            android:text="忘记密码？"
+            android:textColor="#34a2ed" />
 
         <Button
             android:id="@+id/btn_login"
@@ -108,7 +130,7 @@
             android:layout_width="210dp"
             android:layout_height="40dp"
             android:layout_marginTop="24dp"
-            android:orientation="horizontal" >
+            android:orientation="horizontal">
 
             <Button
                 android:id="@+id/btn_register"

@@ -1,14 +1,19 @@
 package com.woyuce.activity.Activity;
 
 import android.Manifest;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.InputType;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request.Method;
@@ -34,6 +39,8 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 
     private Button btninto, btnLogin, btnRegister, btnApply;
     private EditText edtUsername, edtPassword;
+    private TextView txtForget;
+    private ImageView imgEye;
 
     private String strPassword, strUserName; // 本类中变量，用于下次登录时作自动登录的数据
     private String localtoken;
@@ -42,6 +49,9 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 
     // 注册页面跳转过来用
     private String username_register, password_register, timer_register;
+
+    //密码是否可见
+    private boolean isEyeCan = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,12 +73,6 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
         } else {
             requestPermission(Constants.CODE_WRITE_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE);
         }
-
-//        // 友盟推送
-//        PushAgent mPushAgent = PushAgent.getInstance(LoginActivity.this);
-//        mPushAgent.enable();
-//
-//        PushAgent.getInstance(LoginActivity.this).onAppStart();
     }
 
     @Override
@@ -109,11 +113,15 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
         btnApply = (Button) findViewById(R.id.btn_apply);
         edtUsername = (EditText) findViewById(R.id.edt_username);
         edtPassword = (EditText) findViewById(R.id.edt_password);
+        txtForget = (TextView) findViewById(R.id.txt_activity_login_forget);
+        imgEye = (ImageView) findViewById(R.id.img_login_eye);
 
+        imgEye.setOnClickListener(this);
         btninto.setOnClickListener(this);
         btnLogin.setOnClickListener(this);
         btnRegister.setOnClickListener(this);
         btnApply.setOnClickListener(this);
+        txtForget.setOnClickListener(this);
     }
 
     /**
@@ -156,49 +164,6 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
         };
         strinRequest.setTag("login");
         AppContext.getHttpQueue().add(strinRequest);
-    }
-
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-            //TODO 登录密码是否可见
-//            mPasswordView.setInputType(InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
-//            mPasswordView.setInputType(InputType.TYPE_TEXT_VARIATION_PASSWORD | InputType.TYPE_CLASS_TEXT);
-
-            case R.id.btn_login:
-                strUserName = edtUsername.getText().toString();
-                strPassword = edtPassword.getText().toString();
-                // 保存账号信息到sharepreferences数据库中
-                PreferenceUtil.save(LoginActivity.this, "username", LoginActivity.this.strUserName);
-                PreferenceUtil.save(LoginActivity.this, "password", LoginActivity.this.strPassword);
-
-                if (TextUtils.isEmpty(strUserName) || TextUtils.isEmpty(strPassword)) {
-                    ToastUtil.showMessage(LoginActivity.this, "账号密码不能为空，试试体验登陆吧");
-                    return;
-                }
-                //请求网络
-                doRequest();
-//                CookieManager.getInstance().removeAllCookie();
-                break;
-            case R.id.btn_loginAtOnce:
-                startActivity(new Intent(this, MainActivity.class));
-                PreferenceUtil.removeall(this); // 只留下了版本号
-//                CookieManager.getInstance().removeAllCookie();
-                // PreferenceUtil.clear(this);
-                finish();
-                break;
-            case R.id.btn_register:
-                startActivity(new Intent(this, LoginRegisterActivity.class));
-                finish();
-                break;
-            case R.id.btn_apply:
-                Intent intent = new Intent(this, WebActivity.class);
-                intent.putExtra("URL", "http://www.iyuce.com/m/appfbbsq");
-                intent.putExtra("TITLE", "集训营申请");
-                intent.putExtra("COLOR", "#f7941d");
-                startActivity(intent);
-                break;
-        }
     }
 
     /**
@@ -282,5 +247,89 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
         };
         stringRequest.setTag("login");
         AppContext.getHttpQueue().add(stringRequest);
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.btn_login:
+                strUserName = edtUsername.getText().toString();
+                strPassword = edtPassword.getText().toString();
+                // 保存账号信息到sharepreferences数据库中
+                PreferenceUtil.save(LoginActivity.this, "username", LoginActivity.this.strUserName);
+                PreferenceUtil.save(LoginActivity.this, "password", LoginActivity.this.strPassword);
+
+                if (TextUtils.isEmpty(strUserName) || TextUtils.isEmpty(strPassword)) {
+                    ToastUtil.showMessage(LoginActivity.this, "账号密码不能为空，试试体验登陆吧");
+                    return;
+                }
+                //请求网络
+                doRequest();
+//                CookieManager.getInstance().removeAllCookie();
+                break;
+            case R.id.btn_loginAtOnce:
+                startActivity(new Intent(this, MainActivity.class));
+                PreferenceUtil.removeall(this); // 只留下了版本号
+//                CookieManager.getInstance().removeAllCookie();
+                // PreferenceUtil.clear(this);
+                finish();
+                break;
+            case R.id.btn_apply:
+                Intent intent = new Intent(this, WebActivity.class);
+                intent.putExtra("URL", "http://www.iyuce.com/m/appfbbsq");
+                intent.putExtra("TITLE", "集训营申请");
+                intent.putExtra("COLOR", "#f7941d");
+                startActivity(intent);
+                break;
+            case R.id.txt_activity_login_forget:
+//                final Intent intent_loginforget = new Intent(this, LoginRegisterActivity.class);
+//                intent_loginforget.putExtra("method", "forget_password");
+//                doAlertDialog(intent_loginforget, "请选择找回方式", "国内请选择手机找回，国外请选择邮箱找回", "手机找回", "邮箱找回");
+                startActivity(new Intent(this, LoginForgetActivity.class));
+                break;
+            case R.id.btn_register:
+                final Intent intent_loginregister = new Intent(this, LoginRegisterActivity.class);
+                doAlertDialog(intent_loginregister, "请选择注册环境", "国内请选择手机注册，国外请选择邮箱注册", "手机注册", "邮箱注册");
+                break;
+            case R.id.img_login_eye:
+                //TODO 登录密码是否可见
+                if (!isEyeCan) {
+                    edtPassword.setInputType(InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
+                    imgEye.setBackgroundResource(R.mipmap.icon_eye_cannot);
+                    isEyeCan = !isEyeCan;
+                } else {
+                    edtPassword.setInputType(InputType.TYPE_TEXT_VARIATION_PASSWORD | InputType.TYPE_CLASS_TEXT);
+                    imgEye.setBackgroundResource(R.mipmap.icon_eye_can);
+                    isEyeCan = !isEyeCan;
+                }
+                break;
+        }
+    }
+
+    /**
+     * 做弹窗选择
+     */
+    private void doAlertDialog(final Intent intent, String title, String message, String btn_positon, String btn_negative) {
+        new AlertDialog.Builder(this, AlertDialog.THEME_DEVICE_DEFAULT_LIGHT)
+                .setTitle(title)
+                .setMessage(message)
+                .setPositiveButton(btn_positon, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        intent.putExtra("environment", "phone");
+                        startActivity(intent);
+                        finish();
+                    }
+                })
+                .setNegativeButton(btn_negative, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        intent.putExtra("environment", "email");
+                        startActivity(intent);
+                        finish();
+                    }
+                })
+                .setNeutralButton("取消", null)
+                .show();
     }
 }

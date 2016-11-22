@@ -39,7 +39,7 @@ public class LoginRegisterInfoActivity extends BaseActivity implements View.OnCl
     private TextView txtback;
     private Button btnfinish, btnCheckUsername, btnCheckEmail;
 
-    private String localtoken, localPhonenum, localtimer;
+    private String localtoken, localPhoneOrEmail, email_or_phone, localtimer;
     private String URL = "http://api.iyuce.com/v1/account/register";
     private String URL_VAILD = "http://api.iyuce.com/v1/account/valid";
 
@@ -68,7 +68,8 @@ public class LoginRegisterInfoActivity extends BaseActivity implements View.OnCl
 
     private void initView() {
         Intent intent = getIntent();
-        localPhonenum = intent.getStringExtra("localPhonenum");
+        email_or_phone = intent.getStringExtra("email_or_phone");
+        localPhoneOrEmail = intent.getStringExtra("local_phone_or_email");
 
         txtback = (TextView) findViewById(R.id.txt_registerinfo_back);
         edtNickname = (EditText) findViewById(R.id.edt_registerinfo_nickname);
@@ -146,13 +147,18 @@ public class LoginRegisterInfoActivity extends BaseActivity implements View.OnCl
 
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {
-                HashMap<String, String> map = new HashMap<String, String>();
-                map.put("mobile", localPhonenum);
+                HashMap<String, String> map = new HashMap<>();
+                if (email_or_phone.equals("phone")) {
+                    map.put("mobile", localPhoneOrEmail);
+                    map.put("email", edtEmail.getText().toString().trim());
+                } else {
+                    map.put("mobile", edtEmail.getText().toString().trim());
+                    map.put("email", localPhoneOrEmail);
+                }
                 map.put("username", edtUsername.getText().toString().trim());
                 map.put("nickname", edtNickname.getText().toString().trim());
                 map.put("password", edtPassword.getText().toString().trim());
                 map.put("name", "");
-                map.put("email", edtEmail.getText().toString().trim());
                 map.put("avatar", "");
                 map.put("sex", "");
                 map.put("province", "");
@@ -163,7 +169,7 @@ public class LoginRegisterInfoActivity extends BaseActivity implements View.OnCl
                 map.put("passwordquestion", "");
                 map.put("examtime", "");
                 map.put("invite", "");
-                LogUtil.e("mobile = " + localPhonenum + "," + edtUsername.getText().toString().trim() + ","
+                LogUtil.e("mobile = " + localPhoneOrEmail + "," + edtUsername.getText().toString().trim() + ","
                         + edtNickname.getText().toString().trim() + "," + edtPassword.getText().toString().trim() + ","
                         + edtEmail.getText().toString().trim());
 
@@ -188,12 +194,12 @@ public class LoginRegisterInfoActivity extends BaseActivity implements View.OnCl
                     int result = obj.getInt("data");
                     if (result == 0) {
                         if (TextUtils.equals(key, "username")) {
-                            btnCheckUsername.setText("可以使用");
+//                            btnCheckUsername.setText("可以使用");
                         }
                         ToastUtil.showMessage(LoginRegisterInfoActivity.this, obj.getString("message"));
                     } else {
                         if (TextUtils.equals(key, "username")) {
-                            btnCheckUsername.setText("不可使用");
+//                            btnCheckUsername.setText("不可使用");
                         }
                         ToastUtil.showMessage(LoginRegisterInfoActivity.this, obj.getString("message"));
                     }
@@ -257,7 +263,7 @@ public class LoginRegisterInfoActivity extends BaseActivity implements View.OnCl
                 break;
             case R.id.btn_registerinfo_tonext:
                 LogUtil.e("alledt = " + edtNickname.getText() + edtUsername.getText() + edtPassword.getText()
-                        + edtRepassword.getText() + edtEmail.getText() + localPhonenum + localtoken);
+                        + edtRepassword.getText() + edtEmail.getText() + localPhoneOrEmail + localtoken);
                 // 判断是否填入内容
                 if (TextUtils.isEmpty(edtNickname.getText().toString().trim())
                         || TextUtils.isEmpty(edtUsername.getText().toString().trim())

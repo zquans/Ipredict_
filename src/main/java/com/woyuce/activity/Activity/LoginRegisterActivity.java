@@ -4,6 +4,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.text.InputFilter;
+import android.text.InputType;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
@@ -32,14 +34,18 @@ import java.util.TimerTask;
 /**
  * Created by Administrator on 2016/9/22.
  */
-public class LoginRegisterActivity  extends BaseActivity implements View.OnClickListener {
+public class LoginRegisterActivity extends BaseActivity implements View.OnClickListener {
 
     private TextView txtback;
-    private EditText mEdtPhonenum, mEdtAcceptMsg;
+    private EditText mEdtPhonenum, mEdtAcceptMsg, mEdtPassword, mEdtPasswordAgain;
     private Button btnSend, btnToNext;
     private String localtoken, localChecknum;
 
-    private String URL_SENDMSG = "http://api.iyuce.com/v1/common/sendsmsvericode";
+    //上一级传来，用于判断是短信还是邮件
+    private String email_or_phone, forget_password;
+
+    private String URL_SEND_PHONE_MSG = "http://api.iyuce.com/v1/common/sendsmsvericode";
+    private String URL_SEND_EMAIL_MSG = "http://api.iyuce.com/v1/common/sendemailvericode";
     private String URL_TONEXT = "http://api.iyuce.com/v1/common/verifycode";
     private String URL_VAILD = "http://api.iyuce.com/v1/account/valid";
 
@@ -48,21 +54,21 @@ public class LoginRegisterActivity  extends BaseActivity implements View.OnClick
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        startActivity(new Intent(LoginRegisterActivity.this,LoginActivity.class));
+        startActivity(new Intent(LoginRegisterActivity.this, LoginActivity.class));
         finish();
     }
 
     //创建一个Handler去处理倒计时事件
-    private Handler mHandler = new Handler(){
+    private Handler mHandler = new Handler() {
         public void handleMessage(Message msg) {
             btnSend.setText(msg.obj.toString() + "秒后重发");
             btnSend.setClickable(false);
-            if((int)msg.obj == 0){
+            if ((int) msg.obj == 0) {
                 btnSend.setText("发送验证码");
                 time_count = 61;
                 btnSend.setClickable(true);
             }
-        };
+        }
     };
 
     @Override
@@ -80,19 +86,38 @@ public class LoginRegisterActivity  extends BaseActivity implements View.OnClick
     }
 
     private void initView() {
+        email_or_phone = getIntent().getStringExtra("environment");
+        forget_password = getIntent().getStringExtra("method");
+
         txtback = (TextView) findViewById(R.id.txt_register_back);
         mEdtPhonenum = (EditText) findViewById(R.id.edit_register_acceptphonenum);
         mEdtAcceptMsg = (EditText) findViewById(R.id.edit_register_acceptmsg);
+        mEdtPassword = (EditText) findViewById(R.id.edt_activity_loginregister_password);
+        mEdtPasswordAgain = (EditText) findViewById(R.id.edt_activity_loginregister_passwordagain);
+
         btnSend = (Button) findViewById(R.id.btn_register_sendmsg);
         btnToNext = (Button) findViewById(R.id.btn_register_tonext);
 
         txtback.setOnClickListener(this);
         btnSend.setOnClickListener(this);
         btnToNext.setOnClickListener(this);
+
+        //如果不是找回密码，隐藏后两个EditText
+        if (!TextUtils.isEmpty(forget_password)) {
+            mEdtPassword.setVisibility(View.VISIBLE);
+            mEdtPasswordAgain.setVisibility(View.VISIBLE);
+            txtback.setText("找回密码");
+            btnToNext.setText("确认");
+        }
+        if (email_or_phone.equals("phone")) {
+            mEdtPhonenum.setHint("请输入手机号码");
+            mEdtPhonenum.setFilters(new InputFilter[]{new InputFilter.LengthFilter(11)});
+            mEdtPhonenum.setInputType(InputType.TYPE_CLASS_NUMBER);
+        }
     }
 
     /**
-     * 检查电话是否可用
+     * 检查电话或邮箱是否可用
      */
     private void RequestVaild() {
         StringRequest VaildRequest = new StringRequest(Request.Method.POST, URL_VAILD, new Response.Listener<String>() {
@@ -106,7 +131,11 @@ public class LoginRegisterActivity  extends BaseActivity implements View.OnClick
                     if (result == 0) {
                         String localdata = obj.getString("data");
                         if (localdata.equals("1")) {
-                            RequestMsg();
+                            if (email_or_phone.equals("phone")) {
+                                RequestMsg(URL_SEND_PHONE_MSG);
+                            } else {
+                                RequestMsg(URL_SEND_EMAIL_MSG);
+                            }
                         } else {
                             ToastUtil.showMessage(LoginRegisterActivity.this, obj.getString("message"));
                         }
@@ -135,7 +164,11 @@ public class LoginRegisterActivity  extends BaseActivity implements View.OnClick
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {
                 HashMap<String, String> map = new HashMap<>();
-                map.put("key", "mobile");
+                if (email_or_phone.equals("phone")) {
+                    map.put("key", "mobile");
+                } else {
+                    map.put("key", "email");
+                }
                 map.put("value", mEdtPhonenum.getText().toString().trim());
                 return map;
             }
@@ -145,23 +178,26 @@ public class LoginRegisterActivity  extends BaseActivity implements View.OnClick
     }
 
     /**
-     * 发送短信
+     * 发送验证码
      */
-    private void RequestMsg() {
-        StringRequest MsgRequest = new StringRequest(Request.Method.POST, URL_SENDMSG, new Response.Listener<String>() {
+    private void RequestMsg(String url) {
+        StringRequest MsgRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
                 LogUtil.e("response 2 = " + response);
-                JSONObject jsonObject;
+                JSONObject obj;
                 try {
-                    jsonObject = new JSONObject(response);
-                    int result = jsonObject.getInt("code");
-                    if (result == 0) {
-                        ToastUtil.showMessage(LoginRegisterActivity.this, "已发送，请注意短信哦,亲!");
+                    obj = new JSONObject(response);
+                    if (obj.getString("code").equals("0")) {
+                        if (email_or_phone.equals("phone")) {
+                            ToastUtil.showMessage(LoginRegisterActivity.this, "已发送，请查看短信哦,亲!");
+                        } else {
+                            ToastUtil.showMessage(LoginRegisterActivity.this, "已发送，请查看邮件哦,亲!");
+                        }
                         //倒计时
                         toCount();
                     } else {
-                        ToastUtil.showMessage(LoginRegisterActivity.this, "发送失败，请重试");
+                        ToastUtil.showMessage(LoginRegisterActivity.this, obj.getString("message"));
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -185,7 +221,11 @@ public class LoginRegisterActivity  extends BaseActivity implements View.OnClick
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {
                 HashMap<String, String> map = new HashMap<>();
-                map.put("phone", mEdtPhonenum.getText().toString().trim());
+                if (email_or_phone.equals("phone")) {
+                    map.put("phone", mEdtPhonenum.getText().toString().trim());
+                } else {
+                    map.put("email", mEdtPhonenum.getText().toString().trim());
+                }
                 map.put("template", "VeriCode");
                 return map;
             }
@@ -194,8 +234,10 @@ public class LoginRegisterActivity  extends BaseActivity implements View.OnClick
         AppContext.getHttpQueue().add(MsgRequest);
     }
 
-    // 验证验证码
-    private void requeToNext() {
+    /**
+     * 验证验证码
+     */
+    private void requeToNext(final String arg) {
         StringRequest CheckRequest = new StringRequest(Request.Method.POST, URL_TONEXT, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
@@ -204,11 +246,16 @@ public class LoginRegisterActivity  extends BaseActivity implements View.OnClick
                     jsonObject = new JSONObject(response);
                     int result = jsonObject.getInt("code");
                     if (result == 0) {
-                        ToastUtil.showMessage(LoginRegisterActivity.this, "验证成功啦,亲!");
-                        Intent intent = new Intent(LoginRegisterActivity.this, LoginRegisterInfoActivity.class);
-                        intent.putExtra("localPhonenum", mEdtPhonenum.getText().toString().trim());
-                        startActivity(intent);
-                        finish();
+                        if (arg.equals("forget_password")) {
+                            ToastUtil.showMessage(LoginRegisterActivity.this, "发送一个请求去修改密码");
+                        } else {
+                            ToastUtil.showMessage(LoginRegisterActivity.this, "验证成功啦,亲!");
+                            Intent intent = new Intent(LoginRegisterActivity.this, LoginRegisterInfoActivity.class);
+                            intent.putExtra("email_or_phone",email_or_phone);
+                            intent.putExtra("local_phone_or_email", mEdtPhonenum.getText().toString().trim());
+                            startActivity(intent);
+                            finish();
+                        }
                     } else {
                         ToastUtil.showMessage(LoginRegisterActivity.this, "验证失败，请重试");
                     }
@@ -225,14 +272,14 @@ public class LoginRegisterActivity  extends BaseActivity implements View.OnClick
         }) {
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
+                HashMap<String, String> headers = new HashMap<>();
                 headers.put("Authorization", "Bearer " + localtoken);
                 return headers;
             }
 
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {
-                HashMap<String, String> map = new HashMap<String, String>();
+                HashMap<String, String> map = new HashMap<>();
                 map.put("email_or_mobile", mEdtPhonenum.getText().toString().trim());
                 map.put("code", localChecknum);
                 return map;
@@ -246,19 +293,50 @@ public class LoginRegisterActivity  extends BaseActivity implements View.OnClick
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.txt_register_back:
-                startActivity(new Intent(LoginRegisterActivity.this,LoginActivity.class));
+                startActivity(new Intent(LoginRegisterActivity.this, LoginActivity.class));
                 finish();
                 break;
             case R.id.btn_register_sendmsg:
+                //发送短信或者邮件
                 if (TextUtils.isEmpty(mEdtPhonenum.getText().toString().trim())) {
-                    ToastUtil.showMessage(LoginRegisterActivity.this, "请输入手机号码");
+                    if (email_or_phone.equals("phone")) {
+                        ToastUtil.showMessage(LoginRegisterActivity.this, "请输入手机号码");
+                    } else {
+                        ToastUtil.showMessage(LoginRegisterActivity.this, "请输入邮箱地址");
+                    }
                     break;
                 }
-                RequestVaild();
+                if (TextUtils.isEmpty(forget_password)) {
+                    RequestVaild();
+                } else {
+                    //如果是找回密码，则直接发送验证短信、邮件，不用去判断是否唯一
+                    if (email_or_phone.equals("phone")) {
+                        RequestMsg(URL_SEND_PHONE_MSG);
+                    } else {
+                        RequestMsg(URL_SEND_EMAIL_MSG);
+                    }
+                }
                 break;
             case R.id.btn_register_tonext:
+                //找回密码时"确认",注册时，进入下一步
                 localChecknum = mEdtAcceptMsg.getText().toString().trim();
-                requeToNext();
+                //是找回密码则进入该if，否则就是正常注册
+                if (!TextUtils.isEmpty(forget_password)) {
+                    //是否输入了需要重置的密码
+                    if (TextUtils.isEmpty(mEdtPassword.getText().toString())
+                            || TextUtils.isEmpty(mEdtPasswordAgain.getText().toString())) {
+                        ToastUtil.showMessage(this, "亲，请输入完整信息哦");
+                        break;
+                    }
+                    if (!mEdtPassword.getText().toString().equals(mEdtPasswordAgain.getText().toString())) {
+                        ToastUtil.showMessage(this, "亲，两次输入的密码不一致哦");
+                        break;
+                    }
+                    requeToNext("forget_password");
+                    break;
+                }
+                //正常注册，走这里
+                requeToNext("to_validate");
                 break;
         }
     }
@@ -272,15 +350,15 @@ public class LoginRegisterActivity  extends BaseActivity implements View.OnClick
         mTimer.schedule(new TimerTask() {
             @Override
             public void run() {
-                if(time_count > 0 && time_count <61){
+                if (time_count > 0 && time_count < 61) {
                     time_count = time_count - 1;
                     Message msg = Message.obtain();
                     msg.obj = time_count;
                     mHandler.sendMessage(msg);
-                }else{
+                } else {
                     mTimer.cancel();
                 }
             }
-        }, 500,1000);
+        }, 500, 1000);
     }
 }
