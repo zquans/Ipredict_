@@ -27,6 +27,15 @@ public class StoreSpcAdapter extends BaseAdapter {
     }
 
     @Override
+    public boolean isEnabled(int position) {
+        if (mList.get(position).getAttr_clickable().equals("false")) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    @Override
     public int getCount() {
         return mList.size();
     }
@@ -55,9 +64,11 @@ public class StoreSpcAdapter extends BaseAdapter {
         viewHolder.txtGoal.setText(mList.get(position).getAttr_text());
         if (mList.get(position).getAttr_clickable().equals("false")) {
             viewHolder.txtGoal.setTextColor(Color.parseColor("#ff0000"));//设置不可选的颜色表现
+        }else{
+            viewHolder.txtGoal.setTextColor(Color.parseColor("#f7941d"));//设置可选的颜色表现
         }
         if (mSelectSpcList.contains(mList.get(position).getAttr_id())) {
-            viewHolder.txtGoal.setBackgroundColor(Color.parseColor("#ff0000"));//设置已选中的的颜色表现
+            viewHolder.txtGoal.setBackgroundColor(Color.parseColor("#336699"));//设置已选中的的颜色表现
         }
         return convertView;
     }

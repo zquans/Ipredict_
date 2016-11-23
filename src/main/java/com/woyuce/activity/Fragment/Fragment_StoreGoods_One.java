@@ -45,7 +45,7 @@ public class Fragment_StoreGoods_One extends Fragment implements AdapterView.OnI
     private String URL_SPC;//可以做成局部变量
 
     private String local_skuid, local_goodsid;
-    private String return_local_goodsid,return_local_goods_sku_id, return_local_name, return_local_price;
+    private String return_local_goodsid, return_local_goods_sku_id, return_local_specname, return_local_price;
 
     public String returenGoodsId() {
         LogUtil.i("return_local_goodsid = " + return_local_goodsid);
@@ -57,9 +57,9 @@ public class Fragment_StoreGoods_One extends Fragment implements AdapterView.OnI
         return return_local_goods_sku_id;
     }
 
-    public String returenGoodsName() {
-        LogUtil.i("return_local_name = " + return_local_name);
-        return return_local_name;
+    public String returenGoodsSpecName() {
+        LogUtil.i("return_local_name = " + return_local_specname);
+        return return_local_specname;
     }
 
     public String returenGoodsPrice() {
@@ -168,9 +168,9 @@ public class Fragment_StoreGoods_One extends Fragment implements AdapterView.OnI
                         LogUtil.i("test need =" + obj.getString("spec_texts") + "以及其他的价格、数量等等");//Test
                         return_local_goodsid = obj.getString("goods_id");
                         return_local_goods_sku_id = obj.getString("id");
-                        return_local_name = obj.getString("spec_texts");
+                        return_local_specname = obj.getString("spec_texts");
                         return_local_price = obj.getString("sales_price");
-                        mTxtGoodsTitle.setText(return_local_name);
+                        mTxtGoodsTitle.setText(return_local_specname);
                         mTxtGoodsPrice.setText(return_local_price);
 
                         //拆解JSON对象之二，数组，选中的规格
@@ -178,14 +178,14 @@ public class Fragment_StoreGoods_One extends Fragment implements AdapterView.OnI
                         for (int i = 0; i < arr_seleted_specs.length(); i++) {
                             mSelectSpcList.add(arr_seleted_specs.getJSONObject(i).getString("attr_value_id"));
                         }
+                        LogUtil.i("mSelectSpcList =" + mSelectSpcList);
 
                         //拆解JSON对象之三，数组，所有的规格ID
                         arr_all_spec_id = obj.getJSONArray("all_spec_ids");
                         for (int i = 0; i < arr_all_spec_id.length(); i++) {
                             mAllSpcId.add(arr_all_spec_id.get(i).toString());
                         }
-//                        LogUtil.i("arr_all_spec_id =" + mAllSpcId + "...." + mAllSpcId.get(3));
-//                        LogUtil.i("really? = " + mAllSpcId.contains(",17,"));
+                        LogUtil.i("arr_all_spec_id =" + mAllSpcId);
 
                         //拆解JSON对象之四，数组，所有的规格。这里需要优化或者封装
                         arr_all_spec = obj.getJSONArray("all_specs");
@@ -304,10 +304,12 @@ public class Fragment_StoreGoods_One extends Fragment implements AdapterView.OnI
 //                LogUtil.e(mAllSpcId + "," + arr.getJSONObject(i).getString("attr_id"));
 //            }
 
-            if (!mAllSpcId.contains("," + storeGoods.getAttr_id() + ",")) {
-                storeGoods.setAttr_clickable("false");
-            } else {
+            if (mAllSpcId.contains("," + storeGoods.getAttr_id() + ",")
+                    || mAllSpcId.contains("," + storeGoods.getAttr_id() + "," + mSelectSpcList.get(0) + ",")
+                    || mAllSpcId.contains("," + mSelectSpcList.get(0) + "," + storeGoods.getAttr_id() + ",")) {
                 storeGoods.setAttr_clickable("true");
+            } else {
+                storeGoods.setAttr_clickable("false");
             }
 //            LogUtil.e(mAllSpcId + "," + arr.getJSONObject(i).getString("attr_id"));
             list.add(storeGoods);
@@ -329,8 +331,10 @@ public class Fragment_StoreGoods_One extends Fragment implements AdapterView.OnI
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        mAllSpcId.clear();
-        mSelectSpcList.clear();
+//        mAllSpcId.clear();
+//        if (mSelectSpcList.size() > 0) {
+//            mSelectSpcList.remove(mSelectSpcList.size() - 1);
+//        }
         switch (parent.getId()) {
             case R.id.gridview_fragment_store_one:
                 resetItemView(parent, view, mListOne);
@@ -339,22 +343,44 @@ public class Fragment_StoreGoods_One extends Fragment implements AdapterView.OnI
                         + "&selected_specs=" + mListOne.get(position).getAttr_id();
                 LogUtil.e("URL_SPC = " + URL_SPC);
                 requestGoodsSpe(URL_SPC, true);
+
+                mSelectSpcList.clear();
                 break;
             case R.id.gridview_fragment_store_two:
                 resetItemView(parent, view, mListTwo);
 
-                URL_SPC = URL + "?goodsid=" + local_goodsid + "&skuid="
-                        + "&selected_specs=" + mListTwo.get(position).getAttr_id() + "," + mSelectSpcList.get(0);
-                LogUtil.e("URL_SPC = " + URL_SPC);
-                requestGoodsSpe(URL_SPC, true);
+                for (int i = 0; i < mAllSpcId.size(); i++) {
+                    if (mAllSpcId.get(i).contains(mListTwo.get(position).getAttr_id())) {
+                        LogUtil.i("really = " + mAllSpcId.get(i).contains(mListTwo.get(position).getAttr_id()));
+                        URL_SPC = URL + "?goodsid=" + local_goodsid + "&skuid="
+                                + "&selected_specs=" + mListTwo.get(position).getAttr_id() + "," + mSelectSpcList.get(0);
+                        LogUtil.e("URL_SPC = " + URL_SPC);
+                        requestGoodsSpe(URL_SPC, true);
+                        break;
+                    }
+                }
+
+                mSelectSpcList.clear();
+                mAllSpcId.clear();
                 break;
             case R.id.gridview_fragment_store_three:
                 resetItemView(parent, view, mListThree);
 
-                URL_SPC = URL + "?goodsid=" + local_goodsid + "&skuid="
-                        + "&selected_specs=" + mListThree.get(position).getAttr_id() + "," + mSelectSpcList.get(0);
-                LogUtil.e("URL_SPC = " + URL_SPC);
-                requestGoodsSpe(URL_SPC, true);
+                LogUtil.i("hunle = " + mListThree.get(position).getAttr_id());
+
+                for (int i = 0; i < mAllSpcId.size(); i++) {
+                    if (mAllSpcId.get(i).contains(mListThree.get(position).getAttr_id())) {
+                        LogUtil.i("really = " + mAllSpcId.get(i).contains(mListThree.get(position).getAttr_id()));
+                        URL_SPC = URL + "?goodsid=" + local_goodsid + "&skuid="
+                                + "&selected_specs=" + mListThree.get(position).getAttr_id() + "," + mSelectSpcList.get(0);
+                        LogUtil.e("URL_SPC = " + URL_SPC);
+                        requestGoodsSpe(URL_SPC, true);
+                        break;
+                    }
+                }
+
+                mSelectSpcList.clear();
+                mAllSpcId.clear();
                 break;
         }
     }

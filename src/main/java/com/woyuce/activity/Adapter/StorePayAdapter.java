@@ -55,7 +55,7 @@ public class StorePayAdapter extends BaseAdapter {
             viewHolder = (ViewHolder) convertView.getTag();
         }
         viewHolder.mTxtName.setText(mList.get(position).getName());
-//        viewHolder.mTxtSpec.setText(mList.get(position).getName());
+        viewHolder.mTxtSpec.setText(mList.get(position).getSpecname());
         viewHolder.mTxtNum.setText(mList.get(position).getNum());
 
         Integer num = Integer.parseInt(mList.get(position).getNum());

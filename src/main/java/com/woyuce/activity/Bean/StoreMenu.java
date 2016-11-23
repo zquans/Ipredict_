@@ -7,12 +7,21 @@ public class StoreMenu {
 
     private String _id;
     private String name;
+    private String specname;
     private String id;
     private String num;
     private String price;
     private String goodsskuid;
 
     public StoreMenu() {
+    }
+
+    public String getSpecname() {
+        return specname;
+    }
+
+    public void setSpecname(String specname) {
+        this.specname = specname;
     }
 
     public String getGoodsskuid() {
@@ -68,6 +77,7 @@ public class StoreMenu {
         return "StoreMenu{" +
                 "_id='" + _id + '\'' +
                 ", name='" + name + '\'' +
+                ", specname='" + specname + '\'' +
                 ", id='" + id + '\'' +
                 ", num='" + num + '\'' +
                 ", price='" + price + '\'' +

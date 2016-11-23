@@ -63,6 +63,7 @@ public class StoreCarAdapter extends BaseAdapter {
             viewHolder = new ViewHolder();
             convertView = mLayoutInflater.inflate(R.layout.listitem_storecar, null);
             viewHolder.mTxtName = (TextView) convertView.findViewById(R.id.txt_listitem_storecar_name);
+            viewHolder.mTxtSpecName = (TextView) convertView.findViewById(R.id.txt_listitem_storecar_specname);
             viewHolder.mTxtPrice = (TextView) convertView.findViewById(R.id.txt_listitem_storecar_price);
             viewHolder.mTxtCount = (TextView) convertView.findViewById(R.id.txt_listitem_storecar_count);
 
@@ -73,6 +74,7 @@ public class StoreCarAdapter extends BaseAdapter {
             viewHolder = (ViewHolder) convertView.getTag();
         }
         viewHolder.mTxtName.setText(mList.get(position).getName());
+        viewHolder.mTxtSpecName.setText(mList.get(position).getSpecname());
         viewHolder.mTxtPrice.setText(mList.get(position).getPrice());
         viewHolder.mTxtCount.setText(mList.get(position).getNum());
 
@@ -98,7 +100,7 @@ public class StoreCarAdapter extends BaseAdapter {
     }
 
     public class ViewHolder {
-        public TextView mTxtName, mTxtPrice, mTxtCount;
+        public TextView mTxtName, mTxtSpecName, mTxtPrice, mTxtCount;
         public Button btnAdd, btnMinus;
     }
 }

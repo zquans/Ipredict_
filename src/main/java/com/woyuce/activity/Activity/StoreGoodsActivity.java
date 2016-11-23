@@ -42,6 +42,9 @@ public class StoreGoodsActivity extends BaseActivity implements View.OnClickList
     Fragment_StoreGoods_One mFrgOne;
 
     private static final int OPEN_FRAGMENT = 0x001;
+
+    private String local_goods_title;
+
     private Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -75,6 +78,7 @@ public class StoreGoodsActivity extends BaseActivity implements View.OnClickList
     }
 
     private void initView() {
+        local_goods_title = getIntent().getStringExtra("goods_title");
         mTxtTabOne = (TextView) findViewById(R.id.txt_storegoods_tab_one);
         mTxtTabTwo = (TextView) findViewById(R.id.txt_storegoods_tab_two);
         mTxtTabThree = (TextView) findViewById(R.id.txt_storegoods_tab_three);
@@ -159,16 +163,17 @@ public class StoreGoodsActivity extends BaseActivity implements View.OnClickList
     /**
      * 开数据库建一张表
      */
-    private void saveStoreInfo(String id, String goodsid, String goodsskuid, String name, String num, String price) {
+    private void saveStoreInfo(String id, String goodsid, String goodsskuid, String name, String specname, String num, String price) {
         SQLiteDatabase mDatabase = openOrCreateDatabase("aipu.db", MODE_PRIVATE, null);
         mDatabase.execSQL(
                 "create table if not exists storetb(_id integer primary key autoincrement," +
                         "id text not null,goodsskuid text not null,name text not null," +
-                        "num text not null,price text not null)");
+                        "specname text not null,num text not null,price text not null)");
         ContentValues mValues = new ContentValues();
         mValues.put("id", id);
         mValues.put("goodsskuid", goodsskuid);
         mValues.put("name", name);
+        mValues.put("specname", specname);
         mValues.put("num", num);
         mValues.put("price", price);
         mDatabase.insert("storetb", null, mValues);
@@ -186,7 +191,8 @@ public class StoreGoodsActivity extends BaseActivity implements View.OnClickList
         //这些应该从Fragment中获取
         String local_goodsid = mFrgOne.returenGoodsId();
         String local_goods_sku_id = mFrgOne.returenGoodsSkuId();
-        String local_name = mFrgOne.returenGoodsName();
+        String local_name = local_goods_title;
+        String local_specname = mFrgOne.returenGoodsSpecName();
         String local_price = mFrgOne.returenGoodsPrice();
         String local_num = String.valueOf(1);
         switch (v.getId()) {
@@ -222,12 +228,12 @@ public class StoreGoodsActivity extends BaseActivity implements View.OnClickList
                 break;
             case R.id.btn_activity_storegoods_buynow:
                 //保存进数据库
-                saveStoreInfo(local_id, local_goodsid, local_goods_sku_id, local_name, local_num, local_price);
+                saveStoreInfo(local_id, local_goodsid, local_goods_sku_id, local_name, local_specname, local_num, local_price);
                 startActivity(new Intent(this, StoreCarActivity.class));
                 break;
             case R.id.btn_activity_storegoods_putincar:
                 //保存进数据库
-                saveStoreInfo(local_id, local_goodsid, local_goods_sku_id, local_name, local_num, local_price);
+                saveStoreInfo(local_id, local_goodsid, local_goods_sku_id, local_name, local_specname, local_num, local_price);
                 ToastUtil.showMessage(this, "您的商品放入购物车啦!");
                 break;
             case R.id.btn_activity_storegoods_tocar:

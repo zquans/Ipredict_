@@ -91,7 +91,6 @@ public class StoreCarActivity extends BaseActivity implements StoreCarAdapter.On
         for (int i = 0; i < mFinalList.size(); i++) {
             URL = URL + mFinalList.get(i).getGoodsskuid() + ",";
         }
-        LogUtil.i("URL = " + URL);
         StringRequest requestRecentGoods = new StringRequest(Request.Method.GET, URL, new Response.Listener<String>() {
             @Override
             public void onResponse(String s) {
@@ -160,6 +159,7 @@ public class StoreCarActivity extends BaseActivity implements StoreCarAdapter.On
                 storemenu.setId(mCursor.getString(mCursor.getColumnIndex("id")));
                 storemenu.setGoodsskuid(mCursor.getString(mCursor.getColumnIndex("goodsskuid")));
                 storemenu.setName(mCursor.getString(mCursor.getColumnIndex("name")));
+                storemenu.setSpecname(mCursor.getString(mCursor.getColumnIndex("specname")));
                 storemenu.setNum(mCursor.getString(mCursor.getColumnIndex("num")));
                 storemenu.setPrice(mCursor.getString(mCursor.getColumnIndex("price")));
                 mList.add(storemenu);
@@ -192,12 +192,10 @@ public class StoreCarActivity extends BaseActivity implements StoreCarAdapter.On
         //循环后删除随意一项mList中的商品
         String local_del_goodsskuid = mFinalList.get(pos).getGoodsskuid();
         for (int i = 0; i < mList.size(); i++) {
-            LogUtil.i("i = " + i);
             if (mList.get(i).getGoodsskuid().equals(local_del_goodsskuid)) {
                 //删除对应主键ID的那条数据
                 deleteData(mList.get(i).get_id(), "_id");
                 mList.remove(i);
-                LogUtil.i("mList.get(i).get_id() = " + mList.get(i).get_id());
                 break;
             }
         }
@@ -282,7 +280,7 @@ public class StoreCarActivity extends BaseActivity implements StoreCarAdapter.On
         for (int i = 0; i < mList.size(); i++) {
             mSkuIdSet.add(mList.get(i).getGoodsskuid());
         }
-        LogUtil.e("mSkuIdSet =" + mSkuIdSet);
+//        LogUtil.e("mSkuIdSet =" + mSkuIdSet);
         //转换Set为ArrayList
         ArrayList mSkuIdList = new ArrayList();
         Iterator it = mSkuIdSet.iterator();
@@ -322,17 +320,20 @@ public class StoreCarActivity extends BaseActivity implements StoreCarAdapter.On
     public void toPay(View view) {
         Intent intent = new Intent(this, StorePayActivity.class);
         ArrayList<String> mGoodsSkuIdList = new ArrayList<>();
+        ArrayList<String> mSpecNameList = new ArrayList<>();
         ArrayList<String> mNameList = new ArrayList<>();
         ArrayList<String> mPriceList = new ArrayList<>();
         ArrayList<String> mNumList = new ArrayList<>();
         for (int i = 0; i < mFinalList.size(); i++) {
             mGoodsSkuIdList.add(mFinalList.get(i).getGoodsskuid());
             mNameList.add(mFinalList.get(i).getName());
+            mSpecNameList.add(mFinalList.get(i).getSpecname());
             mPriceList.add(mFinalList.get(i).getPrice());
             mNumList.add(mFinalList.get(i).getNum());
         }
         intent.putStringArrayListExtra("mGoodsSkuIdList", mGoodsSkuIdList);
         intent.putStringArrayListExtra("mNameList", mNameList);
+        intent.putStringArrayListExtra("mSpecNameList", mSpecNameList);
         intent.putStringArrayListExtra("mPriceList", mPriceList);
         intent.putStringArrayListExtra("mNumList", mNumList);
         intent.putExtra("total_price", total_price);

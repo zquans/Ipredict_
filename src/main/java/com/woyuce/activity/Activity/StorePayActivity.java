@@ -43,6 +43,7 @@ public class StorePayActivity extends BaseActivity implements View.OnClickListen
     ArrayList<String> mNameList = new ArrayList<>();
     ArrayList<String> mPriceList = new ArrayList<>();
     ArrayList<String> mNumList = new ArrayList<>();
+    ArrayList<String> mSpecNameList = new ArrayList<>();
     private Integer total_count;
     private Double total_price;
     private Integer local_store_user_money, max_store_user_money;
@@ -63,6 +64,7 @@ public class StorePayActivity extends BaseActivity implements View.OnClickListen
         Intent intent = getIntent();
         mGoodsSkuIdList = intent.getStringArrayListExtra("mGoodsSkuIdList");
         mNameList = intent.getStringArrayListExtra("mNameList");
+        mSpecNameList = intent.getStringArrayListExtra("mSpecNameList");
         mPriceList = intent.getStringArrayListExtra("mPriceList");
         mNumList = intent.getStringArrayListExtra("mNumList");
         total_count = intent.getIntExtra("total_count", -1);
@@ -89,6 +91,7 @@ public class StorePayActivity extends BaseActivity implements View.OnClickListen
             storeMenu = new StoreMenu();
             storeMenu.setGoodsskuid(mGoodsSkuIdList.get(i));
             storeMenu.setName(mNameList.get(i));
+            storeMenu.setSpecname(mSpecNameList.get(i));
             storeMenu.setNum(mNumList.get(i));
             storeMenu.setPrice(mPriceList.get(i));
             mList.add(storeMenu);
@@ -141,6 +144,7 @@ public class StorePayActivity extends BaseActivity implements View.OnClickListen
                         obj = arr.getJSONObject(0);
                         mTxtAddressOne.setText(obj.getString("name") + "\r\r" + obj.getString("mobile"));
                         mTxtAddressTwo.setText("QQ:" + obj.getString("q_q") + "\r\r" + "邮箱" + obj.getString("email"));
+                        local_address_id = obj.getString("id");
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -169,8 +173,20 @@ public class StorePayActivity extends BaseActivity implements View.OnClickListen
         mTxtMiddle.setText(local_store_user_money.toString());
     }
 
+    private String local_address_id;
+
     public void nowPay(View view) {
-        ToastUtil.showMessage(this, "去调支付吧,你要付这么多钱" + total_price + "元");
+        String local_skuids = "";
+        for (int i = 0; i < mList.size(); i++) {
+            local_skuids = local_skuids + mList.get(i).getGoodsskuid()
+                    + "|" + mList.get(i).getNum() + ",";
+        }
+        Intent intent = new Intent(this, StoreOrderActivity.class);
+        intent.putExtra("total_price", total_price.toString());
+        intent.putExtra("address", local_address_id);
+        intent.putExtra("skuids", local_skuids);
+        intent.putExtra("discount", local_store_user_money.toString());
+        startActivity(intent);
     }
 
     @Override
