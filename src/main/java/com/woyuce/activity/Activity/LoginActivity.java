@@ -209,7 +209,7 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
                         // 取消加载对话框
                         progressdialogcancel();
                         // 上传注册时设定的考试时间
-                        uploadTime(timer_register, userId);
+//                        uploadTime(timer_register, userId);
                         // 启动主页面
                         startActivity(new Intent(LoginActivity.this, MainActivity.class));
                         finish();

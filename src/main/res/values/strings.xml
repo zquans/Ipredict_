@@ -1,6 +1,8 @@
 <resources>
     <string name="app_name">我预测</string>
-    <string name="aiyoupuintroduce"> \t\t我预测，你高分！\n\n\t\t厦门爱优普教育咨询有限公司是经国家工商行政管理部门依法批准的专业化教育咨询公司。 \n\n\t\t我们是专注于英语技巧培养提升的教育机构，旨在为广大考生提供丰富、准确的信息。  </string>
+    <string name="aiyoupuintroduce"> \t\t我预测，你高分！
+        \n\n\t\t厦门爱优普教育咨询有限公司前身是厦门新航道学校，现已正式更名，仍由我预测教主带领一批明星教师执教，师资力量及校区各项服务没有改变。
+        \n\n\t\t我预测开发的雅思在线考试系统，提供准确的雅思考题预测服务，内含雅思考题回忆题库，包含听力、阅读、写作、口语四项，并且有名师公开课录音，是准备参加雅思考试的同学必备的学习工具，另有线下雅思、托福、SAT、GMAT培训课程。</string>
     <string name="welcome">Welcome To Ipredicting</string>
     <string name="username">Username:</string>
     <string name="password">Password:</string>

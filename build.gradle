@@ -8,8 +8,8 @@ android {
         applicationId "com.woyuce.activity"
         minSdkVersion 15
         targetSdkVersion 24
-        versionCode 24
-        versionName "2.4"
+        versionCode 26
+        versionName "2.6"
     }
     buildTypes {
         release {
