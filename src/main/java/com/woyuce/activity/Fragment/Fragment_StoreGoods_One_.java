@@ -34,7 +34,7 @@ import java.util.ArrayList;
 /**
  * 两部分，一：将传递到的数据直接放上视图，二：请求规格获取数据
  */
-public class Fragment_StoreGoods_One extends Fragment implements AdapterView.OnItemClickListener {
+public class Fragment_StoreGoods_One_ extends Fragment implements AdapterView.OnItemClickListener {
 
     private ViewFlipper mFlipper;
 

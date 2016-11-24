@@ -98,7 +98,22 @@ public class StoreOrderActivity extends BaseActivity {
         AppContext.getHttpQueue().add(addressRequest);
     }
 
+    private String URL_ALIPAY = "http://pay.iyuce.com/api/order/ApplyApp";
+
     public void toPay(View view) {
         ToastUtil.showMessage(this, "去调支付宝吧");
+        StringRequest aliRequest = new StringRequest(Request.Method.POST, URL_ALIPAY, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String s) {
+                LogUtil.i("s = " + s);
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError volleyError) {
+                LogUtil.i("volleyError = " + volleyError);
+            }
+        });
+        aliRequest.setTag("aliRequest");
+        AppContext.getHttpQueue().add(aliRequest);
     }
 }

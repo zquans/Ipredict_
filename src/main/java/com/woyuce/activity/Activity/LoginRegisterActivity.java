@@ -176,6 +176,7 @@ public class LoginRegisterActivity extends BaseActivity implements View.OnClickL
      * 发送验证码
      */
     private void RequestMsg(String url) {
+        progressdialogshow(this);
         isVarify = true;
         StringRequest MsgRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
             @Override
@@ -195,6 +196,7 @@ public class LoginRegisterActivity extends BaseActivity implements View.OnClickL
                     } else {
                         ToastUtil.showMessage(LoginRegisterActivity.this, obj.getString("message"));
                     }
+                    progressdialogcancel();
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -204,6 +206,7 @@ public class LoginRegisterActivity extends BaseActivity implements View.OnClickL
             public void onErrorResponse(VolleyError error) {
                 LogUtil.e("Wrong-Back", "连接错误原因： " + error.getMessage());
                 ToastUtil.showMessage(LoginRegisterActivity.this, "网络错误，请稍候再试");
+                progressdialogcancel();
             }
         }) {
             @Override

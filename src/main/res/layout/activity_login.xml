@@ -32,12 +32,6 @@
             android:gravity="center"
             android:orientation="horizontal">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingLeft="5.0dp"
-                android:text="@string/username" />
-
             <EditText
                 android:id="@+id/edt_username"
                 android:layout_width="match_parent"
@@ -46,6 +40,7 @@
                 android:layout_marginRight="5dp"
                 android:background="@android:color/transparent"
                 android:gravity="left|center"
+                android:hint="用户名/手机号/电子邮箱"
                 android:imeOptions="actionDone"
                 android:maxLength="30"
                 android:singleLine="true"
@@ -66,11 +61,6 @@
                 android:gravity="center"
                 android:orientation="horizontal">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingLeft="5.0dp"
-                    android:text="@string/password" />
 
                 <EditText
                     android:id="@+id/edt_password"
@@ -80,6 +70,7 @@
                     android:layout_marginRight="5.0dp"
                     android:background="@android:color/transparent"
                     android:gravity="left|center"
+                    android:hint="请输入密码"
                     android:imeOptions="actionDone"
                     android:inputType="textPassword"
                     android:maxLength="30"
