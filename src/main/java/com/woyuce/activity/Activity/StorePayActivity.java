@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
@@ -32,7 +33,8 @@ import java.util.ArrayList;
 public class StorePayActivity extends BaseActivity implements View.OnClickListener {
 
     private RelativeLayout mReLayoutAddress;
-    private TextView mTxtAddressOne, mTxtAddressTwo, mTxtPrice, mTxtCount, mTxtUserMoney, mTxtMiddle;
+    private TextView mTxtAddressOne, mTxtAddressTwo, mTxtPrice, mTxtCount, mTxtUserMoney;
+    private EditText mEdtMiddle;
 
     private ListView mListView;
     private StorePayAdapter mAdapter;
@@ -77,14 +79,14 @@ public class StorePayActivity extends BaseActivity implements View.OnClickListen
         mTxtPrice = (TextView) findViewById(R.id.txt_storecar_final_price);
         mTxtCount = (TextView) findViewById(R.id.txt_storecar_total_num);
         mTxtUserMoney = (TextView) findViewById(R.id.txt_actvity_storepay_havemoney);
-        mTxtMiddle = (TextView) findViewById(R.id.txt_actvity_storepay_middle);
+        mEdtMiddle = (EditText) findViewById(R.id.edt_actvity_storepay_middle);
         mTxtPrice.setText(total_price + "元");
         mTxtCount.setText(total_count + "件");
 
         local_store_user_money = Integer.parseInt(PreferenceUtil.getSharePre(this).getString("store_user_money", ""));
         max_store_user_money = local_store_user_money;
         mTxtUserMoney.setText("你有" + local_store_user_money + "个金币,可以抵扣" + local_store_user_money + "元");
-        mTxtMiddle.setText(local_store_user_money.toString());
+        mEdtMiddle.setText(local_store_user_money.toString());
 
         StoreMenu storeMenu;
         for (int i = 0; i < mGoodsSkuIdList.size(); i++) {
@@ -161,7 +163,7 @@ public class StorePayActivity extends BaseActivity implements View.OnClickListen
             return;
         }
         local_store_user_money = local_store_user_money + 1;
-        mTxtMiddle.setText(local_store_user_money.toString());
+        mEdtMiddle.setText(local_store_user_money.toString());
     }
 
     public void minusMoney(View view) {
@@ -170,7 +172,7 @@ public class StorePayActivity extends BaseActivity implements View.OnClickListen
             return;
         }
         local_store_user_money = local_store_user_money - 1;
-        mTxtMiddle.setText(local_store_user_money.toString());
+        mEdtMiddle.setText(local_store_user_money.toString());
     }
 
     private String local_address_id;
@@ -185,7 +187,7 @@ public class StorePayActivity extends BaseActivity implements View.OnClickListen
         intent.putExtra("total_price", total_price.toString());
         intent.putExtra("address", local_address_id);
         intent.putExtra("skuids", local_skuids);
-        intent.putExtra("discount", local_store_user_money.toString());
+        intent.putExtra("discount",mEdtMiddle.getText().toString());
         startActivity(intent);
     }
 

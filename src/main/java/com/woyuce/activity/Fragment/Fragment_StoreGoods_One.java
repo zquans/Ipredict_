@@ -284,23 +284,29 @@ public class Fragment_StoreGoods_One extends Fragment implements AdapterView.OnI
             storeGoods.setAttr_id(arr.getJSONObject(i).getString("attr_id"));
             storeGoods.setAttr_text(arr.getJSONObject(i).getString("attr_text"));
 
-            if (need_notify == true) {
-                //两个选中项
-                if ((!mAllSpcId.contains("," + storeGoods.getAttr_id() + "," + mSelectSpcList.get(0) + ","))
-                        && (!mAllSpcId.contains("," + mSelectSpcList.get(0) + "," + storeGoods.getAttr_id() + ","))) {
-                    storeGoods.setAttr_clickable("false");
-                } else {
-                    storeGoods.setAttr_clickable("true");
-                }
-//                LogUtil.e(mAllSpcId + "," + arr.getJSONObject(i).getString("attr_id") + mSelectSpcList.get(0));
-            } else {
-                //一个选中项
-                if (!mAllSpcId.contains("," + storeGoods.getAttr_id() + ",")) {
-                    storeGoods.setAttr_clickable("false");
-                } else {
-                    storeGoods.setAttr_clickable("true");
-                }
+//            if (need_notify == true) {
+//                //两个选中项
+//                if ((!mAllSpcId.contains("," + storeGoods.getAttr_id() + "," + mSelectSpcList.get(0) + ","))
+//                        && (!mAllSpcId.contains("," + mSelectSpcList.get(0) + "," + storeGoods.getAttr_id() + ","))) {
+//                    storeGoods.setAttr_clickable("false");
+//                } else {
+//                    storeGoods.setAttr_clickable("true");
+//                }
+////                LogUtil.e(mAllSpcId + "," + arr.getJSONObject(i).getString("attr_id") + mSelectSpcList.get(0));
+//            } else {
+//                //一个选中项
+//                if (!mAllSpcId.contains("," + storeGoods.getAttr_id() + ",")) {
+//                    storeGoods.setAttr_clickable("false");
+//                } else {
+//                    storeGoods.setAttr_clickable("true");
+//                }
 //                LogUtil.e(mAllSpcId + "," + arr.getJSONObject(i).getString("attr_id"));
+//            }
+
+            if (!mAllSpcId.contains("," + storeGoods.getAttr_id() + ",")) {
+                storeGoods.setAttr_clickable("false");
+            } else {
+                storeGoods.setAttr_clickable("true");
             }
             list.add(storeGoods);
         }

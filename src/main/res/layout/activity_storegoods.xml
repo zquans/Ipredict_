@@ -67,7 +67,9 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:background="#f7941d"
-            android:text="加入购物车" />
+            android:drawableLeft="@mipmap/icon_store_car"
+            android:text="加入购物车"
+            android:textColor="#fff" />
 
         <Button
             android:id="@+id/btn_activity_storegoods_buynow"
@@ -75,7 +77,8 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:background="#f23030"
-            android:text="立即购买" />
+            android:text="立即购买"
+            android:textColor="#fff" />
     </LinearLayout>
 
 </LinearLayout>
