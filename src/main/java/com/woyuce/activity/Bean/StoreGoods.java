@@ -25,6 +25,16 @@ public class StoreGoods {
     private String img_url; //晒单图片
     private String show_at; //晒单时间
 
+    //订单Order相关
+    private String id;
+    private String order_id;
+    private String goods_thumb_img_url;
+    private String is_show_order;
+    private String is_comment;
+    private String unit_price;
+    private String total_price;
+    private String goods_property;
+
     public StoreGoods() {
     }
 

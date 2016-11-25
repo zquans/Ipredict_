@@ -183,6 +183,10 @@ public class StoreGoodsActivity extends BaseActivity implements View.OnClickList
         PreferenceUtil.save(this, "storetb_is_exist", "yes");
     }
 
+    public void back(View view) {
+        finish();
+    }
+
     @Override
     public void onClick(View v) {//前三个case是顶部导航栏，后三个是底部导航栏
         //这些参数是传递给底部操作栏的，跟购物车相关

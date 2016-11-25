@@ -53,6 +53,10 @@ public class StorePayActivity extends BaseActivity implements View.OnClickListen
     //获取默认收货地址
     private String URL = "http://api.iyuce.com/v1/store/getdefaultaddr";
 
+    public void back(View view) {
+        finish();
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -187,7 +191,7 @@ public class StorePayActivity extends BaseActivity implements View.OnClickListen
         intent.putExtra("total_price", total_price.toString());
         intent.putExtra("address", local_address_id);
         intent.putExtra("skuids", local_skuids);
-        intent.putExtra("discount",mEdtMiddle.getText().toString());
+        intent.putExtra("discount", mEdtMiddle.getText().toString());
         startActivity(intent);
     }
 

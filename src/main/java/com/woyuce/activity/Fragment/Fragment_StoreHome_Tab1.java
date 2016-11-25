@@ -56,6 +56,7 @@ public class Fragment_StoreHome_Tab1 extends Fragment {
 
                     for (int i = 0; i < mData.size(); i++) {
                         ImageView mImg = new ImageView(getActivity());
+                        mImg.setScaleType(ImageView.ScaleType.FIT_XY);
                         ImageLoader.getInstance().displayImage(mData.get(i), mImg, options);
                         mViewFlipper.addView(mImg);
                     }

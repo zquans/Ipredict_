@@ -36,6 +36,10 @@ public class StoreAddressActivity extends BaseActivity implements
 
     private String URL = "http://api.iyuce.com/v1/store/findbyuser";
 
+    public void back(View view) {
+        finish();
+    }
+
     @Override
     protected void onRestart() {
         super.onRestart();

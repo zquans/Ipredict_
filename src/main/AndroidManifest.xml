@@ -208,6 +208,7 @@
         <activity android:name=".Activity.StoreAddressActivity" />
         <activity android:name=".Activity.StoreAddAddressActivity" />
         <activity android:name=".Activity.StoreOrderActivity" />
+        <activity android:name=".Activity.StoreOrderListActivity" />
 
         <!-- 意见反馈Activity -->
         <activity
@@ -217,6 +218,11 @@
         <!-- 关于我们Activity -->
         <activity
             android:name=".Activity.AboutUsActivity"
+            android:launchMode="standard"
+            android:screenOrientation="portrait" />
+        <!-- 客服Activity -->
+        <activity
+            android:name=".Activity.CustomServiceActivity"
             android:launchMode="standard"
             android:screenOrientation="portrait" />
 

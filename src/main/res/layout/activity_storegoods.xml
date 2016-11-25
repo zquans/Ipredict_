@@ -7,6 +7,29 @@
     android:orientation="vertical"
     tools:context="com.woyuce.activity.Activity.StoreGoodsActivity">
 
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:background="#f7941d">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="商城"
+            android:textColor="#fff"
+            android:textSize="20sp" />
+
+        <ImageButton
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="4dp"
+            android:background="@mipmap/arrow_white_back"
+            android:onClick="back" />
+
+    </RelativeLayout>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="48dp"

@@ -37,6 +37,10 @@ public class StoreAddAddressActivity extends BaseActivity implements View.OnClic
     private String URL_SEND_MSG = "http://api.iyuce.com/v1/store/sendsmscode";
     private String URL_VALIDATE = "http://api.iyuce.com/v1/store/validsmscode";
 
+    public void back(View view) {
+        finish();
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -150,6 +154,13 @@ public class StoreAddAddressActivity extends BaseActivity implements View.OnClic
      * @param view
      */
     public void save(View view) {
+        if (!TextUtils.isEmpty(getIntent().getStringExtra("local_name"))) {
+            isValidated = true;
+        }
+        if (!isValidated) {
+            ToastUtil.showMessage(this, "请先确认验证码哦，亲");
+            return;
+        }
         if (TextUtils.isEmpty(local_id)) {
             operaAddressRequest(URL + "?operation=save&userid=" + local_user_id);
         } else {
@@ -158,6 +169,8 @@ public class StoreAddAddressActivity extends BaseActivity implements View.OnClic
         }
     }
 
+    private boolean isValidated = false;
+
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
@@ -165,6 +178,7 @@ public class StoreAddAddressActivity extends BaseActivity implements View.OnClic
                 requestPhoneValidate(URL_SEND_MSG + "?phone=" + mEdtPhone.getText().toString() + "&userid=" + local_user_id);
                 break;
             case R.id.btn_activity_storeaddaddress_validate:
+                isValidated = true;
                 requestPhoneValidate(URL_VALIDATE + "?phone=" + mEdtPhone.getText().toString() + "&code=" + mEdtCode.getText().toString());
                 break;
         }

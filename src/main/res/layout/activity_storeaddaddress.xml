@@ -1,124 +1,126 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:layout_height="match_parent">
 
-    <LinearLayout
+    <TextView
+        android:id="@+id/txt_activity_storeaddaddress_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/edt_activity_storeaddaddress_name"
+        android:layout_marginLeft="16dp"
+        android:text="联系人"
+        android:textStyle="bold" />
+
+    <EditText
+        android:id="@+id/edt_activity_storeaddaddress_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:layout_marginLeft="64dp"
+        android:layout_toRightOf="@+id/txt_activity_storeaddaddress_name"
+        android:hint="请输入联系人" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="联系人" />
+    <TextView
+        android:id="@+id/txt_activity_storeaddaddress_phone"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/edt_activity_storeaddaddress_phone"
+        android:layout_below="@+id/txt_activity_storeaddaddress_name"
+        android:layout_marginLeft="16dp"
+        android:text="手机号"
+        android:textStyle="bold" />
 
-        <!--做EditText外嵌的那层，监听-->
-        <EditText
-            android:id="@+id/edt_activity_storeaddaddress_name"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1" />
-    </LinearLayout>
-
-    <LinearLayout
+    <!--做EditText外嵌的那层，监听-->
+    <EditText
+        android:id="@+id/edt_activity_storeaddaddress_phone"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="手机号" />
-
-        <!--做EditText外嵌的那层，监听-->
-        <EditText
-            android:id="@+id/edt_activity_storeaddaddress_phone"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:inputType="number"
-            android:maxLength="11" />
-    </LinearLayout>
+        android:layout_alignLeft="@+id/edt_activity_storeaddaddress_name"
+        android:layout_below="@+id/edt_activity_storeaddaddress_name"
+        android:hint="请输入手机号码"
+        android:inputType="number"
+        android:maxLength="11" />
 
     <Button
         android:id="@+id/btn_activity_storeaddaddress_sendmsg"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/edt_activity_storeaddaddress_name"
+        android:layout_below="@+id/edt_activity_storeaddaddress_phone"
         android:layout_gravity="center_horizontal"
-        android:text="发送验证码" />
+        android:background="@drawable/buttonstyle_orange"
+        android:text="发送验证码"
+        android:textColor="#fff" />
 
-    <LinearLayout
+    <Button
+        android:id="@+id/btn_activity_storeaddaddress_validate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/btn_activity_storeaddaddress_sendmsg"
+        android:layout_marginRight="16dp"
+        android:background="@drawable/buttonstyle_orange"
+        android:text="验证"
+        android:textColor="#fff" />
+
+    <EditText
+        android:id="@+id/edt_activity_storeaddaddress_code"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:layout_alignLeft="@+id/btn_activity_storeaddaddress_sendmsg"
+        android:layout_below="@+id/btn_activity_storeaddaddress_sendmsg"
+        android:layout_marginRight="8dp"
+        android:layout_toLeftOf="@+id/btn_activity_storeaddaddress_validate"
+        android:hint="验证码" />
 
-        <EditText
-            android:id="@+id/edt_activity_storeaddaddress_code"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:hint="验证码" />
+    <TextView
+        android:id="@+id/txt_activity_storeaddaddress_qq"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/edt_activity_storeaddaddress_qq"
+        android:layout_below="@+id/btn_activity_storeaddaddress_validate"
+        android:layout_marginLeft="16dp"
+        android:text="QQ"
+        android:textStyle="bold" />
 
-        <Button
-            android:id="@+id/btn_activity_storeaddaddress_validate"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="验证" />
-    </LinearLayout>
-
-    <LinearLayout
+    <!--做EditText外嵌的那层，监听-->
+    <EditText
+        android:id="@+id/edt_activity_storeaddaddress_qq"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:layout_alignLeft="@+id/edt_activity_storeaddaddress_name"
+        android:layout_below="@+id/btn_activity_storeaddaddress_validate"
+        android:layout_toRightOf="@+id/txt_activity_storeaddaddress_qq"
+        android:hint="请输入QQ"
+        android:inputType="number"
+        android:maxLength="11" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="QQ" />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/edt_activity_storeaddaddress_email"
+        android:layout_below="@+id/txt_activity_storeaddaddress_qq"
+        android:layout_marginLeft="16dp"
+        android:text="邮箱"
+        android:textStyle="bold" />
 
-        <!--做EditText外嵌的那层，监听-->
-        <EditText
-            android:id="@+id/edt_activity_storeaddaddress_qq"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:inputType="number"
-            android:maxLength="11" />
-    </LinearLayout>
-
-    <LinearLayout
+    <!--做EditText外嵌的那层，监听-->
+    <EditText
+        android:id="@+id/edt_activity_storeaddaddress_email"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:layout_alignLeft="@+id/edt_activity_storeaddaddress_name"
+        android:layout_below="@+id/edt_activity_storeaddaddress_qq"
+        android:layout_toRightOf="@+id/txt_activity_storeaddaddress_qq"
+        android:hint="请输入邮箱" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="邮箱" />
-
-        <!--做EditText外嵌的那层，监听-->
-        <EditText
-            android:id="@+id/edt_activity_storeaddaddress_email"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1" />
-    </LinearLayout>
-
-    <LinearLayout
+    <Button
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="@drawable/buttonstyle_orange"
+        android:onClick="save"
+        android:text="保存并使用"
+        android:textColor="#fff" />
 
-        <Button
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom|center_vertical"
-            android:background="@drawable/buttonstyle_orange"
-            android:onClick="save"
-            android:text="保存并使用" />
-
-    </LinearLayout>
-
-
-</LinearLayout>
+</RelativeLayout>

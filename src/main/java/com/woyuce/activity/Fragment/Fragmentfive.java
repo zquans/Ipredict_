@@ -19,7 +19,9 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.toolbox.StringRequest;
 import com.woyuce.activity.Activity.AboutUsActivity;
+import com.woyuce.activity.Activity.CustomServiceActivity;
 import com.woyuce.activity.Activity.LoginActivity;
+import com.woyuce.activity.Activity.StoreOrderListActivity;
 import com.woyuce.activity.Activity.SuggestionActivity;
 import com.woyuce.activity.Activity.WebActivity;
 import com.woyuce.activity.Application.AppContext;
@@ -41,7 +43,8 @@ import java.util.Map;
 
 public class Fragmentfive extends Fragment implements View.OnClickListener {
 
-    private TextView txtName, txtMoney, txtAboutUs, txtUpdate, txtSuggestion, txtRoom, txtSubject, txtClassTable, txtStore, txtSignOut;
+    private TextView txtName, txtMoney, txtAboutUs, txtUpdate, txtSuggestion, txtRoom, txtSubject,
+            txtClassTable, txtStore, txtService, txtSignOut, txtOrderList;
     private ImageView imgIcon;
     // 暂做课表的入口
     private TextView mCourseTable;
@@ -79,7 +82,9 @@ public class Fragmentfive extends Fragment implements View.OnClickListener {
         txtRoom = (TextView) view.findViewById(R.id.txt_tab5_localroom);
         txtSubject = (TextView) view.findViewById(R.id.txt_tab5_localsubject);
 //        txtStore = (TextView) view.findViewById(R.id.txt_to_store);
+        txtService = (TextView) view.findViewById(R.id.txt_to_service);
         txtSignOut = (TextView) view.findViewById(R.id.txt_to_signout);
+        txtOrderList = (TextView) view.findViewById(R.id.txt_to_orderlist);
         mCourseTable = (TextView) view.findViewById(R.id.txt_tab5_localmessage);
 
         mCourseTable.setOnClickListener(this);
@@ -90,7 +95,9 @@ public class Fragmentfive extends Fragment implements View.OnClickListener {
         txtRoom.setOnClickListener(this);
         txtSubject.setOnClickListener(this);
 //        txtStore.setOnClickListener(this);
+        txtService.setOnClickListener(this);
         txtSignOut.setOnClickListener(this);
+        txtOrderList.setOnClickListener(this);
     }
 
     // fragment 生命周期，打开时
@@ -238,6 +245,12 @@ public class Fragmentfive extends Fragment implements View.OnClickListener {
 //            case R.id.txt_to_store:
 //                startActivity(new Intent(getActivity(), StoreHomeActivity.class));
 //                break;
+            case R.id.txt_to_service:
+                startActivity(new Intent(getActivity(), CustomServiceActivity.class));
+                break;
+            case R.id.txt_to_orderlist:
+                startActivity(new Intent(getActivity(),StoreOrderListActivity.class));
+                break;
             case R.id.txt_to_signout:
                 toSignOut();
                 break;

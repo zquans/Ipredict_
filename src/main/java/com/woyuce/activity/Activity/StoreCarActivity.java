@@ -42,6 +42,10 @@ public class StoreCarActivity extends BaseActivity implements StoreCarAdapter.On
     private ArrayList<StoreMenu> mFinalList = new ArrayList<>();
     private StoreCarAdapter mAdapter;
 
+    public void back(View view) {
+        finish();
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

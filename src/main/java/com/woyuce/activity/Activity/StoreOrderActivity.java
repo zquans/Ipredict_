@@ -67,6 +67,10 @@ public class StoreOrderActivity extends BaseActivity {
         }
     };
 
+    public void back(View view) {
+        finish();
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
