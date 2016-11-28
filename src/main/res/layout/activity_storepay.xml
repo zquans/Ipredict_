@@ -116,7 +116,8 @@
                     android:layout_alignBaseline="@+id/txt_actvity_storepay_havemoney"
                     android:layout_toLeftOf="@+id/btn_actvity_storepay_add"
                     android:background="#ffffff"
-                    android:gravity="center" />
+                    android:gravity="center"
+                    android:inputType="number" />
 
                 <Button
                     android:id="@+id/btn_actvity_storepay_minus"

@@ -2,6 +2,8 @@ package com.woyuce.activity.Act;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -91,6 +93,26 @@ public class StorePayActivity extends BaseActivity implements View.OnClickListen
         max_store_user_money = local_store_user_money;
         mTxtUserMoney.setText("你有" + local_store_user_money + "个金币,可以抵扣" + local_store_user_money + "元");
         mEdtMiddle.setText(local_store_user_money.toString());
+
+        mEdtMiddle.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (Integer.parseInt(s.toString()) - local_store_user_money > 0) {
+                    ToastUtil.showMessage(StorePayActivity.this, "您的金币不足");
+                    mEdtMiddle.setText("1");
+                }
+            }
+        });
 
         StoreMenu storeMenu;
         for (int i = 0; i < mGoodsSkuIdList.size(); i++) {

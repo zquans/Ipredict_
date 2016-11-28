@@ -231,6 +231,10 @@
             android:name=".Act.WebActivity"
             android:launchMode="standard"
             android:screenOrientation="portrait" />
+        <activity
+            android:name=".Act.WebNoCookieActivity"
+            android:launchMode="standard"
+            android:screenOrientation="portrait" />
 
         <service
             android:name=".Services.UpdateService"

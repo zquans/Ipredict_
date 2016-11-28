@@ -33,10 +33,37 @@ public class StoreGoods {
     private String is_comment;
     private String unit_price;
     private String total_price;
-    private String goods_property;
+    private String quantity;
 
     public StoreGoods() {
     }
+
+    public String getGoods_thumb_img_url() {
+        return goods_thumb_img_url;
+    }
+
+    public void setGoods_thumb_img_url(String goods_thumb_img_url) {
+        this.goods_thumb_img_url = goods_thumb_img_url;
+    }
+
+    public String getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(String quantity) {
+        this.quantity = quantity;
+    }
+
+    public String getGoods_property() {
+        return goods_property;
+    }
+
+    public void setGoods_property(String goods_property) {
+        this.goods_property = goods_property;
+    }
+
+    private String goods_property;
+
 
     public String getAttr_clickable() {
         return attr_clickable;

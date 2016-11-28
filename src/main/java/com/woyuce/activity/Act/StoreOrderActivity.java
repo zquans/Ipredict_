@@ -1,5 +1,6 @@
 package com.woyuce.activity.Act;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -139,7 +140,7 @@ public class StoreOrderActivity extends BaseActivity {
 
     private String URL_ALIPAY = "http://pay.iyuce.com/api/order/ApplyApp";
 
-    public void toPay(View view) {
+    public void toPay() {//Test
         ToastUtil.showMessage(this, "去调支付宝吧");
         StringRequest aliRequest = new StringRequest(Request.Method.POST, URL_ALIPAY, new Response.Listener<String>() {
             @Override
@@ -182,7 +183,7 @@ public class StoreOrderActivity extends BaseActivity {
         AppContext.getHttpQueue().add(aliRequest);
     }
 
-    public void toPay() {
+    public void toPay(View view) {
         ToastUtil.showMessage(this, "去调支付宝吧");
 
         StringRequest payRequest = new StringRequest(Request.Method.POST, URL_TO_PAY + "?id="
@@ -191,6 +192,21 @@ public class StoreOrderActivity extends BaseActivity {
                     @Override
                     public void onResponse(String s) {
                         LogUtil.i("s = " + s);
+                        try {
+                            JSONObject obj;
+                            obj = new JSONObject(s);
+                            if (obj.getString("code").equals("0")) {
+                                int init_money = Integer.parseInt(PreferenceUtil.getSharePre(StoreOrderActivity.this).getString("store_user_money", ""));
+                                PreferenceUtil.save(StoreOrderActivity.this, "store_user_money", (init_money - Integer.parseInt(local_store_user_money)) + "");
+                                startActivity(new Intent(StoreOrderActivity.this, MainActivity.class));
+                            } else if (obj.getString("code").equals("!")) {
+                                ToastUtil.showMessage(StoreOrderActivity.this, "金币不足抵扣");
+                            } else {
+                                ToastUtil.showMessage(StoreOrderActivity.this, "支付失败");
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
                     }
                 }, new Response.ErrorListener() {
             @Override

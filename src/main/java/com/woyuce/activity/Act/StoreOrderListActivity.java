@@ -1,12 +1,13 @@
 package com.woyuce.activity.Act;
 
 import android.os.Bundle;
-import android.widget.ArrayAdapter;
+import android.view.View;
 import android.widget.ListView;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.toolbox.StringRequest;
+import com.woyuce.activity.Adapter.StoreOrderListAdapter;
 import com.woyuce.activity.Application.AppContext;
 import com.woyuce.activity.Bean.StoreGoods;
 import com.woyuce.activity.Bean.StoreOrder;
@@ -27,8 +28,7 @@ public class StoreOrderListActivity extends BaseActivity {
 
     private ListView mListView;
     private ArrayList<StoreOrder> mList = new ArrayList<>();
-    private ArrayList<String> mmList = new ArrayList<>();
-    private ArrayAdapter madapter;
+    private StoreOrderListAdapter mAdapter;
 
     private String URL = "http://api.iyuce.com/v1/store/orderlist?userid=";
 
@@ -50,6 +50,10 @@ public class StoreOrderListActivity extends BaseActivity {
         mListView = (ListView) findViewById(R.id.listview_activity_store_orderlist);
 
         requestData();
+    }
+
+    public void back(View view) {
+        finish();
     }
 
     private void requestData() {
@@ -84,15 +88,17 @@ public class StoreOrderListActivity extends BaseActivity {
                                 obj_ = arr_.getJSONObject(j);
                                 goods.setThumb_img(obj_.getString("goods_thumb_img_url"));
                                 goods.setGoods_title(obj_.getString("goods_title"));
+                                goods.setGoods_property(obj_.getString("goods_property"));
+                                goods.setQuantity(obj_.getString("quantity"));
+                                goods.setGoods_thumb_img_url(obj_.getString("goods_thumb_img_url"));
                                 mArrayList.add(goods);
                             }
                             order.setUser_order_details(mArrayList);
                             mList.add(order);
                         }
                         LogUtil.i("mList = " + mList);
-                        mmList.add(mList.toString());
-                        madapter = new ArrayAdapter(StoreOrderListActivity.this, android.R.layout.simple_list_item_1, mmList);
-                        mListView.setAdapter(madapter);
+                        mAdapter = new StoreOrderListAdapter(mList, StoreOrderListActivity.this);
+                        mListView.setAdapter(mAdapter);
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();

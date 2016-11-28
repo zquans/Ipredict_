@@ -10,6 +10,8 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.woyuce.activity.Act.StoreGoodsActivity;
+import com.woyuce.activity.Act.WebActivity;
+import com.woyuce.activity.Act.WebNoCookieActivity;
 import com.woyuce.activity.Bean.StoreBean;
 import com.woyuce.activity.R;
 import com.woyuce.activity.Utils.RecyclerItemClickListener;
@@ -56,24 +58,33 @@ public class StoreHomeAdapter extends RecyclerView.Adapter<StoreHomeAdapter.MyVi
         RecyclerView.Adapter mmAdapter = new StoreGoodsAdapter(context, mDatas.get(pos).getGoods_result());
         holder.mRecycler.setAdapter(mmAdapter);
         //加入Item点击事件
-        holder.mRecycler.addOnItemTouchListener(new RecyclerItemClickListener(context, holder.mRecycler, new RecyclerItemClickListener.OnItemClickListener() {
-            @Override
-            public void onItemClick(View view, int position) {
-                ToastUtil.showMessage(context, "what ? = " + position + pos);
-                //通过反向获取嵌套数组,拿到所需的参数
-                Intent intent = new Intent(context, StoreGoodsActivity.class);
-                intent.putExtra("goods_id", mDatas.get(pos).getGoods_result().get(position).getGoods_id());
-                intent.putExtra("goods_sku_id", mDatas.get(pos).getGoods_result().get(position).getGoods_sku_id());
-                intent.putExtra("goods_title", mDatas.get(pos).getGoods_result().get(position).getGoods_title());
-                intent.putExtra("sales_price", mDatas.get(pos).getGoods_result().get(position).getSales_price());
-                context.startActivity(intent);
-            }
+        holder.mRecycler.addOnItemTouchListener(new RecyclerItemClickListener(context, holder.mRecycler,
+                new RecyclerItemClickListener.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(View view, int position) {
+                        ToastUtil.showMessage(context, "what ? = " + position + pos);
+                        //通过反向获取嵌套数组,拿到所需的参数
+                        if (mDatas.get(pos).getGoods_result().get(position).getGoods_title().contains("http")) {
+                            Intent intent = new Intent(context, WebNoCookieActivity.class);
+                            intent.putExtra("URL", mDatas.get(pos).getGoods_result().get(position).getGoods_title());
+                            intent.putExtra("TITLE", "淘宝商品");
+                            intent.putExtra("COLOR", "#f7941d");
+                            context.startActivity(intent);
+                        } else {
+                            Intent intent = new Intent(context, StoreGoodsActivity.class);
+                            intent.putExtra("goods_id", mDatas.get(pos).getGoods_result().get(position).getGoods_id());
+                            intent.putExtra("goods_sku_id", mDatas.get(pos).getGoods_result().get(position).getGoods_sku_id());
+                            intent.putExtra("goods_title", mDatas.get(pos).getGoods_result().get(position).getGoods_title());
+                            intent.putExtra("sales_price", mDatas.get(pos).getGoods_result().get(position).getSales_price());
+                            context.startActivity(intent);
+                        }
+                    }
 
-            @Override
-            public void onItemLongClick(View view, int position) {
-                ToastUtil.showMessage(context, "what ?? = " + position);
-            }
-        }));
+                    @Override
+                    public void onItemLongClick(View view, int position) {
+                        ToastUtil.showMessage(context, "what ?? = " + position);
+                    }
+                }));
     }
 
     @Override
