@@ -9,10 +9,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.woyuce.activity.Activity.StoreGoodsActivity;
+import com.woyuce.activity.Act.StoreGoodsActivity;
 import com.woyuce.activity.Bean.StoreBean;
 import com.woyuce.activity.R;
-import com.woyuce.activity.Utils.LogUtil;
 import com.woyuce.activity.Utils.RecyclerItemClickListener;
 import com.woyuce.activity.Utils.ToastUtil;
 
