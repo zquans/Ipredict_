@@ -20,6 +20,7 @@ import android.widget.TextView;
 import com.woyuce.activity.Application.AppContext;
 import com.woyuce.activity.Fragment.Fragment3;
 import com.woyuce.activity.Fragment.FragmentTwo;
+import com.woyuce.activity.Fragment.Fragment_StoreHome;
 import com.woyuce.activity.Fragment.Fragment_StoreHome_Tab1;
 import com.woyuce.activity.Fragment.Fragmentfive;
 import com.woyuce.activity.Fragment.Fragmentone;
@@ -98,7 +99,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener, O
         Fragment mTab03_ = new Fragment3();
 //        Fragment mTab04 = new Fragmentfour();
         Fragment mTab05 = new Fragmentfive();
-        Fragment mTab04_ = new Fragment_StoreHome_Tab1();
+        Fragment mTab04_ = new Fragment_StoreHome();
 
         mFragments.add(mTab01);
         mFragments.add(mTab02);

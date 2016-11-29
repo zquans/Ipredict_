@@ -1,13 +1,14 @@
 package com.woyuce.activity.Act;
 
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.View;
-import android.widget.ListView;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.toolbox.StringRequest;
-import com.woyuce.activity.Adapter.StoreOrderListAdapter;
+import com.woyuce.activity.Adapter.StoreOrderListAdapter_;
 import com.woyuce.activity.Application.AppContext;
 import com.woyuce.activity.Bean.StoreGoods;
 import com.woyuce.activity.Bean.StoreOrder;
@@ -26,9 +27,9 @@ import java.util.ArrayList;
  */
 public class StoreOrderListActivity extends BaseActivity {
 
-    private ListView mListView;
+    private RecyclerView mRecyclerView;
+    private RecyclerView.Adapter mAdapter;
     private ArrayList<StoreOrder> mList = new ArrayList<>();
-    private StoreOrderListAdapter mAdapter;
 
     private String URL = "http://api.iyuce.com/v1/store/orderlist?userid=";
 
@@ -46,8 +47,9 @@ public class StoreOrderListActivity extends BaseActivity {
         initView();
     }
 
+    //改为RecyclerView
     private void initView() {
-        mListView = (ListView) findViewById(R.id.listview_activity_store_orderlist);
+        mRecyclerView = (RecyclerView) findViewById(R.id.recycler_activity_store_orderlist);
 
         requestData();
     }
@@ -97,8 +99,9 @@ public class StoreOrderListActivity extends BaseActivity {
                             mList.add(order);
                         }
                         LogUtil.i("mList = " + mList);
-                        mAdapter = new StoreOrderListAdapter(mList, StoreOrderListActivity.this);
-                        mListView.setAdapter(mAdapter);
+                        mAdapter = new StoreOrderListAdapter_(StoreOrderListActivity.this, mList);
+                        mRecyclerView.setLayoutManager(new LinearLayoutManager(StoreOrderListActivity.this));
+                        mRecyclerView.setAdapter(mAdapter);
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();

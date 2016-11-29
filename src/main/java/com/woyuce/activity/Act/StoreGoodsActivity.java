@@ -16,6 +16,7 @@ import com.android.volley.Response;
 import com.android.volley.toolbox.StringRequest;
 import com.woyuce.activity.Application.AppContext;
 import com.woyuce.activity.Fragment.Fragment_StoreGoods_One;
+import com.woyuce.activity.Fragment.Fragment_StoreGoods_One_;
 import com.woyuce.activity.Fragment.Fragment_StoreGoods_Three;
 import com.woyuce.activity.Fragment.Fragment_StoreGoods_Two;
 import com.woyuce.activity.R;
@@ -39,7 +40,7 @@ public class StoreGoodsActivity extends BaseActivity implements View.OnClickList
     private List<String> mList = new ArrayList<>();
     private String mImgList = null;//或者是个数组
 
-    Fragment_StoreGoods_One mFrgOne;
+    Fragment_StoreGoods_One_ mFrgOne;
 
     private static final int OPEN_FRAGMENT = 0x001;
 
@@ -52,7 +53,7 @@ public class StoreGoodsActivity extends BaseActivity implements View.OnClickList
             switch (msg.what) {
                 case OPEN_FRAGMENT:
                     Bundle bundle = new Bundle();
-                    mFrgOne = new Fragment_StoreGoods_One();
+                    mFrgOne = new Fragment_StoreGoods_One_();
                     bundle.putString("goods_id", getIntent().getStringExtra("goods_id"));
                     bundle.putString("goods_sku_id", getIntent().getStringExtra("goods_sku_id"));
                     bundle.putString("goods_title", getIntent().getStringExtra("goods_title"));
@@ -202,7 +203,7 @@ public class StoreGoodsActivity extends BaseActivity implements View.OnClickList
         switch (v.getId()) {
             case R.id.txt_storegoods_tab_one:
                 resetTxtTab(mTxtTabOne);
-                Fragment_StoreGoods_One mFrgOne = new Fragment_StoreGoods_One();
+                Fragment_StoreGoods_One_ mFrgOne = new Fragment_StoreGoods_One_();
                 bundle.putString("goods_id", getIntent().getStringExtra("goods_id"));
                 bundle.putString("goods_sku_id", getIntent().getStringExtra("goods_sku_id"));
                 bundle.putString("goods_title", getIntent().getStringExtra("goods_title"));

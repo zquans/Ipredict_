@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:orientation="vertical">
 
     <RelativeLayout
@@ -26,10 +26,10 @@
             android:onClick="back" />
     </RelativeLayout>
 
-    <ListView
-        android:id="@+id/listview_activity_store_orderlist"
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recycler_activity_store_orderlist"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:divider="#ddd"
         android:dividerHeight="16dp" />
 
