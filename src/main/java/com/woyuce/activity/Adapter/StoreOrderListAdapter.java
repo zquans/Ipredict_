@@ -16,13 +16,13 @@ import java.util.List;
 /**
  * Created by Administrator on 2016/11/2.
  */
-public class StoreOrderListAdapter_ extends RecyclerView.Adapter<StoreOrderListAdapter_.MyViewHolder> {
+public class StoreOrderListAdapter extends RecyclerView.Adapter<StoreOrderListAdapter.MyViewHolder> {
 
     private LayoutInflater mLayoutInflater;
     private List<StoreOrder> mList;
     private Context context;
 
-    public StoreOrderListAdapter_(Context context, List<StoreOrder> mList) {
+    public StoreOrderListAdapter(Context context, List<StoreOrder> mList) {
         this.mList = mList;
         this.context = context;
         mLayoutInflater = LayoutInflater.from(context);

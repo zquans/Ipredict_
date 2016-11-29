@@ -119,7 +119,7 @@ public class Fragment_StoreHome extends Fragment {
                         obj = arr_data.getJSONObject(i);
                         //"goods_result"
                         arr_goods_result = obj.getJSONArray("goods_result");
-                        List<StoreGoods> goodsList = new ArrayList<>();
+                        ArrayList<StoreGoods> goodsList = new ArrayList<>();
                         StoreGoods goods;
                         for (int j = 0; j < arr_goods_result.length(); j++) {
                             goods = new StoreGoods();
@@ -131,7 +131,7 @@ public class Fragment_StoreHome extends Fragment {
                             goods.setGoods_sku_id(obj_goods.getString("goods_sku_id"));
                             goodsList.add(goods);
                         }
-                        store.setGoods_result((ArrayList<StoreGoods>) goodsList);
+                        store.setGoods_result(goodsList);
                         // "menu"
                         obj = obj.getJSONObject("menu");
                         store.setTitle(obj.getString("title"));

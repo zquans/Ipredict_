@@ -62,9 +62,9 @@
         <Button
             android:id="@+id/btn_listitem_orderlist_pay"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="28dp"
             android:layout_alignParentRight="true"
-            android:background="@drawable/buttonstyle_orange"
+            android:background="#f7941d"
             android:text="去付款"
             android:textColor="#fff" />
 
