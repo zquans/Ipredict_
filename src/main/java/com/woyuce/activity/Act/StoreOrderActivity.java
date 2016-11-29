@@ -37,10 +37,10 @@ public class StoreOrderActivity extends BaseActivity {
     //生成订单
     private String URL_TO_ORDER = "http://api.iyuce.com/v1/store/order";
     private String URL_TO_PAY = "http://api.iyuce.com/v1/store/pay";
+    private String URL_TO_CASH_PAY = "http://api.iyuce.com/v1/store/paywithcash?paytype=alipay&id=";
 
     private String total_price, local_address_id, local_skuids, local_store_user_money;
-    private String local_order_id;
-    private String local_order_back_info;
+    private String local_user_id, local_order_id, local_alipay_data;
 
     private static final int SDK_PAY_FLAG = 2;
 
@@ -61,7 +61,7 @@ public class StoreOrderActivity extends BaseActivity {
                         ToastUtil.showMessage(StoreOrderActivity.this, "支付成功");
                     } else {
                         // 该笔订单真实的支付结果，需要依赖服务端的异步通知。
-                        ToastUtil.showMessage(StoreOrderActivity.this, "支付成功");
+                        ToastUtil.showMessage(StoreOrderActivity.this, "支付失败");
                     }
                     break;
             }
@@ -81,6 +81,8 @@ public class StoreOrderActivity extends BaseActivity {
     }
 
     private void initView() {
+        local_user_id = PreferenceUtil.getSharePre(StoreOrderActivity.this).getString("userId", "");
+
         total_price = getIntent().getStringExtra("total_price");
         local_address_id = getIntent().getStringExtra("address");
         local_skuids = getIntent().getStringExtra("skuids");
@@ -127,10 +129,10 @@ public class StoreOrderActivity extends BaseActivity {
                 HashMap<String, String> map = new HashMap<>();
                 map.put("discount", local_store_user_money);
                 map.put("address", local_address_id);
-                map.put("userid", PreferenceUtil.getSharePre(StoreOrderActivity.this).getString("userId", ""));
+                map.put("userid", local_user_id);
                 map.put("skuids", local_skuids);
                 LogUtil.i("aaaa = " + local_store_user_money + "," + local_address_id + "," + local_skuids + ","
-                        + PreferenceUtil.getSharePre(StoreOrderActivity.this).getString("userId", ""));
+                        + local_user_id);
                 return map;
             }
         };
@@ -138,56 +140,16 @@ public class StoreOrderActivity extends BaseActivity {
         AppContext.getHttpQueue().add(addressRequest);
     }
 
-    private String URL_ALIPAY = "http://pay.iyuce.com/api/order/ApplyApp";
-
-    public void toPay() {//Test
-        ToastUtil.showMessage(this, "去调支付宝吧");
-        StringRequest aliRequest = new StringRequest(Request.Method.POST, URL_ALIPAY, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String s) {
-                try {
-                    JSONObject obj;
-                    obj = new JSONObject(s);
-                    local_order_back_info = obj.getString("data");
-
-                    Runnable payRunnable = new Runnable() {
-
-                        @Override
-                        public void run() {
-                            PayTask alipay = new PayTask(StoreOrderActivity.this);
-                            Map<String, String> result = alipay.payV2(local_order_back_info, true);
-
-                            Message msg = new Message();
-                            msg.what = SDK_PAY_FLAG;
-                            msg.obj = result;
-                            mHandler.sendMessage(msg);
-                        }
-                    };
-                    // 必须异步调用
-                    Thread payThread = new Thread(payRunnable);
-                    payThread.start();
-
-
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                LogUtil.i("local_order_back_info = " + local_order_back_info);
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError volleyError) {
-                LogUtil.i("volleyError = " + volleyError);
-            }
-        });
-        aliRequest.setTag("StoreOrderActivity");
-        AppContext.getHttpQueue().add(aliRequest);
-    }
-
+    /**
+     * 支付请求第一步，金币支付
+     *
+     * @param view
+     */
     public void toPay(View view) {
-        ToastUtil.showMessage(this, "去调支付宝吧");
+        ToastUtil.showMessage(this, "去调金币支付吧");
 
-        StringRequest payRequest = new StringRequest(Request.Method.POST, URL_TO_PAY + "?id="
-                + local_order_id + "&userid=" + PreferenceUtil.getSharePre(StoreOrderActivity.this).getString("userId", ""),
+        StringRequest payRequest = new StringRequest(Request.Method.POST,
+                URL_TO_PAY + "?id=" + local_order_id + "&userid=" + local_user_id,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String s) {
@@ -199,8 +161,10 @@ public class StoreOrderActivity extends BaseActivity {
                                 int init_money = Integer.parseInt(PreferenceUtil.getSharePre(StoreOrderActivity.this).getString("store_user_money", ""));
                                 PreferenceUtil.save(StoreOrderActivity.this, "store_user_money", (init_money - Integer.parseInt(local_store_user_money)) + "");
                                 startActivity(new Intent(StoreOrderActivity.this, MainActivity.class));
-                            } else if (obj.getString("code").equals("!")) {
-                                ToastUtil.showMessage(StoreOrderActivity.this, "金币不足抵扣");
+                            } else if (obj.getString("code").equals("2")) {
+                                ToastUtil.showMessage(StoreOrderActivity.this, "金币不足抵扣,去调支付宝");
+                                //现金支付请求
+                                cashRequest(URL_TO_CASH_PAY + local_order_id);
                             } else {
                                 ToastUtil.showMessage(StoreOrderActivity.this, "支付失败");
                             }
@@ -216,5 +180,54 @@ public class StoreOrderActivity extends BaseActivity {
         });
         payRequest.setTag("StoreOrderActivity");
         AppContext.getHttpQueue().add(payRequest);
+    }
+
+    /**
+     * 支付请求第二步，现金支付
+     */
+    private void cashRequest(String url) {
+        StringRequest cashRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String s) {
+                try {
+                    JSONObject obj = new JSONObject(s);
+                    if (obj.getString("code").equals("0")) {
+                        local_alipay_data = obj.getString("data");
+
+                        //必须异步调用支付宝
+                        Runnable payRunnable = new Runnable() {
+                            @Override
+                            public void run() {
+                                PayTask alipay = new PayTask(StoreOrderActivity.this);
+                                Map<String, String> result = alipay.payV2(local_alipay_data, true);
+
+                                Message msg = new Message();
+                                msg.what = SDK_PAY_FLAG;
+                                msg.obj = result;
+                                mHandler.sendMessage(msg);
+                            }
+                        };
+                        // 必须异步调用
+                        Thread payThread = new Thread(payRunnable);
+                        payThread.start();
+                    } else {
+                        ToastUtil.showMessage(StoreOrderActivity.this, "调用支付宝失败");
+                        LogUtil.i(s);
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }, null) {
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                HashMap<String, String> map = new HashMap<>();
+                map.put("paytype", "alipay");
+                map.put("id", local_order_id);
+                return map;
+            }
+        };
+        cashRequest.setTag("StoreOrderActivity");
+        AppContext.getHttpQueue().add(cashRequest);
     }
 }

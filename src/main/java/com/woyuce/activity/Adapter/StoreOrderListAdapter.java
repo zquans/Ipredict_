@@ -44,34 +44,6 @@ public class StoreOrderListAdapter extends RecyclerView.Adapter<StoreOrderListAd
         holder.mRecycler.setLayoutManager(new LinearLayoutManager(context));
         RecyclerView.Adapter mAdapter = new StoreOrderGoodsAdapter(context, mList.get(pos).getUser_order_details());
         holder.mRecycler.setAdapter(mAdapter);
-        //加入Item点击事件
-//        holder.mRecycler.addOnItemTouchListener(new RecyclerItemClickListener(context, holder.mRecycler,
-//                new RecyclerItemClickListener.OnItemClickListener() {
-//                    @Override
-//                    public void onItemClick(View view, int position) {
-//                        ToastUtil.showMessage(context, "what ? = " + position + pos);
-//                        //通过反向获取嵌套数组,拿到所需的参数
-//                        if (mDatas.get(pos).getGoods_result().get(position).getGoods_title().contains("http")) {
-//                            Intent intent = new Intent(context, WebNoCookieActivity.class);
-//                            intent.putExtra("URL", mDatas.get(pos).getGoods_result().get(position).getGoods_title());
-//                            intent.putExtra("TITLE", "淘宝商品");
-//                            intent.putExtra("COLOR", "#f7941d");
-//                            context.startActivity(intent);
-//                        } else {
-//                            Intent intent = new Intent(context, StoreGoodsActivity.class);
-//                            intent.putExtra("goods_id", mDatas.get(pos).getGoods_result().get(position).getGoods_id());
-//                            intent.putExtra("goods_sku_id", mDatas.get(pos).getGoods_result().get(position).getGoods_sku_id());
-//                            intent.putExtra("goods_title", mDatas.get(pos).getGoods_result().get(position).getGoods_title());
-//                            intent.putExtra("sales_price", mDatas.get(pos).getGoods_result().get(position).getSales_price());
-//                            context.startActivity(intent);
-//                        }
-//                    }
-//
-//                    @Override
-//                    public void onItemLongClick(View view, int position) {
-//                        ToastUtil.showMessage(context, "what ?? = " + position);
-//                    }
-//                }));
     }
 
     @Override

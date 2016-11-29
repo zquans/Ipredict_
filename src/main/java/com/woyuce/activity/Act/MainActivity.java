@@ -21,7 +21,6 @@ import com.woyuce.activity.Application.AppContext;
 import com.woyuce.activity.Fragment.Fragment3;
 import com.woyuce.activity.Fragment.FragmentTwo;
 import com.woyuce.activity.Fragment.Fragment_StoreHome;
-import com.woyuce.activity.Fragment.Fragment_StoreHome_Tab1;
 import com.woyuce.activity.Fragment.Fragmentfive;
 import com.woyuce.activity.Fragment.Fragmentone;
 import com.woyuce.activity.Fragment.Fragmentthree;
@@ -103,7 +102,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener, O
 
         mFragments.add(mTab01);
         mFragments.add(mTab02);
-        mFragments.add(mTab03);
+        mFragments.add(mTab03_);
         mFragments.add(mTab04_);
         mFragments.add(mTab05);
 

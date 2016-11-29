@@ -17,7 +17,8 @@ import com.woyuce.activity.R;
 import java.util.List;
 
 /**
- * Created by Administrator on 2016/11/2.
+ * Created by Administrator on 2016/11/29.
+ * 商品订单列表中二级列表的适配器RecyclerView
  */
 public class StoreOrderGoodsAdapter extends RecyclerView.Adapter<StoreOrderGoodsAdapter.MViewHolder> {
 
