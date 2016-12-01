@@ -1,18 +1,18 @@
 package com.woyuce.activity.Act;
 
+import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
+import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.woyuce.activity.Adapter.StoreCarAdapter;
 import com.woyuce.activity.Application.AppContext;
@@ -20,11 +20,13 @@ import com.woyuce.activity.Bean.StoreMenu;
 import com.woyuce.activity.R;
 import com.woyuce.activity.Utils.LogUtil;
 import com.woyuce.activity.Utils.PreferenceUtil;
+import com.woyuce.activity.Utils.ToastUtil;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -33,6 +35,7 @@ import java.util.Set;
 /**
  * Created by Administrator on 2016/11/7.
  */
+
 public class StoreCarActivity extends BaseActivity implements StoreCarAdapter.OnMyClickListener {
 
     private TextView mTxtTotalNum, mTxtTotalPrice, mTxtFinalPrice;
@@ -62,8 +65,10 @@ public class StoreCarActivity extends BaseActivity implements StoreCarAdapter.On
 
         //计算总价
         for (int i = 0; i < mFinalList.size(); i++) {
-            Double mtotal_price = (Double.parseDouble(mFinalList.get(i).getNum())) * (Double.parseDouble(mFinalList.get(i).getPrice()));
-            total_price = total_price + mtotal_price;
+            Double mtotal_price = ArithUtil
+                    .mul(Double.parseDouble(mFinalList.get(i).getNum()), Double.parseDouble(mFinalList.get(i).getPrice()));
+//            total_price = total_price + mtotal_price;
+            total_price = ArithUtil.add(total_price, mtotal_price);
             int mtota_count = Integer.parseInt(mFinalList.get(i).getNum());
             total_count = total_count + mtota_count;
         }
@@ -77,7 +82,6 @@ public class StoreCarActivity extends BaseActivity implements StoreCarAdapter.On
         mAdapter = new StoreCarAdapter(this, mFinalList);
         mAdapter.setOnMyClickListener(this);
         mListView.setAdapter(mAdapter);
-        setListViewHeightBasedOnChildren(mListView);//动态计算ListView宽高
 
         //商品列表 总值计算
         mTxtTotalNum.setText(total_count + "件");
@@ -95,6 +99,8 @@ public class StoreCarActivity extends BaseActivity implements StoreCarAdapter.On
         for (int i = 0; i < mFinalList.size(); i++) {
             URL = URL + mFinalList.get(i).getGoodsskuid() + ",";
         }
+        progressdialogshow(this);
+        LogUtil.i("URL = " + URL);
         StringRequest requestRecentGoods = new StringRequest(Request.Method.GET, URL, new Response.Listener<String>() {
             @Override
             public void onResponse(String s) {
@@ -104,32 +110,62 @@ public class StoreCarActivity extends BaseActivity implements StoreCarAdapter.On
                     obj = new JSONObject(s);
                     if (obj.getString("code").equals("0")) {
                         arr = new JSONArray(obj.getString("data"));
+                        LogUtil.i("arr = " + arr);
                         for (int i = 0; i < arr.length(); i++) {
                             obj = arr.getJSONObject(i);
                             for (int j = 0; j < mFinalList.size(); j++) {
                                 if (obj.getString("Id").equals(mFinalList.get(j).getGoodsskuid())) {
                                     mFinalList.get(j).setPrice(obj.getString("SalesPrice"));
+//                                    LogUtil.i("obj.getString(\"Id\") = " + obj.getString("Id") +
+//                                            "-----obj.getString(\"SalesPrice\") = " + obj.getString("SalesPrice")
+//                                    );
                                     break;
                                 }
                             }
                         }
                     } else {
+                        ToastUtil.showMessage(StoreCarActivity.this, "获取最新商品信息错误");
                         LogUtil.i("oode != 0 " + obj.getString("message"));
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
+                progressdialogcancel();
             }
-        }, null);
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError volleyError) {
+                LogUtil.e("volleyError = " + volleyError.getMessage());
+                progressdialogcancel();
+            }
+        });
         requestRecentGoods.setTag("requestRecentGoods");
         AppContext.getHttpQueue().add(requestRecentGoods);
+    }
+
+    //数据库
+    private SQLiteDatabase mDatabase;
+
+    /**
+     * 插入新商品数据
+     */
+    private void insertData(String id, String goodsid, String goodsskuid, String name, String specname, String num, String price) {
+        mDatabase = openOrCreateDatabase("aipu.db", MODE_PRIVATE, null);
+        ContentValues mValues = new ContentValues();
+        mValues.put("id", id);
+        mValues.put("goodsskuid", goodsskuid);
+        mValues.put("name", name);
+        mValues.put("specname", specname);
+        mValues.put("num", num);
+        mValues.put("price", price);
+        mDatabase.insert("storetb", null, mValues);
+        mValues.clear();
+        mDatabase.close();
     }
 
     /**
      * 删除数据库中某商品的某一项
      */
-    private SQLiteDatabase mDatabase;
-
     private void deleteData(String arg, String _id_or_goodsskuid) {
         mDatabase = openOrCreateDatabase("aipu.db", MODE_PRIVATE, null);
         String local_delete = null;
@@ -179,16 +215,29 @@ public class StoreCarActivity extends BaseActivity implements StoreCarAdapter.On
     // 回调的方法，两个Button的处理
     @Override
     public void OnMyAddClick(View view, final int pos) {
+        progressdialogshow(this);
         TextView txtCount = (TextView) getViewByPosition(pos, mListView);
         int local_count = Integer.parseInt(txtCount.getText().toString());
         local_count = local_count + 1;
+        //循环后增加一项mList中的商品
+        String local_insert_goodsskuid = mFinalList.get(pos).getGoodsskuid();
+        for (int i = 0; i < mList.size(); i++) {
+            if (mList.get(i).getGoodsskuid().equals(local_insert_goodsskuid)) {
+                //增加对应主键ID的那条数据
+                insertData(mList.get(i).getId(), mList.get(i).getId(), mList.get(i).getGoodsskuid(),
+                        mList.get(i).getName(), mList.get(i).getSpecname(), "1", mList.get(i).getPrice());
+                break;
+            }
+        }
         //计算商品总价和总数
         countPrice("add", mFinalList.get(pos).getPrice());
         txtCount.setText(local_count + "");
+        progressdialogcancel();
     }
 
     @Override
     public void OnMyMinusClick(View view, int pos) {
+        progressdialogshow(this);
         //减少商品的时候需要考虑商品减少到0的情况
         TextView txtCount = (TextView) getViewByPosition(pos, mListView);
         int local_count = Integer.parseInt(txtCount.getText().toString());
@@ -211,9 +260,11 @@ public class StoreCarActivity extends BaseActivity implements StoreCarAdapter.On
             //同时移除视图
             mFinalList.remove(pos);
             mAdapter.notifyDataSetChanged();
+            progressdialogcancel();
             return;
         }
         txtCount.setText(local_count + "");
+        progressdialogcancel();
     }
 
     /**
@@ -221,13 +272,17 @@ public class StoreCarActivity extends BaseActivity implements StoreCarAdapter.On
      *
      * @return
      */
+
+    //TODO 这里会发生double计算错误，导致崩溃
     private void countPrice(String add_or_minus, String price) {
         if (add_or_minus.equals("add")) {
             total_count = total_count + 1;
-            total_price = total_price + Double.parseDouble(price);
+//            total_price = total_price + Double.parseDouble(price);
+            total_price = ArithUtil.add(total_price, Double.parseDouble(price));
         } else if (add_or_minus.equals("minus")) {
             total_count = total_count - 1;
-            total_price = total_price - Double.parseDouble(price);
+//            total_price = total_price - Double.parseDouble(price);
+            total_price = ArithUtil.sub(total_price, Double.parseDouble(price));
         }
         mTxtTotalNum.setText(total_count + "件");
         mTxtTotalPrice.setText(total_price + "元");
@@ -251,28 +306,6 @@ public class StoreCarActivity extends BaseActivity implements StoreCarAdapter.On
             final int childIndex = pos - firstListItemPosition;
             return listView.getChildAt(childIndex).findViewById(R.id.txt_listitem_storecar_count);
         }
-    }
-
-    /**
-     * 帮助类:动态设置ListView的高度
-     *
-     * @param listView
-     */
-    public static void setListViewHeightBasedOnChildren(ListView listView) {
-        if (listView == null) return;
-        ListAdapter listAdapter = listView.getAdapter();
-        if (listAdapter == null) {
-            return;
-        }
-        int totalHeight = 0;
-        for (int i = 0; i < listAdapter.getCount(); i++) {
-            View listItem = listAdapter.getView(i, null, listView);
-            listItem.measure(0, 0);
-            totalHeight += listItem.getMeasuredHeight();
-        }
-        ViewGroup.LayoutParams params = listView.getLayoutParams();
-        params.height = totalHeight + (listView.getDividerHeight() * (listAdapter.getCount() - 1));
-        listView.setLayoutParams(params);
     }
 
     /**
@@ -343,5 +376,49 @@ public class StoreCarActivity extends BaseActivity implements StoreCarAdapter.On
         intent.putExtra("total_price", total_price);
         intent.putExtra("total_count", total_count);
         startActivity(intent);
+    }
+
+    static class ArithUtil {
+        private static final int DEF_DIV_SCALE = 10;
+
+        private ArithUtil() {
+        }
+
+        public static double add(double d1, double d2) {
+            BigDecimal b1 = new BigDecimal(Double.toString(d1));
+            BigDecimal b2 = new BigDecimal(Double.toString(d2));
+            return b1.add(b2).doubleValue();
+
+        }
+
+        public static double sub(double d1, double d2) {
+            BigDecimal b1 = new BigDecimal(Double.toString(d1));
+            BigDecimal b2 = new BigDecimal(Double.toString(d2));
+            return b1.subtract(b2).doubleValue();
+
+        }
+
+        public static double mul(double d1, double d2) {
+            BigDecimal b1 = new BigDecimal(Double.toString(d1));
+            BigDecimal b2 = new BigDecimal(Double.toString(d2));
+            return b1.multiply(b2).doubleValue();
+
+        }
+
+        public static double div(double d1, double d2) {
+
+            return div(d1, d2, DEF_DIV_SCALE);
+
+        }
+
+        public static double div(double d1, double d2, int scale) {
+            if (scale < 0) {
+                throw new IllegalArgumentException("The scale must be a positive integer or zero");
+            }
+            BigDecimal b1 = new BigDecimal(Double.toString(d1));
+            BigDecimal b2 = new BigDecimal(Double.toString(d2));
+            return b1.divide(b2, scale, BigDecimal.ROUND_HALF_UP).doubleValue();
+
+        }
     }
 }

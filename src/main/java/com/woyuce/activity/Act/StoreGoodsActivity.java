@@ -15,7 +15,6 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.toolbox.StringRequest;
 import com.woyuce.activity.Application.AppContext;
-import com.woyuce.activity.Fragment.Fragment_StoreGoods_One;
 import com.woyuce.activity.Fragment.Fragment_StoreGoods_One_;
 import com.woyuce.activity.Fragment.Fragment_StoreGoods_Three;
 import com.woyuce.activity.Fragment.Fragment_StoreGoods_Two;
@@ -107,26 +106,24 @@ public class StoreGoodsActivity extends BaseActivity implements View.OnClickList
     private String URL = "http://api.iyuce.com/v1/store/goods";
 
     private void requestData() {
-        URL = URL + "?goodsid=" + getIntent().getStringExtra("goods_id") + "&skuid="
-                + getIntent().getStringExtra("goods_sku_id") + "&userid="
-                + PreferenceUtil.getSharePre(this).getString("userId", "");
-        LogUtil.i("url = " + URL);
-        StringRequest goodsDetialRequest = new StringRequest(Request.Method.GET, URL,
+        StringRequest goodsDetialRequest = new StringRequest(Request.Method.GET,
+                URL + "?goodsid=" + getIntent().getStringExtra("goods_id") + "&skuid="
+                        + getIntent().getStringExtra("goods_sku_id") + "&userid="
+                        + PreferenceUtil.getSharePre(this).getString("userId", ""),
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String s) {
-                        LogUtil.i(s.toString());
                         try {
                             JSONObject obj;
                             JSONArray arr;
                             obj = new JSONObject(s);
                             if (obj.getString("code").equals("0")) {
-                                //保存这个money，到购物车结算时可以抵充金币
+                                //TODO 保存这个money，到购物车结算时可以抵充金币
                                 String store_user_money = obj.getString("user_money");
                                 LogUtil.i("user_money = " + store_user_money);
                                 PreferenceUtil.save(StoreGoodsActivity.this, "store_user_money", store_user_money);
                                 obj = obj.getJSONObject("good");
-                                //给Tab的商品详情多图
+                                //给Tab2的商品详情多图
                                 mImgList = obj.getString("goods_desc");
                                 total_sales_volume = obj.getString("total_sales_volume");
                                 total_good_volume = obj.getString("total_good_volume");
@@ -141,6 +138,7 @@ public class StoreGoodsActivity extends BaseActivity implements View.OnClickList
                                 msg.what = OPEN_FRAGMENT;
                                 mHandler.sendMessage(msg);
                             } else {
+                                ToastUtil.showMessage(getApplicationContext(), "获取商品信息失败");
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -199,7 +197,7 @@ public class StoreGoodsActivity extends BaseActivity implements View.OnClickList
         String local_name = local_goods_title;
         String local_specname = mFrgOne.returenGoodsSpecName();
         String local_price = mFrgOne.returenGoodsPrice();
-        String local_num = String.valueOf(1);
+        String local_num = "1";
         switch (v.getId()) {
             case R.id.txt_storegoods_tab_one:
                 resetTxtTab(mTxtTabOne);

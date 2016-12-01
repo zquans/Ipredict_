@@ -39,6 +39,12 @@ public class Fragment_StoreGoods_Three extends Fragment implements View.OnClickL
     private String URL_ShowOrder = "http://api.iyuce.com/v1/store/showordersbygoodsid";
 
     @Override
+    public void onStop() {
+        super.onStop();
+        AppContext.getHttpQueue().cancelAll("goodsCommentRequest");
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_storegoods_three, null);
         initView(view);

@@ -18,7 +18,7 @@ import com.android.volley.Response;
 import com.android.volley.toolbox.StringRequest;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
-import com.woyuce.activity.Adapter.StoreSpcAdapter;
+import com.woyuce.activity.Adapter.StoreSpcAdapter_;
 import com.woyuce.activity.Application.AppContext;
 import com.woyuce.activity.Bean.StoreGoods;
 import com.woyuce.activity.R;
@@ -45,28 +45,28 @@ public class Fragment_StoreGoods_One_ extends Fragment implements AdapterView.On
     private String return_local_goodsid, return_local_goods_sku_id, return_local_specname, return_local_price;
 
     public String returenGoodsId() {
-        LogUtil.i("return_local_goodsid = " + return_local_goodsid);
+//        LogUtil.i("return_local_goodsid = " + return_local_goodsid);
         return return_local_goodsid;
     }
 
     public String returenGoodsSkuId() {
-        LogUtil.i("return_local_goods_sku_id = " + return_local_goods_sku_id);
+//        LogUtil.i("return_local_goods_sku_id = " + return_local_goods_sku_id);
         return return_local_goods_sku_id;
     }
 
     public String returenGoodsSpecName() {
-        LogUtil.i("return_local_name = " + return_local_specname);
+//        LogUtil.i("return_local_name = " + return_local_specname);
         return return_local_specname;
     }
 
     public String returenGoodsPrice() {
-        LogUtil.i("return_local_price = " + return_local_price);
+//        LogUtil.i("return_local_price = " + return_local_price);
         return return_local_price;
     }
 
     @Override
-    public void onDestroyView() {
-        super.onDestroyView();
+    public void onStop() {
+        super.onStop();
         AppContext.getHttpQueue().cancelAll("goodsSpeRequest");
     }
 
@@ -146,7 +146,7 @@ public class Fragment_StoreGoods_One_ extends Fragment implements AdapterView.On
     private ArrayList<StoreGoods> mListOne = new ArrayList<>();
     private ArrayList<StoreGoods> mListTwo = new ArrayList<>();
     private ArrayList<StoreGoods> mListThree = new ArrayList<>();
-    private StoreSpcAdapter mAdapterOne, mAdapterTwo, mAdapterThree;
+    private StoreSpcAdapter_ mAdapterOne, mAdapterTwo, mAdapterThree;
 
     private ArrayList<String> mAllSpcId = new ArrayList<>();
     private ArrayList<String> mSelectSpcList = new ArrayList<>();
@@ -238,7 +238,7 @@ public class Fragment_StoreGoods_One_ extends Fragment implements AdapterView.On
                             mAdapterTwo.notifyDataSetChanged();
                             mAdapterThree.notifyDataSetChanged();
                         } else {
-                            mAdapterOne = new StoreSpcAdapter(getActivity(), mListOne, mSelectSpcList);
+                            mAdapterOne = new StoreSpcAdapter_(getActivity(), mListOne, mSelectSpcList);
                             mGridOne.setAdapter(mAdapterOne);
                             if (mListOne.size() > 2) {
                                 mGridOne.setNumColumns(2);//设置每行显示的Item数
@@ -246,7 +246,7 @@ public class Fragment_StoreGoods_One_ extends Fragment implements AdapterView.On
                                 mGridOne.setNumColumns(mListOne.size());//设置每行显示的Item数
                             }
 
-                            mAdapterTwo = new StoreSpcAdapter(getActivity(), mListTwo, mSelectSpcList);
+                            mAdapterTwo = new StoreSpcAdapter_(getActivity(), mListTwo, mSelectSpcList);
                             mGridTwo.setAdapter(mAdapterTwo);
                             if (mListTwo.size() > 2) {
                                 mGridTwo.setNumColumns(2);//设置每行显示的Item数
@@ -254,7 +254,7 @@ public class Fragment_StoreGoods_One_ extends Fragment implements AdapterView.On
                                 mGridTwo.setNumColumns(mListTwo.size());//设置每行显示的Item数
                             }
 
-                            mAdapterThree = new StoreSpcAdapter(getActivity(), mListThree, mSelectSpcList);
+                            mAdapterThree = new StoreSpcAdapter_(getActivity(), mListThree, mSelectSpcList);
                             mGridThree.setAdapter(mAdapterThree);
                             if (mListThree.size() > 2) {
                                 mGridThree.setNumColumns(2);//设置每行显示的Item数
@@ -300,8 +300,14 @@ public class Fragment_StoreGoods_One_ extends Fragment implements AdapterView.On
                 } else {
                     storeGoods.setAttr_clickable("true");
                 }
-//                LogUtil.e(mAllSpcId + "," + arr.getJSONObject(i).getString("attr_id"));
+                LogUtil.e(mAllSpcId + "," + arr.getJSONObject(i).getString("attr_id"));
             }
+
+//            if (!mAllSpcId.contains("," + storeGoods.getAttr_id() + ",")) {
+//                storeGoods.setAttr_clickable("false");
+//            } else {
+//                storeGoods.setAttr_clickable("true");
+//            }
             list.add(storeGoods);
         }
     }
