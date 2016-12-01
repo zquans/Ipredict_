@@ -378,6 +378,9 @@ public class StoreCarActivity extends BaseActivity implements StoreCarAdapter.On
         startActivity(intent);
     }
 
+    /**
+     * 这个类应该放在外面
+     */
     static class ArithUtil {
         private static final int DEF_DIV_SCALE = 10;
 

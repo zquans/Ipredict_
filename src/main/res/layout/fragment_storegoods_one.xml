@@ -18,17 +18,16 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:background="#ffffff"
-        android:paddingLeft="16sp"
+        android:paddingLeft="16dp"
         android:textColor="#f7941d"
-        android:textSize="16sp" />
+        android:textSize="18sp" />
 
     <TextView
         android:id="@+id/txt_activity_storegoods_goodsprice"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
         android:background="#ffffff"
-        android:paddingLeft="16sp"
+        android:paddingLeft="16dp"
         android:textColor="#f23030"
         android:textSize="18sp" />
 

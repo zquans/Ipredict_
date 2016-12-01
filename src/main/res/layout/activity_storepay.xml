@@ -47,9 +47,10 @@
                     android:id="@+id/txt_activity_storepay_defoultaddress_one"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
                     android:background="#fff"
                     android:paddingLeft="8dp"
-                    android:textColor="#bf7473"
+                    android:textColor="#336699"
                     android:textStyle="bold" />
 
                 <TextView
@@ -57,9 +58,11 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/txt_activity_storepay_defoultaddress_one"
+                    android:layout_marginBottom="16dp"
+                    android:layout_marginTop="4dp"
                     android:background="#fff"
                     android:paddingLeft="8dp"
-                    android:textColor="#bf7473" />
+                    android:textColor="#336699" />
 
                 <ImageButton
                     android:layout_width="wrap_content"
@@ -70,16 +73,22 @@
 
             </RelativeLayout>
 
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="8dp"
+                android:background="#336699" />
+
             <ListView
                 android:id="@+id/listview_actvity_storepay"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp" />
+                android:layout_marginTop="8dp" />
 
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp">
+                android:layout_marginLeft="16dp"
+                android:layout_marginTop="24dp">
 
                 <TextView
                     android:id="@+id/txt_actvity_storepay_havemoney"
@@ -104,6 +113,7 @@
                     android:layout_height="32dp"
                     android:layout_alignBaseline="@+id/txt_actvity_storepay_havemoney"
                     android:layout_alignParentRight="true"
+                    android:layout_marginRight="16dp"
                     android:background="#ffffff"
                     android:gravity="center"
                     android:onClick="plusMoney"
@@ -135,7 +145,8 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginTop="24dp"
                 android:background="#fff"
                 android:orientation="horizontal">
 
@@ -160,7 +171,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
+                android:layout_marginLeft="16dp"
                 android:background="#fff"
                 android:orientation="horizontal">
 
@@ -186,7 +197,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
-                android:layout_marginTop="8dp"
+                android:layout_marginLeft="16dp"
                 android:background="#fff"
                 android:orientation="horizontal">
 

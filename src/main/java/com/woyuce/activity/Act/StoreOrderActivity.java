@@ -7,9 +7,11 @@ import android.os.Message;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import com.alipay.sdk.app.PayTask;
 import com.android.volley.AuthFailureError;
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -33,13 +35,14 @@ import java.util.Map;
 public class StoreOrderActivity extends BaseActivity {
 
     private EditText mEdtOrder, mEdtMoney;
+    private TextView mTxtGoods;
 
     //生成订单
     private String URL_TO_ORDER = "http://api.iyuce.com/v1/store/order";
     private String URL_TO_PAY = "http://api.iyuce.com/v1/store/pay";
     private String URL_TO_CASH_PAY = "http://api.iyuce.com/v1/store/paywithcash?paytype=alipay&id=";
 
-    private String total_price, local_address_id, local_skuids, local_store_user_money;
+    private String total_price, local_address_id, local_goods_name, local_skuids, local_store_user_money;
     private String local_user_id, local_order_id, local_alipay_data;
 
     private static final int SDK_PAY_FLAG = 2;
@@ -87,11 +90,14 @@ public class StoreOrderActivity extends BaseActivity {
         local_address_id = getIntent().getStringExtra("address");
         local_skuids = getIntent().getStringExtra("skuids");
         local_store_user_money = getIntent().getStringExtra("discount");
+        local_goods_name = getIntent().getStringExtra("goods_name");
 
         mEdtOrder = (EditText) findViewById(R.id.edt_activity_storeorder_order);
         mEdtMoney = (EditText) findViewById(R.id.edt_activity_storeorder_money);
+        mTxtGoods = (TextView) findViewById(R.id.txt_activity_storeorder_goods);
 
         mEdtMoney.setText(total_price);
+        mTxtGoods.setText(local_goods_name);
         //生成订单请求
         requestOrder();
     }
@@ -228,6 +234,8 @@ public class StoreOrderActivity extends BaseActivity {
             }
         };
         cashRequest.setTag("StoreOrderActivity");
+        cashRequest.setRetryPolicy(new DefaultRetryPolicy(1000, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         AppContext.getHttpQueue().add(cashRequest);
+
     }
 }

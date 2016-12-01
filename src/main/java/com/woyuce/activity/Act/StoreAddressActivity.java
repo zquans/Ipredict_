@@ -88,10 +88,25 @@ public class StoreAddressActivity extends BaseActivity implements
                                 storeaddress.setId(obj.getString("id"));
                                 storeaddress.setIs_default(obj.getString("is_default"));
                                 storeaddress.setMobile_veri_code_id(obj.getString("mobile_veri_code_id"));
+                                //给上一个Activity返回默认的地址信息
+                                if (obj.getString("is_default").equals("true")) {
+                                    Intent intent = new Intent();
+                                    intent.putExtra("default_address_id", obj.getString("id"));
+                                    intent.putExtra("default_address_name", obj.getString("name"));
+                                    intent.putExtra("default_address_mobile", obj.getString("mobile"));
+                                    intent.putExtra("default_address_q_q", obj.getString("q_q"));
+                                    intent.putExtra("default_address_email", obj.getString("email"));
+                                    // 设置结果，并进行传送
+                                    StoreAddressActivity.this.setResult(0, intent);
+                                }
                                 mList.add(storeaddress);
                             }
                             mAdapter = new StoreAddressAdapter(StoreAddressActivity.this, mList);
                             mListView.setAdapter(mAdapter);
+
+                            for (StoreAddress address : mList) {
+                                //            mList.get(i).getIs_default().equals("true");
+                            }
                         }
                     }
                 } catch (JSONException e) {

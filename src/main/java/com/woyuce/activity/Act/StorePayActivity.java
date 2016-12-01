@@ -20,6 +20,7 @@ import com.woyuce.activity.Adapter.StorePayAdapter;
 import com.woyuce.activity.Application.AppContext;
 import com.woyuce.activity.Bean.StoreMenu;
 import com.woyuce.activity.R;
+import com.woyuce.activity.Utils.LogUtil;
 import com.woyuce.activity.Utils.PreferenceUtil;
 import com.woyuce.activity.Utils.ToastUtil;
 
@@ -156,8 +157,8 @@ public class StorePayActivity extends BaseActivity implements View.OnClickListen
     }
 
     private void requestAddress() {
-        URL = URL + "?userid=" + PreferenceUtil.getSharePre(this).getString("userId", "");
-        StringRequest addressRequest = new StringRequest(Request.Method.GET, URL, new Response.Listener<String>() {
+        StringRequest addressRequest = new StringRequest(Request.Method.GET,
+                URL + "?userid=" + PreferenceUtil.getSharePre(this).getString("userId", ""), new Response.Listener<String>() {
             @Override
             public void onResponse(String s) {
                 JSONObject obj;
@@ -214,15 +215,35 @@ public class StorePayActivity extends BaseActivity implements View.OnClickListen
         intent.putExtra("address", local_address_id);
         intent.putExtra("skuids", local_skuids);
         intent.putExtra("discount", mEdtMiddle.getText().toString());
+        intent.putExtra("goods_name", mSpecNameList.toString());
         startActivity(intent);
     }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        LogUtil.i("resultCode = " + resultCode);
+        if (data == null) {
+            return;
+        }
+        switch (requestCode) {
+            case REQUEST_CODE_FOR_ADDRESS:
+                mTxtAddressOne.setText(data.getStringExtra("default_address_name") + "\r\r" + data.getStringExtra("default_address_mobile"));
+                mTxtAddressTwo.setText(data.getStringExtra("default_address_q_q") + "\r\r" + data.getStringExtra("default_address_email"));
+                mTxtAddressTwo.setGravity(Gravity.CENTER_VERTICAL);
+                local_address_id = data.getStringExtra("default_address_id");
+                break;
+        }
+    }
+
+    //startActivityForResult的请求码
+    private static final int REQUEST_CODE_FOR_ADDRESS = 0x001;
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.relative_activity_storepay:
-                //TODO 应该做forResult，因为设置的默认地址应该返回
-                startActivity(new Intent(this, StoreAddressActivity.class));
+                startActivityForResult(new Intent(this, StoreAddressActivity.class), REQUEST_CODE_FOR_ADDRESS);
                 break;
         }
     }

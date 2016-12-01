@@ -3,6 +3,28 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:background="#f7941d">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="收货信息"
+            android:textColor="#fff"
+            android:textSize="20sp" />
+
+        <ImageButton
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="4dp"
+            android:background="@mipmap/arrow_white_back"
+            android:onClick="back" />
+    </RelativeLayout>
+
     <TextView
         android:id="@+id/txt_activity_storeaddaddress_name"
         android:layout_width="wrap_content"
@@ -17,6 +39,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="64dp"
+        android:layout_marginTop="72dp"
         android:layout_toRightOf="@+id/txt_activity_storeaddaddress_name"
         android:hint="请输入联系人" />
 
