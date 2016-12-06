@@ -8,8 +8,8 @@ android {
         applicationId "com.woyuce.activity"
         minSdkVersion 15
         targetSdkVersion 24
-        versionCode 9
-        versionName "0.9"
+        versionCode 26
+        versionName "2.6"
     }
     buildTypes {
         release {
@@ -31,5 +31,6 @@ dependencies {
     compile 'com.squareup.okhttp3:okhttp:3.4.1'
     compile 'com.umeng.analytics:analytics:latest.integration'
     compile files('libs/MobCommons-2016.0830.1940.jar')
-    compile files('libs/alipaySdk-20161009.jar')
+    compile project(':Pushlib')
+    compile files('libs/alipaySingle-20161129.jar')
 }

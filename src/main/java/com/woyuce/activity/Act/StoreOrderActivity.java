@@ -41,6 +41,7 @@ public class StoreOrderActivity extends BaseActivity {
     private String URL_TO_ORDER = "http://api.iyuce.com/v1/store/order";
     private String URL_TO_PAY = "http://api.iyuce.com/v1/store/pay";
     private String URL_TO_CASH_PAY = "http://api.iyuce.com/v1/store/paywithcash?paytype=alipay&id=";
+    private String URL_TO_VALID = "http://api.iyuce.com/v1/store/validpaybyapp?paytype=alipay";
 
     private String total_price, local_address_id, local_goods_name, local_skuids, local_store_user_money;
     private String local_user_id, local_order_id, local_alipay_data;
@@ -57,14 +58,17 @@ public class StoreOrderActivity extends BaseActivity {
                     String resultInfo = result.getResult();// 同步返回需要验证的信息
                     String resultStatus = result.getResultStatus();
                     String resultMemo = result.getMemo();
-                    LogUtil.i("result = " + ",resultInfo = " + resultInfo
-                            + ",resultStatus = " + resultStatus + ",resultMemo = " + resultMemo);
+
+                    //请求验证是否支付成功
+                    validRequest(resultInfo);
+
+                    LogUtil.i(resultInfo);
                     if (TextUtils.equals(resultStatus, "9000")) {
                         // 该笔订单是否真实支付成功，需要依赖服务端的异步通知。
-                        ToastUtil.showMessage(StoreOrderActivity.this, "支付成功");
+                        ToastUtil.showMessage(StoreOrderActivity.this, "本地回调，支付成功");
                     } else {
                         // 该笔订单真实的支付结果，需要依赖服务端的异步通知。
-                        ToastUtil.showMessage(StoreOrderActivity.this, "支付失败");
+                        ToastUtil.showMessage(StoreOrderActivity.this, "本地回调,支付失败");
                     }
                     break;
             }
@@ -143,6 +147,7 @@ public class StoreOrderActivity extends BaseActivity {
             }
         };
         addressRequest.setTag("StoreOrderActivity");
+        addressRequest.setRetryPolicy(new DefaultRetryPolicy(1000, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         AppContext.getHttpQueue().add(addressRequest);
     }
 
@@ -185,6 +190,7 @@ public class StoreOrderActivity extends BaseActivity {
             }
         });
         payRequest.setTag("StoreOrderActivity");
+        payRequest.setRetryPolicy(new DefaultRetryPolicy(1000, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         AppContext.getHttpQueue().add(payRequest);
     }
 
@@ -236,6 +242,47 @@ public class StoreOrderActivity extends BaseActivity {
         cashRequest.setTag("StoreOrderActivity");
         cashRequest.setRetryPolicy(new DefaultRetryPolicy(1000, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         AppContext.getHttpQueue().add(cashRequest);
+    }
 
+    /**
+     * 校验支付宝回调结果
+     */
+    private void validRequest(final String pay_result) {
+        StringRequest validRequest = new StringRequest(Request.Method.POST, URL_TO_VALID, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String s) {
+                LogUtil.i("valid s = " + s);
+                try {
+                    JSONObject obj;
+                    obj = new JSONObject(s);
+                    if (obj.getString("code").equals("0")) {
+                        ToastUtil.showMessage(StoreOrderActivity.this, "message" + obj.getString("message"));
+                        int init_money = Integer.parseInt(PreferenceUtil.getSharePre(StoreOrderActivity.this).getString("store_user_money", ""));
+                        PreferenceUtil.save(StoreOrderActivity.this, "store_user_money", (init_money - Integer.parseInt(local_store_user_money)) + "");
+                        startActivity(new Intent(StoreOrderActivity.this, MainActivity.class));
+                    } else {
+                        ToastUtil.showMessage(StoreOrderActivity.this, "code !=0" + obj.getString("message"));
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError volleyError) {
+                LogUtil.e("volleyError = " + volleyError.getMessage());
+            }
+        }) {
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                HashMap<String, String> map = new HashMap<>();
+                map.put("", pay_result);
+                LogUtil.i("pay_result = " + pay_result);
+                return map;
+            }
+        };
+        validRequest.setTag("validRequest");
+        validRequest.setRetryPolicy(new DefaultRetryPolicy(1000, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+        AppContext.getHttpQueue().add(validRequest);
     }
 }

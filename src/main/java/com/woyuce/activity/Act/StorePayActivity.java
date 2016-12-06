@@ -33,6 +33,10 @@ import java.util.ArrayList;
 /**
  * Created by Administrator on 2016/11/7.
  */
+
+//TODO EdtMiddle中Button计算金币细化操作,上封顶，下封底
+//TODO 件数、金额、ListView中的Item不匹配问题需要修复
+
 public class StorePayActivity extends BaseActivity implements View.OnClickListener {
 
     private RelativeLayout mReLayoutAddress;
@@ -236,7 +240,7 @@ public class StorePayActivity extends BaseActivity implements View.OnClickListen
         }
     }
 
-    //startActivityForResult的请求码
+    /*startActivityForResult的请求码*/
     private static final int REQUEST_CODE_FOR_ADDRESS = 0x001;
 
     @Override

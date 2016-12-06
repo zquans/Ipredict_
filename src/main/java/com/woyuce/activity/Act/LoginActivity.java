@@ -21,6 +21,10 @@ import com.android.volley.Response;
 import com.android.volley.Response.ErrorListener;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
+import com.umeng.message.PushAgent;
+import com.umeng.message.UTrack;
+import com.umeng.message.common.inter.ITagManager;
+import com.umeng.message.tag.TagManager;
 import com.woyuce.activity.Application.AppContext;
 import com.woyuce.activity.R;
 import com.woyuce.activity.Utils.LogUtil;
@@ -44,7 +48,7 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 
     private String strPassword, strUserName; // 本类中变量，用于下次登录时作自动登录的数据
     private String localtoken;
-    private String LOGIN_URL = "http://api.iyuce.com/v1/account/login";
+    private String LOGIN_URL = "http://api.iyuce.com/v1001/account/login";
     private String URL_UPLOADTIME = "http://api.iyuce.com/v1/exam/setexamtime";
 
     // 注册页面跳转过来用
@@ -52,6 +56,12 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 
     //密码是否可见
     private boolean isEyeCan = false;
+
+    //声明推送管理
+    private PushAgent mPushAgent;
+
+    //设备唯一标识码
+    private String local_device_token;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,6 +83,9 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
         } else {
             requestPermission(Constants.CODE_WRITE_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE);
         }
+
+        mPushAgent = PushAgent.getInstance(this);
+        mPushAgent.onAppStart();
     }
 
     @Override
@@ -90,10 +103,13 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 
     @Override
     protected void onStart() {
+        super.onStart();
         Intent intent = getIntent();
         username_register = intent.getStringExtra("username_register");
         password_register = intent.getStringExtra("password_register");
         timer_register = intent.getStringExtra("timer_register");
+        local_device_token = intent.getStringExtra("local_device_token");
+
         // 给Edit输入默认账号密码
         if (!TextUtils.isEmpty(username_register)) {
             edtUsername.setText(username_register);
@@ -103,7 +119,14 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
             edtPassword.setText(PreferenceUtil.getSharePre(this).getString("password", ""));
         }
         LogUtil.e("username_register = " + username_register + "-----" + password_register);
-        super.onStart();
+
+        if (!TextUtils.isEmpty(local_device_token) && !local_device_token.equals(AppContext.getDeviceToken())) {
+            new AlertDialog.Builder(this).setTitle("您的账号在别处异常登录")
+                    .setMessage("如果不是本人操作，请及时修改密码")
+                    .setPositiveButton("知道了", null)
+                    .show();
+        }
+        LogUtil.e("----" + local_device_token + "------" + AppContext.getDeviceToken());
     }
 
     private void initView() {
@@ -122,6 +145,49 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
         btnRegister.setOnClickListener(this);
         btnApply.setOnClickListener(this);
         txtForget.setOnClickListener(this);
+    }
+
+    /**
+     * 设置推送标签
+     */
+    private void addTag(String tag) {
+        mPushAgent.getTagManager().add(new TagManager.TCallBack() {
+            @Override
+            public void onMessage(final boolean isSuccess, final ITagManager.Result result) {
+                if (isSuccess) {
+                    LogUtil.i("Add Tag:" + result);
+                } else {
+                    LogUtil.i("Add Tag:" + "加入tag失败");
+                }
+            }
+        }, tag);
+    }
+
+    /**
+     * 设置推送别名
+     */
+    private void addAlias(String userid) {
+        //获取设备唯一IMEI码
+//        TelephonyManager TelephonyMgr = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
+//        String user_device_token = TelephonyMgr.getDeviceId();
+//        LogUtil.i("user_device_token = " + user_device_token);
+
+        //别名和分组(别名应该用user_id)
+        String alias = userid;
+        String aliasType = "user_id";
+        //TODO 如果设备ID为null，return
+        LogUtil.i("device_token = " + alias);
+        mPushAgent.addAlias(alias, aliasType, new UTrack.ICallBack() {
+            @Override
+            public void onMessage(boolean isSuccess, String message) {
+                LogUtil.i("isSuccess:" + isSuccess + "," + message);
+                if (isSuccess)
+                    LogUtil.i("alias was set successfully.");
+
+                final boolean success = isSuccess;
+                LogUtil.i("Add Alias:" + (success ? "Success" : "Fail"));
+            }
+        });
     }
 
     /**
@@ -206,6 +272,10 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
                         PreferenceUtil.save(LoginActivity.this, "mtimer", localtimer);
                         // 拿到JSON中的token 打印出来
                         LogUtil.e("所有数据 " + userId + "->" + mUserName + "->" + Permission + "->" + money + "->");
+                        /*将userId作为推送的分组别名*/
+                        addAlias(userId);
+                        /*将userId作为推送的分组标签*/
+//                        addTag(userId);
                         // 取消加载对话框
                         progressdialogcancel();
                         // 上传注册时设定的考试时间
@@ -242,6 +312,7 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
                 HashMap<String, String> map = new HashMap<>();
                 map.put("username", strUserName);
                 map.put("password", strPassword);
+                map.put("deviceid", AppContext.getDeviceToken());
                 return map;
             }
         };

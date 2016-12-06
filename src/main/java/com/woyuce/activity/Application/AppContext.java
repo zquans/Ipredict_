@@ -2,6 +2,7 @@ package com.woyuce.activity.Application;
 
 import android.app.Application;
 import android.content.Context;
+import android.content.Intent;
 import android.view.Display;
 import android.view.WindowManager;
 
@@ -12,6 +13,15 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.assist.QueueProcessingType;
 import com.nostra13.universalimageloader.core.download.BaseImageDownloader;
+import com.umeng.message.IUmengRegisterCallback;
+import com.umeng.message.PushAgent;
+import com.umeng.message.UTrack;
+import com.umeng.message.UmengMessageHandler;
+import com.umeng.message.UmengNotificationClickHandler;
+import com.umeng.message.entity.UMessage;
+import com.woyuce.activity.Act.LoginActivity;
+import com.woyuce.activity.Utils.LogUtil;
+import com.woyuce.activity.Utils.ToastUtil;
 
 import java.io.File;
 
@@ -24,6 +34,7 @@ import java.io.File;
 public class AppContext extends Application {
     private static final String TAG = AppContext.class.getSimpleName();
     private static final String APP_CACAHE_DIRNAME = "/webcache";
+    private static String DEVICE_TOKEN;
 
     //singleton
     private static AppContext appContext = null;
@@ -37,6 +48,68 @@ public class AppContext extends Application {
         appContext = this;
         mQueue = Volley.newRequestQueue(getApplicationContext());
         init();
+
+        PushAgent mPushAgent = PushAgent.getInstance(this);
+
+        UmengMessageHandler messageHandler = new UmengMessageHandler() {
+            /**
+             * 自定义消息的回调方法
+             */
+            @Override
+            public void dealWithCustomMessage(final Context context, final UMessage msg) {
+                LogUtil.i("linx", "dealWithCustomMessage----" + msg.custom);
+                if (!msg.custom.equals(DEVICE_TOKEN)) {
+                    Intent startLogin = new Intent(context, LoginActivity.class);
+                    startLogin.putExtra("local_device_token", DEVICE_TOKEN);
+                    startLogin.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    context.startActivity(startLogin);
+                }
+                boolean isClickOrDismissed = true;
+                if (isClickOrDismissed) {
+                    //自定义消息的点击统计
+                    UTrack.getInstance(getApplicationContext()).trackMsgClick(msg);
+                } else {
+                    //自定义消息的忽略统计
+                    UTrack.getInstance(getApplicationContext()).trackMsgDismissed(msg);
+                }
+            }
+        };
+        mPushAgent.setMessageHandler(messageHandler);
+
+        /**
+         * 自定义行为的回调处理
+         * UmengNotificationClickHandler是在BroadcastReceiver中被调用，故
+         * 如果需启动Activity，需添加Intent.FLAG_ACTIVITY_NEW_TASK
+         * */
+        UmengNotificationClickHandler notificationClickHandler = new UmengNotificationClickHandler() {
+            @Override
+            public void dealWithCustomAction(final Context context, UMessage msg) {
+                //TODO 接收到推送后自定义打开的界面或者其他
+                ToastUtil.showMessage(context, "收到通知：" + msg.custom + ",并执行相应操作");
+                Intent startLogin = new Intent(context, LoginActivity.class);
+                startLogin.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                context.startActivity(startLogin);
+            }
+        };
+        //使用自定义的NotificationHandler，来结合友盟统计处理消息通知
+        //参考http://bbs.umeng.com/thread-11112-1-1.html
+        //CustomNotificationHandler notificationClickHandler = new CustomNotificationHandler();
+        mPushAgent.setNotificationClickHandler(notificationClickHandler);
+
+        //注册推送服务，每次调用register方法都会回调该接口
+        mPushAgent.register(new IUmengRegisterCallback() {
+            @Override
+            public void onSuccess(String deviceToken) {
+                //注册成功会返回device token
+                LogUtil.i("Appcontext deviceToken = " + deviceToken);
+                DEVICE_TOKEN = deviceToken;
+            }
+
+            @Override
+            public void onFailure(String s, String s1) {
+
+            }
+        });
     }
 
     public static AppContext getInstance() {
@@ -87,6 +160,13 @@ public class AppContext extends Application {
         if (!cacheDir.exists())
             cacheDir.mkdirs();
         return cacheDir.getAbsolutePath();
+    }
+
+    /**
+     * 返回DEVICE_TOKEN
+     */
+    public static String getDeviceToken() {
+        return DEVICE_TOKEN;
     }
 
     /**
