@@ -2,6 +2,7 @@ package com.woyuce.activity.Act;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -37,7 +38,7 @@ public class StoreOrderListActivity extends BaseActivity {
     private ArrayList<StoreOrder> mList = new ArrayList<>();
 
     private String local_user_id;
-    private String URL = "http://api.iyuce.com/v1/store/orderlist?userid=";
+    private String URL = "http://api.iyuce.com/v1/store/orderlist?pageSize=30&userid=";
     private String URL_Del = "http://api.iyuce.com/v1/store/orderdelete?userid=";
 
     @Override
@@ -94,7 +95,7 @@ public class StoreOrderListActivity extends BaseActivity {
                             order.setOrder_no(obj.getString("order_no"));
                             order.setPrice(obj.getString("price"));
                             order.setCreate_at(obj.getString("create_at"));
-
+                            order.setOrder_status(obj.getString("order_status"));
                             ArrayList<StoreGoods> mArrayList = new ArrayList<>();
                             //StoreOrder对象内的StoreGoods数组
                             arr_ = obj.getJSONArray("user_order_details");
@@ -119,7 +120,11 @@ public class StoreOrderListActivity extends BaseActivity {
                                 new RecyclerItemClickListener.OnItemClickListener() {
                                     @Override
                                     public void onItemClick(View view, int position) {
-
+                                        Intent intent = new Intent(StoreOrderListActivity.this, StoreOrderActivity.class);
+                                        intent.putExtra("local_order_id", mList.get(position).getId());
+                                        intent.putExtra("total_price", mList.get(position).getPrice());
+                                        intent.putExtra("goods_name", mList.get(position).getUser_order_details().get(0).getGoods_title() + "\r...");
+                                        startActivity(intent);
                                     }
 
                                     @Override

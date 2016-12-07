@@ -4,9 +4,15 @@
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="16dp"
+        android:background="#f0f2f5" />
+
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="8dp">
 
         <TextView
             android:id="@+id/txt_listitem_orderlist_num"
@@ -23,11 +29,18 @@
             android:layout_below="@+id/txt_listitem_orderlist_num"
             android:text="订单时间" />
 
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:background="#f0f2f5" />
+
         <ImageButton
             android:id="@+id/img_listitem_orderlist_delete"
             android:layout_width="28dp"
             android:layout_height="28dp"
             android:layout_alignParentRight="true"
+            android:layout_marginRight="4dp"
+            android:layout_marginTop="4dp"
             android:background="@mipmap/icon_delete_" />
     </RelativeLayout>
 
@@ -41,17 +54,18 @@
         android:id="@+id/recyclerview_listitem_orderlist"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginLeft="8dp"
         android:layout_marginTop="4dp" />
 
     <View
         android:layout_width="match_parent"
-        android:layout_height="0.5dp"
-        android:layout_marginTop="4dp"
-        android:background="#ccc" />
+        android:layout_height="2dp"
+        android:background="#f0f2f5" />
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="8dp">
 
         <TextView
             android:id="@+id/txt_listitem_orderlist_price"
@@ -59,15 +73,31 @@
             android:layout_height="wrap_content"
             android:text="付款金额" />
 
-        <Button
-            android:id="@+id/btn_listitem_orderlist_pay"
+        <TextView
+            android:id="@+id/txt_listitem_orderlist_statue"
             android:layout_width="wrap_content"
-            android:layout_height="28dp"
-            android:layout_alignParentRight="true"
-            android:background="#f7941d"
-            android:text="去付款"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="8dp"
+            android:layout_toRightOf="@+id/txt_listitem_orderlist_price"
+            android:background="#5bc0de"
+            android:paddingLeft="4dp"
+            android:paddingRight="4dp"
+            android:text="订单状态"
             android:textColor="#fff" />
 
+        <TextView
+            android:id="@+id/btn_listitem_orderlist_pay"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:background="#d9534f"
+            android:paddingBottom="1dp"
+            android:paddingLeft="4dp"
+            android:paddingRight="4dp"
+            android:paddingTop="1dp"
+            android:text="￥ 去付款"
+            android:textColor="#fff"
+            android:textSize="16sp" />
     </RelativeLayout>
 
 </LinearLayout>

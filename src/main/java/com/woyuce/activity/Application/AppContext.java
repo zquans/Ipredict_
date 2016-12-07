@@ -1,6 +1,7 @@
 package com.woyuce.activity.Application;
 
 import android.app.Application;
+import android.app.Notification;
 import android.content.Context;
 import android.content.Intent;
 import android.view.Display;
@@ -15,15 +16,16 @@ import com.nostra13.universalimageloader.core.assist.QueueProcessingType;
 import com.nostra13.universalimageloader.core.download.BaseImageDownloader;
 import com.umeng.message.IUmengRegisterCallback;
 import com.umeng.message.PushAgent;
-import com.umeng.message.UTrack;
 import com.umeng.message.UmengMessageHandler;
 import com.umeng.message.UmengNotificationClickHandler;
 import com.umeng.message.entity.UMessage;
 import com.woyuce.activity.Act.LoginActivity;
 import com.woyuce.activity.Utils.LogUtil;
+import com.woyuce.activity.Utils.PreferenceUtil;
 import com.woyuce.activity.Utils.ToastUtil;
 
 import java.io.File;
+import java.util.Map;
 
 /**
  * 全局应用程序类：用于保存和调用全局应用配置及访问网络数据
@@ -53,31 +55,64 @@ public class AppContext extends Application {
 
         UmengMessageHandler messageHandler = new UmengMessageHandler() {
             /**
-             * 自定义消息的回调方法
+             * 自定义消息的回调方法(透传)，用户无感知
              */
             @Override
             public void dealWithCustomMessage(final Context context, final UMessage msg) {
-                LogUtil.i("linx", "dealWithCustomMessage----" + msg.custom);
-                if (!msg.custom.equals(DEVICE_TOKEN)) {
+                LogUtil.i("linx", "dealWithCustomMessage----msg:" + msg.custom);
+                if (msg.custom.equals(PreferenceUtil.getSharePre(context).getString("userId", ""))) {
                     Intent startLogin = new Intent(context, LoginActivity.class);
-                    startLogin.putExtra("local_device_token", DEVICE_TOKEN);
+                    startLogin.putExtra("local_push_code", msg.custom);
                     startLogin.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     context.startActivity(startLogin);
                 }
-                boolean isClickOrDismissed = true;
-                if (isClickOrDismissed) {
-                    //自定义消息的点击统计
-                    UTrack.getInstance(getApplicationContext()).trackMsgClick(msg);
-                } else {
-                    //自定义消息的忽略统计
-                    UTrack.getInstance(getApplicationContext()).trackMsgDismissed(msg);
+                //自定义参数
+                LogUtil.i("linx", "dealWithCustomMessage----extra:" + msg.extra);
+                for (Map.Entry<String, String> entry : msg.extra.entrySet()) {
+                    //键值自己拼装，2016/12/07全蛋说只会传一组数据key不变，所以我只拿了value
+                    String key = entry.getKey();
+                    String value = entry.getValue();
+                    if (value.equals(PreferenceUtil.getSharePre(context).getString("userId", ""))) {
+                        Intent startLogin = new Intent(context, LoginActivity.class);
+                        startLogin.putExtra("local_push_code", value);
+                        startLogin.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        context.startActivity(startLogin);
+                    }
                 }
+//                boolean isClickOrDismissed = true;
+//                if (isClickOrDismissed) {
+//                    //自定义消息的点击统计
+//                    UTrack.getInstance(getApplicationContext()).trackMsgClick(msg);
+//                } else {
+//                    //自定义消息的忽略统计
+//                    UTrack.getInstance(getApplicationContext()).trackMsgDismissed(msg);
+//                }
+            }
+
+            /**
+             * 当消息推送到用户通知栏时回调
+             */
+            @Override
+            public Notification getNotification(Context context, UMessage uMessage) {
+                LogUtil.i("linx", "getNotification----extra:" + uMessage.extra);
+                for (Map.Entry<String, String> entry : uMessage.extra.entrySet()) {
+                    //键值自己拼装，2016/12/07全蛋说只会传一组数据key不变，所以我只拿了value
+                    String key = entry.getKey();
+                    String value = entry.getValue();
+                    if (value.equals(PreferenceUtil.getSharePre(context).getString("userId", ""))) {
+                        Intent startLogin = new Intent(context, LoginActivity.class);
+                        startLogin.putExtra("local_push_code", value);
+                        startLogin.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        context.startActivity(startLogin);
+                    }
+                }
+                return super.getNotification(context, uMessage);
             }
         };
         mPushAgent.setMessageHandler(messageHandler);
 
         /**
-         * 自定义行为的回调处理
+         * 当用户点击收到的通知时回调
          * UmengNotificationClickHandler是在BroadcastReceiver中被调用，故
          * 如果需启动Activity，需添加Intent.FLAG_ACTIVITY_NEW_TASK
          * */
@@ -85,10 +120,7 @@ public class AppContext extends Application {
             @Override
             public void dealWithCustomAction(final Context context, UMessage msg) {
                 //TODO 接收到推送后自定义打开的界面或者其他
-                ToastUtil.showMessage(context, "收到通知：" + msg.custom + ",并执行相应操作");
-                Intent startLogin = new Intent(context, LoginActivity.class);
-                startLogin.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                context.startActivity(startLogin);
+                ToastUtil.showMessage(context, "收到通知：" + msg.custom + "||" + msg.extra + ",并执行相应操作");
             }
         };
         //使用自定义的NotificationHandler，来结合友盟统计处理消息通知

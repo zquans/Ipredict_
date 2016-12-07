@@ -124,7 +124,7 @@ public class StoreCarActivity extends BaseActivity implements StoreCarAdapter.On
                             }
                         }
                     } else {
-                        ToastUtil.showMessage(StoreCarActivity.this, "获取最新商品信息错误");
+                        ToastUtil.showMessage(StoreCarActivity.this, "获取最新商品信息失败");
                         LogUtil.i("oode != 0 " + obj.getString("message"));
                     }
                 } catch (JSONException e) {

@@ -52,6 +52,7 @@ public class Fragmentfive extends Fragment implements View.OnClickListener {
     private String localroomname;
     private String URL_ROOM = "http://iphone.ipredicting.com/kymyroom.aspx";
     private String URL_SUBJECT = "http://iphone.ipredicting.com/kymyshanesub.aspx";
+    private String URL_MONEY_INFO = "http://api.iyuce.com/v1/store/getusermoney?userid=";
     private List<SpeakingRoom> roomList = new ArrayList<>();
     private List<String> subcontentList = new ArrayList<>();
     private List<String> myexamList = new ArrayList<>();
@@ -105,6 +106,7 @@ public class Fragmentfive extends Fragment implements View.OnClickListener {
         if (share().getString("username", "").length() == 0) {
             txtRoom.setText("登录后可见");
             txtSubject.setText("登录后可见");
+            txtMoney.setText(share().getString("money", "登录后可见"));
             myexamList.clear();
         } else {
             roomList.clear();
@@ -112,6 +114,7 @@ public class Fragmentfive extends Fragment implements View.OnClickListener {
             myexamList.clear();
             getRoomJson();
             getSubjectJson();
+            getMoney();
             mCourseTable.setText("查看");
         }
         txtName.setText(share().getString("mUserName", "点击头像切换账号"));
@@ -125,7 +128,7 @@ public class Fragmentfive extends Fragment implements View.OnClickListener {
 
     //获取考场
     private void getRoomJson() {
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, URL_ROOM, new Response.Listener<String>() {
+        StringRequest rommRequest = new StringRequest(Request.Method.POST, URL_ROOM, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
                 JSONObject jsonObject;
@@ -157,15 +160,15 @@ public class Fragmentfive extends Fragment implements View.OnClickListener {
                 return hashMap;
             }
         };
-        stringRequest.setTag("fragmentfive");
-        AppContext.getHttpQueue().add(stringRequest);
+        rommRequest.setTag("fragmentfive");
+        AppContext.getHttpQueue().add(rommRequest);
     }
 
     /**
      * 获取考题列表
      */
     private void getSubjectJson() {
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, URL_SUBJECT, new Response.Listener<String>() {
+        StringRequest subjectRequest = new StringRequest(Request.Method.POST, URL_SUBJECT, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
                 JSONObject jsonObject;
@@ -199,8 +202,32 @@ public class Fragmentfive extends Fragment implements View.OnClickListener {
                 return hashMap;
             }
         };
-        stringRequest.setTag("fragmentfive");
-        AppContext.getHttpQueue().add(stringRequest);
+        subjectRequest.setTag("fragmentfive");
+        AppContext.getHttpQueue().add(subjectRequest);
+    }
+
+
+    /**
+     * 获取金币
+     */
+    private void getMoney() {
+        StringRequest moneyRequest = new StringRequest(Request.Method.GET,
+                URL_MONEY_INFO + PreferenceUtil.getSharePre(getActivity()).getString("userId", ""), new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                try {
+                    JSONObject obj;
+                    obj = new JSONObject(response);
+                    if (obj.getString("code").equals("0")) {
+                        txtMoney.setText(obj.getString("data"));
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }, null);
+        moneyRequest.setTag("fragmentfive");
+        AppContext.getHttpQueue().add(moneyRequest);
     }
 
     @Override
@@ -249,7 +276,7 @@ public class Fragmentfive extends Fragment implements View.OnClickListener {
                 startActivity(new Intent(getActivity(), CustomServiceActivity.class));
                 break;
             case R.id.txt_to_orderlist:
-                startActivity(new Intent(getActivity(),StoreOrderListActivity.class));
+                startActivity(new Intent(getActivity(), StoreOrderListActivity.class));
                 break;
             case R.id.txt_to_signout:
                 toSignOut();
@@ -269,6 +296,8 @@ public class Fragmentfive extends Fragment implements View.OnClickListener {
                         CookieManager.getInstance().removeAllCookie();
                         LogUtil.e("CookieManager = " + CookieManager.getInstance().getCookie("iyuce.com") + "");
                         startActivity(new Intent(getActivity(), LoginActivity.class));
+                        PreferenceUtil.removeall(getActivity()); // 只留下了版本号
+                        getActivity().finish();
                     }
                 }).setNegativeButton("取消", null)
                 .show();

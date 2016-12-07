@@ -61,7 +61,7 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
     private PushAgent mPushAgent;
 
     //设备唯一标识码
-    private String local_device_token;
+    private String local_push_code;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,6 +71,7 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 
         initView();
         localtoken = PreferenceUtil.getSharePre(LoginActivity.this).getString("localtoken", "");
+
         if (TextUtils.isEmpty(localtoken)) {
             getBaseToken();
         } else {
@@ -91,8 +92,12 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
     @Override
     public void doUpdate() {
         new UpdateManager(this).checkUpdate();
-//        Intent intent = new Intent(this, UpdateService.class);
-//        startService(intent);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        local_push_code = null;
     }
 
     @Override
@@ -104,32 +109,28 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
     @Override
     protected void onStart() {
         super.onStart();
+        if (!TextUtils.isEmpty(local_push_code)) {
+            if (local_push_code.equals(PreferenceUtil.getSharePre(this).getString("userId", "default"))) {
+                if (!local_push_code.equals("default")) {
+                    new AlertDialog.Builder(this).setTitle("您的账号在别处异常登录")
+                            .setMessage("如果不是本人操作，请及时修改密码")
+                            .setPositiveButton("知道了", null)
+                            .show();
+                    LogUtil.e("----" + local_push_code + "------" + AppContext.getDeviceToken());
+
+                    local_push_code = null;
+                }
+            }
+        }
+    }
+
+    private void initView() {
         Intent intent = getIntent();
         username_register = intent.getStringExtra("username_register");
         password_register = intent.getStringExtra("password_register");
         timer_register = intent.getStringExtra("timer_register");
-        local_device_token = intent.getStringExtra("local_device_token");
+        local_push_code = intent.getStringExtra("local_push_code");
 
-        // 给Edit输入默认账号密码
-        if (!TextUtils.isEmpty(username_register)) {
-            edtUsername.setText(username_register);
-            edtPassword.setText(password_register);
-        } else {
-            edtUsername.setText(PreferenceUtil.getSharePre(this).getString("username", ""));
-            edtPassword.setText(PreferenceUtil.getSharePre(this).getString("password", ""));
-        }
-        LogUtil.e("username_register = " + username_register + "-----" + password_register);
-
-        if (!TextUtils.isEmpty(local_device_token) && !local_device_token.equals(AppContext.getDeviceToken())) {
-            new AlertDialog.Builder(this).setTitle("您的账号在别处异常登录")
-                    .setMessage("如果不是本人操作，请及时修改密码")
-                    .setPositiveButton("知道了", null)
-                    .show();
-        }
-        LogUtil.e("----" + local_device_token + "------" + AppContext.getDeviceToken());
-    }
-
-    private void initView() {
         btninto = (Button) findViewById(R.id.btn_login);
         btnLogin = (Button) findViewById(R.id.btn_loginAtOnce);
         btnRegister = (Button) findViewById(R.id.btn_register);
@@ -145,6 +146,16 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
         btnRegister.setOnClickListener(this);
         btnApply.setOnClickListener(this);
         txtForget.setOnClickListener(this);
+
+        // 给Edit输入默认账号密码
+        if (!TextUtils.isEmpty(username_register)) {
+            edtUsername.setText(username_register);
+            edtPassword.setText(password_register);
+        } else {
+            edtUsername.setText(PreferenceUtil.getSharePre(this).getString("username", ""));
+            edtPassword.setText(PreferenceUtil.getSharePre(this).getString("password", ""));
+        }
+        LogUtil.e("username_register = " + username_register + "-----" + password_register);
     }
 
     /**
@@ -170,7 +181,6 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
         //获取设备唯一IMEI码
 //        TelephonyManager TelephonyMgr = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
 //        String user_device_token = TelephonyMgr.getDeviceId();
-//        LogUtil.i("user_device_token = " + user_device_token);
 
         //别名和分组(别名应该用user_id)
         String alias = userid;
@@ -235,7 +245,7 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
     /**
      * 请求登录
      */
-    private void doRequest() {
+    private void loginRequest() {
         progressdialogshow(this);
         StringRequest stringRequest = new StringRequest(Method.POST, LOGIN_URL, new Response.Listener<String>() {
             @Override
@@ -273,7 +283,7 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
                         // 拿到JSON中的token 打印出来
                         LogUtil.e("所有数据 " + userId + "->" + mUserName + "->" + Permission + "->" + money + "->");
                         /*将userId作为推送的分组别名*/
-                        addAlias(userId);
+//                        addAlias(userId);
                         /*将userId作为推送的分组标签*/
 //                        addTag(userId);
                         // 取消加载对话框
@@ -296,7 +306,7 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
             public void onErrorResponse(VolleyError error) {
                 progressdialogcancel();
                 LogUtil.e("Wrong-Back", "连接错误原因： " + error.getMessage());
-                ToastUtil.showMessage(LoginActivity.this, "登录失败，请重试");
+                ToastUtil.showMessage(LoginActivity.this, "登录超时，请重试");
             }
         }) {
             @Override
@@ -334,8 +344,8 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
                     ToastUtil.showMessage(LoginActivity.this, "账号密码不能为空，试试体验登陆吧");
                     return;
                 }
-                //请求网络
-                doRequest();
+                //请求登录
+                loginRequest();
 //                CookieManager.getInstance().removeAllCookie();
                 break;
             case R.id.btn_loginAtOnce:

@@ -37,10 +37,10 @@ public class StoreOrderListAdapter extends RecyclerView.Adapter<StoreOrderListAd
 
     @Override
     public void onBindViewHolder(MyViewHolder holder, final int pos) {
-        holder.mTxtOrder.setText(mList.get(pos).getOrder_no());
-        holder.mTxtTime.setText(mList.get(pos).getCreate_at());
-        holder.mTxtPrice.setText(mList.get(pos).getPrice());
-
+        holder.mTxtOrder.setText("订单号:" + mList.get(pos).getOrder_no());
+        holder.mTxtTime.setText("订单时间:" + mList.get(pos).getCreate_at());
+        holder.mTxtPrice.setText("实付款:" + mList.get(pos).getPrice());
+        holder.mTxtStatue.setText(mList.get(pos).getOrder_status());
         holder.mRecycler.setLayoutManager(new LinearLayoutManager(context));
         RecyclerView.Adapter mAdapter = new StoreOrderGoodsAdapter(context, mList.get(pos).getUser_order_details());
         holder.mRecycler.setAdapter(mAdapter);
@@ -52,7 +52,7 @@ public class StoreOrderListAdapter extends RecyclerView.Adapter<StoreOrderListAd
     }
 
     class MyViewHolder extends RecyclerView.ViewHolder {
-        TextView mTxtOrder, mTxtTime, mTxtPrice;
+        TextView mTxtOrder, mTxtTime, mTxtPrice, mTxtStatue;
         RecyclerView mRecycler;
 
         public MyViewHolder(View view) {
@@ -61,6 +61,7 @@ public class StoreOrderListAdapter extends RecyclerView.Adapter<StoreOrderListAd
             mTxtTime = (TextView) view.findViewById(R.id.txt_listitem_orderlist_time);
             mTxtPrice = (TextView) view.findViewById(R.id.txt_listitem_orderlist_price);
             mRecycler = (RecyclerView) view.findViewById(R.id.recyclerview_listitem_orderlist);
+            mTxtStatue = (TextView) itemView.findViewById(R.id.txt_listitem_orderlist_statue);
         }
     }
 }

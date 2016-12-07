@@ -1,44 +1,61 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
 
-    <ImageView
-        android:id="@+id/img_listitem_ordergoods_imgurl"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
-        android:background="@mipmap/icon_camera"
-        android:scaleType="centerCrop" />
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="4dp"
+        android:background="#0000" />
 
-    <TextView
-        android:id="@+id/txt_listitem_ordergoods_name"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:layout_toRightOf="@+id/img_listitem_ordergoods_imgurl"
-        android:ellipsize="marquee"
-        android:maxLines="1"
-        android:text="商品大类"
-        android:textSize="16sp"
-        android:textStyle="bold" />
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
-    <TextView
-        android:id="@+id/txt_listitem_ordergoods_specname"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/txt_listitem_ordergoods_name"
-        android:layout_marginTop="4dp"
-        android:layout_toRightOf="@+id/img_listitem_ordergoods_imgurl"
-        android:ellipsize="marquee"
-        android:maxLines="1"
-        android:text="商品规格" />
+        <ImageView
+            android:id="@+id/img_listitem_ordergoods_imgurl"
+            android:layout_width="120dp"
+            android:layout_height="60dp"
+            android:layout_marginRight="8dp"
+            android:scaleType="centerCrop" />
 
-    <TextView
-        android:id="@+id/txt_listitem_ordergoods_goodsnum"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_centerVertical="true"
-        android:layout_marginRight="8dp"
-        android:text="x 1" />
-</RelativeLayout>
+        <TextView
+            android:id="@+id/txt_listitem_ordergoods_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:layout_toRightOf="@+id/img_listitem_ordergoods_imgurl"
+            android:ellipsize="marquee"
+            android:maxLines="1"
+            android:text="商品大类"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/txt_listitem_ordergoods_specname"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/txt_listitem_ordergoods_name"
+            android:layout_marginTop="4dp"
+            android:layout_toRightOf="@+id/img_listitem_ordergoods_imgurl"
+            android:ellipsize="marquee"
+            android:maxLines="1"
+            android:text="商品规格" />
+
+        <TextView
+            android:id="@+id/txt_listitem_ordergoods_goodsnum"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="8dp"
+            android:text="x 1" />
+
+    </RelativeLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="4dp"
+        android:background="#0000" />
+</LinearLayout>

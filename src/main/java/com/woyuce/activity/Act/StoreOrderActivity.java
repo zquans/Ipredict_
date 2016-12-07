@@ -59,6 +59,7 @@ public class StoreOrderActivity extends BaseActivity {
                     String resultStatus = result.getResultStatus();
                     String resultMemo = result.getMemo();
 
+                    LogUtil.i("resultStatus = " + resultStatus + ",resultMemo = " + resultMemo + ",resultInfo = " + resultInfo);
                     //请求验证是否支付成功
                     validRequest(resultInfo);
 
@@ -90,11 +91,14 @@ public class StoreOrderActivity extends BaseActivity {
     private void initView() {
         local_user_id = PreferenceUtil.getSharePre(StoreOrderActivity.this).getString("userId", "");
 
+        //从订单列表或者从StorePay界面传过来的
         total_price = getIntent().getStringExtra("total_price");
         local_address_id = getIntent().getStringExtra("address");
         local_skuids = getIntent().getStringExtra("skuids");
         local_store_user_money = getIntent().getStringExtra("discount");
         local_goods_name = getIntent().getStringExtra("goods_name");
+        //从订单列表Activity传过来的订单号，不为空则不用去请求生成订单
+        local_order_id = getIntent().getStringExtra("local_order_id");
 
         mEdtOrder = (EditText) findViewById(R.id.edt_activity_storeorder_order);
         mEdtMoney = (EditText) findViewById(R.id.edt_activity_storeorder_money);
@@ -102,8 +106,13 @@ public class StoreOrderActivity extends BaseActivity {
 
         mEdtMoney.setText(total_price);
         mTxtGoods.setText(local_goods_name);
-        //生成订单请求
-        requestOrder();
+
+        if (TextUtils.isEmpty(local_order_id)) {
+            //生成订单请求
+            requestOrder();
+        } else {
+            mEdtOrder.setText(local_order_id);
+        }
     }
 
     /**
@@ -201,6 +210,7 @@ public class StoreOrderActivity extends BaseActivity {
         StringRequest cashRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String s) {
+                LogUtil.i("S = " + s);
                 try {
                     JSONObject obj = new JSONObject(s);
                     if (obj.getString("code").equals("0")) {

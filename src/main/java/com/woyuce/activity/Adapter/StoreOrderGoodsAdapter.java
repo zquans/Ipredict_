@@ -45,7 +45,7 @@ public class StoreOrderGoodsAdapter extends RecyclerView.Adapter<StoreOrderGoods
     public void onBindViewHolder(StoreOrderGoodsAdapter.MViewHolder holder, int position) {
         holder.mTxtName.setText(mList.get(position).getGoods_title());
         holder.mTxtSpecName.setText(mList.get(position).getGoods_property());
-        holder.mTxtGoodsNum.setText(mList.get(position).getQuantity());
+        holder.mTxtGoodsNum.setText("x\r" + mList.get(position).getQuantity());
         ImageLoader.getInstance().displayImage(mList.get(position).getThumb_img(), holder.mImg, options);
     }
 
