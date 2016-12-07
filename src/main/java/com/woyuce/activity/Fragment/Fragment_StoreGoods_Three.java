@@ -64,6 +64,12 @@ public class Fragment_StoreGoods_Three extends Fragment implements View.OnClickL
         mTxtBad.setOnClickListener(this);
         mTxtShowOrder.setOnClickListener(this);
 
+        mTxtAll.setText("全部(" + getArguments().getString("total_sales_volume") + ")");
+        mTxtGood.setText("好评(" + getArguments().getString("total_good_volume") + ")");
+        mTxtBad.setText("差评(" + getArguments().getString("total_bad_volume") + ")");
+        mTxtMiddle.setText("中评(" + getArguments().getString("total_medium_volume") + ")");
+        mTxtShowOrder.setText("晒单(" + getArguments().getString("total_show_order_volume") + ")");
+
         //列表填充
         mListView = (ListView) view.findViewById(R.id.listview_store_fragment_three);
         //数据请求
@@ -71,9 +77,8 @@ public class Fragment_StoreGoods_Three extends Fragment implements View.OnClickL
     }
 
     private void requestData() {
-        //Fragment传递参数
-        URL = URL + "?goodsid=" + getArguments().getString("goods_id") + "&pageindex=" + "1" + "&pagesize=" + "10";
-        StringRequest goodsCommentRequest = new StringRequest(Request.Method.GET, URL,
+        StringRequest goodsCommentRequest = new StringRequest(Request.Method.GET,
+                URL + "?goodsid=" + getArguments().getString("goods_id") + "&pageindex=" + "1" + "&pagesize=" + "30",
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String s) {

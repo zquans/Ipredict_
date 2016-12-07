@@ -102,7 +102,7 @@ public class StoreGoodsActivity extends BaseActivity implements View.OnClickList
     /**
      * 获取的是轮播图、商品详情的数据
      */
-    private String total_sales_volume, total_good_volume, total_show_order_volume;
+    private String total_sales_volume, total_good_volume, total_bad_volume, total_medium_volume, total_show_order_volume;
     private String URL = "http://api.iyuce.com/v1/store/goods";
 
     private void requestData() {
@@ -127,6 +127,8 @@ public class StoreGoodsActivity extends BaseActivity implements View.OnClickList
                                 mImgList = obj.getString("goods_desc");
                                 total_sales_volume = obj.getString("total_sales_volume");
                                 total_good_volume = obj.getString("total_good_volume");
+                                total_bad_volume = obj.getString("total_bad_volume");
+                                total_medium_volume = obj.getString("total_medium_volume");
                                 total_show_order_volume = obj.getString("total_show_order_volume");
                                 //填充轮播图数据
                                 arr = obj.getJSONArray("goods_albums");
@@ -226,6 +228,11 @@ public class StoreGoodsActivity extends BaseActivity implements View.OnClickList
                 resetTxtTab(mTxtTabThree);
                 Fragment_StoreGoods_Three mFrgThree = new Fragment_StoreGoods_Three();
                 bundle.putString("goods_id", getIntent().getStringExtra("goods_id"));
+                bundle.putString("total_sales_volume", total_sales_volume);
+                bundle.putString("total_good_volume", total_good_volume);
+                bundle.putString("total_bad_volume", total_bad_volume);
+                bundle.putString("total_medium_volume", total_medium_volume);
+                bundle.putString("total_show_order_volume", total_show_order_volume);
                 mFrgThree.setArguments(bundle);
                 getFragmentManager().beginTransaction().replace(R.id.frame_activity_storegoods_fragment, mFrgThree).commit();
                 break;

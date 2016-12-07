@@ -62,7 +62,6 @@ public class StoreHomeAdapter extends RecyclerView.Adapter<StoreHomeAdapter.MyVi
                 new RecyclerItemClickListener.OnItemClickListener() {
                     @Override
                     public void onItemClick(View view, int position) {
-                        ToastUtil.showMessage(context, "what ? = " + position + pos);
                         //通过反向获取嵌套数组,拿到所需的参数
                         if (mDatas.get(pos).getGoods_result().get(position).getGoods_title().contains("http")) {
                             Intent intent = new Intent(context, WebNoCookieActivity.class);
@@ -82,7 +81,6 @@ public class StoreHomeAdapter extends RecyclerView.Adapter<StoreHomeAdapter.MyVi
 
                     @Override
                     public void onItemLongClick(View view, int position) {
-                        ToastUtil.showMessage(context, "what ?? = " + position);
                     }
                 }));
     }

@@ -2,114 +2,131 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:layout_gravity="center_horizontal"
-    android:layout_margin="4dp"
-    android:background="@drawable/buttonstyle_orangestroke"
     android:orientation="vertical">
 
-    <!--可能是样式设计了边距-->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="8dp"
+        android:background="#fff" />
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="#eeeef0"
-        android:orientation="horizontal"
-        android:paddingBottom="16dp"
-        android:paddingTop="16dp">
-
-        <TextView
-            android:layout_width="80dp"
-            android:layout_height="match_parent"
-            android:gravity="center_vertical"
-            android:text="商品名称" />
-
-        <TextView
-            android:id="@+id/txt_listitem_storecar_name"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="#eeeef0"
-        android:orientation="horizontal"
-        android:paddingBottom="16dp"
-        android:paddingTop="16dp">
-
-        <TextView
-            android:layout_width="80dp"
-            android:layout_height="match_parent"
-            android:gravity="center_vertical"
-            android:text="规格参数" />
-
-        <TextView
-            android:id="@+id/txt_listitem_storecar_specname"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="#ffffff"
-        android:orientation="horizontal"
-        android:paddingBottom="16dp"
-        android:paddingTop="16dp">
-
-        <TextView
-            android:layout_width="80dp"
-            android:layout_height="match_parent"
-            android:gravity="center_vertical"
-            android:text="单价" />
-
-        <TextView
-            android:id="@+id/txt_listitem_storecar_price"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="#eeeef0"
-        android:orientation="horizontal"
-        android:paddingBottom="16dp"
-        android:paddingTop="16dp">
-
-        <TextView
-            android:layout_width="80dp"
-            android:layout_height="match_parent"
-            android:gravity="center_vertical"
-            android:text="数量" />
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:background="@drawable/buttonstyle_orangestroke_store_car"
+        android:orientation="vertical">
 
         <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:orientation="horizontal">
-
-            <Button
-                android:id="@+id/btn_listitem_storecar_minus"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:text="-" />
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#eeeef0"
+            android:orientation="horizontal"
+            android:paddingBottom="16dp"
+            android:paddingLeft="8dp"
+            android:paddingTop="16dp">
 
             <TextView
-                android:id="@+id/txt_listitem_storecar_count"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:gravity="center" />
+                android:layout_width="160dp"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:text="商品名称" />
 
-            <Button
-                android:id="@+id/btn_listitem_storecar_add"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:text="+" />
+            <TextView
+                android:id="@+id/txt_listitem_storecar_name"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1" />
+        </LinearLayout>
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#eeeef0"
+            android:orientation="horizontal"
+            android:paddingBottom="16dp"
+            android:paddingLeft="8dp"
+            android:paddingTop="16dp">
+
+            <TextView
+                android:layout_width="160dp"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:text="规格参数" />
+
+            <TextView
+                android:id="@+id/txt_listitem_storecar_specname"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#ffffff"
+            android:orientation="horizontal"
+            android:paddingBottom="16dp"
+            android:paddingLeft="8dp"
+            android:paddingTop="16dp">
+
+            <TextView
+                android:layout_width="160dp"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:text="单价" />
+
+            <TextView
+                android:id="@+id/txt_listitem_storecar_price"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#eeeef0"
+            android:orientation="horizontal"
+            android:paddingBottom="16dp"
+            android:paddingLeft="8dp"
+            android:paddingTop="16dp">
+
+            <TextView
+                android:layout_width="160dp"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:text="数量" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/btn_listitem_storecar_minus"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:background="#fff"
+                    android:text="-" />
+
+                <TextView
+                    android:id="@+id/txt_listitem_storecar_count"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:background="#fff"
+                    android:gravity="center" />
+
+                <Button
+                    android:id="@+id/btn_listitem_storecar_add"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:background="#fff"
+                    android:text="+" />
+
+            </LinearLayout>
         </LinearLayout>
     </LinearLayout>
 

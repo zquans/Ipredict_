@@ -128,6 +128,7 @@ public class Fragment_StoreGoods_One extends Fragment implements AdapterView.OnI
         } else {
             for (int i = 0; i < mList.size(); i++) {
                 ImageView img = new ImageView(getActivity());
+                img.setScaleType(ImageView.ScaleType.FIT_XY);
                 ImageLoader.getInstance().displayImage(mList.get(i), img, options);
                 mFlipper.addView(img);
             }

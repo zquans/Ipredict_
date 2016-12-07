@@ -201,7 +201,6 @@
             android:screenOrientation="portrait" />
 
         <!-- Tab5 -->
-        <activity android:name=".Act.StoreHomeActivity" />
         <activity android:name=".Act.StoreGoodsActivity" />
         <activity android:name=".Act.StoreCarActivity" />
         <activity android:name=".Act.StorePayActivity" />

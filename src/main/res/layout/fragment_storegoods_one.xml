@@ -10,7 +10,7 @@
     <ViewFlipper
         android:id="@+id/viewflip_activity_storegoods"
         android:layout_width="match_parent"
-        android:layout_height="240dp" />
+        android:layout_height="160dp" />
 
     <TextView
         android:id="@+id/txt_activity_storegoods_goodstitle"
@@ -31,10 +31,17 @@
         android:textColor="#f23030"
         android:textSize="18sp" />
 
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="12dp"
+        android:background="#f0f2f5" />
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="48dp"
-        android:orientation="horizontal">
+        android:background="#fff"
+        android:orientation="horizontal"
+        android:paddingLeft="16dp">
 
         <TextView
             android:id="@+id/txt_storegoods_fragmentone_salenum"
@@ -70,34 +77,45 @@
 
     </LinearLayout>
 
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="12dp"
+        android:background="#f0f2f5" />
+
     <TextView
         android:id="@+id/txt_fragment_store_one"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:paddingLeft="16dp" />
 
     <GridView
         android:id="@+id/gridview_fragment_store_one"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:paddingLeft="16dp" />
 
     <TextView
         android:id="@+id/txt_fragment_store_two"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:paddingLeft="16dp" />
 
     <GridView
         android:id="@+id/gridview_fragment_store_two"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:paddingLeft="16dp" />
 
     <TextView
         android:id="@+id/txt_fragment_store_three"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:paddingLeft="16dp" />
 
     <GridView
         android:id="@+id/gridview_fragment_store_three"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:paddingLeft="16dp" />
 
 </LinearLayout>

@@ -120,7 +120,7 @@ public class AppContext extends Application {
             @Override
             public void dealWithCustomAction(final Context context, UMessage msg) {
                 //TODO 接收到推送后自定义打开的界面或者其他
-                ToastUtil.showMessage(context, "收到通知：" + msg.custom + "||" + msg.extra + ",并执行相应操作");
+//                ToastUtil.showMessage(context, "收到通知：" + msg.custom + "||" + msg.extra + ",并执行相应操作");
             }
         };
         //使用自定义的NotificationHandler，来结合友盟统计处理消息通知

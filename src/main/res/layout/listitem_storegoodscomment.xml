@@ -1,49 +1,71 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:descendantFocusability="blocksDescendants"
-    android:gravity="center_vertical">
+    android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/txt_goodscomment_username"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:singleLine="true"
-        android:text="用户名"
-        android:textColor="#3399ff"
-        android:textSize="14sp" />
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="8dp"
+        android:background="#f0f2f5" />
 
-    <TextView
-        android:id="@+id/txt_goodscomment_comment"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="8dp"
-        android:layout_toRightOf="@+id/txt_goodscomment_username"
-        android:singleLine="true"
-        android:text="评价"
-        android:textColor="#ff0000"
-        android:textSize="14sp" />
-
-    <TextView
-        android:id="@+id/txt_goodscomment_content"
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/txt_goodscomment_username"
-        android:layout_marginTop="2dp"
-        android:minLines="1"
-        android:text="我是一个评论"
-        android:textColor="#898989"
-        android:textSize="18sp" />
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginTop="8dp"
+        android:descendantFocusability="blocksDescendants"
+        android:gravity="center_vertical">
 
-    <TextView
-        android:id="@+id/txt_goodscomment_time"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/txt_goodscomment_username"
-        android:layout_alignBottom="@+id/txt_goodscomment_username"
-        android:layout_alignRight="@+id/txt_goodscomment_content"
-        android:text="2014-12-12"
-        android:textColor="#898989"
-        android:textSize="14sp" />
+        <TextView
+            android:id="@+id/txt_goodscomment_username"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:singleLine="true"
+            android:text="用户名"
+            android:textColor="#3399ff"
+            android:textSize="14sp" />
 
-</RelativeLayout>
+        <TextView
+            android:id="@+id/txt_goodscomment_comment"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="8dp"
+            android:layout_toRightOf="@+id/txt_goodscomment_username"
+            android:singleLine="true"
+            android:text="评价"
+            android:textColor="#ff0000"
+            android:textSize="14sp" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:layout_below="@id/txt_goodscomment_username"
+            android:layout_marginTop="2dp"
+            android:background="#f0f2f5" />
+
+        <TextView
+            android:id="@+id/txt_goodscomment_content"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/txt_goodscomment_username"
+            android:layout_marginTop="8dp"
+            android:minLines="1"
+            android:text="我是一个评论"
+            android:layout_marginBottom="8dp"
+            android:textColor="#898989"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/txt_goodscomment_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@+id/txt_goodscomment_username"
+            android:layout_alignBottom="@+id/txt_goodscomment_username"
+            android:layout_alignRight="@+id/txt_goodscomment_content"
+            android:text="2014-12-12"
+            android:textColor="#898989"
+            android:textSize="14sp" />
+    </RelativeLayout>
+
+</LinearLayout>
