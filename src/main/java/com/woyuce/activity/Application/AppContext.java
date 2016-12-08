@@ -75,6 +75,7 @@ public class AppContext extends Application {
                     if (value.equals(PreferenceUtil.getSharePre(context).getString("userId", ""))) {
                         Intent startLogin = new Intent(context, LoginActivity.class);
                         startLogin.putExtra("local_push_code", value);
+                        startLogin.putExtra("local_push_message", msg.custom);
                         startLogin.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                         context.startActivity(startLogin);
                     }
@@ -94,17 +95,14 @@ public class AppContext extends Application {
              */
             @Override
             public Notification getNotification(Context context, UMessage uMessage) {
-                LogUtil.i("linx", "getNotification----extra:" + uMessage.extra);
-                for (Map.Entry<String, String> entry : uMessage.extra.entrySet()) {
-                    //键值自己拼装，2016/12/07全蛋说只会传一组数据key不变，所以我只拿了value
-                    String key = entry.getKey();
-                    String value = entry.getValue();
-                    if (value.equals(PreferenceUtil.getSharePre(context).getString("userId", ""))) {
-                        Intent startLogin = new Intent(context, LoginActivity.class);
-                        startLogin.putExtra("local_push_code", value);
-                        startLogin.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                        context.startActivity(startLogin);
-                    }
+                LogUtil.i("linx", "getNotification----custom:" + uMessage.custom);
+                if (uMessage.custom.equals(PreferenceUtil.getSharePre(context).getString("userId", ""))) {
+                    Intent startLogin = new Intent(context, LoginActivity.class);
+                    startLogin.putExtra("local_push_code", uMessage.custom);
+                    startLogin.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    context.startActivity(startLogin);
+                } else if (uMessage.custom.equals("notification")) {
+                    ToastUtil.showMessage(context, "您收到了一条最新消息");
                 }
                 return super.getNotification(context, uMessage);
             }

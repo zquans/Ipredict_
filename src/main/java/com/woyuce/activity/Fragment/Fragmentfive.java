@@ -19,9 +19,7 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.toolbox.StringRequest;
 import com.woyuce.activity.Act.AboutUsActivity;
-import com.woyuce.activity.Act.CustomServiceActivity;
 import com.woyuce.activity.Act.LoginActivity;
-import com.woyuce.activity.Act.StoreOrderListActivity;
 import com.woyuce.activity.Act.SuggestionActivity;
 import com.woyuce.activity.Act.WebActivity;
 import com.woyuce.activity.Application.AppContext;
@@ -44,7 +42,7 @@ import java.util.Map;
 public class Fragmentfive extends Fragment implements View.OnClickListener {
 
     private TextView txtName, txtMoney, txtAboutUs, txtUpdate, txtSuggestion, txtRoom, txtSubject,
-            txtClassTable, txtStore, txtService, txtSignOut, txtOrderList;
+            txtClassTable, txtStore, txtClear, txtService, txtSignOut, txtOrderList;
     private ImageView imgIcon;
     // 暂做课表的入口
     private TextView mCourseTable;
@@ -83,9 +81,10 @@ public class Fragmentfive extends Fragment implements View.OnClickListener {
         txtRoom = (TextView) view.findViewById(R.id.txt_tab5_localroom);
         txtSubject = (TextView) view.findViewById(R.id.txt_tab5_localsubject);
 //        txtStore = (TextView) view.findViewById(R.id.txt_to_store);
-        txtService = (TextView) view.findViewById(R.id.txt_to_service);
+        txtClear = (TextView) view.findViewById(R.id.txt_to_clearcache);
+//        txtService = (TextView) view.findViewById(R.id.txt_to_service);
         txtSignOut = (TextView) view.findViewById(R.id.txt_to_signout);
-        txtOrderList = (TextView) view.findViewById(R.id.txt_to_orderlist);
+//        txtOrderList = (TextView) view.findViewById(R.id.txt_to_orderlist);
         mCourseTable = (TextView) view.findViewById(R.id.txt_tab5_localmessage);
 
         mCourseTable.setOnClickListener(this);
@@ -96,9 +95,10 @@ public class Fragmentfive extends Fragment implements View.OnClickListener {
         txtRoom.setOnClickListener(this);
         txtSubject.setOnClickListener(this);
 //        txtStore.setOnClickListener(this);
-        txtService.setOnClickListener(this);
+        txtClear.setOnClickListener(this);
+//        txtService.setOnClickListener(this);
         txtSignOut.setOnClickListener(this);
-        txtOrderList.setOnClickListener(this);
+//        txtOrderList.setOnClickListener(this);
     }
 
     // fragment 生命周期，打开时
@@ -188,7 +188,8 @@ public class Fragmentfive extends Fragment implements View.OnClickListener {
                         for (int i = 0; i < subcontentList.size(); i++) {
                             sublist.add("《" + subcontentList.get(i) + "》");
                         }
-                        txtSubject.setText(sublist.toString());
+                        String subStr = sublist.toString();
+                        txtSubject.setText(subStr.substring(1, subStr.length() - 1));
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -269,15 +270,20 @@ public class Fragmentfive extends Fragment implements View.OnClickListener {
             case R.id.txt_to_suggestion:
                 startActivity(new Intent(getActivity(), SuggestionActivity.class));
                 break;
+            case R.id.txt_to_clearcache:
+                com.nostra13.universalimageloader.core.ImageLoader.getInstance().clearDiskCache();
+                com.nostra13.universalimageloader.core.ImageLoader.getInstance().clearMemoryCache();
+                ToastUtil.showMessage(getActivity(), "清除缓存成功");
+                break;
 //            case R.id.txt_to_store:
 //                startActivity(new Intent(getActivity(), StoreHomeActivity.class));
 //                break;
-            case R.id.txt_to_service:
-                startActivity(new Intent(getActivity(), CustomServiceActivity.class));
-                break;
-            case R.id.txt_to_orderlist:
-                startActivity(new Intent(getActivity(), StoreOrderListActivity.class));
-                break;
+//            case R.id.txt_to_service:
+//                startActivity(new Intent(getActivity(), CustomServiceActivity.class));
+//                break;
+//            case R.id.txt_to_orderlist:
+//                startActivity(new Intent(getActivity(), StoreOrderListActivity.class));
+//                break;
             case R.id.txt_to_signout:
                 toSignOut();
                 break;
@@ -296,7 +302,7 @@ public class Fragmentfive extends Fragment implements View.OnClickListener {
                         CookieManager.getInstance().removeAllCookie();
                         LogUtil.e("CookieManager = " + CookieManager.getInstance().getCookie("iyuce.com") + "");
                         startActivity(new Intent(getActivity(), LoginActivity.class));
-                        PreferenceUtil.removeall(getActivity()); // 只留下了版本号
+//                        PreferenceUtil.removeall(getActivity()); // 只留下了版本号
                         getActivity().finish();
                     }
                 }).setNegativeButton("取消", null)

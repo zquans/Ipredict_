@@ -26,11 +26,17 @@
             android:onClick="back" />
     </RelativeLayout>
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/recycler_activity_store_orderlist"
+    <com.dinuscxj.refresh.RecyclerRefreshLayout
+        android:id="@+id/refresh_layout_activity_storeorderlist"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:divider="#ddd"
-        android:dividerHeight="16dp" />
+        android:layout_height="wrap_content">
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recycler_activity_store_orderlist"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:divider="#ddd"
+            android:dividerHeight="16dp" />
+    </com.dinuscxj.refresh.RecyclerRefreshLayout>
 
 </LinearLayout>

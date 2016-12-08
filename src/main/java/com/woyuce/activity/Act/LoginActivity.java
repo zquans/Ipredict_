@@ -112,8 +112,8 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
         if (!TextUtils.isEmpty(local_push_code)) {
             if (local_push_code.equals(PreferenceUtil.getSharePre(this).getString("userId", "default"))) {
                 if (!local_push_code.equals("default")) {
-                    new AlertDialog.Builder(this).setTitle("您的账号在别处异常登录")
-                            .setMessage("如果不是本人操作，请及时修改密码")
+                    new AlertDialog.Builder(this).setTitle("通知:")
+                            .setMessage(getIntent().getStringExtra("local_push_message"))
                             .setPositiveButton("知道了", null)
                             .show();
                     LogUtil.e("----" + local_push_code + "------" + AppContext.getDeviceToken());

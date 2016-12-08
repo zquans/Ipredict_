@@ -8,8 +8,8 @@ android {
         applicationId "com.woyuce.activity"
         minSdkVersion 15
         targetSdkVersion 24
-        versionCode 26
-        versionName "2.6"
+        versionCode 27
+        versionName "2.7"
     }
     buildTypes {
         release {
@@ -33,4 +33,5 @@ dependencies {
     compile files('libs/MobCommons-2016.0830.1940.jar')
     compile project(':Pushlib')
     compile files('libs/alipaySingle-20161129.jar')
+    compile 'com.dinuscxj:recyclerrefreshlayout:2.0.3'
 }

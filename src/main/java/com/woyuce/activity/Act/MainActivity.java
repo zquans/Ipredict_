@@ -22,6 +22,7 @@ import com.woyuce.activity.Fragment.Fragment3;
 import com.woyuce.activity.Fragment.FragmentTwo;
 import com.woyuce.activity.Fragment.Fragment_StoreHome;
 import com.woyuce.activity.Fragment.Fragmentfive;
+import com.woyuce.activity.Fragment.Fragmentfour;
 import com.woyuce.activity.Fragment.Fragmentone;
 import com.woyuce.activity.Fragment.Fragmentthree;
 import com.woyuce.activity.R;
@@ -96,14 +97,14 @@ public class MainActivity extends FragmentActivity implements OnClickListener, O
         //两个Tab3可以相互替换
         Fragment mTab03 = new Fragmentthree();
         Fragment mTab03_ = new Fragment3();
-//        Fragment mTab04 = new Fragmentfour();
+        Fragment mTab04 = new Fragmentfour();
         Fragment mTab05 = new Fragmentfive();
         Fragment mTab04_ = new Fragment_StoreHome();
 
         mFragments.add(mTab01);
         mFragments.add(mTab02);
         mFragments.add(mTab03_);
-        mFragments.add(mTab04_);
+        mFragments.add(mTab04);
         mFragments.add(mTab05);
 
         mAdapter = new FragmentPagerAdapter(getSupportFragmentManager()) {

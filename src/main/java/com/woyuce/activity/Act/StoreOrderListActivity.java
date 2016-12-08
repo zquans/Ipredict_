@@ -12,6 +12,7 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
+import com.dinuscxj.refresh.RecyclerRefreshLayout;
 import com.woyuce.activity.Adapter.StoreOrderListAdapter;
 import com.woyuce.activity.Application.AppContext;
 import com.woyuce.activity.Bean.StoreGoods;
@@ -33,6 +34,7 @@ import java.util.ArrayList;
  */
 public class StoreOrderListActivity extends BaseActivity {
 
+    private RecyclerRefreshLayout mRefreshLayout;
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
     private ArrayList<StoreOrder> mList = new ArrayList<>();
@@ -59,7 +61,13 @@ public class StoreOrderListActivity extends BaseActivity {
     private void initView() {
         local_user_id = PreferenceUtil.getSharePre(this).getString("userId", "");
         mRecyclerView = (RecyclerView) findViewById(R.id.recycler_activity_store_orderlist);
-
+        mRefreshLayout = (RecyclerRefreshLayout) findViewById(R.id.refresh_layout_activity_storeorderlist);
+        mRefreshLayout.setOnRefreshListener(new RecyclerRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                mRefreshLayout.setRefreshing(false);
+            }
+        });
         requestData();
     }
 
@@ -112,36 +120,12 @@ public class StoreOrderListActivity extends BaseActivity {
                             order.setUser_order_details(mArrayList);
                             mList.add(order);
                         }
+
                         LogUtil.i("mList = " + mList);
                         mAdapter = new StoreOrderListAdapter(StoreOrderListActivity.this, mList);
                         mRecyclerView.setLayoutManager(new LinearLayoutManager(StoreOrderListActivity.this));
                         mRecyclerView.setAdapter(mAdapter);
-                        mRecyclerView.addOnItemTouchListener(new RecyclerItemClickListener(StoreOrderListActivity.this, mRecyclerView,
-                                new RecyclerItemClickListener.OnItemClickListener() {
-                                    @Override
-                                    public void onItemClick(View view, int position) {
-                                        Intent intent = new Intent(StoreOrderListActivity.this, StoreOrderActivity.class);
-                                        intent.putExtra("local_order_id", mList.get(position).getId());
-                                        intent.putExtra("total_price", mList.get(position).getPrice());
-                                        intent.putExtra("goods_name", mList.get(position).getUser_order_details().get(0).getGoods_title() + "\r...");
-                                        startActivity(intent);
-                                    }
-
-                                    @Override
-                                    public void onItemLongClick(View view, final int position) {
-
-                                        new AlertDialog.Builder(StoreOrderListActivity.this)
-                                                .setTitle("删除订单")
-                                                .setMessage("确认删除")
-                                                .setPositiveButton("确认", new DialogInterface.OnClickListener() {
-                                                    @Override
-                                                    public void onClick(DialogInterface dialog, int which) {
-                                                        //删除某项订单
-                                                        delRequest(position, URL_Del + local_user_id + "&id=" + mList.get(position).getId());
-                                                    }
-                                                }).setNegativeButton("取消", null).show();
-                                    }
-                                }));
+                        doRecyclerItemClick();
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -159,6 +143,12 @@ public class StoreOrderListActivity extends BaseActivity {
         AppContext.getHttpQueue().add(orderListRequest);
     }
 
+    /**
+     * 删除订单
+     *
+     * @param position
+     * @param url
+     */
     private void delRequest(final int position, String url) {
         StringRequest delRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
             @Override
@@ -180,5 +170,37 @@ public class StoreOrderListActivity extends BaseActivity {
         }, null);
         delRequest.setTag("StoreOrderList");
         AppContext.getHttpQueue().add(delRequest);
+    }
+
+    /**
+     * 设置Recycler的Item事件
+     */
+    private void doRecyclerItemClick() {
+        mRecyclerView.addOnItemTouchListener(new RecyclerItemClickListener(StoreOrderListActivity.this, mRecyclerView,
+                new RecyclerItemClickListener.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(View view, int position) {
+                        Intent intent = new Intent(StoreOrderListActivity.this, StoreOrderActivity.class);
+                        intent.putExtra("local_order_id", mList.get(position).getId());
+                        intent.putExtra("total_price", mList.get(position).getPrice());
+                        intent.putExtra("goods_name", mList.get(position).getUser_order_details().get(0).getGoods_title() + "\r...");
+                        startActivity(intent);
+                    }
+
+                    @Override
+                    public void onItemLongClick(View view, final int position) {
+
+                        new AlertDialog.Builder(StoreOrderListActivity.this)
+                                .setTitle("删除订单")
+                                .setMessage("确认删除")
+                                .setPositiveButton("确认", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        //删除某项订单
+                                        delRequest(position, URL_Del + local_user_id + "&id=" + mList.get(position).getId());
+                                    }
+                                }).setNegativeButton("取消", null).show();
+                    }
+                }));
     }
 }

@@ -109,23 +109,22 @@
                 android:layout_margin="8dp"
                 android:background="#cccccc" />
 
+            <!--<TextView-->
+                <!--android:id="@+id/txt_to_orderlist"-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:drawableLeft="@mipmap/my_examroom"-->
+                <!--android:gravity="center_vertical"-->
+                <!--android:padding="8dp"-->
+                <!--android:text="     我的订单"-->
+                <!--android:textColor="#a2a2a2"-->
+                <!--android:textSize="16sp" />-->
 
-            <TextView
-                android:id="@+id/txt_to_orderlist"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:drawableLeft="@mipmap/my_examroom"
-                android:gravity="center_vertical"
-                android:padding="8dp"
-                android:text="     我的订单"
-                android:textColor="#a2a2a2"
-                android:textSize="16sp" />
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="0.5dp"
-                android:layout_margin="8dp"
-                android:background="#cccccc" />
+            <!--<View-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="0.5dp"-->
+                <!--android:layout_margin="8dp"-->
+                <!--android:background="#cccccc" />-->
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -190,6 +189,12 @@
                     android:textSize="16sp" />
             </LinearLayout>
 
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="0.5dp"
+                android:layout_margin="8dp"
+                android:background="#cccccc" />
+
             <TextView
                 android:id="@+id/txt_to_clearcache"
                 android:layout_width="match_parent"
@@ -197,10 +202,9 @@
                 android:drawableLeft="@mipmap/my_message"
                 android:gravity="center_vertical"
                 android:padding="8dp"
-                android:text="     图片更新"
+                android:text="     清除缓存"
                 android:textColor="#a2a2a2"
-                android:textSize="16sp"
-                android:visibility="gone" />
+                android:textSize="16sp" />
 
             <View
                 android:layout_width="match_parent"
@@ -276,22 +280,22 @@
             <!--android:layout_margin="8dp"-->
             <!--android:background="#cccccc" />-->
 
-            <TextView
-                android:id="@+id/txt_to_service"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:drawableLeft="@mipmap/my_examroom"
-                android:gravity="center_vertical"
-                android:padding="8dp"
-                android:text="     产品客服"
-                android:textColor="#a2a2a2"
-                android:textSize="16sp" />
+            <!--<TextView-->
+                <!--android:id="@+id/txt_to_service"-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:drawableLeft="@mipmap/my_examroom"-->
+                <!--android:gravity="center_vertical"-->
+                <!--android:padding="8dp"-->
+                <!--android:text="     产品客服"-->
+                <!--android:textColor="#a2a2a2"-->
+                <!--android:textSize="16sp" />-->
 
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="0.5dp"
-                android:layout_margin="8dp"
-                android:background="#cccccc" />
+            <!--<View-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="0.5dp"-->
+                <!--android:layout_margin="8dp"-->
+                <!--android:background="#cccccc" />-->
 
             <TextView
                 android:id="@+id/txt_to_signout"
