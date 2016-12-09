@@ -26,7 +26,7 @@ public class Fragment3 extends Fragment implements View.OnClickListener {
     private ImageView imgLoading;
     private WebView web;
 
-    private String URL_CAM = "http://www.iyuce.com/m/appjxy.html";
+    private String URL_CAM = "http://www.iyuce.com/m/appjxy.html?v=" + System.currentTimeMillis();
 
     @Override
     public void onStart() {
