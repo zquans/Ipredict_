@@ -10,12 +10,10 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.woyuce.activity.Act.StoreGoodsActivity;
-import com.woyuce.activity.Act.WebActivity;
 import com.woyuce.activity.Act.WebNoCookieActivity;
 import com.woyuce.activity.Bean.StoreBean;
 import com.woyuce.activity.R;
 import com.woyuce.activity.Utils.RecyclerItemClickListener;
-import com.woyuce.activity.Utils.ToastUtil;
 
 import java.util.List;
 

@@ -2,8 +2,6 @@ package com.woyuce.activity.Act;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,6 +19,7 @@ import com.woyuce.activity.Application.AppContext;
 import com.woyuce.activity.Bean.StoreMenu;
 import com.woyuce.activity.R;
 import com.woyuce.activity.Utils.LogUtil;
+import com.woyuce.activity.Utils.MathUtil;
 import com.woyuce.activity.Utils.PreferenceUtil;
 import com.woyuce.activity.Utils.ToastUtil;
 
@@ -34,13 +33,12 @@ import java.util.ArrayList;
  * Created by Administrator on 2016/11/7.
  */
 
-//TODO EdtMiddle中Button计算金币细化操作,上封顶，下封底
 //TODO 件数、金额、ListView中的Item不匹配问题需要修复
 
 public class StorePayActivity extends BaseActivity implements View.OnClickListener {
 
     private RelativeLayout mReLayoutAddress;
-    private TextView mTxtAddressOne, mTxtAddressTwo, mTxtPrice, mTxtCount, mTxtUserMoney;
+    private TextView mTxtAddressOne, mTxtAddressTwo, mTxtCount, mTxtPrice, mTxtFinalPrice, mTxtUserMoney;
     private EditText mEdtMiddle;
 
     private ListView mListView;
@@ -55,7 +53,7 @@ public class StorePayActivity extends BaseActivity implements View.OnClickListen
     ArrayList<String> mSpecNameList = new ArrayList<>();
     private Integer total_count;
     private Double total_price;
-    private Integer local_store_user_money, max_store_user_money;
+    private Double local_store_user_money, max_store_user_money;
 
     //获取默认收货地址
     private String URL = "http://api.iyuce.com/v1/store/getdefaultaddr";
@@ -93,41 +91,13 @@ public class StorePayActivity extends BaseActivity implements View.OnClickListen
         mReLayoutAddress.setOnClickListener(this);
         mTxtAddressOne = (TextView) findViewById(R.id.txt_activity_storepay_defoultaddress_one);
         mTxtAddressTwo = (TextView) findViewById(R.id.txt_activity_storepay_defoultaddress_two);
-        mTxtPrice = (TextView) findViewById(R.id.txt_storecar_final_price);
         mTxtCount = (TextView) findViewById(R.id.txt_storecar_total_num);
+        mTxtPrice = (TextView) findViewById(R.id.txt_storecar_total_price);
+        mTxtFinalPrice = (TextView) findViewById(R.id.txt_storecar_final_price);
         mTxtUserMoney = (TextView) findViewById(R.id.txt_actvity_storepay_havemoney);
         mEdtMiddle = (EditText) findViewById(R.id.edt_actvity_storepay_middle);
         mTxtPrice.setText(total_price + "元");
         mTxtCount.setText(total_count + "件");
-
-        local_store_user_money = Integer.parseInt(PreferenceUtil.getSharePre(this).getString("store_user_money", ""));
-        max_store_user_money = local_store_user_money;
-        mTxtUserMoney.setText("你有" + local_store_user_money + "个金币,可以抵扣" + local_store_user_money + "元");
-        mEdtMiddle.setText(local_store_user_money.toString());
-
-        mEdtMiddle.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                if (Integer.parseInt(s.toString()) - local_store_user_money > 0) {
-                    ToastUtil.showMessage(StorePayActivity.this, "您的金币不足");
-                    mEdtMiddle.setText("0");
-                }
-                if (Integer.parseInt(s.toString()) - local_store_user_money > 0) {
-                    ToastUtil.showMessage(StorePayActivity.this, "您的金币不足");
-                    mEdtMiddle.setText("0");
-                }
-            }
-        });
 
         StoreMenu storeMenu;
         for (int i = 0; i < mGoodsSkuIdList.size(); i++) {
@@ -188,7 +158,15 @@ public class StorePayActivity extends BaseActivity implements View.OnClickListen
                     JSONObject obj;
                     obj = new JSONObject(response);
                     if (obj.getString("code").equals("0")) {
-                        local_store_user_money = Integer.parseInt(obj.getString("data"));
+                        local_store_user_money = Double.parseDouble(obj.getString("data"));
+                        max_store_user_money = local_store_user_money;
+                        mTxtUserMoney.setText("你有" + local_store_user_money + "个金币,可以抵扣" + local_store_user_money + "元");
+                        //判断该显示的金币数和该显示的实际应付价格,最大金币数不应超过价格
+                        if (local_store_user_money > total_price) {
+                            local_store_user_money = total_price;
+                        }
+                        mEdtMiddle.setText(local_store_user_money.toString());
+                        mTxtFinalPrice.setText("应付总金额:" + MathUtil.sub(total_price, local_store_user_money) + "元");
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -235,17 +213,19 @@ public class StorePayActivity extends BaseActivity implements View.OnClickListen
             ToastUtil.showMessage(this, "您的金币不够咯");
             return;
         }
-        local_store_user_money = local_store_user_money + 1;
+        local_store_user_money = MathUtil.add(local_store_user_money, (double) 1);
         mEdtMiddle.setText(local_store_user_money.toString());
+        mTxtFinalPrice.setText("应付总金额:" + MathUtil.sub((double) total_price, (double) local_store_user_money) + "元");
     }
 
     public void minusMoney(View view) {
-        if (local_store_user_money <= 0) {
+        if (local_store_user_money < 1) {
             ToastUtil.showMessage(this, "不能再减啦");
             return;
         }
-        local_store_user_money = local_store_user_money - 1;
+        local_store_user_money = MathUtil.sub(local_store_user_money, (double) 1);
         mEdtMiddle.setText(local_store_user_money.toString());
+        mTxtFinalPrice.setText("应付总金额:" + MathUtil.sub((double) total_price, (double) local_store_user_money) + "元");
     }
 
     private String local_address_id;
@@ -260,7 +240,7 @@ public class StorePayActivity extends BaseActivity implements View.OnClickListen
         intent.putExtra("total_price", total_price.toString());
         intent.putExtra("address", local_address_id);
         intent.putExtra("skuids", local_skuids);
-        intent.putExtra("discount", mEdtMiddle.getText().toString());
+        intent.putExtra("discount", String.valueOf(Math.ceil(Double.parseDouble(mEdtMiddle.getText().toString()))));
         intent.putExtra("goods_name", mSpecNameList.toString());
         startActivity(intent);
     }
