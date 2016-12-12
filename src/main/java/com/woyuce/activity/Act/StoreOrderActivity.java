@@ -105,7 +105,7 @@ public class StoreOrderActivity extends BaseActivity {
         mTxtGoods = (TextView) findViewById(R.id.txt_activity_storeorder_goods);
 
         mEdtMoney.setText(total_price);
-        mTxtGoods.setText(local_goods_name);
+        mTxtGoods.setText(local_goods_name.substring(1, local_goods_name.length() - 1));
 
         if (TextUtils.isEmpty(local_order_id)) {
             //生成订单请求
@@ -127,8 +127,10 @@ public class StoreOrderActivity extends BaseActivity {
                 try {
                     obj = new JSONObject(s);
                     if (obj.getString("code").equals("0")) {
-                        mEdtOrder.setText(obj.getString("message"));
-                        local_order_id = obj.getString("message");
+                        obj = obj.getJSONObject("data");
+                        mEdtOrder.setText(obj.getString("order_no"));
+                        local_order_id = obj.getString("order_no");
+                        mEdtMoney.setText(obj.getString("actual_price"));
                     } else {
                         LogUtil.i("生成订单错误" + obj.getString("message"));
                     }

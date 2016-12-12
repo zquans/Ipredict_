@@ -63,7 +63,7 @@ public class StoreGoodsActivity extends BaseActivity implements View.OnClickList
                     mFrgOne.setArguments(bundle);
                     bundle.putStringArrayList("mList", (ArrayList<String>) mList);
                     //传递参数给Fragment，始终保持数据最新
-                    getFragmentManager().beginTransaction().replace(R.id.frame_activity_storegoods_fragment, mFrgOne).commit();
+                    getFragmentManager().beginTransaction().replace(R.id.frame_activity_storegoods_fragment, mFrgOne).disallowAddToBackStack().commit();
                     break;
             }
         }
@@ -185,11 +185,14 @@ public class StoreGoodsActivity extends BaseActivity implements View.OnClickList
     }
 
     public void back(View view) {
-        finish();
+        StoreGoodsActivity.this.finish();
     }
 
     @Override
     public void onClick(View v) {//前三个case是顶部导航栏，后三个是底部导航栏
+        if (mFrgOne == null) {
+            return;
+        }
         //这些参数是传递给底部操作栏的，跟购物车相关
         Bundle bundle = new Bundle();
         String local_id = PreferenceUtil.getSharePre(this).getString("userId", "");
@@ -214,7 +217,7 @@ public class StoreGoodsActivity extends BaseActivity implements View.OnClickList
                 bundle.putStringArrayList("mList", (ArrayList<String>) mList);
                 mFrgOne.setArguments(bundle);
                 //传递参数给Fragment，始终保持数据最新
-                getFragmentManager().beginTransaction().replace(R.id.frame_activity_storegoods_fragment, mFrgOne).commit();
+                getFragmentManager().beginTransaction().replace(R.id.frame_activity_storegoods_fragment, mFrgOne).disallowAddToBackStack().commit();
                 break;
             case R.id.txt_storegoods_tab_two:
                 resetTxtTab(mTxtTabTwo);
@@ -222,7 +225,7 @@ public class StoreGoodsActivity extends BaseActivity implements View.OnClickList
                 bundle.putString("mImgList", mImgList);
                 mFrgTwo.setArguments(bundle);
                 //传递参数给Fragment，始终保持数据最新
-                getFragmentManager().beginTransaction().replace(R.id.frame_activity_storegoods_fragment, mFrgTwo).commit();
+                getFragmentManager().beginTransaction().replace(R.id.frame_activity_storegoods_fragment, mFrgTwo).disallowAddToBackStack().commit();
                 break;
             case R.id.txt_storegoods_tab_three:
                 resetTxtTab(mTxtTabThree);
@@ -234,7 +237,7 @@ public class StoreGoodsActivity extends BaseActivity implements View.OnClickList
                 bundle.putString("total_medium_volume", total_medium_volume);
                 bundle.putString("total_show_order_volume", total_show_order_volume);
                 mFrgThree.setArguments(bundle);
-                getFragmentManager().beginTransaction().replace(R.id.frame_activity_storegoods_fragment, mFrgThree).commit();
+                getFragmentManager().beginTransaction().replace(R.id.frame_activity_storegoods_fragment, mFrgThree).disallowAddToBackStack().commit();
                 break;
             case R.id.btn_activity_storegoods_buynow:
                 //保存进数据库

@@ -1,9 +1,7 @@
 package com.woyuce.activity.Act;
 
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.net.Uri;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
@@ -128,15 +126,16 @@ public class WebNoCookieActivity extends BaseActivity implements View.OnClickLis
                 view.loadUrl("file:///android_asset/index.html");
             }
 
-            @Override
-            public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                if (url.startsWith("http:") || url.startsWith("https:")) {
-                    return false;
-                }
-                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-                startActivity(intent);
-                return true;
-            }
+            //TODO 淘宝打开页面崩溃可能是由于此处原因
+//            @Override
+//            public boolean shouldOverrideUrlLoading(WebView view, String url) {
+//                if (url.startsWith("http:") || url.startsWith("https:")) {
+//                    return false;
+//                }
+//                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+//                startActivity(intent);
+//                return true;
+//            }
 
             @Override
             public void onPageFinished(WebView view, String url) {

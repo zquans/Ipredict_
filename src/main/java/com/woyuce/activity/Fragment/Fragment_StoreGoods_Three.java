@@ -64,7 +64,8 @@ public class Fragment_StoreGoods_Three extends Fragment implements View.OnClickL
         mTxtBad.setOnClickListener(this);
         mTxtShowOrder.setOnClickListener(this);
 
-        mTxtAll.setText("全部(" + getArguments().getString("total_sales_volume") + ")");
+//        mTxtAll.setText("全部(" + getArguments().getString("total_sales_volume") + ")");
+        mTxtAll.setText("全部");
         mTxtGood.setText("好评(" + getArguments().getString("total_good_volume") + ")");
         mTxtBad.setText("差评(" + getArguments().getString("total_bad_volume") + ")");
         mTxtMiddle.setText("中评(" + getArguments().getString("total_medium_volume") + ")");

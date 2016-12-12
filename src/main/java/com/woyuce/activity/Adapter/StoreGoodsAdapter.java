@@ -38,7 +38,13 @@ public class StoreGoodsAdapter extends RecyclerView.Adapter<StoreGoodsAdapter.MV
 
     @Override
     public void onBindViewHolder(StoreGoodsAdapter.MViewHolder holder, int position) {
-        holder.mTxt.setText("￥" + mDatas.get(position).getSales_price());
+        //TODO 淘宝商品价格要做区间
+        String local_price = mDatas.get(position).getSales_price();
+        if (mDatas.get(position).getGoods_title().contains("http") && local_price.contains(".") && !local_price.contains(".0")) {
+            holder.mTxt.setText("￥" + local_price.replace(".", "～"));
+        } else {
+            holder.mTxt.setText("￥" + local_price);
+        }
         DisplayImageOptions options = new DisplayImageOptions.Builder().showImageOnLoading(R.mipmap.img_error)
                 .showImageOnFail(R.mipmap.img_error).cacheInMemory(true).cacheOnDisk(true)
                 .bitmapConfig(Bitmap.Config.RGB_565).build();

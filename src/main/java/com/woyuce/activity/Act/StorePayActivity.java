@@ -72,6 +72,12 @@ public class StorePayActivity extends BaseActivity implements View.OnClickListen
         initView();
     }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+        AppContext.getHttpQueue().cancelAll("StorePayRequest");
+    }
+
     private void initView() {
         //获取到传递来的数据
         Intent intent = getIntent();
@@ -114,7 +120,11 @@ public class StorePayActivity extends BaseActivity implements View.OnClickListen
             public void afterTextChanged(Editable s) {
                 if (Integer.parseInt(s.toString()) - local_store_user_money > 0) {
                     ToastUtil.showMessage(StorePayActivity.this, "您的金币不足");
-                    mEdtMiddle.setText("1");
+                    mEdtMiddle.setText("0");
+                }
+                if (Integer.parseInt(s.toString()) - local_store_user_money > 0) {
+                    ToastUtil.showMessage(StorePayActivity.this, "您的金币不足");
+                    mEdtMiddle.setText("0");
                 }
             }
         });
@@ -135,6 +145,9 @@ public class StorePayActivity extends BaseActivity implements View.OnClickListen
         mListView.setAdapter(mAdapter);
         setListViewHeightBasedOnChildren(mListView);
 
+        //请求金币
+        requestMoney();
+        //请求地址
         requestAddress();
     }
 
@@ -160,6 +173,35 @@ public class StorePayActivity extends BaseActivity implements View.OnClickListen
         listView.setLayoutParams(params);
     }
 
+
+    /**
+     * 获取金币请求
+     */
+    private String URL_MONEY_INFO = "http://api.iyuce.com/v1/store/getusermoney?userid=";
+
+    private void requestMoney() {
+        StringRequest moneyRequest = new StringRequest(Request.Method.GET,
+                URL_MONEY_INFO + PreferenceUtil.getSharePre(StorePayActivity.this).getString("userId", ""), new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                try {
+                    JSONObject obj;
+                    obj = new JSONObject(response);
+                    if (obj.getString("code").equals("0")) {
+                        local_store_user_money = Integer.parseInt(obj.getString("data"));
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }, null);
+        moneyRequest.setTag("StorePayRequest");
+        AppContext.getHttpQueue().add(moneyRequest);
+    }
+
+    /**
+     * 请求收货地址
+     */
     private void requestAddress() {
         StringRequest addressRequest = new StringRequest(Request.Method.GET,
                 URL + "?userid=" + PreferenceUtil.getSharePre(this).getString("userId", ""), new Response.Listener<String>() {
@@ -184,7 +226,7 @@ public class StorePayActivity extends BaseActivity implements View.OnClickListen
                 }
             }
         }, null);
-        addressRequest.setTag("addressRequest");
+        addressRequest.setTag("StorePayRequest");
         AppContext.getHttpQueue().add(addressRequest);
     }
 
