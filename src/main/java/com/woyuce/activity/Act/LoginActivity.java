@@ -72,11 +72,11 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
         initView();
         localtoken = PreferenceUtil.getSharePre(LoginActivity.this).getString("localtoken", "");
 
-        if (TextUtils.isEmpty(localtoken)) {
-            getBaseToken();
-        } else {
-            LogUtil.e("localtoken2 = " + localtoken);
-        }
+//        if (TextUtils.isEmpty(localtoken)) {
+        getBaseToken();
+//        } else {
+        LogUtil.e("localtoken = " + localtoken);
+//        }
 
         //判断是否有权限
         if (hasPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE)) {

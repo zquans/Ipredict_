@@ -104,7 +104,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener, O
         mFragments.add(mTab01);
         mFragments.add(mTab02);
         mFragments.add(mTab03_);
-        mFragments.add(mTab04_);
+        mFragments.add(mTab04);
         mFragments.add(mTab05);
 
         mAdapter = new FragmentPagerAdapter(getSupportFragmentManager()) {
