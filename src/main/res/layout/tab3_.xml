@@ -23,7 +23,7 @@
             android:id="@+id/btn_tab3_apply"
             android:layout_width="wrap_content"
             android:layout_height="40dp"
-            android:layout_gravity="bottom|center_horizontal"
+            android:layout_gravity="bottom|right"
             android:background="#d15730"
             android:paddingLeft="8dp"
             android:paddingRight="8dp"

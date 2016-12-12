@@ -555,7 +555,7 @@ public class FreePageActivity extends BaseActivity implements View.OnClickListen
             protected Map<String, String> getParams() throws AuthFailureError {
                 HashMap<String, String> map = new HashMap<>();
                 map.put("user_id", PreferenceUtil.getSharePre(FreePageActivity.this).getString("userId", ""));
-                map.put("gid", "1");
+                map.put("gid", "99");
                 return map;
             }
         };

@@ -53,7 +53,7 @@ public class Fragmentthree extends Fragment implements View.OnClickListener, Ada
     private WeiboRecommandAdapter mAdapter;
 
     private String localtoken;
-    private String URL = "http://api.iyuce.com/v1/bbs/weibolist";
+    private String URL = "http://api.iyuce.com/v1/bbs/weibolist?value=" + System.currentTimeMillis();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {

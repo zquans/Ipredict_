@@ -41,6 +41,11 @@ android {
                     umeng_channel: "360"
             ]
         }
+        wandoujia {
+            manifestPlaceholders = [
+                    umeng_channel: "wandoujia"
+            ]
+        }
         meizu {
             manifestPlaceholders = [
                     umeng_channel: "meizu"
@@ -59,6 +64,11 @@ android {
         Oppo {
             manifestPlaceholders = [
                     umeng_channel: "Oppo"
+            ]
+        }
+        update {
+            manifestPlaceholders = [
+                    umeng_channel: "update"
             ]
         }
     }
