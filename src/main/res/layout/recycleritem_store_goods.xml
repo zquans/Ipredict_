@@ -1,21 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical">
+    android:paddingBottom="4dp"
+    android:paddingLeft="8dp"
+    android:paddingRight="8dp"
+    android:paddingTop="4dp">
 
     <ImageView
         android:id="@+id/img_item_recycler_goods"
         android:layout_width="match_parent"
-        android:layout_height="120dp" />
+        android:layout_height="144dp"
+        android:scaleType="centerCrop" />
 
     <TextView
         android:id="@+id/txt_item_recycler_goods"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="40dp"
-        android:layout_gravity="center"
-        android:gravity="center"
+        android:layout_below="@+id/img_item_recycler_goods"
+        android:gravity="center_vertical"
+        android:paddingLeft="4dp"
         android:textColor="#f7941d"
         android:textSize="16sp" />
 
-</LinearLayout>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/txt_item_recycler_goods"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="4dp"
+        android:background="@drawable/buttonstyle_orangestroke_store_car"
+        android:text="查看详情"
+        android:textColor="#f7941d" />
+
+</RelativeLayout>

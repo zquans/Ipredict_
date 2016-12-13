@@ -97,7 +97,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener, O
         //两个Tab3可以相互替换
         Fragment mTab03 = new Fragmentthree();
         Fragment mTab03_ = new Fragment3();
-        Fragment mTab04 = new Fragmentfour();
+//        Fragment mTab04 = new Fragmentfour();
         Fragment mTab05 = new Fragmentfive();
         Fragment mTab04_ = new Fragment_StoreHome();
 

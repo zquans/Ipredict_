@@ -69,6 +69,10 @@ public class Fragment_StoreHome extends Fragment {
                     mAdapter = new StoreHomeAdapter(getActivity(), mList);
                     mRecycler.setLayoutManager(new LinearLayoutManager(getActivity()));
                     mRecycler.setAdapter(mAdapter);
+//                    FullLinearLayoutManager linearLayoutManager = new FullLinearLayoutManager(getActivity());
+//                    mRecycler.setNestedScrollingEnabled(false);
+//                    //设置布局管理器
+//                    mRecycler.setLayoutManager(linearLayoutManager);
                     break;
             }
         }

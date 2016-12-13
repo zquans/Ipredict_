@@ -19,7 +19,9 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.toolbox.StringRequest;
 import com.woyuce.activity.Act.AboutUsActivity;
+import com.woyuce.activity.Act.CustomServiceActivity;
 import com.woyuce.activity.Act.LoginActivity;
+import com.woyuce.activity.Act.StoreOrderListActivity;
 import com.woyuce.activity.Act.SuggestionActivity;
 import com.woyuce.activity.Act.WebActivity;
 import com.woyuce.activity.Application.AppContext;
@@ -82,9 +84,9 @@ public class Fragmentfive extends Fragment implements View.OnClickListener {
         txtSubject = (TextView) view.findViewById(R.id.txt_tab5_localsubject);
 //        txtStore = (TextView) view.findViewById(R.id.txt_to_store);
         txtClear = (TextView) view.findViewById(R.id.txt_to_clearcache);
-//        txtService = (TextView) view.findViewById(R.id.txt_to_service);
+        txtService = (TextView) view.findViewById(R.id.txt_to_service);
         txtSignOut = (TextView) view.findViewById(R.id.txt_to_signout);
-//        txtOrderList = (TextView) view.findViewById(R.id.txt_to_orderlist);
+        txtOrderList = (TextView) view.findViewById(R.id.txt_to_orderlist);
         mCourseTable = (TextView) view.findViewById(R.id.txt_tab5_localmessage);
 
         mCourseTable.setOnClickListener(this);
@@ -96,9 +98,9 @@ public class Fragmentfive extends Fragment implements View.OnClickListener {
         txtSubject.setOnClickListener(this);
 //        txtStore.setOnClickListener(this);
         txtClear.setOnClickListener(this);
-//        txtService.setOnClickListener(this);
+        txtService.setOnClickListener(this);
         txtSignOut.setOnClickListener(this);
-//        txtOrderList.setOnClickListener(this);
+        txtOrderList.setOnClickListener(this);
     }
 
     // fragment 生命周期，打开时
@@ -278,12 +280,12 @@ public class Fragmentfive extends Fragment implements View.OnClickListener {
 //            case R.id.txt_to_store:
 //                startActivity(new Intent(getActivity(), StoreHomeActivity.class));
 //                break;
-//            case R.id.txt_to_service:
-//                startActivity(new Intent(getActivity(), CustomServiceActivity.class));
-//                break;
-//            case R.id.txt_to_orderlist:
-//                startActivity(new Intent(getActivity(), StoreOrderListActivity.class));
-//                break;
+            case R.id.txt_to_service:
+                startActivity(new Intent(getActivity(), CustomServiceActivity.class));
+                break;
+            case R.id.txt_to_orderlist:
+                startActivity(new Intent(getActivity(), StoreOrderListActivity.class));
+                break;
             case R.id.txt_to_signout:
                 toSignOut();
                 break;

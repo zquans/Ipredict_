@@ -17,6 +17,6 @@ public class CustomServiceActivity extends Activity {
         setContentView(R.layout.activity_for_emptyfragment);
 
 
-//        getFragmentManager().beginTransaction().replace(R.id.ll_activity_empty,new Fragmentfour()).commit();
+        getFragmentManager().beginTransaction().replace(R.id.ll_activity_empty, new Fragmentfour()).commit();
     }
 }

@@ -9,6 +9,7 @@ import android.widget.TextView;
 
 import com.woyuce.activity.Bean.StoreMenu;
 import com.woyuce.activity.R;
+import com.woyuce.activity.Utils.MathUtil;
 
 import java.util.ArrayList;
 
@@ -56,12 +57,12 @@ public class StorePayAdapter extends BaseAdapter {
         }
         viewHolder.mTxtName.setText(mList.get(position).getName());
         viewHolder.mTxtSpec.setText(mList.get(position).getSpecname());
-        viewHolder.mTxtNum.setText(mList.get(position).getNum());
+        viewHolder.mTxtNum.setText(" X " + mList.get(position).getNum());
 
         Integer num = Integer.parseInt(mList.get(position).getNum());
         Double price = Double.parseDouble(mList.get(position).getPrice());
 
-        viewHolder.mTxtPrice.setText((num * price) + "元");
+        viewHolder.mTxtPrice.setText((MathUtil.mul(num, price)) + "元");
         return convertView;
     }
 
