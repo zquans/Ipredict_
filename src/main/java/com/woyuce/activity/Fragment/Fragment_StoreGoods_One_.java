@@ -67,13 +67,21 @@ public class Fragment_StoreGoods_One_ extends Fragment implements AdapterView.On
     @Override
     public void onStop() {
         super.onStop();
+        LogUtil.i("one = onStop ");
         AppContext.getHttpQueue().cancelAll("goodsSpeRequest");
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        LogUtil.i("one = onDestroyView ");
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_storegoods_one, null);
         initView(view);
+        LogUtil.i("one = onCreateView ");
         return view;
     }
 
@@ -110,8 +118,8 @@ public class Fragment_StoreGoods_One_ extends Fragment implements AdapterView.On
      * 第一部分:将上一级获取到的数据设置在View上
      */
     private void setView() {
-        DisplayImageOptions options = new DisplayImageOptions.Builder().showImageOnLoading(R.mipmap.img_error)
-                .showImageOnFail(R.mipmap.img_error).cacheInMemory(true).cacheOnDisk(true)
+        DisplayImageOptions options = new DisplayImageOptions.Builder().showImageOnLoading(R.mipmap.img_error_horizon)
+                .showImageOnFail(R.mipmap.img_error_horizon).cacheInMemory(true).cacheOnDisk(true)
                 .bitmapConfig(Bitmap.Config.RGB_565).build();
 
         //将获取到的数据设置到View上

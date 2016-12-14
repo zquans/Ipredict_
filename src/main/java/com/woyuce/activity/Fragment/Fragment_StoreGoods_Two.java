@@ -16,7 +16,20 @@ public class Fragment_StoreGoods_Two extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_storegoods_two, null);
         initView(view);
+        LogUtil.i("two = onCreateView ");
         return view;
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        LogUtil.i("two = onStop ");
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        LogUtil.i("two = onDestroyView ");
     }
 
     private void initView(View view) {

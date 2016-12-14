@@ -25,8 +25,8 @@ public class StoreOrderGoodsAdapter extends RecyclerView.Adapter<StoreOrderGoods
     private LayoutInflater mLayoutInflater;
     private List<StoreGoods> mList;
 
-    DisplayImageOptions options = new DisplayImageOptions.Builder().showImageOnLoading(R.mipmap.img_error)
-            .showImageOnFail(R.mipmap.img_error).cacheInMemory(true).cacheOnDisk(true)
+    DisplayImageOptions options = new DisplayImageOptions.Builder().showImageOnLoading(R.mipmap.img_error_horizon)
+            .showImageOnFail(R.mipmap.img_error_horizon).cacheInMemory(true).cacheOnDisk(true)
             .bitmapConfig(Bitmap.Config.RGB_565).build();
 
     public StoreOrderGoodsAdapter(Context context, List<StoreGoods> list) {

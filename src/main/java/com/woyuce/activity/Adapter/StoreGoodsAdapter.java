@@ -23,6 +23,9 @@ public class StoreGoodsAdapter extends RecyclerView.Adapter<StoreGoodsAdapter.MV
 
     private LayoutInflater mLayoutInflater;
     private List<StoreGoods> mDatas;
+    private DisplayImageOptions options = new DisplayImageOptions.Builder().showImageOnLoading(R.mipmap.img_error_horizon)
+            .showImageOnFail(R.mipmap.img_error_horizon).cacheInMemory(true).cacheOnDisk(true)
+            .bitmapConfig(Bitmap.Config.RGB_565).build();
 
     public StoreGoodsAdapter(Context context, List<StoreGoods> mList) {
         this.mDatas = mList;
@@ -45,9 +48,7 @@ public class StoreGoodsAdapter extends RecyclerView.Adapter<StoreGoodsAdapter.MV
         } else {
             holder.mTxt.setText("￥" + local_price);
         }
-        DisplayImageOptions options = new DisplayImageOptions.Builder().showImageOnLoading(R.mipmap.img_error)
-                .showImageOnFail(R.mipmap.img_error).cacheInMemory(true).cacheOnDisk(true)
-                .bitmapConfig(Bitmap.Config.RGB_565).build();
+
         ImageLoader.getInstance().displayImage(mDatas.get(position).getThumb_img(), holder.mImg, options);
     }
 
@@ -66,5 +67,4 @@ public class StoreGoodsAdapter extends RecyclerView.Adapter<StoreGoodsAdapter.MV
             mTxt = (TextView) itemView.findViewById(R.id.txt_item_recycler_goods);
         }
     }
-
 }

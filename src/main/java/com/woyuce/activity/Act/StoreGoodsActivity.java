@@ -186,6 +186,14 @@ public class StoreGoodsActivity extends BaseActivity implements View.OnClickList
 
     public void back(View view) {
         StoreGoodsActivity.this.finish();
+        startActivity(new Intent(this, MainActivity.class));
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        StoreGoodsActivity.this.finish();
+        startActivity(new Intent(this, MainActivity.class));
     }
 
     @Override
@@ -205,8 +213,9 @@ public class StoreGoodsActivity extends BaseActivity implements View.OnClickList
         String local_num = "1";
         switch (v.getId()) {
             case R.id.txt_storegoods_tab_one:
+                getFragmentManager().beginTransaction().remove(mFrgOne).commit();
                 resetTxtTab(mTxtTabOne);
-                Fragment_StoreGoods_One_ mFrgOne = new Fragment_StoreGoods_One_();
+                Fragment_StoreGoods_One_ mFrgOne_ = new Fragment_StoreGoods_One_();
                 bundle.putString("goods_id", getIntent().getStringExtra("goods_id"));
                 bundle.putString("goods_sku_id", getIntent().getStringExtra("goods_sku_id"));
                 bundle.putString("goods_title", getIntent().getStringExtra("goods_title"));
@@ -215,11 +224,12 @@ public class StoreGoodsActivity extends BaseActivity implements View.OnClickList
                 bundle.putString("total_good_volume", total_good_volume);
                 bundle.putString("total_show_order_volume", total_show_order_volume);
                 bundle.putStringArrayList("mList", (ArrayList<String>) mList);
-                mFrgOne.setArguments(bundle);
+                mFrgOne_.setArguments(bundle);
                 //传递参数给Fragment，始终保持数据最新
-                getFragmentManager().beginTransaction().replace(R.id.frame_activity_storegoods_fragment, mFrgOne).disallowAddToBackStack().commit();
+                getFragmentManager().beginTransaction().replace(R.id.frame_activity_storegoods_fragment, mFrgOne_).disallowAddToBackStack().commit();
                 break;
             case R.id.txt_storegoods_tab_two:
+                getFragmentManager().beginTransaction().remove(mFrgOne).commit();
                 resetTxtTab(mTxtTabTwo);
                 Fragment_StoreGoods_Two mFrgTwo = new Fragment_StoreGoods_Two();
                 bundle.putString("mImgList", mImgList);
@@ -228,6 +238,7 @@ public class StoreGoodsActivity extends BaseActivity implements View.OnClickList
                 getFragmentManager().beginTransaction().replace(R.id.frame_activity_storegoods_fragment, mFrgTwo).disallowAddToBackStack().commit();
                 break;
             case R.id.txt_storegoods_tab_three:
+                getFragmentManager().beginTransaction().remove(mFrgOne).commit();
                 resetTxtTab(mTxtTabThree);
                 Fragment_StoreGoods_Three mFrgThree = new Fragment_StoreGoods_Three();
                 bundle.putString("goods_id", getIntent().getStringExtra("goods_id"));

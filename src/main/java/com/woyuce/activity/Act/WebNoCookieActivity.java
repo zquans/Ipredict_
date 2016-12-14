@@ -1,5 +1,6 @@
 package com.woyuce.activity.Act;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -35,6 +36,7 @@ public class WebNoCookieActivity extends BaseActivity implements View.OnClickLis
                 web.goBack();
             } else {
                 WebNoCookieActivity.this.finish();
+                startActivity(new Intent(this, MainActivity.class));
             }
         }
         return true;
@@ -161,10 +163,12 @@ public class WebNoCookieActivity extends BaseActivity implements View.OnClickLis
                     web.goBack();
                 } else {
                     WebNoCookieActivity.this.finish();
+                    startActivity(new Intent(this, MainActivity.class));
                 }
                 break;
             case R.id.img_close:
-                finish();
+                WebNoCookieActivity.this.finish();
+                startActivity(new Intent(this, MainActivity.class));
                 break;
         }
     }

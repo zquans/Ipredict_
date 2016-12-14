@@ -180,34 +180,55 @@
 
         <!-- Tab3 -->
         <!--<activity-->
-            <!--android:name=".Act.WeiboPublishActivity"-->
-            <!--android:launchMode="singleTop"-->
-            <!--android:screenOrientation="portrait" />-->
+        <!--android:name=".Act.WeiboPublishActivity"-->
+        <!--android:launchMode="singleTop"-->
+        <!--android:screenOrientation="portrait" />-->
         <!--<activity-->
-            <!--android:name=".Act.WeiboAlbumActivity"-->
-            <!--android:launchMode="singleTop"-->
-            <!--android:screenOrientation="portrait" />-->
+        <!--android:name=".Act.WeiboAlbumActivity"-->
+        <!--android:launchMode="singleTop"-->
+        <!--android:screenOrientation="portrait" />-->
         <!--<activity-->
-            <!--android:name=".Act.WeiboAlbumDetailActivity"-->
-            <!--android:launchMode="singleTop"-->
-            <!--android:screenOrientation="portrait" />-->
+        <!--android:name=".Act.WeiboAlbumDetailActivity"-->
+        <!--android:launchMode="singleTop"-->
+        <!--android:screenOrientation="portrait" />-->
         <!--<activity-->
-            <!--android:name=".Act.WeiboInfoActivity"-->
-            <!--android:launchMode="singleTop"-->
-            <!--android:screenOrientation="portrait" />-->
+        <!--android:name=".Act.WeiboInfoActivity"-->
+        <!--android:launchMode="singleTop"-->
+        <!--android:screenOrientation="portrait" />-->
         <!--<activity-->
-            <!--android:name=".Act.WeiboGroupActivity"-->
-            <!--android:launchMode="singleTop"-->
-            <!--android:screenOrientation="portrait" />-->
+        <!--android:name=".Act.WeiboGroupActivity"-->
+        <!--android:launchMode="singleTop"-->
+        <!--android:screenOrientation="portrait" />-->
 
         <!-- Tab5 -->
-        <activity android:name=".Act.StoreGoodsActivity" />
-        <activity android:name=".Act.StoreCarActivity" />
-        <activity android:name=".Act.StorePayActivity" />
-        <activity android:name=".Act.StoreAddressActivity" />
-        <activity android:name=".Act.StoreAddAddressActivity" />
-        <activity android:name=".Act.StoreOrderActivity"/>
-        <activity android:name=".Act.StoreOrderListActivity" />
+        <activity
+            android:name=".Act.StoreGoodsActivity"
+            android:launchMode="standard"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".Act.StoreCarActivity"
+            android:launchMode="standard"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".Act.StorePayActivity"
+            android:launchMode="standard"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".Act.StoreAddressActivity"
+            android:launchMode="standard"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".Act.StoreAddAddressActivity"
+            android:launchMode="standard"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".Act.StoreOrderActivity"
+            android:launchMode="standard"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".Act.StoreOrderListActivity"
+            android:launchMode="standard"
+            android:screenOrientation="portrait" />
 
         <!-- 意见反馈Activity -->
         <activity

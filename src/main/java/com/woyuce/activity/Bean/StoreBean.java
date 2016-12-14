@@ -7,13 +7,16 @@ import java.util.ArrayList;
  */
 public class StoreBean {
 
-    //商城目录相关
+    //商城轮播图相关
     private String menudata;
     private String icon_mobile_url;
-    private String id;
+    private String goods_id;
+    private String goods_sku_id;
+    private String goods_title;
+    private String sales_price;
 
+    //商城首页展示实体
     private String title;
-
     private String menu;
 
     private ArrayList<StoreGoods> goods_result = new ArrayList<>();
@@ -29,12 +32,36 @@ public class StoreBean {
         this.goods_result = goods_result;
     }
 
-    public String getId() {
-        return id;
+    public String getGoods_id() {
+        return goods_id;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setGoods_id(String goods_id) {
+        this.goods_id = goods_id;
+    }
+
+    public String getGoods_sku_id() {
+        return goods_sku_id;
+    }
+
+    public void setGoods_sku_id(String goods_sku_id) {
+        this.goods_sku_id = goods_sku_id;
+    }
+
+    public String getGoods_title() {
+        return goods_title;
+    }
+
+    public void setGoods_title(String goods_title) {
+        this.goods_title = goods_title;
+    }
+
+    public String getSales_price() {
+        return sales_price;
+    }
+
+    public void setSales_price(String sales_price) {
+        this.sales_price = sales_price;
     }
 
     public String getTitle() {

@@ -41,14 +41,31 @@ public class Fragment_StoreGoods_Three extends Fragment implements View.OnClickL
     @Override
     public void onStop() {
         super.onStop();
+        LogUtil.i("three = onStop ");
         AppContext.getHttpQueue().cancelAll("goodsCommentRequest");
     }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        LogUtil.i("three = onDestroyView ");
+    }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_storegoods_three, null);
         initView(view);
+        LogUtil.i("three = onCreateView ");
         return view;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        //数据请求
+        requestData();
+        LogUtil.i("three = onCreateView ");
     }
 
     private void initView(View view) {
@@ -73,8 +90,6 @@ public class Fragment_StoreGoods_Three extends Fragment implements View.OnClickL
 
         //列表填充
         mListView = (ListView) view.findViewById(R.id.listview_store_fragment_three);
-        //数据请求
-        requestData();
     }
 
     private void requestData() {
