@@ -89,4 +89,6 @@ dependencies {
     compile project(':Pushlib')
     compile files('libs/alipaySingle-20161129.jar')
     compile 'com.dinuscxj:recyclerrefreshlayout:2.0.3'
+    compile files('libs/libammsdk.jar')
+
 }

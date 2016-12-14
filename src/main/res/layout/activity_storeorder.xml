@@ -26,131 +26,146 @@
             android:onClick="back" />
     </RelativeLayout>
 
-    <TextView
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="16dp"
-        android:layout_marginTop="16dp"
-        android:padding="4dp"
-        android:text="支付信息"
-        android:textSize="18sp"
-        android:textStyle="bold" />
+        android:layout_height="match_parent">
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="16dp"
-        android:layout_marginTop="8dp"
-        android:padding="4dp"
-        android:text="订单号码："
-        android:textColor="#000"
-        android:textSize="16sp" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
 
-    <EditText
-        android:id="@+id/edt_activity_storeorder_order"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="16dp"
-        android:background="#ccc"
-        android:enabled="false"
-        android:padding="4dp"
-        android:text="hed54634634degae"
-        android:textColor="#333" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:layout_marginTop="16dp"
+                android:padding="4dp"
+                android:text="支付信息"
+                android:textSize="18sp"
+                android:textStyle="bold" />
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="16dp"
-        android:layout_marginTop="16dp"
-        android:padding="4dp"
-        android:text="商品"
-        android:textColor="#000"
-        android:textSize="16sp" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:layout_marginTop="8dp"
+                android:padding="4dp"
+                android:text="订单号码："
+                android:textColor="#000"
+                android:textSize="16sp" />
 
-    <TextView
-        android:id="@+id/txt_activity_storeorder_goods"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="16dp"
-        android:padding="4dp"
-        android:text="抵用券等"
-        android:textColor="#336699" />
+            <EditText
+                android:id="@+id/edt_activity_storeorder_order"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:background="#ccc"
+                android:enabled="false"
+                android:padding="4dp"
+                android:text="error occur"
+                android:textColor="#333" />
 
-    <ListView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="16dp" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:layout_marginTop="16dp"
+                android:padding="4dp"
+                android:text="商品"
+                android:textColor="#000"
+                android:textSize="16sp" />
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="16dp"
-        android:layout_marginTop="16dp"
-        android:padding="4dp"
-        android:text="金额"
-        android:textColor="#000"
-        android:textSize="16sp" />
+            <TextView
+                android:id="@+id/txt_activity_storeorder_goods"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:padding="4dp"
+                android:text="抵用券等"
+                android:textColor="#336699" />
 
-    <EditText
-        android:id="@+id/edt_activity_storeorder_money"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="16dp"
-        android:background="#ccc"
-        android:enabled="false"
-        android:padding="4dp"
-        android:text="400"
-        android:textColor="#333" />
+            <ListView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp" />
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="16dp"
-        android:layout_marginTop="24dp"
-        android:padding="4dp"
-        android:text="请选择支付方式"
-        android:textColor="#000"
-        android:textSize="18sp" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:layout_marginTop="16dp"
+                android:padding="4dp"
+                android:text="金额"
+                android:textColor="#000"
+                android:textSize="16sp" />
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:paddingLeft="32dp"
-        android:paddingTop="16dp">
+            <EditText
+                android:id="@+id/edt_activity_storeorder_money"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:background="#ccc"
+                android:enabled="false"
+                android:padding="4dp"
+                android:text="wrong"
+                android:textColor="#333" />
 
-        <ImageButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@mipmap/icon_pay_ali"
-            android:onClick="payAli" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:layout_marginTop="24dp"
+                android:padding="4dp"
+                android:text="请选择支付方式:"
+                android:textColor="#000"
+                android:textSize="18sp" />
 
-        <ImageButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="16dp"
-            android:background="@mipmap/icon_pay_weixin"
-            android:onClick="payWx" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingLeft="32dp"
+                android:paddingTop="16dp">
 
-    </LinearLayout>
+                <ImageButton
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:background="@mipmap/icon_pay_ali"
+                    android:onClick="payAli" />
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="16dp"
-        android:layout_marginTop="8dp"
-        android:text="1.通过支付宝支付，将会支付到iyuce@qq.com账号上；\n2.支付宝单笔限额10000元"
-        android:textColor="#a00"
-        android:textSize="16sp" />
+                <ImageButton
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:layout_marginLeft="16dp"
+                    android:background="@mipmap/icon_pay_weixin"
+                    android:onClick="payWx" />
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="16dp"
-        android:layout_marginTop="32dp"
-        android:background="#0a0"
-        android:onClick="toCheck"
-        android:text="确定"
-        android:textColor="#fff" />
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:layout_marginTop="8dp"
+                android:text="@string/pay_hint"
+                android:textColor="#a00"
+                android:textSize="14sp" />
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:layout_marginTop="32dp"
+                android:background="#0a0"
+                android:onClick="toCheck"
+                android:text="确定"
+                android:textColor="#fff"
+                android:visibility="gone" />
+
+        </LinearLayout>
+    </ScrollView>
 
 </LinearLayout>

@@ -26,6 +26,7 @@ import com.woyuce.activity.R;
 import com.woyuce.activity.Utils.LogUtil;
 import com.woyuce.activity.Utils.PreferenceUtil;
 import com.woyuce.activity.Utils.ToastUtil;
+import com.woyuce.activity.wxapi.WXPayEntryActivity;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -53,8 +54,7 @@ public class StoreOrderActivity extends BaseActivity {
 
     private static final int SDK_PAY_FLAG = 2;
 
-    //WXPAY相关
-    final IWXAPI msgApi = WXAPIFactory.createWXAPI(this, null);
+    private IWXAPI api;
 
     private Handler mHandler = new Handler() {
         @Override
@@ -93,6 +93,8 @@ public class StoreOrderActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_storeorder);
 
+        //先进行微信注册
+        api = WXAPIFactory.createWXAPI(this, "wxee1be723a57f9d21");
         initView();
     }
 
@@ -174,6 +176,7 @@ public class StoreOrderActivity extends BaseActivity {
 
     /**
      * 以上是生成订单部分，以下是支付部分
+     *
      * @param view
      */
 
@@ -189,8 +192,9 @@ public class StoreOrderActivity extends BaseActivity {
 
     //检查微信版本是否支持支付
     public void toCheck(View view) {
-        boolean isPaySupported = msgApi.getWXAppSupportAPI() >= Build.PAY_SUPPORTED_SDK_INT;
+        boolean isPaySupported = api.getWXAppSupportAPI() >= Build.PAY_SUPPORTED_SDK_INT;
         ToastUtil.showMessage(this, "该版本微信是否支持支付 = " + String.valueOf(isPaySupported));
+        startActivity(new Intent(this,WXPayEntryActivity.class));
     }
 
     /**
@@ -211,7 +215,7 @@ public class StoreOrderActivity extends BaseActivity {
                                 PreferenceUtil.save(StoreOrderActivity.this, "store_user_money", (init_money - Integer.parseInt(local_store_user_money)) + "");
                                 startActivity(new Intent(StoreOrderActivity.this, MainActivity.class));
                             } else if (obj.getString("code").equals("2")) {
-                                ToastUtil.showMessage(StoreOrderActivity.this, "金币不足抵扣,去调支付宝");
+                                ToastUtil.showMessage(StoreOrderActivity.this, "金币不足抵扣,去调支付宝或者微信");
                                 //现金支付请求
                                 LogUtil.i("cashrequest url = " + url + local_order_id);
                                 cashRequest(method, url + local_order_id);
@@ -248,6 +252,7 @@ public class StoreOrderActivity extends BaseActivity {
                         //TODO 区分 微信和阿里支付
                         //如果是阿里支付
                         if (method.equals("alipay")) {
+                            ToastUtil.showMessage(StoreOrderActivity.this, "去调支付宝吧 = ");
                             local_alipay_data = obj.getString("data");
                             //必须异步调用支付宝
                             Runnable payRunnable = new Runnable() {
@@ -272,19 +277,15 @@ public class StoreOrderActivity extends BaseActivity {
                             obj = new JSONObject(data);
                             LogUtil.i("wx obj = " + obj);
                             PayReq req = new PayReq();
-                            req.appId = "wxf8b4f85f3a794e77";  // 测试用appId
-//                            req.appId = obj.getString("appId");
+                            req.appId = "wxee1be723a57f9d21";
                             req.partnerId = obj.getString("partnerid");
                             req.prepayId = obj.getString("prepayid");
-                            req.nonceStr = obj.getString("nonceStr");
-                            req.timeStamp = obj.getString("timeStamp");
+                            req.nonceStr = obj.getString("noncestr");
+                            req.timeStamp = obj.getString("timestamp");
                             req.packageValue = obj.getString("package");
                             req.sign = obj.getString("sign");
-//                            req.extData			= "app data"; // optional
-                            LogUtil.i("req.sign= " + req.sign);
                             // 调起请求之前先将该app注册到微信
-                            msgApi.registerApp("wxee1be723a57f9d21");
-                            boolean b = msgApi.sendReq(req);
+                            boolean b = api.sendReq(req);
                             ToastUtil.showMessage(StoreOrderActivity.this, "去调微信支付吧 = " + b);
                         }
                     } else {

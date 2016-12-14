@@ -273,7 +273,12 @@
             android:screenOrientation="behind" />
 
         <!--WxPay-->
-        <activity android:name=".wxapi.WXPayEntryActivity" />
+        <activity
+            android:name=".wxapi.WXPayEntryActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:exported="true"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
 
         <!-- MOB分享 -->
         <activity
