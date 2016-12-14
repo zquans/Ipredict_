@@ -122,13 +122,15 @@
         <ImageButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@mipmap/block_gongyi" />
+            android:background="@mipmap/icon_pay_ali"
+            android:onClick="payAli" />
 
         <ImageButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="16dp"
-            android:background="@mipmap/block_gongyi" />
+            android:background="@mipmap/icon_pay_weixin"
+            android:onClick="payWx" />
 
     </LinearLayout>
 
@@ -147,7 +149,7 @@
         android:layout_marginLeft="16dp"
         android:layout_marginTop="32dp"
         android:background="#0a0"
-        android:onClick="toPay"
+        android:onClick="toCheck"
         android:text="确定"
         android:textColor="#fff" />
 

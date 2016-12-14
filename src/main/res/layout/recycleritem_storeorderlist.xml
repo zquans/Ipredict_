@@ -41,7 +41,8 @@
             android:layout_alignParentRight="true"
             android:layout_marginRight="4dp"
             android:layout_marginTop="4dp"
-            android:background="@mipmap/icon_delete_" />
+            android:background="@mipmap/icon_delete_"
+            android:visibility="gone" />
     </RelativeLayout>
 
     <View
@@ -90,6 +91,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
+            android:layout_alignBaseline="@+id/txt_listitem_orderlist_statue"
             android:background="#d9534f"
             android:paddingBottom="1dp"
             android:paddingLeft="4dp"

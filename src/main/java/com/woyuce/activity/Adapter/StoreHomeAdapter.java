@@ -14,7 +14,6 @@ import com.woyuce.activity.Act.WebNoCookieActivity;
 import com.woyuce.activity.Bean.StoreBean;
 import com.woyuce.activity.R;
 import com.woyuce.activity.Utils.RecyclerItemClickListener;
-import com.woyuce.activity.Utils.ToastUtil;
 
 import java.util.List;
 
@@ -61,7 +60,7 @@ public class StoreHomeAdapter extends RecyclerView.Adapter<StoreHomeAdapter.MyVi
                 new RecyclerItemClickListener.OnItemClickListener() {
                     @Override
                     public void onItemClick(View view, int position) {
-                        ToastUtil.showMessage(context, "==" + pos + " ," + position);
+//                        ToastUtil.showMessage(context, "==" + pos + " ," + position);
                         //通过反向获取嵌套数组,拿到所需的参数
                         if (mDatas.get(pos).getGoods_result().get(position).getGoods_title().contains("http")) {
                             Intent intent = new Intent(context, WebNoCookieActivity.class);

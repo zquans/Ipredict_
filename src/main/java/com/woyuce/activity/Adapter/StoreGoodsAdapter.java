@@ -38,7 +38,7 @@ public class StoreGoodsAdapter extends RecyclerView.Adapter<StoreGoodsAdapter.MV
 
     @Override
     public void onBindViewHolder(StoreGoodsAdapter.MViewHolder holder, int position) {
-        //淘宝商品价格做区间
+        //淘宝商品价格要做区间
         String local_price = mDatas.get(position).getSales_price();
         if (mDatas.get(position).getGoods_title().contains("http") && local_price.contains(".") && !local_price.contains(".0")) {
             holder.mTxt.setText("￥" + local_price.replace(".", "～"));

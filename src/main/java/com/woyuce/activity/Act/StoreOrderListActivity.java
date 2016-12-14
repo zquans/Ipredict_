@@ -182,6 +182,7 @@ public class StoreOrderListActivity extends BaseActivity {
                     public void onItemClick(View view, int position) {
                         Intent intent = new Intent(StoreOrderListActivity.this, StoreOrderActivity.class);
                         intent.putExtra("local_order_id", mList.get(position).getId());
+                        intent.putExtra("local_order_no", mList.get(position).getOrder_no());
                         intent.putExtra("total_price", mList.get(position).getPrice());
                         intent.putExtra("goods_name", mList.get(position).getUser_order_details().get(0).getGoods_title() + "\r...");
                         startActivity(intent);

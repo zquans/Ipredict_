@@ -17,16 +17,13 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.woyuce.activity.Application.AppContext;
 import com.woyuce.activity.Fragment.Fragment3;
 import com.woyuce.activity.Fragment.FragmentTwo;
 import com.woyuce.activity.Fragment.Fragment_StoreHome;
 import com.woyuce.activity.Fragment.Fragmentfive;
-import com.woyuce.activity.Fragment.Fragmentfour;
 import com.woyuce.activity.Fragment.Fragmentone;
 import com.woyuce.activity.Fragment.Fragmentthree;
 import com.woyuce.activity.R;
-import com.woyuce.activity.Utils.LocalImageHelper;
 import com.woyuce.activity.Utils.PreferenceUtil;
 
 import java.util.ArrayList;
@@ -67,8 +64,8 @@ public class MainActivity extends FragmentActivity implements OnClickListener, O
         initEvent();
         setSelect(0);
 
-        //微博相册图片辅助类初始化(这一步必须，开启异步，否则后面相册无法打开，会崩溃)
-        LocalImageHelper.init(AppContext.getInstance());
+        //TODO 微博相册图片辅助类初始化(这一步必须，开启异步，否则后面相册无法打开，会崩溃)
+//        LocalImageHelper.init(AppContext.getInstance());
     }
 
     private void initView() {

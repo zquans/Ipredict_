@@ -179,26 +179,26 @@
             android:screenOrientation="portrait" />
 
         <!-- Tab3 -->
-        <activity
-            android:name=".Act.WeiboPublishActivity"
-            android:launchMode="singleTop"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".Act.WeiboAlbumActivity"
-            android:launchMode="singleTop"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".Act.WeiboAlbumDetailActivity"
-            android:launchMode="singleTop"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".Act.WeiboInfoActivity"
-            android:launchMode="singleTop"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".Act.WeiboGroupActivity"
-            android:launchMode="singleTop"
-            android:screenOrientation="portrait" />
+        <!--<activity-->
+            <!--android:name=".Act.WeiboPublishActivity"-->
+            <!--android:launchMode="singleTop"-->
+            <!--android:screenOrientation="portrait" />-->
+        <!--<activity-->
+            <!--android:name=".Act.WeiboAlbumActivity"-->
+            <!--android:launchMode="singleTop"-->
+            <!--android:screenOrientation="portrait" />-->
+        <!--<activity-->
+            <!--android:name=".Act.WeiboAlbumDetailActivity"-->
+            <!--android:launchMode="singleTop"-->
+            <!--android:screenOrientation="portrait" />-->
+        <!--<activity-->
+            <!--android:name=".Act.WeiboInfoActivity"-->
+            <!--android:launchMode="singleTop"-->
+            <!--android:screenOrientation="portrait" />-->
+        <!--<activity-->
+            <!--android:name=".Act.WeiboGroupActivity"-->
+            <!--android:launchMode="singleTop"-->
+            <!--android:screenOrientation="portrait" />-->
 
         <!-- Tab5 -->
         <activity android:name=".Act.StoreGoodsActivity" />
@@ -206,7 +206,7 @@
         <activity android:name=".Act.StorePayActivity" />
         <activity android:name=".Act.StoreAddressActivity" />
         <activity android:name=".Act.StoreAddAddressActivity" />
-        <activity android:name=".Act.StoreOrderActivity" />
+        <activity android:name=".Act.StoreOrderActivity"/>
         <activity android:name=".Act.StoreOrderListActivity" />
 
         <!-- 意见反馈Activity -->
@@ -250,6 +250,9 @@
             android:configChanges="orientation|keyboardHidden|navigation"
             android:exported="false"
             android:screenOrientation="behind" />
+
+        <!--WxPay-->
+        <activity android:name=".wxapi.WXPayEntryActivity" />
 
         <!-- MOB分享 -->
         <activity

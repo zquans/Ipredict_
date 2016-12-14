@@ -10,10 +10,12 @@ public class StoreBean {
     //商城目录相关
     private String menudata;
     private String icon_mobile_url;
+    private String id;
 
     private String title;
 
     private String menu;
+
     private ArrayList<StoreGoods> goods_result = new ArrayList<>();
 
     public StoreBean() {
@@ -25,6 +27,14 @@ public class StoreBean {
 
     public void setGoods_result(ArrayList<StoreGoods> goods_result) {
         this.goods_result = goods_result;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getTitle() {

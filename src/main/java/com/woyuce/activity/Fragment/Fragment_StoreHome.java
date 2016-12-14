@@ -1,5 +1,6 @@
 package com.woyuce.activity.Fragment;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
@@ -19,6 +20,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
+import com.woyuce.activity.Act.StoreGoodsActivity;
 import com.woyuce.activity.Adapter.StoreHomeAdapter;
 import com.woyuce.activity.Application.AppContext;
 import com.woyuce.activity.Bean.StoreBean;
@@ -40,6 +42,7 @@ public class Fragment_StoreHome extends Fragment {
     private RecyclerView mRecycler;
     private RecyclerView.Adapter mAdapter;
     private List<String> mData = new ArrayList<>();
+    private List<StoreBean> mImgData = new ArrayList<>();
     private List<StoreBean> mList = new ArrayList<>();
 
     private String URL = "http://api.iyuce.com/v1/store/homegoodslist";
@@ -54,10 +57,21 @@ public class Fragment_StoreHome extends Fragment {
                             .showImageOnFail(R.mipmap.img_error).cacheInMemory(true).cacheOnDisk(true)
                             .bitmapConfig(Bitmap.Config.RGB_565).build();
 
-                    for (int i = 0; i < mData.size(); i++) {
+                    for (int i = 0; i < mImgData.size(); i++) {
                         ImageView mImg = new ImageView(getActivity());
                         mImg.setScaleType(ImageView.ScaleType.FIT_XY);
-                        ImageLoader.getInstance().displayImage(mData.get(i), mImg, options);
+                        ImageLoader.getInstance().displayImage(mImgData.get(i).getIcon_mobile_url(), mImg, options);
+                        mImg.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                Intent intent = new Intent(getActivity(), StoreGoodsActivity.class);
+//                                intent.putExtra("goods_id", mDatas.get(pos).getGoods_result().get(position).getGoods_id());
+//                                intent.putExtra("goods_sku_id", mDatas.get(pos).getGoods_result().get(position).getGoods_sku_id());
+//                                intent.putExtra("goods_title", mDatas.get(pos).getGoods_result().get(position).getGoods_title());
+//                                intent.putExtra("sales_price", mDatas.get(pos).getGoods_result().get(position).getSales_price());
+                                getActivity().startActivity(intent);
+                            }
+                        });
                         mViewFlipper.addView(mImg);
                     }
                     LogUtil.i("mData = " + mData.toString());
@@ -106,13 +120,19 @@ public class Fragment_StoreHome extends Fragment {
                     obj = new JSONObject(s);
                     arr_menu = obj.getJSONArray("menudata");
                     arr_data = obj.getJSONArray("data");
+                    StoreBean storeBean;
                     for (int i = 0; i < arr_menu.length(); i++) {
+                        storeBean = new StoreBean();
                         obj = arr_menu.getJSONObject(i);
-                        mData.add(obj.getString("icon_mobile_url"));
+//                        mData.add(obj.getString("icon_mobile_url"));
+                        storeBean.setIcon_mobile_url(obj.getString("icon_mobile_url"));
+                        storeBean.setId(obj.getString("id"));
+                        //还是需要做成对象
+                        mImgData.add(storeBean);
                     }
                     Message msg1 = new Message();
                     msg1.what = 1;
-                    msg1.obj = mData;
+                    msg1.obj = mImgData;
                     mHandler.sendMessage(msg1);
 
                     StoreBean store;
