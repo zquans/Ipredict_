@@ -1,6 +1,9 @@
 package com.woyuce.activity.Act;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -68,16 +71,16 @@ public class StoreOrderActivity extends BaseActivity {
                     String resultMemo = result.getMemo();
 
                     LogUtil.i("resultStatus = " + resultStatus + ",resultMemo = " + resultMemo + ",resultInfo = " + resultInfo);
-                    //请求验证阿里支付是否支付成功
-                    validRequest(resultInfo);
-
-                    LogUtil.i(resultInfo);
                     if (TextUtils.equals(resultStatus, "9000")) {
-                        // 该笔订单是否真实支付成功，需要依赖服务端的异步通知。
-                        ToastUtil.showMessage(StoreOrderActivity.this, "本地回调，支付成功");
+                        // 请求真实结果,该笔订单是否真实支付成功，需要依赖服务端的异步通知。
+                        validRequest(resultInfo);
                     } else {
                         // 该笔订单真实的支付结果，需要依赖服务端的异步通知。
-                        ToastUtil.showMessage(StoreOrderActivity.this, "本地回调,支付失败");
+                        new AlertDialog.Builder(StoreOrderActivity.this, AlertDialog.THEME_DEVICE_DEFAULT_LIGHT)
+                                .setTitle("支付宝支付结果")
+                                .setMessage("支付失败")
+                                .setPositiveButton("知道了", null)
+                                .show();
                     }
                     break;
             }
@@ -194,7 +197,7 @@ public class StoreOrderActivity extends BaseActivity {
     public void toCheck(View view) {
         boolean isPaySupported = api.getWXAppSupportAPI() >= Build.PAY_SUPPORTED_SDK_INT;
         ToastUtil.showMessage(this, "该版本微信是否支持支付 = " + String.valueOf(isPaySupported));
-        startActivity(new Intent(this,WXPayEntryActivity.class));
+        startActivity(new Intent(this, WXPayEntryActivity.class));
     }
 
     /**
@@ -211,9 +214,11 @@ public class StoreOrderActivity extends BaseActivity {
                             JSONObject obj;
                             obj = new JSONObject(s);
                             if (obj.getString("code").equals("0")) {
-                                int init_money = Integer.parseInt(PreferenceUtil.getSharePre(StoreOrderActivity.this).getString("store_user_money", ""));
-                                PreferenceUtil.save(StoreOrderActivity.this, "store_user_money", (init_money - Integer.parseInt(local_store_user_money)) + "");
+                                //TODO 用了金币接口后，还需要计算吗？
+//                                int init_money = Integer.parseInt(PreferenceUtil.getSharePre(StoreOrderActivity.this).getString("store_user_money", ""));
+//                                PreferenceUtil.save(StoreOrderActivity.this, "store_user_money", (init_money - Integer.parseInt(local_store_user_money)) + "");
                                 startActivity(new Intent(StoreOrderActivity.this, MainActivity.class));
+                                StoreOrderActivity.this.finish();
                             } else if (obj.getString("code").equals("2")) {
                                 ToastUtil.showMessage(StoreOrderActivity.this, "金币不足抵扣,去调支付宝或者微信");
                                 //现金支付请求
@@ -249,11 +254,11 @@ public class StoreOrderActivity extends BaseActivity {
                     JSONObject obj;
                     obj = new JSONObject(s);
                     if (obj.getString("code").equals("0")) {
-                        //TODO 区分 微信和阿里支付
-                        //如果是阿里支付
+                        //**************如果是阿里支付****************
                         if (method.equals("alipay")) {
                             ToastUtil.showMessage(StoreOrderActivity.this, "去调支付宝吧 = ");
-                            local_alipay_data = obj.getString("data");
+                            obj = obj.getJSONObject("data");
+                            local_alipay_data = obj.getString("paydata");
                             //必须异步调用支付宝
                             Runnable payRunnable = new Runnable() {
                                 @Override
@@ -271,13 +276,16 @@ public class StoreOrderActivity extends BaseActivity {
                             Thread payThread = new Thread(payRunnable);
                             payThread.start();
                         }
-                        //如果是微信支付
+                        //************如果是微信支付****************
                         if (method.equals("wxapp")) {
-                            String data = obj.getString("data");
-                            obj = new JSONObject(data);
-                            LogUtil.i("wx obj = " + obj);
+                            obj = obj.getJSONObject("data");
+                            String for_wx_validate = obj.getString("orderno");
+                            LogUtil.i("for_wx_validate = " + for_wx_validate);
+                            //将订单号保存给微信回调做判断
+                            PreferenceUtil.save(StoreOrderActivity.this, "for_wx_validate", for_wx_validate);
+                            obj = obj.getJSONObject("paydata");
                             PayReq req = new PayReq();
-                            req.appId = "wxee1be723a57f9d21";
+                            req.appId = obj.getString("appid");
                             req.partnerId = obj.getString("partnerid");
                             req.prepayId = obj.getString("prepayid");
                             req.nonceStr = obj.getString("noncestr");
@@ -322,12 +330,31 @@ public class StoreOrderActivity extends BaseActivity {
                     JSONObject obj;
                     obj = new JSONObject(s);
                     if (obj.getString("code").equals("0")) {
-                        ToastUtil.showMessage(StoreOrderActivity.this, "message" + obj.getString("message"));
-                        int init_money = Integer.parseInt(PreferenceUtil.getSharePre(StoreOrderActivity.this).getString("store_user_money", ""));
-                        PreferenceUtil.save(StoreOrderActivity.this, "store_user_money", (init_money - Integer.parseInt(local_store_user_money)) + "");
-                        startActivity(new Intent(StoreOrderActivity.this, MainActivity.class));
+                        //删除数据库中该表
+                        deleteSql();
+                        //界面提示处理
+                        new AlertDialog.Builder(StoreOrderActivity.this, AlertDialog.THEME_DEVICE_DEFAULT_LIGHT)
+                                .setTitle("支付宝支付结果")
+                                .setMessage("支付成功")
+                                .setPositiveButton("知道了", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        startActivity(new Intent(StoreOrderActivity.this, MainActivity.class));
+                                        StoreOrderActivity.this.finish();
+                                    }
+                                })
+                                .show();
+                        LogUtil.i("message" + obj.getString("message"));
+//                        int init_money = Integer.parseInt(PreferenceUtil.getSharePre(StoreOrderActivity.this).getString("store_user_money", ""));
+//                        PreferenceUtil.save(StoreOrderActivity.this, "store_user_money", (init_money - Integer.parseInt(local_store_user_money)) + "");
                     } else {
-                        ToastUtil.showMessage(StoreOrderActivity.this, "code !=0" + obj.getString("message"));
+                        // 该笔订单真实的支付结果，需要依赖服务端的异步通知。
+                        new AlertDialog.Builder(StoreOrderActivity.this, AlertDialog.THEME_DEVICE_DEFAULT_LIGHT)
+                                .setTitle("支付宝支付结果")
+                                .setMessage("支付失败")
+                                .setPositiveButton("知道了", null)
+                                .show();
+                        LogUtil.i("code !=0" + obj.getString("message"));
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -350,5 +377,16 @@ public class StoreOrderActivity extends BaseActivity {
         validRequest.setTag("validRequest");
         validRequest.setRetryPolicy(new DefaultRetryPolicy(1000, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         AppContext.getHttpQueue().add(validRequest);
+    }
+
+    /**
+     * 删除数据库中的这张表
+     */
+    private void deleteSql() {
+        //删除数据库中该表
+        PreferenceUtil.removestoretbisexist(StoreOrderActivity.this);
+        SQLiteDatabase mDatabase = openOrCreateDatabase("aipu.db", MODE_PRIVATE, null);
+        mDatabase.execSQL("drop table storetb");
+        mDatabase.close();
     }
 }

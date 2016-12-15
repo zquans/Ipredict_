@@ -66,6 +66,8 @@
     <ListView
         android:id="@+id/listview_store_fragment_three"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:divider="#f0f2f5"
+        android:dividerHeight="8dp" />
 
 </LinearLayout>

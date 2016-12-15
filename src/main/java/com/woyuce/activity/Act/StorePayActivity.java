@@ -13,6 +13,7 @@ import android.widget.TextView;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
+import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.woyuce.activity.Adapter.StorePayAdapter;
 import com.woyuce.activity.Application.AppContext;
@@ -181,6 +182,7 @@ public class StorePayActivity extends BaseActivity implements View.OnClickListen
      * 请求收货地址
      */
     private void requestAddress() {
+        progressdialogshow(this);
         StringRequest addressRequest = new StringRequest(Request.Method.GET,
                 URL + "?userid=" + PreferenceUtil.getSharePre(this).getString("userId", ""), new Response.Listener<String>() {
             @Override
@@ -202,8 +204,14 @@ public class StorePayActivity extends BaseActivity implements View.OnClickListen
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
+                progressdialogcancel();
             }
-        }, null);
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError volleyError) {
+                progressdialogcancel();
+            }
+        });
         addressRequest.setTag("StorePayRequest");
         AppContext.getHttpQueue().add(addressRequest);
     }

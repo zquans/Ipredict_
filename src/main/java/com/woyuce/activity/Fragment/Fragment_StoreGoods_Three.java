@@ -136,7 +136,7 @@ public class Fragment_StoreGoods_Three extends Fragment implements View.OnClickL
      * 请求晒单数据
      */
     private void requestShowOrder(boolean isfirst) {
-        if (isfirst == false) {
+        if (!isfirst) {
             mShowOrderAdapter = new StoreShowOrderAdapter(getActivity(), mShowOrderList);
             mListView.setAdapter(mShowOrderAdapter);
             return;

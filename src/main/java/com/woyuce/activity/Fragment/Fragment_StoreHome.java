@@ -12,6 +12,7 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ViewFlipper;
 
@@ -21,6 +22,8 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
+import com.woyuce.activity.Act.CustomServiceActivity;
+import com.woyuce.activity.Act.StoreCarActivity;
 import com.woyuce.activity.Act.StoreGoodsActivity;
 import com.woyuce.activity.Adapter.StoreHomeAdapter;
 import com.woyuce.activity.Application.AppContext;
@@ -28,6 +31,8 @@ import com.woyuce.activity.Bean.StoreBean;
 import com.woyuce.activity.Bean.StoreGoods;
 import com.woyuce.activity.R;
 import com.woyuce.activity.Utils.LogUtil;
+import com.woyuce.activity.Utils.PreferenceUtil;
+import com.woyuce.activity.Utils.ToastUtil;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -36,8 +41,9 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Fragment_StoreHome extends Fragment {
+public class Fragment_StoreHome extends Fragment implements View.OnClickListener {
 
+    private ImageButton mBtnToCustom, mBtnToStoreCar;
     private ViewFlipper mViewFlipper;
 
     private RecyclerView mRecycler;
@@ -62,7 +68,7 @@ public class Fragment_StoreHome extends Fragment {
 
                     for (int i = 0; i < mImgData.size(); i++) {
                         ImageView mImg = new ImageView(getActivity());
-                        mImg.setScaleType(ImageView.ScaleType.FIT_XY);
+                        mImg.setScaleType(ImageView.ScaleType.CENTER_CROP);
                         ImageLoader.getInstance().displayImage(mImgData.get(i).getIcon_mobile_url(), mImg, options);
                         final int finalI = i;
                         mImg.setOnClickListener(new View.OnClickListener() {
@@ -108,9 +114,13 @@ public class Fragment_StoreHome extends Fragment {
     }
 
     private void initView(View view) {
+        mBtnToCustom = (ImageButton) view.findViewById(R.id.imgbtn_store_toCustom);
+        mBtnToStoreCar = (ImageButton) view.findViewById(R.id.imgbtn_store_toStoreCar);
+        mBtnToCustom.setOnClickListener(this);
+        mBtnToStoreCar.setOnClickListener(this);
+
         mViewFlipper = (ViewFlipper) view.findViewById(R.id.viewflip_fragment_store_tab1);
         mRecycler = (RecyclerView) view.findViewById(R.id.recycler_fragment_store_tab1);
-
         requestData();
     }
 
@@ -193,5 +203,21 @@ public class Fragment_StoreHome extends Fragment {
         });
         goodsrequest.setTag("goodsrequest");
         AppContext.getHttpQueue().add(goodsrequest);
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.imgbtn_store_toCustom:
+                startActivity(new Intent(getActivity(), CustomServiceActivity.class));
+                break;
+            case R.id.imgbtn_store_toStoreCar:
+                if (!PreferenceUtil.getSharePre(getActivity()).getString("storetb_is_exist", "no").equals("yes")) {
+                    ToastUtil.showMessage(getActivity(), "您的购物车空空哒，快去添加商品吧！");
+                    return;
+                }
+                startActivity(new Intent(getActivity(), StoreCarActivity.class));
+                break;
+        }
     }
 }

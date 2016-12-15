@@ -114,6 +114,12 @@ public class PreferenceUtil {
         localEditor.commit();
     }
 
+    public static void removestoretbisexist(Context paramContext) {
+        SharedPreferences.Editor localEditor = getSharePre(paramContext).edit();
+        localEditor.remove("storetb_is_exist");
+        localEditor.commit();
+    }
+
     public static void removefirstguide(Context paramContext) {
         SharedPreferences.Editor localEditor = getSharePre(paramContext).edit();
         localEditor.remove("welcome");

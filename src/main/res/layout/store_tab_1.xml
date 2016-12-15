@@ -3,10 +3,42 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:background="#f7941d">
+
+        <ImageButton
+            android:id="@+id/imgbtn_store_toCustom"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="8dp"
+            android:background="@mipmap/tabfour_client" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="商城"
+            android:textColor="#fff"
+            android:textSize="20sp" />
+
+        <ImageButton
+            android:id="@+id/imgbtn_store_toStoreCar"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="8dp"
+            android:background="@mipmap/icon_store_car" />
+
+    </RelativeLayout>
+
     <ViewFlipper
         android:id="@+id/viewflip_fragment_store_tab1"
         android:layout_width="match_parent"
-        android:layout_height="160dp" />
+        android:layout_height="120dp" />
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recycler_fragment_store_tab1"

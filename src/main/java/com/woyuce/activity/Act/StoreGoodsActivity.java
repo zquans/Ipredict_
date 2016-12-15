@@ -261,6 +261,10 @@ public class StoreGoodsActivity extends BaseActivity implements View.OnClickList
                 ToastUtil.showMessage(this, "您的商品放入购物车啦!");
                 break;
             case R.id.btn_activity_storegoods_tocar:
+                if (!PreferenceUtil.getSharePre(this).getString("storetb_is_exist", "no").equals("yes")) {
+                    ToastUtil.showMessage(this, "您的购物车空空哒，快去添加商品吧！");
+                    return;
+                }
                 startActivity(new Intent(this, StoreCarActivity.class));
                 break;
         }

@@ -67,8 +67,8 @@ public class StoreShowOrderAdapter extends BaseAdapter {
         viewHolder.mTxtContent.setText(mList.get(position).getComment_text());
 
         DisplayImageOptions options = new DisplayImageOptions.Builder()
-                .showImageOnLoading(R.mipmap.img_error)
-                .showImageOnFail(R.mipmap.img_error)
+                .showImageOnLoading(R.mipmap.img_error_horizon)
+                .showImageOnFail(R.mipmap.img_error_horizon)
                 .displayer(new RoundedBitmapDisplayer(10))
                 .cacheInMemory(true)
                 .cacheOnDisk(true)

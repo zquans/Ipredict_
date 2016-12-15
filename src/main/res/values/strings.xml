@@ -33,6 +33,6 @@
     <string name="company_web">我预测网站：www.iyuce.com</string>
     <string name="share_exam">分享考题</string>
     <string name="search_prompt">大家都在搜索</string>
-    <string name="pay_hint">1.通过支付宝支付，将会支付到iyuce@qq.com账号上；\n2.支付宝单笔限额10000元；\n3.通过微信支付，将会支付到"厦门爱优普教育咨询有限公司"</string>
+    <string name="pay_hint">1.通过支付宝支付，将会支付到iyuce@qq.com账号上；\n2.通过微信支付，将会支付到"厦门爱优普教育咨询有限公司"\n3.支付宝单笔限额10000元"</string>
 
 </resources>
