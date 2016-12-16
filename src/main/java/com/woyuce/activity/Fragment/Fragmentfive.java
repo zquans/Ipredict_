@@ -1,9 +1,11 @@
 package com.woyuce.activity.Fragment;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
@@ -21,6 +23,7 @@ import com.android.volley.toolbox.StringRequest;
 import com.woyuce.activity.Act.AboutUsActivity;
 import com.woyuce.activity.Act.CustomServiceActivity;
 import com.woyuce.activity.Act.LoginActivity;
+import com.woyuce.activity.Act.StoreCarActivity;
 import com.woyuce.activity.Act.StoreOrderListActivity;
 import com.woyuce.activity.Act.SuggestionActivity;
 import com.woyuce.activity.Act.WebActivity;
@@ -82,7 +85,7 @@ public class Fragmentfive extends Fragment implements View.OnClickListener {
         txtSuggestion = (TextView) view.findViewById(R.id.txt_to_suggestion);
         txtRoom = (TextView) view.findViewById(R.id.txt_tab5_localroom);
         txtSubject = (TextView) view.findViewById(R.id.txt_tab5_localsubject);
-//        txtStore = (TextView) view.findViewById(R.id.txt_to_store);
+        txtStore = (TextView) view.findViewById(R.id.txt_to_store);
         txtClear = (TextView) view.findViewById(R.id.txt_to_clearcache);
         txtService = (TextView) view.findViewById(R.id.txt_to_service);
         txtSignOut = (TextView) view.findViewById(R.id.txt_to_signout);
@@ -96,7 +99,7 @@ public class Fragmentfive extends Fragment implements View.OnClickListener {
         txtSuggestion.setOnClickListener(this);
         txtRoom.setOnClickListener(this);
         txtSubject.setOnClickListener(this);
-//        txtStore.setOnClickListener(this);
+        txtStore.setOnClickListener(this);
         txtClear.setOnClickListener(this);
         txtService.setOnClickListener(this);
         txtSignOut.setOnClickListener(this);
@@ -277,9 +280,13 @@ public class Fragmentfive extends Fragment implements View.OnClickListener {
                 com.nostra13.universalimageloader.core.ImageLoader.getInstance().clearMemoryCache();
                 ToastUtil.showMessage(getActivity(), "清除缓存成功");
                 break;
-//            case R.id.txt_to_store:
-//                startActivity(new Intent(getActivity(), StoreHomeActivity.class));
-//                break;
+            case R.id.txt_to_store:
+                if (!PreferenceUtil.getSharePre(getActivity()).getString("storetb_is_exist", "no").equals("yes")) {
+                    ToastUtil.showMessage(getActivity(), "您的购物车空空哒，快去添加商品吧！");
+                    return;
+                }
+                startActivity(new Intent(getActivity(), StoreCarActivity.class));
+                break;
             case R.id.txt_to_service:
                 startActivity(new Intent(getActivity(), CustomServiceActivity.class));
                 break;
@@ -303,6 +310,11 @@ public class Fragmentfive extends Fragment implements View.OnClickListener {
                     public void onClick(DialogInterface dialog, int which) {
                         CookieManager.getInstance().removeAllCookie();
                         LogUtil.e("CookieManager = " + CookieManager.getInstance().getCookie("iyuce.com") + "");
+                        //删除数据库中该表
+                        PreferenceUtil.removestoretbisexist(getActivity());
+                        SQLiteDatabase mDatabase = getActivity().openOrCreateDatabase("aipu.db", Context.MODE_PRIVATE,null);
+                        mDatabase.execSQL("drop table storetb");
+                        mDatabase.close();
                         startActivity(new Intent(getActivity(), LoginActivity.class));
 //                        PreferenceUtil.removeall(getActivity()); // 只留下了版本号
                         getActivity().finish();

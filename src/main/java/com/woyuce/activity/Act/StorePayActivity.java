@@ -37,8 +37,6 @@ import java.util.ArrayList;
  * Created by Administrator on 2016/11/7.
  */
 
-//TODO 件数、金额、ListView中的Item不匹配问题需要修复
-
 public class StorePayActivity extends BaseActivity implements View.OnClickListener {
 
     private RelativeLayout mReLayoutAddress;
@@ -242,6 +240,11 @@ public class StorePayActivity extends BaseActivity implements View.OnClickListen
     private String local_address_id;
 
     public void nowPay(View view) {
+        if (total_price == 0) {
+            ToastUtil.showMessage(this, "快去添加商品吧");
+            return;
+        }
+
         if (TextUtils.isEmpty(PreferenceUtil.getSharePre(this).getString("userId", null))) {
             new AlertDialog.Builder(this)
                     .setTitle("您还没有登陆哦")

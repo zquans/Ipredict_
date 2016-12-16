@@ -39,7 +39,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="16dp"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="8dp"
                 android:padding="4dp"
                 android:text="支付信息"
                 android:textSize="18sp"
@@ -72,7 +72,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="16dp"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="8dp"
                 android:padding="4dp"
                 android:text="商品"
                 android:textColor="#000"
@@ -96,7 +96,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="16dp"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="8dp"
                 android:padding="4dp"
                 android:text="金额"
                 android:textColor="#000"
@@ -119,7 +119,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="16dp"
-                android:layout_marginTop="24dp"
+                android:layout_marginTop="16dp"
                 android:padding="4dp"
                 android:text="请选择支付方式:"
                 android:textColor="#000"
@@ -128,33 +128,46 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
+                android:orientation="horizontal"
                 android:paddingLeft="32dp"
                 android:paddingTop="16dp">
 
                 <LinearLayout
                     android:id="@+id/ll_activity_storeorder_payAli"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginRight="32dp">
+                    android:layout_marginRight="32dp"
+                    android:orientation="vertical">
 
                     <ImageView
                         android:layout_width="48dp"
                         android:layout_height="48dp"
+                        android:layout_gravity="center_horizontal"
                         android:src="@mipmap/icon_pay_ali" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="支付宝支付" />
                 </LinearLayout>
 
                 <LinearLayout
                     android:id="@+id/ll_activity_storeorder_payWx"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginRight="32dp"
-                    android:layout_marginTop="8dp">
+                    android:orientation="vertical">
 
                     <ImageView
                         android:layout_width="48dp"
                         android:layout_height="48dp"
+                        android:layout_gravity="center_horizontal"
                         android:background="@mipmap/icon_pay_weixin" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="微信支付" />
                 </LinearLayout>
 
             </LinearLayout>
@@ -173,8 +186,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="16dp"
-                android:layout_marginTop="32dp"
-                android:background="#0a0"
+                android:layout_marginTop="8dp"
+                android:background="#f7941d"
                 android:text="确定"
                 android:textColor="#fff" />
 

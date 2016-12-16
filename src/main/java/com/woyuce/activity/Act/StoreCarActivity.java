@@ -241,7 +241,7 @@ public class StoreCarActivity extends BaseActivity implements StoreCarAdapter.On
         //减少商品的时候需要考虑商品减少到0的情况
         TextView txtCount = (TextView) getViewByPosition(pos, mListView);
         int local_count = Integer.parseInt(txtCount.getText().toString());
-        if(local_count > 0){
+        if (local_count > 0) {
             //计算商品总价和总数
             countPrice("minus", mFinalList.get(pos).getPrice());
         }
@@ -266,6 +266,7 @@ public class StoreCarActivity extends BaseActivity implements StoreCarAdapter.On
 
     /**
      * 循环后删除随意一项mList中的商品
+     *
      * @param pos
      */
     private void doDeleteOneGoods(int pos) {
@@ -375,7 +376,8 @@ public class StoreCarActivity extends BaseActivity implements StoreCarAdapter.On
             mNameList.add(mFinalList.get(i).getName());
             mSpecNameList.add(mFinalList.get(i).getSpecname());
             mPriceList.add(mFinalList.get(i).getPrice());
-            mNumList.add(mFinalList.get(i).getNum());
+            //某Item商品的数量
+            mNumList.add(((TextView) getViewByPosition(i, mListView)).getText().toString());
         }
         intent.putStringArrayListExtra("mGoodsSkuIdList", mGoodsSkuIdList);
         intent.putStringArrayListExtra("mNameList", mNameList);

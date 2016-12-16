@@ -12,7 +12,7 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ViewFlipper;
 
@@ -43,7 +43,7 @@ import java.util.List;
 
 public class Fragment_StoreHome extends Fragment implements View.OnClickListener {
 
-    private ImageButton mBtnToCustom, mBtnToStoreCar;
+    private Button mBtnToCustom, mBtnToStoreCar;
     private ViewFlipper mViewFlipper;
 
     private RecyclerView mRecycler;
@@ -114,8 +114,8 @@ public class Fragment_StoreHome extends Fragment implements View.OnClickListener
     }
 
     private void initView(View view) {
-        mBtnToCustom = (ImageButton) view.findViewById(R.id.imgbtn_store_toCustom);
-        mBtnToStoreCar = (ImageButton) view.findViewById(R.id.imgbtn_store_toStoreCar);
+        mBtnToCustom = (Button) view.findViewById(R.id.imgbtn_store_toCustom);
+        mBtnToStoreCar = (Button) view.findViewById(R.id.imgbtn_store_toStoreCar);
         mBtnToCustom.setOnClickListener(this);
         mBtnToStoreCar.setOnClickListener(this);
 
@@ -159,7 +159,6 @@ public class Fragment_StoreHome extends Fragment implements View.OnClickListener
                     msg1.obj = mImgData;
                     mHandler.sendMessage(msg1);
                     // 首页商品数据Bean
-                    //TODO 应该是这里的obj和上面的obj冲突了
                     StoreBean store;
                     JSONArray arr_goods_result;
                     JSONObject obj_goods;

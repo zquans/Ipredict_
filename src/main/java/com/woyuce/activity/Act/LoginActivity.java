@@ -2,8 +2,10 @@ package com.woyuce.activity.Act;
 
 import android.Manifest;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.text.InputType;
 import android.text.TextUtils;
@@ -339,7 +341,6 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
                 // 保存账号信息到sharepreferences数据库中
                 PreferenceUtil.save(LoginActivity.this, "username", LoginActivity.this.strUserName);
                 PreferenceUtil.save(LoginActivity.this, "password", LoginActivity.this.strPassword);
-
                 if (TextUtils.isEmpty(strUserName) || TextUtils.isEmpty(strPassword)) {
                     ToastUtil.showMessage(LoginActivity.this, "账号密码不能为空，试试体验登陆吧");
                     return;
@@ -351,6 +352,10 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
             case R.id.btn_loginAtOnce:
                 startActivity(new Intent(this, MainActivity.class));
                 PreferenceUtil.removeall(this); // 只留下了版本号
+                PreferenceUtil.removestoretbisexist(this);
+                SQLiteDatabase mDatabase = openOrCreateDatabase("aipu.db", Context.MODE_PRIVATE, null);
+                mDatabase.execSQL("drop table storetb");
+                mDatabase.close();
 //                CookieManager.getInstance().removeAllCookie();
                 // PreferenceUtil.clear(this);
                 finish();

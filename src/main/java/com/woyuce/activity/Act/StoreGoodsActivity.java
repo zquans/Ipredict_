@@ -10,6 +10,8 @@ import android.os.Handler;
 import android.os.Message;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateDecelerateInterpolator;
+import android.view.animation.BounceInterpolator;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -167,8 +169,9 @@ public class StoreGoodsActivity extends BaseActivity implements View.OnClickList
      * 重设Tab样式
      */
     private void resetTxtTab(TextView txt, int start, int end) {
-        ObjectAnimator mAnimator1 = ObjectAnimator.ofFloat(mLine, "translationX", start, end);
-        mAnimator1.setDuration(200).start();
+        ObjectAnimator mAnimator = ObjectAnimator.ofFloat(mLine, "translationX", start, end);
+        mAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
+        mAnimator.setDuration(800).start();
         mTxtTabOne.setTextColor(Color.parseColor("#a7a7a7"));
         mTxtTabTwo.setTextColor(Color.parseColor("#a7a7a7"));
         mTxtTabThree.setTextColor(Color.parseColor("#a7a7a7"));
