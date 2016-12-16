@@ -1,6 +1,5 @@
 package com.woyuce.activity.Fragment;
 
-import android.app.Fragment;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -11,6 +10,7 @@ import android.widget.TextView;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
+import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.woyuce.activity.Adapter.StoreGoodsCommentAdapter;
 import com.woyuce.activity.Adapter.StoreShowOrderAdapter;
@@ -26,7 +26,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Fragment_StoreGoods_Three extends Fragment implements View.OnClickListener {
+public class Fragment_StoreGoods_Three extends BaseFragment implements View.OnClickListener {
 
     private TextView mTxtAll, mTxtGood, mTxtMiddle, mTxtBad, mTxtShowOrder;
 
@@ -93,6 +93,7 @@ public class Fragment_StoreGoods_Three extends Fragment implements View.OnClickL
     }
 
     private void requestData() {
+        progressdialogshow(getActivity());
         StringRequest goodsCommentRequest = new StringRequest(Request.Method.GET,
                 URL + "?goodsid=" + getArguments().getString("goods_id") + "&pageindex=" + "1" + "&pagesize=" + "30",
                 new Response.Listener<String>() {
@@ -123,8 +124,15 @@ public class Fragment_StoreGoods_Three extends Fragment implements View.OnClickL
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
+                        progressdialogcancel();
                     }
-                }, null);
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError volleyError) {
+                LogUtil.i("Fragment_three volleyError = " + volleyError.getMessage());
+                progressdialogcancel();
+            }
+        });
         goodsCommentRequest.setTag("goodsCommentRequest");
         AppContext.getHttpQueue().add(goodsCommentRequest);
     }

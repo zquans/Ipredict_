@@ -63,6 +63,7 @@
                 android:layout_marginRight="16dp"
                 android:background="#ccc"
                 android:enabled="false"
+                android:focusable="false"
                 android:padding="4dp"
                 android:text="error occur"
                 android:textColor="#333" />
@@ -109,6 +110,7 @@
                 android:layout_marginRight="16dp"
                 android:background="#ccc"
                 android:enabled="false"
+                android:focusable="false"
                 android:padding="4dp"
                 android:text="wrong"
                 android:textColor="#333" />
@@ -126,22 +128,34 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
+                android:orientation="vertical"
                 android:paddingLeft="32dp"
                 android:paddingTop="16dp">
 
-                <ImageButton
-                    android:layout_width="80dp"
-                    android:layout_height="80dp"
-                    android:background="@mipmap/icon_pay_ali"
-                    android:onClick="payAli" />
+                <LinearLayout
+                    android:id="@+id/ll_activity_storeorder_payAli"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="32dp">
 
-                <ImageButton
-                    android:layout_width="80dp"
-                    android:layout_height="80dp"
-                    android:layout_marginLeft="16dp"
-                    android:background="@mipmap/icon_pay_weixin"
-                    android:onClick="payWx" />
+                    <ImageView
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:src="@mipmap/icon_pay_ali" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/ll_activity_storeorder_payWx"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="32dp"
+                    android:layout_marginTop="8dp">
+
+                    <ImageView
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:background="@mipmap/icon_pay_weixin" />
+                </LinearLayout>
 
             </LinearLayout>
 
@@ -155,15 +169,14 @@
                 android:textSize="14sp" />
 
             <Button
+                android:id="@+id/btn_activity_storeorder_pay"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="16dp"
                 android:layout_marginTop="32dp"
                 android:background="#0a0"
-                android:onClick="toCheck"
                 android:text="确定"
-                android:textColor="#fff"
-                android:visibility="gone" />
+                android:textColor="#fff" />
 
         </LinearLayout>
     </ScrollView>

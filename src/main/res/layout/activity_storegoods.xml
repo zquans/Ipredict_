@@ -64,12 +64,23 @@
             android:text="评价晒单" />
     </LinearLayout>
 
+    <View
+        android:id="@+id/line_activity_storegoods"
+        android:layout_width="200dp"
+        android:layout_height="2dp"
+        android:background="#f7941d" />
+
     <FrameLayout
         android:id="@+id/frame_activity_storegoods_fragment"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
         android:background="#ffffff" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:background="#f0f2f5" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -81,7 +92,9 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:background="#ffffff"
+            android:background="#ccc"
+            android:drawableLeft="@mipmap/icon_store_car"
+            android:drawablePadding="-40dp"
             android:text="购物车" />
 
         <Button
@@ -90,7 +103,6 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:background="#f7941d"
-            android:drawableLeft="@mipmap/icon_store_car"
             android:text="加入购物车"
             android:textColor="#fff" />
 

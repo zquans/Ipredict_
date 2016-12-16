@@ -10,7 +10,7 @@
     <ViewFlipper
         android:id="@+id/viewflip_activity_storegoods"
         android:layout_width="match_parent"
-        android:layout_height="160dp" />
+        android:layout_height="144dp" />
 
     <TextView
         android:id="@+id/txt_activity_storegoods_goodstitle"
@@ -38,7 +38,7 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="48dp"
+        android:layout_height="44dp"
         android:background="#fff"
         android:orientation="horizontal"
         android:paddingLeft="16dp">
@@ -79,7 +79,76 @@
 
     <View
         android:layout_width="match_parent"
-        android:layout_height="12dp"
+        android:layout_height="8dp"
+        android:background="#f0f2f5" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        android:background="#fff">
+
+        <TextView
+            android:id="@+id/txt_fragment_store_one_chengnuo"
+            android:layout_width="88dp"
+            android:layout_height="32dp"
+            android:layout_marginTop="2dp"
+            android:gravity="center"
+            android:text="承诺"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/txt_fragment_store_one_zhifu"
+            android:layout_width="88dp"
+            android:layout_height="32dp"
+            android:layout_below="@+id/txt_fragment_store_one_chengnuo"
+            android:layout_marginTop="4dp"
+            android:gravity="center"
+            android:padding="4dp"
+            android:text="支付"
+            android:textSize="16sp" />
+
+        <ImageView
+            android:id="@+id/img_fragment_store_one_chengnuo"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_toRightOf="@+id/txt_fragment_store_one_chengnuo"
+            android:background="@mipmap/icon_pay_safe" />
+
+        <ImageView
+            android:id="@+id/img_fragment_store_one_zhifu"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:layout_alignBottom="@+id/txt_fragment_store_one_zhifu"
+            android:layout_marginLeft="4dp"
+            android:layout_toRightOf="@+id/txt_fragment_store_one_zhifu"
+            android:background="@mipmap/icon_pay_ali" />
+
+        <TextView
+            android:id="@+id/txt_fragment_store_one_anquanbaozhang"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_alignBaseline="@+id/txt_fragment_store_one_chengnuo"
+            android:layout_marginLeft="8dp"
+            android:layout_toRightOf="@+id/img_fragment_store_one_chengnuo"
+            android:text="安全保障"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/txt_fragment_store_one_zhifubao"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_alignBaseline="@+id/txt_fragment_store_one_zhifu"
+            android:layout_below="@+id/txt_fragment_store_one_chengnuo"
+            android:layout_marginLeft="8dp"
+            android:layout_toRightOf="@+id/img_fragment_store_one_chengnuo"
+            android:text="支付宝"
+            android:textSize="16sp" />
+
+    </RelativeLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="8dp"
         android:background="#f0f2f5" />
 
     <TextView
@@ -92,7 +161,8 @@
         android:id="@+id/gridview_fragment_store_one"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingLeft="16dp" />
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp" />
 
     <TextView
         android:id="@+id/txt_fragment_store_two"
@@ -104,7 +174,8 @@
         android:id="@+id/gridview_fragment_store_two"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingLeft="16dp" />
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp" />
 
     <TextView
         android:id="@+id/txt_fragment_store_three"
@@ -116,6 +187,7 @@
         android:id="@+id/gridview_fragment_store_three"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingLeft="16dp" />
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp" />
 
 </LinearLayout>

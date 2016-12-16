@@ -1,7 +1,10 @@
 package com.woyuce.activity.Act;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -239,6 +242,20 @@ public class StorePayActivity extends BaseActivity implements View.OnClickListen
     private String local_address_id;
 
     public void nowPay(View view) {
+        if (TextUtils.isEmpty(PreferenceUtil.getSharePre(this).getString("userId", null))) {
+            new AlertDialog.Builder(this)
+                    .setTitle("您还没有登陆哦")
+                    .setMessage("立刻去登陆吗？")
+                    .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            startActivity(new Intent(StorePayActivity.this, LoginActivity.class));
+                        }
+                    })
+                    .setNegativeButton("取消", null)
+                    .show();
+            return;
+        }
         String local_skuids = "";
         for (int i = 0; i < mList.size(); i++) {
             local_skuids = local_skuids + mList.get(i).getGoodsskuid()

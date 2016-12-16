@@ -1,5 +1,6 @@
 package com.woyuce.activity.Act;
 
+import android.animation.ObjectAnimator;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
@@ -8,6 +9,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -34,6 +36,7 @@ public class StoreGoodsActivity extends BaseActivity implements View.OnClickList
 
     private TextView mTxtTabOne, mTxtTabTwo, mTxtTabThree;
     private Button mBtnGoToCar, mBtnPutIntoCar, mBtnBuyNow;
+    private View mLine;
 
     //存放数据
     private List<String> mList = new ArrayList<>();
@@ -42,6 +45,8 @@ public class StoreGoodsActivity extends BaseActivity implements View.OnClickList
     Fragment_StoreGoods_One_ mFrgOne;
 
     private static final int OPEN_FRAGMENT = 0x001;
+    //线宽及线动画的终点
+    private int line_width, line_end;
 
     private String local_goods_title;
 
@@ -85,6 +90,7 @@ public class StoreGoodsActivity extends BaseActivity implements View.OnClickList
         mBtnGoToCar = (Button) findViewById(R.id.btn_activity_storegoods_tocar);
         mBtnPutIntoCar = (Button) findViewById(R.id.btn_activity_storegoods_putincar);
         mBtnBuyNow = (Button) findViewById(R.id.btn_activity_storegoods_buynow);
+        mLine = findViewById(R.id.line_activity_storegoods);
         mBtnGoToCar.setOnClickListener(this);
         mBtnPutIntoCar.setOnClickListener(this);
         mBtnBuyNow.setOnClickListener(this);
@@ -95,7 +101,13 @@ public class StoreGoodsActivity extends BaseActivity implements View.OnClickList
         //请求数据
         requestData();
         //重设Tab的样式
-        resetTxtTab(mTxtTabOne);
+        resetTxtTab(mTxtTabOne, 0, 0);
+        //设置线宽
+        line_width = this.getWindowManager().getDefaultDisplay().getWidth();
+        ViewGroup.LayoutParams mLayoutParams = mLine.getLayoutParams();
+        mLayoutParams.width = line_width / 3;
+        mLine.setLayoutParams(mLayoutParams);
+
         mTxtTabOne.setTextColor(Color.parseColor("#f7941d"));
     }
 
@@ -118,7 +130,6 @@ public class StoreGoodsActivity extends BaseActivity implements View.OnClickList
                             JSONArray arr;
                             obj = new JSONObject(s);
                             if (obj.getString("code").equals("0")) {
-                                //TODO 保存这个money，到购物车结算时可以抵充金币
                                 String store_user_money = obj.getString("user_money");
                                 LogUtil.i("user_money = " + store_user_money);
                                 PreferenceUtil.save(StoreGoodsActivity.this, "store_user_money", store_user_money);
@@ -130,6 +141,7 @@ public class StoreGoodsActivity extends BaseActivity implements View.OnClickList
                                 total_bad_volume = obj.getString("total_bad_volume");
                                 total_medium_volume = obj.getString("total_medium_volume");
                                 total_show_order_volume = obj.getString("total_show_order_volume");
+
                                 //填充轮播图数据
                                 arr = obj.getJSONArray("goods_albums");
                                 for (int i = 0; i < arr.length(); i++) {
@@ -154,11 +166,14 @@ public class StoreGoodsActivity extends BaseActivity implements View.OnClickList
     /**
      * 重设Tab样式
      */
-    private void resetTxtTab(TextView txt) {
+    private void resetTxtTab(TextView txt, int start, int end) {
+        ObjectAnimator mAnimator1 = ObjectAnimator.ofFloat(mLine, "translationX", start, end);
+        mAnimator1.setDuration(200).start();
         mTxtTabOne.setTextColor(Color.parseColor("#a7a7a7"));
         mTxtTabTwo.setTextColor(Color.parseColor("#a7a7a7"));
         mTxtTabThree.setTextColor(Color.parseColor("#a7a7a7"));
         txt.setTextColor(Color.parseColor("#f7941d"));
+        line_end = end;
     }
 
     /**
@@ -196,6 +211,8 @@ public class StoreGoodsActivity extends BaseActivity implements View.OnClickList
         startActivity(new Intent(this, MainActivity.class));
     }
 
+    private boolean is_first_line = true;
+
     @Override
     public void onClick(View v) {//前三个case是顶部导航栏，后三个是底部导航栏
         if (mFrgOne == null) {
@@ -214,7 +231,7 @@ public class StoreGoodsActivity extends BaseActivity implements View.OnClickList
         switch (v.getId()) {
             case R.id.txt_storegoods_tab_one:
                 getFragmentManager().beginTransaction().remove(mFrgOne).commit();
-                resetTxtTab(mTxtTabOne);
+                resetTxtTab(mTxtTabOne, line_end, 0);
                 Fragment_StoreGoods_One_ mFrgOne_ = new Fragment_StoreGoods_One_();
                 bundle.putString("goods_id", getIntent().getStringExtra("goods_id"));
                 bundle.putString("goods_sku_id", getIntent().getStringExtra("goods_sku_id"));
@@ -230,7 +247,11 @@ public class StoreGoodsActivity extends BaseActivity implements View.OnClickList
                 break;
             case R.id.txt_storegoods_tab_two:
                 getFragmentManager().beginTransaction().remove(mFrgOne).commit();
-                resetTxtTab(mTxtTabTwo);
+                if (is_first_line) {
+                    resetTxtTab(mTxtTabTwo, 0, line_width / 3 * 1);
+                    is_first_line = false;
+                }
+                resetTxtTab(mTxtTabTwo, line_end, line_width / 3 * 1);
                 Fragment_StoreGoods_Two mFrgTwo = new Fragment_StoreGoods_Two();
                 bundle.putString("mImgList", mImgList);
                 mFrgTwo.setArguments(bundle);
@@ -239,7 +260,11 @@ public class StoreGoodsActivity extends BaseActivity implements View.OnClickList
                 break;
             case R.id.txt_storegoods_tab_three:
                 getFragmentManager().beginTransaction().remove(mFrgOne).commit();
-                resetTxtTab(mTxtTabThree);
+                if (is_first_line) {
+                    is_first_line = false;
+                    resetTxtTab(mTxtTabThree, 0, line_width / 3 * 2);
+                }
+                resetTxtTab(mTxtTabThree, line_end, line_width / 3 * 2);
                 Fragment_StoreGoods_Three mFrgThree = new Fragment_StoreGoods_Three();
                 bundle.putString("goods_id", getIntent().getStringExtra("goods_id"));
                 bundle.putString("total_sales_volume", total_sales_volume);

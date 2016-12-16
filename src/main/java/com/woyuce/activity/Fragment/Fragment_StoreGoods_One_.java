@@ -1,6 +1,5 @@
 package com.woyuce.activity.Fragment;
 
-import android.app.Fragment;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -15,6 +14,7 @@ import android.widget.ViewFlipper;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
+import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -34,11 +34,11 @@ import java.util.ArrayList;
 /**
  * 两部分，一：将传递到的数据直接放上视图，二：请求规格获取数据
  */
-public class Fragment_StoreGoods_One_ extends Fragment implements AdapterView.OnItemClickListener {
+public class Fragment_StoreGoods_One_ extends BaseFragment implements AdapterView.OnItemClickListener {
 
     private ViewFlipper mFlipper;
 
-    private TextView mTxtGoodsTitle, mTxtGoodsPrice, mTxtTotalSale, mTxtGoodComment, mTxtShowOrder;
+    private TextView mTxtGoodsTitle, mTxtGoodsPrice, mTxtTotalSale, mTxtGoodComment, mTxtShowOrder, mTxtPresentPoint;
     private TextView mTxtSpcOne, mTxtSpcTwo, mTxtSpcThree;
 
     private String local_skuid, local_goodsid, URL;
@@ -97,6 +97,7 @@ public class Fragment_StoreGoods_One_ extends Fragment implements AdapterView.On
         mTxtTotalSale = (TextView) view.findViewById(R.id.txt_storegoods_fragmentone_salenum);
         mTxtGoodComment = (TextView) view.findViewById(R.id.txt_storegoods_fragmentone_good);
         mTxtShowOrder = (TextView) view.findViewById(R.id.txt_storegoods_fragmentone_showorder);
+        mTxtPresentPoint = (TextView) view.findViewById(R.id.txt_storegoods_fragmentone_gift);
         mTxtSpcOne = (TextView) view.findViewById(R.id.txt_fragment_store_one);
         mTxtSpcTwo = (TextView) view.findViewById(R.id.txt_fragment_store_two);
         mTxtSpcThree = (TextView) view.findViewById(R.id.txt_fragment_store_three);
@@ -136,6 +137,7 @@ public class Fragment_StoreGoods_One_ extends Fragment implements AdapterView.On
         } else {
             for (int i = 0; i < mList.size(); i++) {
                 ImageView img = new ImageView(getActivity());
+                img.setScaleType(ImageView.ScaleType.CENTER_CROP);
                 ImageLoader.getInstance().displayImage(mList.get(i), img, options);
                 mFlipper.addView(img);
             }
@@ -160,6 +162,7 @@ public class Fragment_StoreGoods_One_ extends Fragment implements AdapterView.On
     private ArrayList<String> mSelectSpcList = new ArrayList<>();
 
     private void requestGoodsSpe(String url, final boolean need_notify) {
+        progressdialogshow(getActivity());
         StringRequest goodsSpeRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String s) {
@@ -174,6 +177,7 @@ public class Fragment_StoreGoods_One_ extends Fragment implements AdapterView.On
                         return_local_goods_sku_id = obj.getString("id");
                         return_local_specname = obj.getString("spec_texts");
                         return_local_price = obj.getString("sales_price");
+                        mTxtPresentPoint.setText("赠送金币" + obj.getString("present_trade_point"));
                         mTxtGoodsTitle.setText(return_local_specname);
                         mTxtGoodsPrice.setText(return_local_price);
 
@@ -276,8 +280,15 @@ public class Fragment_StoreGoods_One_ extends Fragment implements AdapterView.On
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
+                progressdialogcancel();
             }
-        }, null);
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError volleyError) {
+                LogUtil.i("Fragment_one volleyError = " + volleyError);
+                progressdialogcancel();
+            }
+        });
         goodsSpeRequest.setTag("goodsSpeRequest");
         AppContext.getHttpQueue().add(goodsSpeRequest);
     }

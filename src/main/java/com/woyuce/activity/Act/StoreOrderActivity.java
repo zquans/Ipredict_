@@ -4,12 +4,15 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.text.TextUtils;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.alipay.sdk.app.PayTask;
@@ -19,7 +22,6 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
-import com.tencent.mm.sdk.constants.Build;
 import com.tencent.mm.sdk.modelpay.PayReq;
 import com.tencent.mm.sdk.openapi.IWXAPI;
 import com.tencent.mm.sdk.openapi.WXAPIFactory;
@@ -29,7 +31,6 @@ import com.woyuce.activity.R;
 import com.woyuce.activity.Utils.LogUtil;
 import com.woyuce.activity.Utils.PreferenceUtil;
 import com.woyuce.activity.Utils.ToastUtil;
-import com.woyuce.activity.wxapi.WXPayEntryActivity;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -40,8 +41,10 @@ import java.util.Map;
 /**
  * Created by Administrator on 2016/11/21.
  */
-public class StoreOrderActivity extends BaseActivity {
+public class StoreOrderActivity extends BaseActivity implements View.OnClickListener {
 
+    private LinearLayout mLlayoutAliPay, mLlayoutWxPay;
+    private Button mBtnPay;
     private EditText mEdtOrder, mEdtMoney;
     private TextView mTxtGoods;
 
@@ -114,6 +117,12 @@ public class StoreOrderActivity extends BaseActivity {
         local_order_id = getIntent().getStringExtra("local_order_id");
         local_order_no = getIntent().getStringExtra("local_order_no");
 
+        mLlayoutAliPay = (LinearLayout) findViewById(R.id.ll_activity_storeorder_payAli);
+        mLlayoutWxPay = (LinearLayout) findViewById(R.id.ll_activity_storeorder_payWx);
+        mBtnPay = (Button) findViewById(R.id.btn_activity_storeorder_pay);
+        mLlayoutAliPay.setOnClickListener(this);
+        mLlayoutWxPay.setOnClickListener(this);
+        mBtnPay.setOnClickListener(this);
         mEdtOrder = (EditText) findViewById(R.id.edt_activity_storeorder_order);
         mEdtMoney = (EditText) findViewById(R.id.edt_activity_storeorder_money);
         mTxtGoods = (TextView) findViewById(R.id.txt_activity_storeorder_goods);
@@ -178,32 +187,10 @@ public class StoreOrderActivity extends BaseActivity {
     }
 
     /**
-     * 以上是生成订单部分，以下是支付部分
-     *
-     * @param view
-     */
-
-    //阿里支付
-    public void payAli(View view) {
-        toPay("alipay", URL_TO_CASH_PAY);
-    }
-
-    // 微信支付
-    public void payWx(View view) {
-        toPay("wxapp", URL_TO_WXPAY);
-    }
-
-    //检查微信版本是否支持支付
-    public void toCheck(View view) {
-        boolean isPaySupported = api.getWXAppSupportAPI() >= Build.PAY_SUPPORTED_SDK_INT;
-        ToastUtil.showMessage(this, "该版本微信是否支持支付 = " + String.valueOf(isPaySupported));
-        startActivity(new Intent(this, WXPayEntryActivity.class));
-    }
-
-    /**
      * 支付请求第一步，金币支付
      */
     public void toPay(final String method, final String url) {
+        progressdialogshow(this);
         StringRequest payRequest = new StringRequest(Request.Method.POST,
                 URL_TO_PAY + "?id=" + local_order_id + "&userid=" + local_user_id,
                 new Response.Listener<String>() {
@@ -214,17 +201,21 @@ public class StoreOrderActivity extends BaseActivity {
                             JSONObject obj;
                             obj = new JSONObject(s);
                             if (obj.getString("code").equals("0")) {
+                                //金币支付成功,结束
                                 //TODO 用了金币接口后，还需要计算吗？
 //                                int init_money = Integer.parseInt(PreferenceUtil.getSharePre(StoreOrderActivity.this).getString("store_user_money", ""));
 //                                PreferenceUtil.save(StoreOrderActivity.this, "store_user_money", (init_money - Integer.parseInt(local_store_user_money)) + "");
+                                progressdialogcancel();
                                 startActivity(new Intent(StoreOrderActivity.this, MainActivity.class));
                                 StoreOrderActivity.this.finish();
                             } else if (obj.getString("code").equals("2")) {
+                                //金币支付不成功,跳转现金支付
                                 ToastUtil.showMessage(StoreOrderActivity.this, "金币不足抵扣,去调支付宝或者微信");
                                 //现金支付请求
                                 LogUtil.i("cashrequest url = " + url + local_order_id);
                                 cashRequest(method, url + local_order_id);
                             } else {
+                                progressdialogcancel();
                                 ToastUtil.showMessage(StoreOrderActivity.this, "支付失败");
                             }
                         } catch (JSONException e) {
@@ -235,6 +226,7 @@ public class StoreOrderActivity extends BaseActivity {
             @Override
             public void onErrorResponse(VolleyError volleyError) {
                 LogUtil.i("volleyError = " + volleyError);
+                progressdialogcancel();
             }
         });
         payRequest.setTag("StoreOrderActivity");
@@ -249,10 +241,10 @@ public class StoreOrderActivity extends BaseActivity {
         StringRequest cashRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String s) {
-                LogUtil.i("cashRequest = " + s);
                 try {
                     JSONObject obj;
                     obj = new JSONObject(s);
+                    progressdialogcancel();
                     if (obj.getString("code").equals("0")) {
                         //**************如果是阿里支付****************
                         if (method.equals("alipay")) {
@@ -304,7 +296,13 @@ public class StoreOrderActivity extends BaseActivity {
                     e.printStackTrace();
                 }
             }
-        }, null) {
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError volleyError) {
+                ToastUtil.showMessage(StoreOrderActivity.this, "支付失败");
+                progressdialogcancel();
+            }
+        }) {
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {
                 HashMap<String, String> map = new HashMap<>();
@@ -388,5 +386,43 @@ public class StoreOrderActivity extends BaseActivity {
         SQLiteDatabase mDatabase = openOrCreateDatabase("aipu.db", MODE_PRIVATE, null);
         mDatabase.execSQL("drop table storetb");
         mDatabase.close();
+    }
+
+    /**
+     * 检查微信是否支持支付
+     */
+    public void toCheck() {
+//        boolean isPaySupported = api.getWXAppSupportAPI() >= Build.PAY_SUPPORTED_SDK_INT;
+//        ToastUtil.showMessage(this, "该版本微信是否支持支付 = " + String.valueOf(isPaySupported));
+//        startActivity(new Intent(this, WXPayEntryActivity.class));
+    }
+
+    private String final_method, final_url;
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.ll_activity_storeorder_payAli:
+                final_url = URL_TO_CASH_PAY;
+                final_method = "alipay";
+                LogUtil.i(final_url + final_method);
+                mLlayoutAliPay.setBackgroundColor(Color.parseColor("#cccccc"));
+                mLlayoutWxPay.setBackgroundColor(Color.parseColor("#ffffff"));
+                break;
+            case R.id.ll_activity_storeorder_payWx:
+                final_url = URL_TO_WXPAY;
+                final_method = "wxapp";
+                LogUtil.i(final_url + final_method);
+                mLlayoutWxPay.setBackgroundColor(Color.parseColor("#cccccc"));
+                mLlayoutAliPay.setBackgroundColor(Color.parseColor("#ffffff"));
+                break;
+            case R.id.btn_activity_storeorder_pay:
+                if (TextUtils.isEmpty(final_method)) {
+                    ToastUtil.showMessage(this, "请先选择支付方式哦");
+                    return;
+                }
+                toPay(final_method, final_url);
+                break;
+        }
     }
 }

@@ -1,6 +1,6 @@
 package com.woyuce.activity.Fragment;
 
-import android.app.Fragment;
+import android.app.ProgressDialog;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -14,7 +14,7 @@ import android.webkit.WebViewClient;
 import com.woyuce.activity.R;
 import com.woyuce.activity.Utils.LogUtil;
 
-public class Fragment_StoreGoods_Two extends Fragment {
+public class Fragment_StoreGoods_Two extends BaseFragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -71,12 +71,14 @@ public class Fragment_StoreGoods_Two extends Fragment {
             @Override
             public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
+                progressdialogcancel();
                 LogUtil.e("onPageFinished");
             }
 
             @Override
             public void onPageStarted(WebView view, String url, Bitmap favicon) {
                 super.onPageStarted(view, url, favicon);
+                progressdialogshow(getActivity());
                 LogUtil.e("onPageStarted");
             }
         });
