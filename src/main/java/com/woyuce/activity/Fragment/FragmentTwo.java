@@ -68,7 +68,8 @@ public class FragmentTwo extends Fragment {
             @Override
             public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
                 super.onReceivedError(view, errorCode, description, failingUrl);
-//                view.loadUrl("file:///android_asset/index.html");
+                view.loadUrl("file:///android_asset/index.html");
+//                view.setVisibility(View.GONE);
             }
 
             @Override

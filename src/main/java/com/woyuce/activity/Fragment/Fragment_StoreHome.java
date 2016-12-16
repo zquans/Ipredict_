@@ -159,6 +159,7 @@ public class Fragment_StoreHome extends Fragment implements View.OnClickListener
                     msg1.obj = mImgData;
                     mHandler.sendMessage(msg1);
                     // 首页商品数据Bean
+                    //TODO 应该是这里的obj和上面的obj冲突了
                     StoreBean store;
                     JSONArray arr_goods_result;
                     JSONObject obj_goods;
