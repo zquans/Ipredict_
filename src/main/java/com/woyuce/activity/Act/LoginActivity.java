@@ -2,10 +2,8 @@ package com.woyuce.activity.Act;
 
 import android.Manifest;
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.text.InputType;
 import android.text.TextUtils;
@@ -308,7 +306,7 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
             public void onErrorResponse(VolleyError error) {
                 progressdialogcancel();
                 LogUtil.e("Wrong-Back", "连接错误原因： " + error.getMessage());
-                ToastUtil.showMessage(LoginActivity.this, "登录超时，请重试");
+                ToastUtil.showMessage(LoginActivity.this, "网络错误" + error.getMessage() + "，请重试");
             }
         }) {
             @Override
@@ -352,10 +350,10 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
             case R.id.btn_loginAtOnce:
                 startActivity(new Intent(this, MainActivity.class));
                 PreferenceUtil.removeall(this); // 只留下了版本号
-                PreferenceUtil.removestoretbisexist(this);
-                SQLiteDatabase mDatabase = openOrCreateDatabase("aipu.db", Context.MODE_PRIVATE, null);
-                mDatabase.execSQL("drop table storetb");
-                mDatabase.close();
+//                PreferenceUtil.removestoretbisexist(this);
+//                SQLiteDatabase mDatabase = openOrCreateDatabase("aipu.db", Context.MODE_PRIVATE, null);
+//                mDatabase.execSQL("drop table storetb");
+//                mDatabase.close();
 //                CookieManager.getInstance().removeAllCookie();
                 // PreferenceUtil.clear(this);
                 finish();

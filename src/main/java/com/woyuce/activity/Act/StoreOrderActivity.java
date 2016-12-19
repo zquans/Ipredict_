@@ -206,6 +206,17 @@ public class StoreOrderActivity extends BaseActivity implements View.OnClickList
 //                                int init_money = Integer.parseInt(PreferenceUtil.getSharePre(StoreOrderActivity.this).getString("store_user_money", ""));
 //                                PreferenceUtil.save(StoreOrderActivity.this, "store_user_money", (init_money - Integer.parseInt(local_store_user_money)) + "");
                                 progressdialogcancel();
+                                new AlertDialog.Builder(StoreOrderActivity.this, AlertDialog.THEME_DEVICE_DEFAULT_LIGHT)
+                                        .setTitle("支付结果")
+                                        .setMessage("支付成功")
+                                        .setPositiveButton("知道了", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                startActivity(new Intent(StoreOrderActivity.this, MainActivity.class));
+                                                StoreOrderActivity.this.finish();
+                                            }
+                                        })
+                                        .show();
                                 startActivity(new Intent(StoreOrderActivity.this, MainActivity.class));
                                 StoreOrderActivity.this.finish();
                             } else if (obj.getString("code").equals("2")) {

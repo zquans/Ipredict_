@@ -171,7 +171,7 @@ public class StoreGoodsActivity extends BaseActivity implements View.OnClickList
     private void resetTxtTab(TextView txt, int start, int end) {
         ObjectAnimator mAnimator = ObjectAnimator.ofFloat(mLine, "translationX", start, end);
         mAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
-        mAnimator.setDuration(800).start();
+        mAnimator.setDuration(500).start();
         mTxtTabOne.setTextColor(Color.parseColor("#a7a7a7"));
         mTxtTabTwo.setTextColor(Color.parseColor("#a7a7a7"));
         mTxtTabThree.setTextColor(Color.parseColor("#a7a7a7"));

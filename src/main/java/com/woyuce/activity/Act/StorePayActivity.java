@@ -104,10 +104,13 @@ public class StorePayActivity extends BaseActivity implements View.OnClickListen
         StoreMenu storeMenu;
         for (int i = 0; i < mGoodsSkuIdList.size(); i++) {
             storeMenu = new StoreMenu();
+            if (mNumList.get(i).equals("0")) {
+                continue;
+            }
+            storeMenu.setNum(mNumList.get(i));
             storeMenu.setGoodsskuid(mGoodsSkuIdList.get(i));
             storeMenu.setName(mNameList.get(i));
             storeMenu.setSpecname(mSpecNameList.get(i));
-            storeMenu.setNum(mNumList.get(i));
             storeMenu.setPrice(mPriceList.get(i));
             mList.add(storeMenu);
         }
@@ -220,6 +223,10 @@ public class StorePayActivity extends BaseActivity implements View.OnClickListen
     public void plusMoney(View view) {
         if (max_store_user_money <= local_store_user_money) {
             ToastUtil.showMessage(this, "您的金币不够咯");
+            return;
+        }
+        if (total_price <= local_store_user_money) {
+            ToastUtil.showMessage(this, "您的金币足够抵扣啦");
             return;
         }
         local_store_user_money = MathUtil.add(local_store_user_money, (double) 1);

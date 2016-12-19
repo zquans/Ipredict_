@@ -28,7 +28,6 @@ import com.woyuce.activity.Utils.ToastUtil;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -129,7 +128,9 @@ public class LoginRegisterInfoActivity extends BaseActivity implements View.OnCl
 
                 @Override
                 public void afterTextChanged(Editable s) {
-                    RequestVaild("mobile", s.toString());
+                    if (s.length() >= 11) {
+                        RequestVaild("mobile", s.toString());
+                    }
                 }
             });
         }
@@ -142,8 +143,8 @@ public class LoginRegisterInfoActivity extends BaseActivity implements View.OnCl
                 JSONObject obj;
                 try {
                     LogUtil.i("respons = " + response);
-                    String parseString = new String(response.getBytes("ISO-8859-1"), "utf-8");
-                    obj = new JSONObject(parseString);
+//                    String parseString = new String(response.getBytes("ISO-8859-1"), "utf-8");
+                    obj = new JSONObject(response);
                     // 成功则Toast，并返回Login界面
                     if (obj.getString("code").equals("0")) {
                         ToastUtil.showMessage(LoginRegisterInfoActivity.this, "恭喜您,注册成功!");
@@ -156,7 +157,7 @@ public class LoginRegisterInfoActivity extends BaseActivity implements View.OnCl
                     } else {
                         ToastUtil.showMessage(LoginRegisterInfoActivity.this, obj.getString("message"));
                     }
-                } catch (JSONException | UnsupportedEncodingException e) {
+                } catch (JSONException e) {
                     e.printStackTrace();
                 }
             }

@@ -311,10 +311,11 @@ public class Fragmentfive extends Fragment implements View.OnClickListener {
                         CookieManager.getInstance().removeAllCookie();
                         LogUtil.e("CookieManager = " + CookieManager.getInstance().getCookie("iyuce.com") + "");
                         //删除数据库中该表
-                        PreferenceUtil.removestoretbisexist(getActivity());
-                        SQLiteDatabase mDatabase = getActivity().openOrCreateDatabase("aipu.db", Context.MODE_PRIVATE,null);
-                        mDatabase.execSQL("drop table storetb");
-                        mDatabase.close();
+//                        PreferenceUtil.removestoretbisexist(getActivity());
+//                        SQLiteDatabase mDatabase = getActivity().openOrCreateDatabase("aipu.db", Context.MODE_PRIVATE,null);
+//                        mDatabase.execSQL("drop table storetb");
+//                        mDatabase.close();
+                        //启动Login页
                         startActivity(new Intent(getActivity(), LoginActivity.class));
 //                        PreferenceUtil.removeall(getActivity()); // 只留下了版本号
                         getActivity().finish();

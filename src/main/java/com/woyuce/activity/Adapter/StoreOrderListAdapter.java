@@ -44,6 +44,9 @@ public class StoreOrderListAdapter extends RecyclerView.Adapter<StoreOrderListAd
         holder.mRecycler.setLayoutManager(new LinearLayoutManager(context));
         RecyclerView.Adapter mAdapter = new StoreOrderGoodsAdapter(context, mList.get(pos).getUser_order_details());
         holder.mRecycler.setAdapter(mAdapter);
+        if (mList.get(pos).getOrder_status().equals("Pay")) {
+            holder.mTxtToPay.setVisibility(View.GONE);
+        }
     }
 
     @Override
@@ -52,7 +55,8 @@ public class StoreOrderListAdapter extends RecyclerView.Adapter<StoreOrderListAd
     }
 
     class MyViewHolder extends RecyclerView.ViewHolder {
-        TextView mTxtOrder, mTxtTime, mTxtPrice, mTxtStatue;
+        TextView mTxtOrder, mTxtTime, mTxtPrice, mTxtStatue, mTxtToPay;
+
         RecyclerView mRecycler;
 
         public MyViewHolder(View view) {
@@ -61,7 +65,8 @@ public class StoreOrderListAdapter extends RecyclerView.Adapter<StoreOrderListAd
             mTxtTime = (TextView) view.findViewById(R.id.txt_listitem_orderlist_time);
             mTxtPrice = (TextView) view.findViewById(R.id.txt_listitem_orderlist_price);
             mRecycler = (RecyclerView) view.findViewById(R.id.recyclerview_listitem_orderlist);
-            mTxtStatue = (TextView) itemView.findViewById(R.id.txt_listitem_orderlist_statue);
+            mTxtToPay = (TextView) view.findViewById(R.id.btn_listitem_orderlist_pay);
+            mTxtStatue = (TextView) view.findViewById(R.id.txt_listitem_orderlist_statue);
         }
     }
 }
