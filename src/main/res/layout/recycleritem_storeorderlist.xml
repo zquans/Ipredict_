@@ -34,7 +34,7 @@
             android:layout_height="2dp"
             android:background="#f0f2f5" />
 
-        <ImageButton
+        <ImageView
             android:id="@+id/img_listitem_orderlist_delete"
             android:layout_width="28dp"
             android:layout_height="28dp"
@@ -90,8 +90,9 @@
             android:id="@+id/btn_listitem_orderlist_pay"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
             android:layout_alignBaseline="@+id/txt_listitem_orderlist_statue"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="8dp"
             android:background="#d9534f"
             android:paddingBottom="1dp"
             android:paddingLeft="4dp"

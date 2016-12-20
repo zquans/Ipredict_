@@ -56,6 +56,8 @@ public class Fragment_StoreHome extends Fragment implements View.OnClickListener
     private static final int FLAG_VIEWFLIPPER = 1;
     private static final int FLAG_RECYCLERVIEW = 2;
 
+    private int screen_width;
+
     private Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -93,7 +95,7 @@ public class Fragment_StoreHome extends Fragment implements View.OnClickListener
                     mViewFlipper.startFlipping();
                     break;
                 case FLAG_RECYCLERVIEW:
-                    mAdapter = new StoreHomeAdapter(getActivity(), mList);
+                    mAdapter = new StoreHomeAdapter(getActivity(), mList,screen_width);
                     mRecycler.setLayoutManager(new LinearLayoutManager(getActivity()));
                     mRecycler.setAdapter(mAdapter);
 //                    FullLinearLayoutManager linearLayoutManager = new FullLinearLayoutManager(getActivity());
@@ -114,6 +116,9 @@ public class Fragment_StoreHome extends Fragment implements View.OnClickListener
     }
 
     private void initView(View view) {
+        //给Item中的Image宽高用
+        screen_width = getActivity().getWindowManager().getDefaultDisplay().getWidth();
+
         mBtnToCustom = (Button) view.findViewById(R.id.imgbtn_store_toCustom);
         mBtnToStoreCar = (Button) view.findViewById(R.id.imgbtn_store_toStoreCar);
         mBtnToCustom.setOnClickListener(this);

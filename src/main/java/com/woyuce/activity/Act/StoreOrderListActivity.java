@@ -2,7 +2,6 @@ package com.woyuce.activity.Act;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -110,6 +109,7 @@ public class StoreOrderListActivity extends BaseActivity {
                             for (int j = 0; j < arr_.length(); j++) {
                                 goods = new StoreGoods();
                                 obj_ = arr_.getJSONObject(j);
+                                goods.setId(obj_.getString("id"));
                                 goods.setThumb_img(obj_.getString("goods_thumb_img_url"));
                                 goods.setGoods_title(obj_.getString("goods_title"));
                                 goods.setGoods_property(obj_.getString("goods_property"));
@@ -180,12 +180,12 @@ public class StoreOrderListActivity extends BaseActivity {
                 new RecyclerItemClickListener.OnItemClickListener() {
                     @Override
                     public void onItemClick(View view, int position) {
-                        Intent intent = new Intent(StoreOrderListActivity.this, StoreOrderActivity.class);
-                        intent.putExtra("local_order_id", mList.get(position).getId());
-                        intent.putExtra("local_order_no", mList.get(position).getOrder_no());
-                        intent.putExtra("total_price", mList.get(position).getPrice());
-                        intent.putExtra("goods_name", mList.get(position).getUser_order_details().get(0).getGoods_title() + "\r...");
-                        startActivity(intent);
+//                        Intent intent = new Intent(StoreOrderListActivity.this, StoreOrderActivity.class);
+//                        intent.putExtra("local_order_id", mList.get(position).getId());
+//                        intent.putExtra("local_order_no", mList.get(position).getOrder_no());
+//                        intent.putExtra("total_price", mList.get(position).getPrice());
+//                        intent.putExtra("goods_name", mList.get(position).getUser_order_details().get(0).getGoods_title() + "\r...");
+//                        startActivity(intent);
                     }
 
                     @Override

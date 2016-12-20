@@ -17,7 +17,6 @@ import android.widget.TextView;
 
 import com.alipay.sdk.app.PayTask;
 import com.android.volley.AuthFailureError;
-import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -128,7 +127,7 @@ public class StoreOrderActivity extends BaseActivity implements View.OnClickList
         mTxtGoods = (TextView) findViewById(R.id.txt_activity_storeorder_goods);
 
         mEdtMoney.setText(total_price);
-        mTxtGoods.setText(local_goods_name.substring(1, local_goods_name.length() - 1));
+        mTxtGoods.setText(local_goods_name.substring(1, local_goods_name.length() - 1).replace(",", ",\n"));
 
         if (TextUtils.isEmpty(local_order_no)) {
             //生成订单请求
@@ -182,7 +181,7 @@ public class StoreOrderActivity extends BaseActivity implements View.OnClickList
             }
         };
         addressRequest.setTag("StoreOrderActivity");
-        addressRequest.setRetryPolicy(new DefaultRetryPolicy(1000, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+//        addressRequest.setRetryPolicy(new DefaultRetryPolicy(1000, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         AppContext.getHttpQueue().add(addressRequest);
     }
 
@@ -202,9 +201,6 @@ public class StoreOrderActivity extends BaseActivity implements View.OnClickList
                             obj = new JSONObject(s);
                             if (obj.getString("code").equals("0")) {
                                 //金币支付成功,结束
-                                //TODO 用了金币接口后，还需要计算吗？
-//                                int init_money = Integer.parseInt(PreferenceUtil.getSharePre(StoreOrderActivity.this).getString("store_user_money", ""));
-//                                PreferenceUtil.save(StoreOrderActivity.this, "store_user_money", (init_money - Integer.parseInt(local_store_user_money)) + "");
                                 progressdialogcancel();
                                 new AlertDialog.Builder(StoreOrderActivity.this, AlertDialog.THEME_DEVICE_DEFAULT_LIGHT)
                                         .setTitle("支付结果")
@@ -241,7 +237,7 @@ public class StoreOrderActivity extends BaseActivity implements View.OnClickList
             }
         });
         payRequest.setTag("StoreOrderActivity");
-        payRequest.setRetryPolicy(new DefaultRetryPolicy(1000, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+//        payRequest.setRetryPolicy(new DefaultRetryPolicy(1000, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         AppContext.getHttpQueue().add(payRequest);
     }
 
@@ -323,7 +319,7 @@ public class StoreOrderActivity extends BaseActivity implements View.OnClickList
             }
         };
         cashRequest.setTag("StoreOrderActivity");
-        cashRequest.setRetryPolicy(new DefaultRetryPolicy(1000, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+//        cashRequest.setRetryPolicy(new DefaultRetryPolicy(1000, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         AppContext.getHttpQueue().add(cashRequest);
     }
 
@@ -384,7 +380,7 @@ public class StoreOrderActivity extends BaseActivity implements View.OnClickList
             }
         };
         validRequest.setTag("validRequest");
-        validRequest.setRetryPolicy(new DefaultRetryPolicy(1000, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+//        validRequest.setRetryPolicy(new DefaultRetryPolicy(1000, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         AppContext.getHttpQueue().add(validRequest);
     }
 

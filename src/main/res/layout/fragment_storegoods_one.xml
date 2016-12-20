@@ -7,6 +7,11 @@
     android:orientation="vertical"
     tools:context="com.woyuce.activity.Act.StoreGoodsActivity">
 
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="4dp"
+        android:background="#f0f2f5" />
+
     <ViewFlipper
         android:id="@+id/viewflip_activity_storegoods"
         android:layout_width="match_parent"
@@ -38,7 +43,7 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="44dp"
+        android:layout_height="40dp"
         android:background="#fff"
         android:orientation="horizontal"
         android:paddingLeft="16dp">

@@ -17,7 +17,6 @@ import com.woyuce.activity.Act.StoreGoodsActivity;
 import com.woyuce.activity.Act.WebNoCookieActivity;
 import com.woyuce.activity.Bean.StoreGoods;
 import com.woyuce.activity.R;
-import com.woyuce.activity.Utils.ToastUtil;
 
 import java.util.List;
 
@@ -29,14 +28,16 @@ public class StoreGoodsAdapter extends RecyclerView.Adapter<StoreGoodsAdapter.MV
     private Context mContext;
     private LayoutInflater mLayoutInflater;
     private List<StoreGoods> mDatas;
+    private Integer screen_width;
     private DisplayImageOptions options = new DisplayImageOptions.Builder().showImageOnLoading(R.mipmap.img_error_horizon)
             .showImageOnFail(R.mipmap.img_error_horizon).cacheInMemory(true).cacheOnDisk(true)
             .bitmapConfig(Bitmap.Config.RGB_565).build();
 
-    public StoreGoodsAdapter(Context context, List<StoreGoods> mList) {
+    public StoreGoodsAdapter(Context context, List<StoreGoods> mList, Integer screen_width) {
         this.mDatas = mList;
         this.mContext = context;
         mLayoutInflater = LayoutInflater.from(context);
+        this.screen_width = screen_width;
     }
 
     @Override
@@ -48,6 +49,12 @@ public class StoreGoodsAdapter extends RecyclerView.Adapter<StoreGoodsAdapter.MV
 
     @Override
     public void onBindViewHolder(StoreGoodsAdapter.MViewHolder holder, final int position) {
+        //如果大目录中小品类总数不为1，则为多种，令ImageView宽为总宽一半
+        if (mDatas.size() != 1) {
+            ViewGroup.LayoutParams mLayoutparams = holder.mImg.getLayoutParams();
+            mLayoutparams.width = screen_width / 2;
+            holder.mImg.setLayoutParams(mLayoutparams);
+        }
         holder.mRelativeLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
