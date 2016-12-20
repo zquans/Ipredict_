@@ -33,6 +33,8 @@ import com.woyuce.activity.R;
 import com.woyuce.activity.Utils.LogUtil;
 import com.woyuce.activity.Utils.PreferenceUtil;
 import com.woyuce.activity.Utils.ToastUtil;
+import com.woyuce.activity.View.FillingMissListener;
+import com.woyuce.activity.View.FillingMissRecyclerView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -41,12 +43,12 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Fragment_StoreHome extends Fragment implements View.OnClickListener {
+public class Fragment_StoreHome extends Fragment implements View.OnClickListener, FillingMissListener {
 
     private Button mBtnToCustom, mBtnToStoreCar;
     private ViewFlipper mViewFlipper;
 
-    private RecyclerView mRecycler;
+    private FillingMissRecyclerView mRecycler;
     private RecyclerView.Adapter mAdapter;
     private List<StoreBean> mImgData = new ArrayList<>();
     private List<StoreBean> mList = new ArrayList<>();
@@ -95,7 +97,7 @@ public class Fragment_StoreHome extends Fragment implements View.OnClickListener
                     mViewFlipper.startFlipping();
                     break;
                 case FLAG_RECYCLERVIEW:
-                    mAdapter = new StoreHomeAdapter(getActivity(), mList,screen_width);
+                    mAdapter = new StoreHomeAdapter(getActivity(), mList, screen_width);
                     mRecycler.setLayoutManager(new LinearLayoutManager(getActivity()));
                     mRecycler.setAdapter(mAdapter);
 //                    FullLinearLayoutManager linearLayoutManager = new FullLinearLayoutManager(getActivity());
@@ -125,7 +127,8 @@ public class Fragment_StoreHome extends Fragment implements View.OnClickListener
         mBtnToStoreCar.setOnClickListener(this);
 
         mViewFlipper = (ViewFlipper) view.findViewById(R.id.viewflip_fragment_store_tab1);
-        mRecycler = (RecyclerView) view.findViewById(R.id.recycler_fragment_store_tab1);
+        mRecycler = (FillingMissRecyclerView) view.findViewById(R.id.recycler_fragment_store_tab1);
+        mRecycler.setMissListener(this);
         requestData();
     }
 
@@ -224,5 +227,21 @@ public class Fragment_StoreHome extends Fragment implements View.OnClickListener
                 startActivity(new Intent(getActivity(), StoreCarActivity.class));
                 break;
         }
+    }
+
+    @Override
+    public void miss() {
+        mViewFlipper.setVisibility(View.GONE);
+//        ObjectAnimator mAnimator = ObjectAnimator.ofFloat(mViewFlipper, "alpha", 0, 0.4f, 0.6f, 0.8f, 1f);
+//        mAnimator.setDuration(1000).start();
+        ToastUtil.showMessage(getActivity(), "should gone");
+    }
+
+    @Override
+    public void show() {
+        mViewFlipper.setVisibility(View.VISIBLE);
+//        ObjectAnimator mAnimator = ObjectAnimator.ofFloat(mViewFlipper, "alpha", 1f, 0.8f, 0, 6f, 0.4f, 0);
+//        mAnimator.setDuration(2000).start();
+        ToastUtil.showMessage(getActivity(), "should show");
     }
 }
