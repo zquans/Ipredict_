@@ -23,82 +23,221 @@
         android:orientation="vertical">
 
         <LinearLayout
-            android:layout_width="210.0dp"
-            android:layout_height="48dp"
-            android:layout_marginTop="16dp"
-            android:background="@drawable/buttonstyle"
-            android:focusable="true"
-            android:focusableInTouchMode="true"
-            android:gravity="center"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
             android:orientation="horizontal">
 
-            <EditText
-                android:id="@+id/edt_username"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginLeft="5dp"
-                android:layout_marginRight="5dp"
-                android:background="@android:color/transparent"
-                android:gravity="left|center"
-                android:hint="用户名/手机号/电子邮箱"
-                android:imeOptions="actionDone"
-                android:maxLength="30"
-                android:singleLine="true"
-                android:textSize="16sp" />
-        </LinearLayout>
+            <!--<FrameLayout-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content">-->
 
-        <FrameLayout
-            android:layout_width="210dp"
-            android:layout_height="48dp"
-            android:layout_marginTop="8dp">
+            <!--<View-->
+            <!--android:id="@+id/backview_activity_login"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="32dp" />-->
 
             <LinearLayout
-                android:layout_width="210dp"
-                android:layout_height="48dp"
-                android:background="@drawable/buttonstyle"
-                android:focusable="true"
-                android:focusableInTouchMode="true"
-                android:gravity="center"
+                android:layout_width="match_parent"
+                android:layout_height="32dp"
+                android:layout_gravity="center_vertical"
+                android:background="@drawable/buttonstyle_bluestroke_login"
+                android:gravity="center_vertical"
                 android:orientation="horizontal">
 
-
-                <EditText
-                    android:id="@+id/edt_password"
-                    android:layout_width="match_parent"
+                <TextView
+                    android:id="@+id/txt_activity_login_choose_one"
+                    android:layout_width="0dp"
                     android:layout_height="match_parent"
-                    android:layout_marginLeft="5.0dp"
-                    android:layout_marginRight="5.0dp"
-                    android:background="@android:color/transparent"
-                    android:gravity="left|center"
-                    android:hint="请输入密码"
-                    android:imeOptions="actionDone"
-                    android:inputType="textPassword"
-                    android:maxLength="30"
-                    android:singleLine="true"
-                    android:textSize="16.0sp" />
+                    android:layout_gravity="center_vertical"
+                    android:layout_weight="1"
+                    android:background="#329fe9"
+                    android:gravity="center"
+                    android:text="账号登录"
+                    android:textColor="#fff" />
+
+                <TextView
+                    android:id="@+id/txt_activity_login_choose_two"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="手机动态登录"
+                    android:textColor="#329fe9" />
             </LinearLayout>
+            <!--</FrameLayout>-->
+        </LinearLayout>
 
-            <ImageView
-                android:id="@+id/img_login_eye"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_gravity="right|center_vertical"
-                android:layout_marginRight="4dp"
-                android:background="@mipmap/icon_eye_can" />
-        </FrameLayout>
-
-        <TextView
-            android:id="@+id/txt_activity_login_forget"
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="right"
-            android:layout_marginTop="4dp"
-            android:text="忘记密码？"
-            android:textColor="#34a2ed" />
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:id="@+id/ll_activity_choose_one"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="240dp"
+                    android:layout_height="48dp"
+                    android:layout_marginTop="16dp"
+                    android:background="@drawable/buttonstyle"
+                    android:focusable="true"
+                    android:focusableInTouchMode="true"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+
+                    <EditText
+                        android:id="@+id/edt_username"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginLeft="5dp"
+                        android:layout_marginRight="5dp"
+                        android:background="@android:color/transparent"
+                        android:gravity="left|center"
+                        android:hint="用户名/手机号/电子邮箱"
+                        android:imeOptions="actionDone"
+                        android:maxLength="30"
+                        android:singleLine="true"
+                        android:textSize="16sp" />
+                </LinearLayout>
+
+                <FrameLayout
+                    android:layout_width="240dp"
+                    android:layout_height="48dp"
+                    android:layout_marginTop="8dp">
+
+                    <LinearLayout
+                        android:layout_width="240dp"
+                        android:layout_height="48dp"
+                        android:background="@drawable/buttonstyle"
+                        android:focusable="true"
+                        android:focusableInTouchMode="true"
+                        android:gravity="center"
+                        android:orientation="horizontal">
+
+                        <EditText
+                            android:id="@+id/edt_password"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_marginLeft="5.0dp"
+                            android:layout_marginRight="5.0dp"
+                            android:background="@android:color/transparent"
+                            android:gravity="left|center"
+                            android:hint="请输入密码"
+                            android:imeOptions="actionDone"
+                            android:inputType="textPassword"
+                            android:maxLength="30"
+                            android:singleLine="true"
+                            android:textSize="16.0sp" />
+                    </LinearLayout>
+
+                    <ImageView
+                        android:id="@+id/img_login_eye"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_gravity="right|center_vertical"
+                        android:layout_marginRight="4dp"
+                        android:background="@mipmap/icon_eye_can" />
+                </FrameLayout>
+            </LinearLayout>
+
+            <!--隐藏换View方案2-->
+            <LinearLayout
+                android:id="@+id/ll_activity_choose_two"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <LinearLayout
+                    android:layout_width="240dp"
+                    android:layout_height="48dp"
+                    android:layout_marginTop="16dp"
+                    android:background="@drawable/buttonstyle"
+                    android:focusable="true"
+                    android:focusableInTouchMode="true"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+
+                    <EditText
+                        android:id="@+id/edt_mobile"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginLeft="5dp"
+                        android:layout_marginRight="5dp"
+                        android:background="@android:color/transparent"
+                        android:gravity="left|center"
+                        android:hint="手机号"
+                        android:imeOptions="actionDone"
+                        android:inputType="number"
+                        android:maxLength="11"
+                        android:singleLine="true"
+                        android:textSize="16sp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="240dp"
+                    android:layout_height="48dp"
+                    android:layout_marginTop="8dp"
+                    android:focusable="true"
+                    android:focusableInTouchMode="true"
+                    android:orientation="horizontal">
+
+                    <EditText
+                        android:id="@+id/edt_mobile_validate_code"
+                        android:layout_width="96dp"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/buttonstyle"
+                        android:gravity="left|center"
+                        android:hint="验证码"
+                        android:imeOptions="actionDone"
+                        android:maxLength="5"
+                        android:singleLine="true"
+                        android:textSize="16sp" />
+
+                    <Button
+                        android:id="@+id/btn_actvity_login_get_code"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginLeft="8dp"
+                        android:layout_weight="1"
+                        android:background="#f55054"
+                        android:text="发送验证码"
+                        android:textColor="#fff" />
+                </LinearLayout>
+
+            </LinearLayout>
+        </LinearLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp">
+
+            <TextView
+                android:id="@+id/txt_activity_login_active_email"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="2dp"
+                android:text="激活邮箱"
+                android:textColor="#34a2ed" />
+
+            <TextView
+                android:id="@+id/txt_activity_login_forget"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:text="忘记密码？"
+                android:textColor="#34a2ed" />
+
+        </RelativeLayout>
 
         <Button
             android:id="@+id/btn_login"
-            android:layout_width="210dp"
+            android:layout_width="240dp"
             android:layout_height="48dp"
             android:layout_marginTop="36dp"
             android:background="@drawable/buttonstyle_orange"
@@ -109,7 +248,7 @@
 
         <Button
             android:id="@+id/btn_loginAtOnce"
-            android:layout_width="210dp"
+            android:layout_width="240dp"
             android:layout_height="48dp"
             android:layout_marginTop="8dp"
             android:background="@drawable/buttonstyle_blue"
@@ -118,7 +257,7 @@
             android:textSize="18dp" />
 
         <LinearLayout
-            android:layout_width="210dp"
+            android:layout_width="240dp"
             android:layout_height="40dp"
             android:layout_marginTop="24dp"
             android:orientation="horizontal">

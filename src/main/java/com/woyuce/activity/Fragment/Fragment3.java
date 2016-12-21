@@ -55,11 +55,23 @@ public class Fragment3 extends Fragment implements View.OnClickListener {
     private void initWebView() {
         web.loadUrl(URL_CAM);
         // web.getSettings().setJavaScriptEnabled(true);
+        web.getSettings().setJavaScriptEnabled(true);
         web.getSettings().setSupportZoom(true);
         web.getSettings().setBuiltInZoomControls(true);
         web.getSettings().setUseWideViewPort(true);
         web.getSettings().setLayoutAlgorithm(WebSettings.LayoutAlgorithm.SINGLE_COLUMN);
         web.getSettings().setLoadWithOverviewMode(true);
+
+		/* 设置缓存相关 */
+        // web.getSettings().setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
+        // web.getSettings().setDomStorageEnabled(true);
+        // web.getSettings().setDatabaseEnabled(true);
+        // String cacheDirPath = getActivity().getFilesDir().getAbsolutePath() +
+        // "/webcachetab2";
+        // LogUtil.e("tab3 cache", "cacheDirPath=" + cacheDirPath);
+        // web.getSettings().setDatabasePath(cacheDirPath);
+        // web.getSettings().setAppCachePath(cacheDirPath);
+        // web.getSettings().setAppCacheEnabled(true);
 
         web.setWebChromeClient(new WebChromeClient());
         web.setWebViewClient(new WebViewClient() {
@@ -67,11 +79,12 @@ public class Fragment3 extends Fragment implements View.OnClickListener {
             public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
                 super.onReceivedError(view, errorCode, description, failingUrl);
                 view.loadUrl("file:///android_asset/index.html");
-                view.setVisibility(View.GONE);
+//                view.setVisibility(View.GONE);
             }
 
             @Override
             public void onPageFinished(WebView view, String url) {
+                super.onPageFinished(view, url);
                 web.setVisibility(View.VISIBLE);
                 imgLoading.setVisibility(View.GONE);
             }

@@ -4,7 +4,10 @@ import android.Manifest;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.text.InputType;
 import android.text.TextUtils;
 import android.view.View;
@@ -13,9 +16,11 @@ import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
 import com.android.volley.Request.Method;
 import com.android.volley.Response;
 import com.android.volley.Response.ErrorListener;
@@ -38,18 +43,28 @@ import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class LoginActivity extends BaseActivity implements OnClickListener {
 
-    private Button btninto, btnLogin, btnRegister, btnApply;
-    private EditText edtUsername, edtPassword;
-    private TextView txtForget;
+    /*creat_at 2016/12/20
+    * 用于做界面手机登录*/
+    private LinearLayout mLinearLayoutChooseOne, mLinearLayoutChooseTwo;
+    private TextView mTxtChooseOne, mTxtChooseTwo;
+    private View mBackChooseView;
+
+    private Button btninto, btnLogin, btnRegister, btnApply, btnGetCode;
+    private EditText edtUsername, edtPassword, edtMobile, edtValidateCode;
+    private TextView txtForget, txtActivityEmail;
     private ImageView imgEye;
 
     private String strPassword, strUserName; // 本类中变量，用于下次登录时作自动登录的数据
     private String localtoken;
     private String LOGIN_URL = "http://api.iyuce.com/v1001/account/login";
     private String URL_UPLOADTIME = "http://api.iyuce.com/v1/exam/setexamtime";
+    private String URL_SEND_PHONE_MSG = "http://api.iyuce.com/v1/common/sendsmsvericode";
+    private String URL_LOGIN_WITH_MESSAGE = "http://api.iyuce.com/v1/account/smslogin";
 
     // 注册页面跳转过来用
     private String username_register, password_register, timer_register;
@@ -62,6 +77,25 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 
     //设备唯一标识码
     private String local_push_code;
+
+    //选择登录方式
+    private boolean login_with_mobile = false;
+
+    //保存倒计时计数
+    private int time_count;
+    //创建一个Handler去处理倒计时事件
+    private Handler mHandler = new Handler() {
+        public void handleMessage(Message msg) {
+            btnGetCode.setText(msg.obj.toString() + "秒后重发");
+            btnGetCode.setClickable(false);
+            if ((int) msg.obj == 0) {
+                btnGetCode.setText("发送验证码");
+                time_count = 61;
+                btnGetCode.setClickable(true);
+            }
+        }
+    };
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -106,6 +140,9 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
         AppContext.getHttpQueue().cancelAll("login");
     }
 
+    /**
+     * 推送处理,强制登出通知
+     */
     @Override
     protected void onStart() {
         super.onStart();
@@ -131,6 +168,22 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
         timer_register = intent.getStringExtra("timer_register");
         local_push_code = intent.getStringExtra("local_push_code");
 
+        mLinearLayoutChooseOne = (LinearLayout) findViewById(R.id.ll_activity_choose_one);
+        mLinearLayoutChooseTwo = (LinearLayout) findViewById(R.id.ll_activity_choose_two);
+        mTxtChooseOne = (TextView) findViewById(R.id.txt_activity_login_choose_one);
+        mTxtChooseTwo = (TextView) findViewById(R.id.txt_activity_login_choose_two);
+        edtMobile = (EditText) findViewById(R.id.edt_mobile);
+        edtValidateCode = (EditText) findViewById(R.id.edt_mobile_validate_code);
+//        mBackChooseView = findViewById(R.id.backview_activity_login);
+        btnGetCode = (Button) findViewById(R.id.btn_actvity_login_get_code);
+//        //动态设置背景的宽度为总体的一半
+//        ViewGroup.LayoutParams mLayoutParams = mBackChooseView.getLayoutParams();
+//        mLayoutParams.width = mBackChooseView.getWidth() / 2;
+//        mBackChooseView.setLayoutParams(mLayoutParams);
+        mTxtChooseOne.setOnClickListener(this);
+        mTxtChooseTwo.setOnClickListener(this);
+        btnGetCode.setOnClickListener(this);
+
         btninto = (Button) findViewById(R.id.btn_login);
         btnLogin = (Button) findViewById(R.id.btn_loginAtOnce);
         btnRegister = (Button) findViewById(R.id.btn_register);
@@ -138,6 +191,7 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
         edtUsername = (EditText) findViewById(R.id.edt_username);
         edtPassword = (EditText) findViewById(R.id.edt_password);
         txtForget = (TextView) findViewById(R.id.txt_activity_login_forget);
+        txtActivityEmail = (TextView) findViewById(R.id.txt_activity_login_active_email);
         imgEye = (ImageView) findViewById(R.id.img_login_eye);
 
         imgEye.setOnClickListener(this);
@@ -146,6 +200,7 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
         btnRegister.setOnClickListener(this);
         btnApply.setOnClickListener(this);
         txtForget.setOnClickListener(this);
+        txtActivityEmail.setOnClickListener(this);
 
         // 给Edit输入默认账号密码
         if (!TextUtils.isEmpty(username_register)) {
@@ -243,7 +298,7 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
     }
 
     /**
-     * 请求登录
+     * 请求用户名登录
      */
     private void loginRequest() {
         progressdialogshow(this);
@@ -251,55 +306,7 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
             @Override
             public void onResponse(String response) {
                 LogUtil.e("response + time = " + response);
-                JSONObject jsonObject;
-                try {
-                    jsonObject = new JSONObject(response);
-                    int result = jsonObject.getInt("code");
-                    if (result == 0) {
-                        ToastUtil.showMessage(LoginActivity.this, "登陆成功");
-                        jsonObject = jsonObject.getJSONObject("data");
-                        // 拿出所有返回数据
-                        String userId = jsonObject.getString("userid");
-                        String mUserName = jsonObject.getString("username");
-                        String Permission = jsonObject.getString("permission");
-                        String money = jsonObject.getString("tradepoints");
-                        String update = jsonObject.getString("login_time");
-                        String localtimer = jsonObject.getString("exam_time");
-                        // 如果为默认初试时间，则设为""
-                        if (localtimer.equals("0001-01-01")) {
-                            localtimer = "";
-                            // 如果注册时本地时间不为null,则将该时间赋给mtimer，并保存
-                            if (!TextUtils.isEmpty(timer_register)) {
-                                localtimer = timer_register;
-                            }
-                        }
-                        // 将所有数据保存到sharepreferences数据库中
-                        PreferenceUtil.save(LoginActivity.this, "userId", userId);
-                        PreferenceUtil.save(LoginActivity.this, "mUserName", mUserName);
-                        PreferenceUtil.save(LoginActivity.this, "Permission", Permission);
-                        PreferenceUtil.save(LoginActivity.this, "money", money);
-                        PreferenceUtil.save(LoginActivity.this, "update", update);
-                        PreferenceUtil.save(LoginActivity.this, "mtimer", localtimer);
-                        // 拿到JSON中的token 打印出来
-                        LogUtil.e("所有数据 " + userId + "->" + mUserName + "->" + Permission + "->" + money + "->");
-                        /*将userId作为推送的分组别名*/
-//                        addAlias(userId);
-                        /*将userId作为推送的分组标签*/
-//                        addTag(userId);
-                        // 取消加载对话框
-                        progressdialogcancel();
-                        // 上传注册时设定的考试时间
-//                        uploadTime(timer_register, userId);
-                        // 启动主页面
-                        startActivity(new Intent(LoginActivity.this, MainActivity.class));
-                        finish();
-                    } else {
-                        progressdialogcancel();
-                        ToastUtil.showMessage(LoginActivity.this, jsonObject.getString("message"));
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+                doSuccess(response);
             }
         }, new ErrorListener() {
             @Override
@@ -330,22 +337,183 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
         AppContext.getHttpQueue().add(stringRequest);
     }
 
+    /**
+     * 处理成功获取的JSON
+     *
+     * @param response
+     */
+    private void doSuccess(String response) {
+        JSONObject jsonObject;
+        try {
+            jsonObject = new JSONObject(response);
+            int result = jsonObject.getInt("code");
+            if (result == 0) {
+                ToastUtil.showMessage(LoginActivity.this, "登陆成功");
+                jsonObject = jsonObject.getJSONObject("data");
+                // 拿出所有返回数据
+                String userId = jsonObject.getString("userid");
+                String mUserName = jsonObject.getString("username");
+                String Permission = jsonObject.getString("permission");
+                String money = jsonObject.getString("tradepoints");
+                String update = jsonObject.getString("login_time");
+                String localtimer = jsonObject.getString("exam_time");
+                // 如果为默认初试时间，则设为""
+                if (localtimer.equals("0001-01-01")) {
+                    localtimer = "";
+                    // 如果注册时本地时间不为null,则将该时间赋给mtimer，并保存
+                    if (!TextUtils.isEmpty(timer_register)) {
+                        localtimer = timer_register;
+                    }
+                }
+                // 将所有数据保存到sharepreferences数据库中
+                PreferenceUtil.save(LoginActivity.this, "userId", userId);
+                PreferenceUtil.save(LoginActivity.this, "mUserName", mUserName);
+                PreferenceUtil.save(LoginActivity.this, "Permission", Permission);
+                PreferenceUtil.save(LoginActivity.this, "money", money);
+                PreferenceUtil.save(LoginActivity.this, "update", update);
+                PreferenceUtil.save(LoginActivity.this, "mtimer", localtimer);
+                // 拿到JSON中的token 打印出来
+                LogUtil.e("所有数据 " + userId + "->" + mUserName + "->" + Permission + "->" + money + "->");
+                /*将userId作为推送的分组别名*/
+//                        addAlias(userId);
+                /*将userId作为推送的分组标签*/
+//                        addTag(userId);
+                // 取消加载对话框
+                progressdialogcancel();
+                // 上传注册时设定的考试时间
+//                        uploadTime(timer_register, userId);
+                // 启动主页面
+                startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                finish();
+            } else {
+                progressdialogcancel();
+                ToastUtil.showMessage(LoginActivity.this, jsonObject.getString("message"));
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 请求手机号登录
+     */
+    private void loginWithMessageRequest(final String mobile, final String validatecode) {
+        progressdialogshow(this);
+        StringRequest loginWithMessageRequest = new StringRequest(Method.POST, URL_LOGIN_WITH_MESSAGE, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                LogUtil.e("loginWithMessageRequest = " + response);
+                doSuccess(response);
+            }
+        }, new ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                progressdialogcancel();
+                LogUtil.e("Wrong-Back", "连接错误原因： " + error.getMessage());
+                ToastUtil.showMessage(LoginActivity.this, "网络错误" + error.getMessage() + "，请重试");
+            }
+        }) {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> headers = new HashMap<>();
+                localtoken = PreferenceUtil.getSharePre(LoginActivity.this).getString("localtoken", "");
+                headers.put("Authorization", "Bearer " + localtoken);
+                return headers;
+            }
+
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                HashMap<String, String> map = new HashMap<>();
+                map.put("accountmobile", mobile);
+                map.put("smsvalidcode", validatecode);
+                map.put("deviceid", AppContext.getDeviceToken());
+                return map;
+            }
+        };
+        loginWithMessageRequest.setTag("login");
+        AppContext.getHttpQueue().add(loginWithMessageRequest);
+    }
+
+    /**
+     * 发送验证码
+     */
+    private void RequestMsg() {
+        progressdialogshow(this);
+        StringRequest MsgRequest = new StringRequest(Request.Method.POST, URL_SEND_PHONE_MSG, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                LogUtil.e("response 2 = " + response);
+                JSONObject obj;
+                try {
+                    obj = new JSONObject(response);
+                    if (obj.getString("code").equals("0")) {
+                        //倒计时
+                        toCount();
+                    } else {
+                        ToastUtil.showMessage(LoginActivity.this, obj.getString("message"));
+                    }
+                    progressdialogcancel();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                LogUtil.e("Wrong-Back", "连接错误原因： " + error.getMessage());
+                ToastUtil.showMessage(LoginActivity.this, "网络错误，请稍候再试");
+                progressdialogcancel();
+            }
+        }) {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> headers = new HashMap<>();
+                localtoken = PreferenceUtil.getSharePre(LoginActivity.this).getString("localtoken", "");
+                headers.put("Authorization", "Bearer " + localtoken);
+                return headers;
+            }
+
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                HashMap<String, String> map = new HashMap<>();
+                map.put("phone", edtMobile.getText().toString().trim());
+                map.put("template", "VeriCode");
+                return map;
+            }
+        };
+        MsgRequest.setTag("login");
+        AppContext.getHttpQueue().add(MsgRequest);
+    }
+
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_login:
-                strUserName = edtUsername.getText().toString();
-                strPassword = edtPassword.getText().toString();
-                // 保存账号信息到sharepreferences数据库中
-                PreferenceUtil.save(LoginActivity.this, "username", LoginActivity.this.strUserName);
-                PreferenceUtil.save(LoginActivity.this, "password", LoginActivity.this.strPassword);
-                if (TextUtils.isEmpty(strUserName) || TextUtils.isEmpty(strPassword)) {
-                    ToastUtil.showMessage(LoginActivity.this, "账号密码不能为空，试试体验登陆吧");
-                    return;
+                //判断两种登录情况,1、手机号登录，
+                if (login_with_mobile) {
+                    String mobile = edtMobile.getText().toString();
+                    String mobile_validate_code = edtValidateCode.getText().toString();
+                    if (TextUtils.isEmpty(mobile_validate_code)) {
+                        ToastUtil.showMessage(LoginActivity.this, "验证码不能为空");
+                        return;
+                    }
+                    loginWithMessageRequest(mobile, mobile_validate_code);
                 }
-                //请求登录
-                loginRequest();
+                //2、用户名登录
+                if (!login_with_mobile) {
+                    strUserName = edtUsername.getText().toString();
+                    strPassword = edtPassword.getText().toString();
+                    // 保存账号信息到sharepreferences数据库中
+                    PreferenceUtil.save(LoginActivity.this, "username", LoginActivity.this.strUserName);
+                    PreferenceUtil.save(LoginActivity.this, "password", LoginActivity.this.strPassword);
+                    if (TextUtils.isEmpty(strUserName) || TextUtils.isEmpty(strPassword)) {
+                        ToastUtil.showMessage(LoginActivity.this, "账号密码不能为空，试试体验登陆吧");
+                        return;
+                    }
+                    //请求登录
+                    loginRequest();
 //                CookieManager.getInstance().removeAllCookie();
+                }
                 break;
             case R.id.btn_loginAtOnce:
                 startActivity(new Intent(this, MainActivity.class));
@@ -371,6 +539,11 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
                 doAlertDialog(intent_loginforget, "请选择找回方式", "国内请选择手机找回，国外请选择邮箱找回", "手机找回", "邮箱找回");
 //                startActivity(new Intent(this, LoginForgetActivity.class));
                 break;
+            case R.id.txt_activity_login_active_email:
+                Intent intent_activity_email = new Intent(this, LoginRegisterActivity.class);
+                intent_activity_email.putExtra("action", "activity_email");
+                startActivity(intent_activity_email);
+                break;
             case R.id.btn_register:
                 final Intent intent_loginregister = new Intent(this, LoginRegisterActivity.class);
                 doAlertDialog(intent_loginregister, "请选择注册环境", "国内请选择手机注册，国外请选择邮箱注册", "手机注册", "邮箱注册");
@@ -386,6 +559,35 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
                     imgEye.setBackgroundResource(R.mipmap.icon_eye_can);
                     isEyeCan = !isEyeCan;
                 }
+                break;
+            case R.id.txt_activity_login_choose_one:
+                login_with_mobile = false;
+                mLinearLayoutChooseOne.setVisibility(View.VISIBLE);
+                mLinearLayoutChooseTwo.setVisibility(View.GONE);
+                mTxtChooseOne.setTextColor(Color.parseColor("#ffffff"));
+                mTxtChooseTwo.setTextColor(Color.parseColor("#329fe9"));
+                mTxtChooseTwo.setBackgroundColor(Color.parseColor("#00000000"));
+                mTxtChooseOne.setBackgroundColor(Color.parseColor("#329fe9"));
+                break;
+            case R.id.txt_activity_login_choose_two:
+                login_with_mobile = true;
+                mLinearLayoutChooseTwo.setVisibility(View.VISIBLE);
+                mLinearLayoutChooseOne.setVisibility(View.GONE);
+                mTxtChooseOne.setTextColor(Color.parseColor("#329fe9"));
+                mTxtChooseTwo.setTextColor(Color.parseColor("#ffffff"));
+                mTxtChooseOne.setBackgroundColor(Color.parseColor("#00000000"));
+                mTxtChooseTwo.setBackgroundColor(Color.parseColor("#329fe9"));
+//                ObjectAnimator mAnimator = ObjectAnimator.ofFloat(mBackChooseView, "translationX", 0, mBackChooseView.getWidth());
+//                mAnimator.setDuration(1000).start();
+                break;
+            case R.id.btn_actvity_login_get_code:
+                ToastUtil.showMessage(this, "获取验证码");
+                if (TextUtils.isEmpty(edtMobile.getText().toString())) {
+                    ToastUtil.showMessage(this, "手机号不能为空哦");
+                    return;
+                }
+                //请求验证码
+                RequestMsg();
                 break;
         }
     }
@@ -415,5 +617,27 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
                 })
                 .setNeutralButton("取消", null)
                 .show();
+    }
+
+
+    /**
+     * 倒计时
+     */
+    private void toCount() {
+        time_count = 60;
+        final Timer mTimer = new Timer();
+        mTimer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                if (time_count > 0 && time_count < 61) {
+                    time_count = time_count - 1;
+                    Message msg = Message.obtain();
+                    msg.obj = time_count;
+                    mHandler.sendMessage(msg);
+                } else {
+                    mTimer.cancel();
+                }
+            }
+        }, 500, 1000);
     }
 }
