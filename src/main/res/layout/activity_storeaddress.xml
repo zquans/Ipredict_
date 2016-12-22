@@ -36,7 +36,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:background="@drawable/buttonstyle_orange"
+        android:background="#f7941d"
         android:onClick="add"
         android:text="新增地址"
         android:textColor="#fff" />
