@@ -2,7 +2,6 @@ package com.woyuce.activity.Adapter;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -10,11 +9,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.woyuce.activity.Act.StoreCommentActivity;
 import com.woyuce.activity.Act.StoreOrderActivity;
 import com.woyuce.activity.Bean.StoreOrder;
 import com.woyuce.activity.R;
-import com.woyuce.activity.Utils.LogUtil;
 
 import java.util.List;
 
@@ -46,27 +43,13 @@ public class StoreOrderListAdapter extends RecyclerView.Adapter<StoreOrderListAd
         holder.mTxtTime.setText("订单时间:" + mList.get(pos).getCreate_at());
         holder.mTxtPrice.setText("实付款:" + mList.get(pos).getPrice());
         holder.mTxtStatue.setText(mList.get(pos).getOrder_status());
-        holder.mRecycler.setLayoutManager(new LinearLayoutManager(context));
-        RecyclerView.Adapter mAdapter = new StoreOrderGoodsAdapter(context, mList.get(pos).getUser_order_details());
-        holder.mRecycler.setAdapter(mAdapter);
+        boolean isPay;
         if (mList.get(pos).getOrder_status().equals("Pay")) {
-            //如果已经支付，则去评价
-//            holder.mTxtToPay.setVisibility(View.GONE);
-            holder.mTxtToPay.setText("去评论");
-            holder.mTxtToPay.setBackgroundColor(Color.parseColor("#f7941d"));
-            holder.mTxtToPay.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent intent = new Intent(context, StoreCommentActivity.class);
-                    intent.putExtra("local_order_id", mList.get(pos).getUser_order_details().get(0).getId());
-                    intent.putExtra("local_order_no", mList.get(pos).getOrder_no());
-                    intent.putExtra("total_price", mList.get(pos).getPrice());
-                    intent.putExtra("goods_name", mList.get(pos).getUser_order_details().get(0).getGoods_title() + "\r...");
-                    LogUtil.i(mList.get(pos).getUser_order_details().get(0).getId() + "--------");
-                    context.startActivity(intent);
-                }
-            });
+            isPay = true;
+            //如果已经支付，则隐藏,留给子RecyclerView去做评论
+            holder.mTxtToPay.setVisibility(View.GONE);
         } else {
+            isPay = false;
             //如果未支付，则去支付
             holder.mTxtToPay.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -80,6 +63,9 @@ public class StoreOrderListAdapter extends RecyclerView.Adapter<StoreOrderListAd
                 }
             });
         }
+        holder.mRecycler.setLayoutManager(new LinearLayoutManager(context));
+        RecyclerView.Adapter mAdapter = new StoreOrderGoodsAdapter(context, mList.get(pos).getUser_order_details(), isPay);
+        holder.mRecycler.setAdapter(mAdapter);
     }
 
     @Override

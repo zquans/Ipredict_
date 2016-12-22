@@ -1,9 +1,12 @@
 package com.woyuce.activity.Act;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.RatingBar;
 import android.widget.TextView;
 
 import com.android.volley.AuthFailureError;
@@ -28,10 +31,11 @@ import java.util.Map;
  */
 public class StoreCommentActivity extends BaseActivity {
 
-    private TextView mTxtStoreName, mTxtStoreTime;
+    private TextView mTxtStoreName;
     private EditText mEdtComment;
+    private RatingBar mRatingBar;
 
-    private String URL_COMMENT = "http://api.iyuce.com/v1/store/submitcomment?";
+    private String URL_COMMENT = "http://api.iyuce.com/v1/store/submitcomment";
 
     private String local_order_id;
 
@@ -46,15 +50,20 @@ public class StoreCommentActivity extends BaseActivity {
     private void initView() {
         local_order_id = getIntent().getStringExtra("local_order_id");
 
+        mRatingBar = (RatingBar) findViewById(R.id.ratingbar_activity_storecomment_start);
         mEdtComment = (EditText) findViewById(R.id.edt_activity_storecomment_content);
         mTxtStoreName = (TextView) findViewById(R.id.txt_activity_storecomment_storename);
-        mTxtStoreTime = (TextView) findViewById(R.id.txt_activity_storecomment_ordertime);
         mTxtStoreName.setText("商品名称: " + getIntent().getStringExtra("goods_name"));
-        mTxtStoreTime.setText("金额：其实应该是时间" + getIntent().getStringExtra("total_price"));
     }
 
-    private void storeCommentRequest(String url, final String userid, final String user_comment) {
-
+    /**
+     * 请求提交评论
+     *
+     * @param url
+     * @param userid
+     * @param user_comment
+     */
+    private void storeCommentRequest(String url, final String userid, final String user_comment, final Float start) {
         StringRequest storeCommentRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String s) {
@@ -64,7 +73,14 @@ public class StoreCommentActivity extends BaseActivity {
                     obj = new JSONObject(s);
                     if (obj.getString("code").equals("0")) {
                         ToastUtil.showMessage(StoreCommentActivity.this, obj.getString("message"));
-                        StoreCommentActivity.this.finish();
+                        new AlertDialog.Builder(StoreCommentActivity.this)
+                                .setMessage("感谢您的评论")
+                                .setPositiveButton("知道了", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        StoreCommentActivity.this.finish();
+                                    }
+                                }).show();
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -79,10 +95,18 @@ public class StoreCommentActivity extends BaseActivity {
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {
                 HashMap<String, String> map = new HashMap<>();
-                map.put("userId", userid);
-                map.put("itemId", local_order_id);
-                map.put("cmtText", user_comment);
-                map.put("satisfaction", "Good");
+                map.put("user_id", userid);
+                map.put("item_id", local_order_id);
+                map.put("cmt_text", user_comment);
+                if (start == 1) {
+                    map.put("satisfaction", "Bad");
+                }
+                if (start == 2) {
+                    map.put("satisfaction", "Medium");
+                }
+                if (start == 3) {
+                    map.put("satisfaction", "Good");
+                }
                 return map;
             }
         };
@@ -98,10 +122,7 @@ public class StoreCommentActivity extends BaseActivity {
         //这里拼接URL
         String user_id = PreferenceUtil.getSharePre(this).getString("userId", null);
         String user_comment = mEdtComment.getText().toString();
-        String final_url = URL_COMMENT + "userId=" + user_id + "&itemId=" + local_order_id + "&imgUrl=&cmtText=" +
-                user_comment + "&satisfaction=" + "Good";
-        LogUtil.i("all = " + local_order_id + user_id);
-        storeCommentRequest(final_url, user_id, user_comment);
+        storeCommentRequest(URL_COMMENT, user_id, user_comment, mRatingBar.getRating());
     }
 
     public void back(View view) {

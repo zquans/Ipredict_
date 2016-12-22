@@ -25,7 +25,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginRight="32dp"
-            android:layout_marginTop="12dp"
+            android:layout_marginTop="2dp"
             android:layout_toRightOf="@+id/img_listitem_ordergoods_imgurl"
             android:ellipsize="marquee"
             android:maxLines="1"
@@ -39,7 +39,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/txt_listitem_ordergoods_name"
             android:layout_marginRight="32dp"
-            android:layout_marginTop="4dp"
+            android:layout_marginTop="2dp"
             android:layout_toRightOf="@+id/img_listitem_ordergoods_imgurl"
             android:ellipsize="marquee"
             android:maxLines="1"
@@ -49,10 +49,22 @@
             android:id="@+id/txt_listitem_ordergoods_goodsnum"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_below="@+id/txt_listitem_ordergoods_specname"
+            android:layout_marginTop="2dp"
+            android:layout_toRightOf="@+id/img_listitem_ordergoods_imgurl"
+            android:text="x 1" />
+
+        <TextView
+            android:id="@+id/txt_listitem_ordergoods_tocomment"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
-            android:layout_marginRight="8dp"
-            android:text="x 1" />
+            android:layout_marginRight="4dp"
+            android:background="#f7941d"
+            android:padding="2dp"
+            android:text="去评论"
+            android:textColor="#fff" />
 
     </RelativeLayout>
 

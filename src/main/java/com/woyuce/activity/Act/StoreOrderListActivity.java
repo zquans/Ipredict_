@@ -39,7 +39,7 @@ public class StoreOrderListActivity extends BaseActivity {
     private ArrayList<StoreOrder> mList = new ArrayList<>();
 
     private String local_user_id;
-    private String URL = "http://api.iyuce.com/v1/store/orderlist?pageSize=30&userid=";
+    private String URL = "http://api.iyuce.com/v1/store/orderlist?pageSize=10&userid=";
     private String URL_Del = "http://api.iyuce.com/v1/store/orderdelete?userid=";
 
     @Override
@@ -54,6 +54,13 @@ public class StoreOrderListActivity extends BaseActivity {
         setContentView(R.layout.activity_store_orderlist);
 
         initView();
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        mList.clear();
+        requestData();
     }
 
     //改为RecyclerView
@@ -114,6 +121,7 @@ public class StoreOrderListActivity extends BaseActivity {
                                 goods.setGoods_title(obj_.getString("goods_title"));
                                 goods.setGoods_property(obj_.getString("goods_property"));
                                 goods.setQuantity(obj_.getString("quantity"));
+                                goods.setIs_comment(obj_.getString("is_comment"));
                                 goods.setGoods_thumb_img_url(obj_.getString("goods_thumb_img_url"));
                                 mArrayList.add(goods);
                             }

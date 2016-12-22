@@ -35,15 +35,23 @@ public class StoreGoods {
     private String total_price;
     private String quantity;
 
+    public StoreGoods() {
+    }
+
+    public String getIs_comment() {
+        return is_comment;
+    }
+
+    public void setIs_comment(String is_comment) {
+        this.is_comment = is_comment;
+    }
+
     public String getId() {
         return id;
     }
 
     public void setId(String id) {
         this.id = id;
-    }
-
-    public StoreGoods() {
     }
 
     public String getGoods_thumb_img_url() {

@@ -105,6 +105,8 @@ public class StorePayActivity extends BaseActivity implements View.OnClickListen
         for (int i = 0; i < mGoodsSkuIdList.size(); i++) {
             storeMenu = new StoreMenu();
             if (mNumList.get(i).equals("0")) {
+                //跳过该次轮询，同时移除商品名称数组中对应位置的商品名称
+                mSpecNameList.remove(i);
                 continue;
             }
             storeMenu.setNum(mNumList.get(i));
