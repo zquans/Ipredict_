@@ -47,7 +47,7 @@ public class GongyiActivity extends Activity implements OnClickListener {
                 startActivity(new Intent(this, GongyiLessonActivity.class));
                 break;
             case R.id.ll_gongyi_tencent:
-                Intent intent = new Intent(this, WebActivity.class);
+                Intent intent = new Intent(this, WebNoCookieActivity.class);
                 intent.putExtra("URL", "https://iyuce.ke.qq.com/");
                 intent.putExtra("TITLE", "我预测腾讯课堂");
                 intent.putExtra("COLOR", "#366090");

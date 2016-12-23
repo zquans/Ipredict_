@@ -49,7 +49,6 @@ public class GongyiContentActivity extends BaseActivity implements View.OnClickL
         Intent it_audio = getIntent();
         localAudioUrl = it_audio.getStringExtra("url"); // 先拿到AudioUrl,录音中直接拿此值进行Prepare
         localAudioTitle = it_audio.getStringExtra("title");
-        LogUtil.e("linx", "what ? =" + localAudioUrl + "//" + localAudioTitle);
 
         txtcontent = (TextView) findViewById(R.id.txt_mediaplay_content);
         txtTimeTotal = (TextView) findViewById(R.id.txt_mediaplay_totaltime);
@@ -87,7 +86,7 @@ public class GongyiContentActivity extends BaseActivity implements View.OnClickL
             @Override
             public void run() {
                 try {
-                    mp.setDataSource("http://php.ipredicting.com/" + localAudioUrl.trim());
+                    mp.setDataSource(localAudioUrl.trim());
                     mp.prepare();
                 } catch (IllegalArgumentException | SecurityException | IllegalStateException | IOException e) {
                     e.printStackTrace();

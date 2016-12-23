@@ -49,7 +49,7 @@ public class GongyiLessonAdapter extends BaseAdapter {
             viewHolder = (ViewHolder) convertView.getTag();
         }
 
-        viewHolder.txt_name.setText(mList.get(position).title);
+        viewHolder.txt_name.setText(mList.get(position).getTitle());
         return convertView;
     }
 
