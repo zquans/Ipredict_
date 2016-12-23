@@ -16,6 +16,8 @@ import android.widget.ImageView;
 
 import com.woyuce.activity.Act.WebActivity;
 import com.woyuce.activity.R;
+import com.woyuce.activity.Utils.JsInterface;
+import com.woyuce.activity.Utils.PreferenceUtil;
 
 /**
  * Created by Administrator on 2016/10/14.
@@ -27,6 +29,9 @@ public class Fragment3 extends Fragment implements View.OnClickListener {
     private WebView web;
 
     private String URL_CAM = "http://www.iyuce.com/m/appjxy.html?v=" + System.currentTimeMillis();
+
+    //JS交互
+    private JsInterface jsInterface;
 
     @Override
     public void onStart() {
@@ -54,8 +59,17 @@ public class Fragment3 extends Fragment implements View.OnClickListener {
     @SuppressLint("SetJavaScriptEnabled")
     private void initWebView() {
         web.loadUrl(URL_CAM);
-        // web.getSettings().setJavaScriptEnabled(true);
+        // 允许JS交互
         web.getSettings().setJavaScriptEnabled(true);
+        // 实例化接口JsInterface
+        jsInterface = new JsInterface(getActivity());
+        // 设置JS的接口
+        web.addJavascriptInterface(jsInterface, "woyuce");
+
+        //设置浏览器标识
+        String localVersion = PreferenceUtil.getSharePre(getActivity()).getString("localVersion", "2.8");
+        web.getSettings().setUserAgentString(web.getSettings().getUserAgentString() + "; woyuce/" + localVersion);
+
         web.getSettings().setSupportZoom(true);
         web.getSettings().setBuiltInZoomControls(true);
         web.getSettings().setUseWideViewPort(true);
