@@ -154,6 +154,7 @@ public class StoreOrderActivity extends BaseActivity implements View.OnClickList
                         local_order_no = obj.getString("order_no");
                         local_order_id = obj.getString("id");
                         mEdtMoney.setText(obj.getString("actual_price"));
+                        total_price = obj.getString("actual_price");
                     } else {
                         LogUtil.i("生成订单错误" + obj.getString("message"));
                     }
@@ -210,11 +211,10 @@ public class StoreOrderActivity extends BaseActivity implements View.OnClickList
                                             public void onClick(DialogInterface dialog, int which) {
                                                 startActivity(new Intent(StoreOrderActivity.this, MainActivity.class));
                                                 StoreOrderActivity.this.finish();
+                                                deleteSql();
                                             }
                                         })
                                         .show();
-                                startActivity(new Intent(StoreOrderActivity.this, MainActivity.class));
-                                StoreOrderActivity.this.finish();
                             } else if (obj.getString("code").equals("2")) {
                                 //金币支付不成功,跳转现金支付
                                 ToastUtil.showMessage(StoreOrderActivity.this, "金币不足抵扣,去调支付宝或者微信");
@@ -350,8 +350,6 @@ public class StoreOrderActivity extends BaseActivity implements View.OnClickList
                                 })
                                 .show();
                         LogUtil.i("message" + obj.getString("message"));
-//                        int init_money = Integer.parseInt(PreferenceUtil.getSharePre(StoreOrderActivity.this).getString("store_user_money", ""));
-//                        PreferenceUtil.save(StoreOrderActivity.this, "store_user_money", (init_money - Integer.parseInt(local_store_user_money)) + "");
                     } else {
                         // 该笔订单真实的支付结果，需要依赖服务端的异步通知。
                         new AlertDialog.Builder(StoreOrderActivity.this, AlertDialog.THEME_DEVICE_DEFAULT_LIGHT)
@@ -389,10 +387,12 @@ public class StoreOrderActivity extends BaseActivity implements View.OnClickList
      */
     private void deleteSql() {
         //删除数据库中该表
-        PreferenceUtil.removestoretbisexist(StoreOrderActivity.this);
-        SQLiteDatabase mDatabase = openOrCreateDatabase("aipu.db", MODE_PRIVATE, null);
-        mDatabase.execSQL("drop table storetb");
-        mDatabase.close();
+        if (PreferenceUtil.getSharePre(this).getString("storetb_is_exist", "").equals("yes")) {
+            PreferenceUtil.removestoretbisexist(StoreOrderActivity.this);
+            SQLiteDatabase mDatabase = openOrCreateDatabase("aipu.db", MODE_PRIVATE, null);
+            mDatabase.execSQL("drop table storetb");
+            mDatabase.close();
+        }
     }
 
     /**
@@ -425,6 +425,12 @@ public class StoreOrderActivity extends BaseActivity implements View.OnClickList
                 break;
             case R.id.btn_activity_storeorder_pay:
                 if (TextUtils.isEmpty(final_method)) {
+                    //判断可否纯金币支付
+                    if (Float.parseFloat(total_price) == 0) {
+                        toPay("", "");
+                        return;
+                    }
+                    LogUtil.i("total_price = " + total_price);
                     ToastUtil.showMessage(this, "请先选择支付方式哦");
                     return;
                 }

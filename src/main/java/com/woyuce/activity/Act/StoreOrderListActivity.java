@@ -107,7 +107,7 @@ public class StoreOrderListActivity extends BaseActivity {
                             obj = arr.getJSONObject(i);
                             order.setId(obj.getString("id"));
                             order.setOrder_no(obj.getString("order_no"));
-                            order.setPrice(obj.getString("price"));
+                            order.setPrice(obj.getString("actual_price"));
                             order.setCreate_at(obj.getString("create_at"));
                             order.setOrder_status(obj.getString("order_status"));
                             ArrayList<StoreGoods> mArrayList = new ArrayList<>();

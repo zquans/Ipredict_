@@ -1,11 +1,12 @@
 package com.woyuce.activity.wxapi;
 
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.DefaultRetryPolicy;
@@ -36,11 +37,22 @@ public class WXPayEntryActivity extends Activity implements IWXAPIEventHandler {
 
     private IWXAPI api;
 
+    private Button mBtn;
+    private TextView mTxt;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_wxpay_result);
 
+        mTxt = (TextView) findViewById(R.id.txt_activity_wxpay);
+        mBtn = (Button) findViewById(R.id.btn_activity_wxpay);
+        mBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                WXPayEntryActivity.this.finish();
+            }
+        });
         api = WXAPIFactory.createWXAPI(this, "wxee1be723a57f9d21");
         api.handleIntent(getIntent(), this);
     }
@@ -94,14 +106,12 @@ public class WXPayEntryActivity extends Activity implements IWXAPIEventHandler {
                     if (obj.getString("code").equals("0")) {
                         ToastUtil.showMessage(WXPayEntryActivity.this, "message" + obj.getString("message"));
                         if (resp.getType() == ConstantsAPI.COMMAND_PAY_BY_WX) {
-                            AlertDialog.Builder builder = new AlertDialog.Builder(WXPayEntryActivity.this, AlertDialog.THEME_DEVICE_DEFAULT_LIGHT);
-                            builder.setTitle("微信支付结果");
                             if (resp.errCode == 0) {
+                                mTxt.setText("支付成功");//************************************
                                 //支付成功
-                                builder.setMessage("支付成功啦");
-                                builder.setPositiveButton("知道了", new DialogInterface.OnClickListener() {
+                                mBtn.setOnClickListener(new View.OnClickListener() {
                                     @Override
-                                    public void onClick(DialogInterface dialog, int which) {
+                                    public void onClick(View v) {
                                         //删除该数据表
                                         deleteSql();
                                         PreferenceUtil.removestoretbisexist(WXPayEntryActivity.this);
@@ -112,39 +122,35 @@ public class WXPayEntryActivity extends Activity implements IWXAPIEventHandler {
                                 });
                             }
                             if (resp.errCode == -1) {
+                                mTxt.setText("支付失败");//************************************
                                 //支付失败
-                                builder.setMessage("支付失败");
-                                builder.setPositiveButton("知道了", new DialogInterface.OnClickListener() {
+                                mBtn.setOnClickListener(new View.OnClickListener() {
                                     @Override
-                                    public void onClick(DialogInterface dialog, int which) {
+                                    public void onClick(View v) {
                                         WXPayEntryActivity.this.finish();
                                     }
                                 });
                             }
                             if (resp.errCode == -2) {
+                                mTxt.setText("支付取消");//************************************
                                 //支付取消
-                                builder.setMessage("支付取消");
-                                builder.setPositiveButton("知道了", new DialogInterface.OnClickListener() {
+                                mBtn.setOnClickListener(new View.OnClickListener() {
                                     @Override
-                                    public void onClick(DialogInterface dialog, int which) {
+                                    public void onClick(View v) {
                                         WXPayEntryActivity.this.finish();
                                     }
                                 });
                             }
-                            builder.show();
                         }
                     } else {
                         //客户端不确定，后台反馈直接不成功
-                        new AlertDialog.Builder(WXPayEntryActivity.this, AlertDialog.THEME_DEVICE_DEFAULT_LIGHT)
-                                .setTitle("微信支付结果")
-                                .setMessage("支付失败")
-                                .setPositiveButton("知道了", new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        WXPayEntryActivity.this.finish();
-                                    }
-                                })
-                                .show();
+                        mTxt.setText("支付失败");
+                        mBtn.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                WXPayEntryActivity.this.finish();
+                            }
+                        });
                         LogUtil.i("code !=0" + obj.getString("message"));
                     }
                 } catch (JSONException e) {
