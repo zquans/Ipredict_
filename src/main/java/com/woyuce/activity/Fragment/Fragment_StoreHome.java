@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.ViewPager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
@@ -14,7 +15,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.ViewFlipper;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
@@ -30,6 +30,7 @@ import com.woyuce.activity.Application.AppContext;
 import com.woyuce.activity.Bean.StoreBean;
 import com.woyuce.activity.Bean.StoreGoods;
 import com.woyuce.activity.R;
+import com.woyuce.activity.Utils.CycleAdViewPageAdapter;
 import com.woyuce.activity.Utils.LogUtil;
 import com.woyuce.activity.Utils.PreferenceUtil;
 import com.woyuce.activity.Utils.ToastUtil;
@@ -42,11 +43,13 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class Fragment_StoreHome extends Fragment implements View.OnClickListener, FillingMissListener {
 
     private Button mBtnToCustom, mBtnToStoreCar;
-    private ViewFlipper mViewFlipper;
+    private ViewPager mViewPager;
 
     private FillingMissRecyclerView mRecycler;
     private RecyclerView.Adapter mAdapter;
@@ -58,7 +61,20 @@ public class Fragment_StoreHome extends Fragment implements View.OnClickListener
     private static final int FLAG_VIEWFLIPPER = 1;
     private static final int FLAG_RECYCLERVIEW = 2;
 
+    //子Item中测量宽高需要
     private int screen_width;
+
+    //保存计时器
+    private int viewpage_position;
+    private Timer mTimer;
+    //创建一个Handler去处理倒计时事件
+    private Handler mTimeHandler = new Handler() {
+        public void handleMessage(Message msg) {
+            if ((int) msg.obj >= 0) {
+                mViewPager.setCurrentItem((Integer) msg.obj);
+            }
+        }
+    };
 
     private Handler mHandler = new Handler() {
         @Override
@@ -70,11 +86,13 @@ public class Fragment_StoreHome extends Fragment implements View.OnClickListener
                             .showImageOnFail(R.mipmap.img_error_horizon).cacheInMemory(true).cacheOnDisk(true)
                             .bitmapConfig(Bitmap.Config.RGB_565).build();
 
+                    ArrayList<ImageView> views = new ArrayList<>();
                     for (int i = 0; i < mImgData.size(); i++) {
                         ImageView mImg = new ImageView(getActivity());
                         mImg.setScaleType(ImageView.ScaleType.CENTER_CROP);
                         ImageLoader.getInstance().displayImage(mImgData.get(i).getIcon_mobile_url(), mImg, options);
                         final int finalI = i;
+                        //图片对应的商品内容，做点击可进入
                         mImg.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
@@ -89,25 +107,28 @@ public class Fragment_StoreHome extends Fragment implements View.OnClickListener
                                 }
                             }
                         });
-                        mViewFlipper.addView(mImg);
+                        views.add(mImg);
                     }
+                    LogUtil.i("views = " + views.size());
+                    mViewPager.setAdapter(new CycleAdViewPageAdapter(views));
+                    //广告轮播
+                    toActAd();
                     LogUtil.i("mData = " + mImgData.toString());
-                    mViewFlipper.setInAnimation(getActivity(), R.anim.left_in);
-                    mViewFlipper.setOutAnimation(getActivity(), R.anim.left_out);
-                    mViewFlipper.startFlipping();
                     break;
                 case FLAG_RECYCLERVIEW:
                     mAdapter = new StoreHomeAdapter(getActivity(), mList, screen_width);
                     mRecycler.setLayoutManager(new LinearLayoutManager(getActivity()));
                     mRecycler.setAdapter(mAdapter);
-//                    FullLinearLayoutManager linearLayoutManager = new FullLinearLayoutManager(getActivity());
-//                    mRecycler.setNestedScrollingEnabled(false);
-//                    //设置布局管理器
-//                    mRecycler.setLayoutManager(linearLayoutManager);
                     break;
             }
         }
     };
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        mTimer.cancel();
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -126,9 +147,13 @@ public class Fragment_StoreHome extends Fragment implements View.OnClickListener
         mBtnToCustom.setOnClickListener(this);
         mBtnToStoreCar.setOnClickListener(this);
 
-        mViewFlipper = (ViewFlipper) view.findViewById(R.id.viewflip_fragment_store_tab1);
+        //自定义可隐藏广告的轮播的RecyclerView
         mRecycler = (FillingMissRecyclerView) view.findViewById(R.id.recycler_fragment_store_tab1);
         mRecycler.setMissListener(this);
+
+        //广告轮播
+        mViewPager = (ViewPager) view.findViewById(R.id.viewpager_fragment_store_home);
+        //请求所有商城数据
         requestData();
     }
 
@@ -191,7 +216,6 @@ public class Fragment_StoreHome extends Fragment implements View.OnClickListener
                         // "menu"
                         obj = obj.getJSONObject("menu");
                         store.setTitle(obj.getString("title"));
-//                        LogUtil.i("obj.getString(\"menu\") = " + obj.getString("title"));
                         mList.add(store);
                     }
                     Message msg2 = new Message();
@@ -231,7 +255,7 @@ public class Fragment_StoreHome extends Fragment implements View.OnClickListener
 
     @Override
     public void miss() {
-        mViewFlipper.setVisibility(View.GONE);
+        mViewPager.setVisibility(View.GONE);
 //        ObjectAnimator mAnimator = ObjectAnimator.ofFloat(mViewFlipper, "alpha", 0, 0.4f, 0.6f, 0.8f, 1f);
 //        mAnimator.setDuration(1000).start();
         ToastUtil.showMessage(getActivity(), "should gone");
@@ -239,9 +263,27 @@ public class Fragment_StoreHome extends Fragment implements View.OnClickListener
 
     @Override
     public void show() {
-        mViewFlipper.setVisibility(View.VISIBLE);
+        mViewPager.setVisibility(View.VISIBLE);
 //        ObjectAnimator mAnimator = ObjectAnimator.ofFloat(mViewFlipper, "alpha", 1f, 0.8f, 0, 6f, 0.4f, 0);
 //        mAnimator.setDuration(2000).start();
         ToastUtil.showMessage(getActivity(), "should show");
+    }
+
+    /**
+     * 广告轮播
+     */
+    private void toActAd() {
+        viewpage_position = 0;
+        mTimer = new Timer();
+        mTimer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                viewpage_position++;
+                Message msg = Message.obtain();
+                msg.obj = viewpage_position;
+                mTimeHandler.sendMessage(msg);
+                LogUtil.i("a" + viewpage_position);
+            }
+        }, 500, 3000);
     }
 }

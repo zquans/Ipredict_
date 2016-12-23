@@ -39,8 +39,8 @@
 
     </RelativeLayout>
 
-    <ViewFlipper
-        android:id="@+id/viewflip_fragment_store_tab1"
+    <android.support.v4.view.ViewPager
+        android:id="@+id/viewpager_fragment_store_home"
         android:layout_width="match_parent"
         android:layout_height="160dp" />
 

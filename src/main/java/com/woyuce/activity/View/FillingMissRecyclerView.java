@@ -13,7 +13,7 @@ import com.woyuce.activity.Utils.LogUtil;
  */
 public class FillingMissRecyclerView extends RecyclerView {
 
-    private Integer startY;
+    private float startY, endY;
 
     private FillingMissListener mListener;
 
@@ -35,26 +35,26 @@ public class FillingMissRecyclerView extends RecyclerView {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        int y = (int) event.getY();
-        float rawY = event.getRawY();
         int action = event.getAction();
-        LogUtil.i(y + "---" + rawY + "---" + startY);
         switch (action) {
             case MotionEvent.ACTION_DOWN:
-                startY = y;
-                LogUtil.i(y + "---" + rawY + "---" + startY);
+                startY = event.getY();
+                LogUtil.i("---" + startY);
                 break;
             case MotionEvent.ACTION_MOVE:
-                if (mListener != null) {
-                    if (startY - y > 100) {
-                        mListener.miss();
-                    }
-                    if (y - startY > 300) {
-                        mListener.show();
-                    }
-                }
+
                 break;
             case MotionEvent.ACTION_UP:
+                endY = event.getY();
+                LogUtil.i(endY + " ------" + startY);
+                if (mListener != null) {
+                    if (endY > startY) {
+                        mListener.show();
+                    }
+                    if (startY > endY) {
+                        mListener.miss();
+                    }
+                }
                 break;
         }
         return super.onTouchEvent(event);
