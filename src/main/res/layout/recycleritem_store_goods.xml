@@ -12,7 +12,7 @@
         android:id="@+id/img_item_recycler_goods"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:scaleType="fitXY" />
+        android:scaleType="centerInside" />
 
     <TextView
         android:id="@+id/txt_item_recycler_goods"

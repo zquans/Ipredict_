@@ -30,7 +30,7 @@ import com.woyuce.activity.Application.AppContext;
 import com.woyuce.activity.Bean.StoreBean;
 import com.woyuce.activity.Bean.StoreGoods;
 import com.woyuce.activity.R;
-import com.woyuce.activity.Utils.CycleAdViewPageAdapter;
+import com.woyuce.activity.View.CycleAdViewPageAdapter;
 import com.woyuce.activity.Utils.LogUtil;
 import com.woyuce.activity.Utils.PreferenceUtil;
 import com.woyuce.activity.Utils.ToastUtil;
@@ -134,7 +134,7 @@ public class Fragment_StoreHome extends Fragment implements View.OnClickListener
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.store_tab_1, container, false);
+        View view = inflater.inflate(R.layout.fragment_store_home, container, false);
 
         initView(view);
         return view;

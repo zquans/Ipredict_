@@ -41,7 +41,7 @@ public class StoreAddAddressActivity extends BaseActivity implements View.OnClic
     private Button mBtnSendMsg, mBtnValidate;
     private EditText mEdtName, mEdtPhone, mEdtCode, mEdtQQ, mEdtEmail;
 
-    private String local_name, local_mobile, local_qq, local_email, local_id, local_mobile_veri_code_id;
+    private String local_name, local_mobile, local_qq, local_email, local_id, local_mobile_veri_code_id, local_verified_type;
     private String local_user_id, LocalMobileVeriCodeId;//LocalMobileVeriCodeId验证短信后返回的标识ID
 
     private String URL = "http://api.iyuce.com/v1/store/OperationAddress";
@@ -87,6 +87,7 @@ public class StoreAddAddressActivity extends BaseActivity implements View.OnClic
         local_email = intent.getStringExtra("local_email");
         local_id = intent.getStringExtra("local_id");
         local_mobile_veri_code_id = intent.getStringExtra("local_mobile_veri_code_id");
+        local_verified_type = intent.getStringExtra("local_verified_type");
 
         mLinearLayoutChoose = (LinearLayout) findViewById(R.id.ll_activity_storeaddaddress_choose);
         mChooseOne = (TextView) findViewById(R.id.txt_activity_storeaddaddress_choose_one);
@@ -112,6 +113,13 @@ public class StoreAddAddressActivity extends BaseActivity implements View.OnClic
             mBtnValidate.setVisibility(View.GONE);
             mEdtCode.setVisibility(View.GONE);
             mLinearLayoutChoose.setVisibility(View.GONE);
+            if (local_verified_type.equals("mobile")) {
+                //如果之前是通过电话验证的，则修改地址不允许修改电话
+                mEdtPhone.setEnabled(false);
+            } else {
+                //如果之前是通过邮箱验证的，则修改地址不允许修改邮箱
+                mEdtEmail.setEnabled(false);
+            }
         } else {
             mBtnSendMsg.setOnClickListener(this);
             mBtnValidate.setOnClickListener(this);
@@ -127,6 +135,7 @@ public class StoreAddAddressActivity extends BaseActivity implements View.OnClic
         StringRequest addressOpreaRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String s) {
+                LogUtil.i("S = " + s);
                 JSONObject obj;
                 try {
                     obj = new JSONObject(s);
@@ -147,9 +156,11 @@ public class StoreAddAddressActivity extends BaseActivity implements View.OnClic
                 if (isPhoneNotEmail) {
                     map.put("mobile", mEdtPhone.getText().toString());
                     map.put("email", mEdtEmail.getText().toString());
+                    map.put("VerifiedType", "mobile");
                 } else {
                     map.put("mobile", mEdtEmail.getText().toString());
                     map.put("email", mEdtPhone.getText().toString());
+                    map.put("VerifiedType", "email");
                 }
                 map.put("name", mEdtName.getText().toString());
                 map.put("qq", mEdtQQ.getText().toString());

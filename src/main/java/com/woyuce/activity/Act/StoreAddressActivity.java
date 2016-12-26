@@ -15,6 +15,7 @@ import com.woyuce.activity.Adapter.StoreAddressAdapter;
 import com.woyuce.activity.Application.AppContext;
 import com.woyuce.activity.Bean.StoreAddress;
 import com.woyuce.activity.R;
+import com.woyuce.activity.Utils.LogUtil;
 import com.woyuce.activity.Utils.PreferenceUtil;
 import com.woyuce.activity.Utils.ToastUtil;
 
@@ -68,6 +69,7 @@ public class StoreAddressActivity extends BaseActivity implements
                 + "?userid=" + PreferenceUtil.getSharePre(this).getString("userId", ""), new Response.Listener<String>() {
             @Override
             public void onResponse(String s) {
+                LogUtil.i("s = " + s);
                 JSONObject obj;
                 JSONArray arr;
                 try {
@@ -88,6 +90,7 @@ public class StoreAddressActivity extends BaseActivity implements
                                 storeaddress.setId(obj.getString("id"));
                                 storeaddress.setIs_default(obj.getString("is_default"));
                                 storeaddress.setMobile_veri_code_id(obj.getString("mobile_veri_code_id"));
+                                storeaddress.setVerified_type(obj.getString("verified_type"));
                                 //给上一个Activity返回默认的地址信息
                                 if (obj.getString("is_default").equals("true")) {
                                     Intent intent = new Intent();
@@ -157,6 +160,7 @@ public class StoreAddressActivity extends BaseActivity implements
         intent.putExtra("local_email", mList.get(position).getEmail());
         intent.putExtra("local_id", mList.get(position).getId());
         intent.putExtra("local_mobile_veri_code_id", mList.get(position).getMobile_veri_code_id());
+        intent.putExtra("local_verified_type", mList.get(position).getVerified_type());
         startActivity(intent);
     }
 

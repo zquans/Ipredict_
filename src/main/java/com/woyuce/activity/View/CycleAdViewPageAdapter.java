@@ -1,4 +1,4 @@
-package com.woyuce.activity.Utils;
+package com.woyuce.activity.View;
 
 import android.support.v4.view.PagerAdapter;
 import android.view.View;

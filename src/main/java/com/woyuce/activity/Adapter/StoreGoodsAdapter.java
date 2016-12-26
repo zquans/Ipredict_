@@ -53,6 +53,7 @@ public class StoreGoodsAdapter extends RecyclerView.Adapter<StoreGoodsAdapter.MV
         if (mDatas.size() != 1) {
             ViewGroup.LayoutParams mLayoutparams = holder.mImg.getLayoutParams();
             mLayoutparams.width = screen_width / 2;
+            mLayoutparams.height = screen_width / 2;
             holder.mImg.setLayoutParams(mLayoutparams);
         }
         holder.mRelativeLayout.setOnClickListener(new View.OnClickListener() {

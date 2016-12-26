@@ -14,8 +14,17 @@ public class StoreAddress {
     private String id;
     private String is_default;
     private String mobile_veri_code_id;
+    private String verified_type;
 
     public StoreAddress() {
+    }
+
+    public String getVerified_type() {
+        return verified_type;
+    }
+
+    public void setVerified_type(String verified_type) {
+        this.verified_type = verified_type;
     }
 
     public String getMobile_veri_code_id() {
