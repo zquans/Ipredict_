@@ -11,7 +11,6 @@ import android.os.Message;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
-import android.view.animation.BounceInterpolator;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -36,7 +35,7 @@ import java.util.List;
 
 public class StoreGoodsActivity extends BaseActivity implements View.OnClickListener {
 
-    private TextView mTxtTabOne, mTxtTabTwo, mTxtTabThree;
+    private TextView mTxtTabOne, mTxtTabTwo, mTxtTabThree, mTxtToCustom;
     private Button mBtnGoToCar, mBtnPutIntoCar, mBtnBuyNow;
     private View mLine;
 
@@ -93,6 +92,8 @@ public class StoreGoodsActivity extends BaseActivity implements View.OnClickList
         mBtnPutIntoCar = (Button) findViewById(R.id.btn_activity_storegoods_putincar);
         mBtnBuyNow = (Button) findViewById(R.id.btn_activity_storegoods_buynow);
         mLine = findViewById(R.id.line_activity_storegoods);
+        mTxtToCustom = (TextView) findViewById(R.id.txt_store_to_custom);
+        mTxtToCustom.setOnClickListener(this);
         mBtnGoToCar.setOnClickListener(this);
         mBtnPutIntoCar.setOnClickListener(this);
         mBtnBuyNow.setOnClickListener(this);
@@ -294,6 +295,9 @@ public class StoreGoodsActivity extends BaseActivity implements View.OnClickList
                     return;
                 }
                 startActivity(new Intent(this, StoreCarActivity.class));
+                break;
+            case R.id.txt_store_to_custom:
+                startActivity(new Intent(this, CustomServiceActivity.class));
                 break;
         }
     }

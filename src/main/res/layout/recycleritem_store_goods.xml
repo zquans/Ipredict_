@@ -30,7 +30,7 @@
         android:layout_alignBaseline="@+id/txt_item_recycler_goods"
         android:layout_alignParentRight="true"
         android:layout_marginRight="4dp"
-        android:background="@drawable/buttonstyle_orangestroke_store_car"
+        android:background="@drawable/buttonstyle_orangestroke_address"
         android:text="查看详情"
         android:textColor="#f7941d" />
 

@@ -2,6 +2,7 @@ package com.woyuce.activity.Act;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.view.View;
 
 import com.woyuce.activity.Fragment.Fragmentfour;
 import com.woyuce.activity.R;
@@ -18,5 +19,9 @@ public class CustomServiceActivity extends Activity {
 
 
         getFragmentManager().beginTransaction().replace(R.id.ll_activity_empty, new Fragmentfour()).commit();
+    }
+
+    public void back(View view) {
+        finish();
     }
 }

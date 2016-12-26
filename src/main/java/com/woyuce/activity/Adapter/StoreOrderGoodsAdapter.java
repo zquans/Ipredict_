@@ -8,11 +8,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.woyuce.activity.Act.StoreCommentActivity;
+import com.woyuce.activity.Act.StoreGoodsActivity;
 import com.woyuce.activity.Bean.StoreGoods;
 import com.woyuce.activity.R;
 import com.woyuce.activity.Utils.LogUtil;
@@ -50,6 +52,17 @@ public class StoreOrderGoodsAdapter extends RecyclerView.Adapter<StoreOrderGoods
 
     @Override
     public void onBindViewHolder(StoreOrderGoodsAdapter.MViewHolder holder, final int position) {
+        holder.mItemLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(mContext, StoreGoodsActivity.class);
+                intent.putExtra("goods_id", mList.get(position).getGoods_id());
+                intent.putExtra("goods_sku_id", mList.get(position).getGoods_sku_id());
+                intent.putExtra("goods_title", mList.get(position).getGoods_title());
+                intent.putExtra("sales_price", mList.get(position).getSales_price());
+                mContext.startActivity(intent);
+            }
+        });
         holder.mTxtName.setText(mList.get(position).getGoods_title());
         holder.mTxtSpecName.setText(mList.get(position).getGoods_property());
         holder.mTxtGoodsNum.setText("x\r" + mList.get(position).getQuantity());
@@ -79,11 +92,13 @@ public class StoreOrderGoodsAdapter extends RecyclerView.Adapter<StoreOrderGoods
     }
 
     class MViewHolder extends RecyclerView.ViewHolder {
+        RelativeLayout mItemLayout;
         ImageView mImg;
         TextView mTxtName, mTxtSpecName, mTxtGoodsNum, mTxtToComment;
 
         public MViewHolder(View itemView) {
             super(itemView);
+            mItemLayout = (RelativeLayout) itemView.findViewById(R.id.rl_listitem_orderlist_goods);
             mImg = (ImageView) itemView.findViewById(R.id.img_listitem_ordergoods_imgurl);
             mTxtName = (TextView) itemView.findViewById(R.id.txt_listitem_ordergoods_name);
             mTxtSpecName = (TextView) itemView.findViewById(R.id.txt_listitem_ordergoods_specname);

@@ -123,6 +123,9 @@ public class StoreOrderListActivity extends BaseActivity {
                                 goods.setQuantity(obj_.getString("quantity"));
                                 goods.setIs_comment(obj_.getString("is_comment"));
                                 goods.setGoods_thumb_img_url(obj_.getString("goods_thumb_img_url"));
+                                goods.setGoods_id(obj_.getString("goods_id"));
+                                goods.setGoods_sku_id(obj_.getString("goods_sku_id"));
+                                goods.setSales_price(obj_.getString("unit_price"));
                                 mArrayList.add(goods);
                             }
                             order.setUser_order_details(mArrayList);

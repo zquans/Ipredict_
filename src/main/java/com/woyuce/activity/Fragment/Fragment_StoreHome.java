@@ -81,6 +81,7 @@ public class Fragment_StoreHome extends Fragment implements View.OnClickListener
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
             switch (msg.what) {
+                //广告轮播
                 case FLAG_VIEWFLIPPER:
                     DisplayImageOptions options = new DisplayImageOptions.Builder().showImageOnLoading(R.mipmap.img_error_horizon)
                             .showImageOnFail(R.mipmap.img_error_horizon).cacheInMemory(true).cacheOnDisk(true)
@@ -116,6 +117,7 @@ public class Fragment_StoreHome extends Fragment implements View.OnClickListener
                     LogUtil.i("mData = " + mImgData.toString());
                     break;
                 case FLAG_RECYCLERVIEW:
+                    //全部商品RecyclerView列表
                     mAdapter = new StoreHomeAdapter(getActivity(), mList, screen_width);
                     mRecycler.setLayoutManager(new LinearLayoutManager(getActivity()));
                     mRecycler.setAdapter(mAdapter);
@@ -258,7 +260,7 @@ public class Fragment_StoreHome extends Fragment implements View.OnClickListener
         mViewPager.setVisibility(View.GONE);
 //        ObjectAnimator mAnimator = ObjectAnimator.ofFloat(mViewFlipper, "alpha", 0, 0.4f, 0.6f, 0.8f, 1f);
 //        mAnimator.setDuration(1000).start();
-        ToastUtil.showMessage(getActivity(), "should gone");
+//        ToastUtil.showMessage(getActivity(), "should gone");
     }
 
     @Override
@@ -266,7 +268,7 @@ public class Fragment_StoreHome extends Fragment implements View.OnClickListener
         mViewPager.setVisibility(View.VISIBLE);
 //        ObjectAnimator mAnimator = ObjectAnimator.ofFloat(mViewFlipper, "alpha", 1f, 0.8f, 0, 6f, 0.4f, 0);
 //        mAnimator.setDuration(2000).start();
-        ToastUtil.showMessage(getActivity(), "should show");
+//        ToastUtil.showMessage(getActivity(), "should show");
     }
 
     /**

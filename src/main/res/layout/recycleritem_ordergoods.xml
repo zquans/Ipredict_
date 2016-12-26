@@ -10,6 +10,7 @@
         android:background="#0000" />
 
     <RelativeLayout
+        android:id="@+id/rl_listitem_orderlist_goods"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
@@ -58,6 +59,7 @@
             android:id="@+id/txt_listitem_ordergoods_tocomment"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_alignBottom="@+id/txt_listitem_ordergoods_goodsnum"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
             android:layout_marginRight="4dp"
