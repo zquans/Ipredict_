@@ -18,7 +18,6 @@ import android.widget.TextView;
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.Response;
-import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.woyuce.activity.Adapter.NetClassLessonAdapter;
@@ -58,7 +57,6 @@ public class NetClassLessonActivity extends BaseActivity implements AdapterView.
     private String localtoken;
     private String localgid, localpid, localmid, localwcg_name;
     private String localCheckCode, localunitid, localunitName;
-    private int errortime = 0;
 
     @Override
     protected void onStop() {
@@ -102,7 +100,9 @@ public class NetClassLessonActivity extends BaseActivity implements AdapterView.
         }
     }
 
-    /** 获取spn的数据 */
+    /**
+     * 获取spn的数据
+     */
     private void getExamUnit() {
         StringRequest strinrequest = new StringRequest(Request.Method.POST, URL, new Response.Listener<String>() {
             @Override
@@ -134,18 +134,7 @@ public class NetClassLessonActivity extends BaseActivity implements AdapterView.
                     e.printStackTrace();
                 }
             }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                if (errortime >= 3) {
-                    // Log.e("error", error.getMessage());
-                } else {
-                    errortime++;
-                    getBaseToken();
-                    getExamUnit();
-                }
-            }
-        }) {
+        }, null) {
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
                 HashMap<String, String> headers = new HashMap<>();

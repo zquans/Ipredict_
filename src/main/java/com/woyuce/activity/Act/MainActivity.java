@@ -25,13 +25,14 @@ import com.woyuce.activity.Fragment.Fragmentone;
 import com.woyuce.activity.Fragment.Fragmentthree;
 import com.woyuce.activity.R;
 import com.woyuce.activity.Utils.PreferenceUtil;
+import com.woyuce.activity.View.NoScrollViewPager;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends FragmentActivity implements OnClickListener, OnPageChangeListener {
 
-    private ViewPager mViewPager;
+    private NoScrollViewPager mViewPager;
     private FragmentPagerAdapter mAdapter;
     private List<Fragment> mFragments;
 
@@ -86,7 +87,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener, O
         mTxt4 = (TextView) findViewById(R.id.txt_client);
         mTxt5 = (TextView) findViewById(R.id.txt_mine);
 
-        mViewPager = (ViewPager) findViewById(R.id.id_viewpager);
+        mViewPager = (NoScrollViewPager) findViewById(R.id.id_viewpager);
         mViewPager.setOnPageChangeListener(this);
         mFragments = new ArrayList<>();
         Fragment mTab01 = new Fragmentone();

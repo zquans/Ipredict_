@@ -60,15 +60,29 @@
             android:layout_marginLeft="8dp"
             android:text="星级" />
 
-        <RatingBar
-            android:id="@+id/ratingbar_activity_storecomment_start"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+        <ImageView
+            android:id="@+id/img_activity_storecomment_bad"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
             android:layout_below="@+id/txt_activity_storecomment_start"
-            android:max="3"
-            android:numStars="3"
-            android:rating="3"
-            android:stepSize="1" />
+            android:background="@mipmap/icon_star_yellow" />
+
+        <ImageView
+            android:id="@+id/img_activity_storecomment_medium"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_below="@+id/txt_activity_storecomment_start"
+            android:layout_toRightOf="@+id/img_activity_storecomment_bad"
+            android:background="@mipmap/icon_star_yellow" />
+
+        <ImageView
+            android:id="@+id/img_activity_storecomment_good"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_below="@+id/txt_activity_storecomment_start"
+            android:layout_toRightOf="@+id/img_activity_storecomment_medium"
+            android:background="@mipmap/icon_star_yellow" />
+
     </RelativeLayout>
 
     <View

@@ -14,12 +14,14 @@ import android.widget.TextView;
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.Response;
+import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.woyuce.activity.Adapter.GongyiLessonAdapter;
 import com.woyuce.activity.Application.AppContext;
 import com.woyuce.activity.Bean.GongyiAudio;
 import com.woyuce.activity.R;
 import com.woyuce.activity.Utils.LogUtil;
+import com.woyuce.activity.Utils.PreferenceUtil;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -42,7 +44,7 @@ public class GongyiLessonActivity extends BaseActivity implements AdapterView.On
     private GongyiLessonAdapter adapter;
     private ArrayList<GongyiAudio> audioList = new ArrayList<>();
     private ArrayList<GongyiAudio> audioTypeList = new ArrayList<>();
-    
+
     private String URL_LIST = "http://api.iyuce.com/v1/exam/audios";
     private String URL_TYPE = "http://api.iyuce.com/v1/exam/audiotypes";
 
@@ -93,6 +95,7 @@ public class GongyiLessonActivity extends BaseActivity implements AdapterView.On
     }
 
     private void getListRequest(String url, final String type_id) {
+        progressdialogshow(this);
         StringRequest audioListRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
@@ -120,8 +123,22 @@ public class GongyiLessonActivity extends BaseActivity implements AdapterView.On
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
+                progressdialogcancel();
             }
-        }, null) {
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError volleyError) {
+                progressdialogcancel();
+            }
+        }) {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> headers = new HashMap<>();
+                String localtoken = PreferenceUtil.getSharePre(GongyiLessonActivity.this).getString("localtoken", "");
+                headers.put("Authorization", "Bearer " + localtoken);
+                return headers;
+            }
+
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {
                 HashMap<String, String> map = new HashMap<>();
@@ -168,7 +185,15 @@ public class GongyiLessonActivity extends BaseActivity implements AdapterView.On
                     e.printStackTrace();
                 }
             }
-        }, null);
+        }, null) {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> headers = new HashMap<>();
+                String localtoken = PreferenceUtil.getSharePre(GongyiLessonActivity.this).getString("localtoken", "");
+                headers.put("Authorization", "Bearer " + localtoken);
+                return headers;
+            }
+        };
         audioTypeRequest.setTag("audiolesson");
         AppContext.getHttpQueue().add(audioTypeRequest);
     }

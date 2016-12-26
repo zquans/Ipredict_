@@ -10,6 +10,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.text.InputType;
 import android.text.TextUtils;
+import android.util.Base64;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
@@ -41,6 +42,7 @@ import com.woyuce.activity.common.Constants;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Timer;
@@ -96,6 +98,12 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
         }
     };
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        LogUtil.i("onBackPressed = ");
+        android.os.Process.killProcess(android.os.Process.myPid());
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -106,11 +114,8 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
         initView();
         localtoken = PreferenceUtil.getSharePre(LoginActivity.this).getString("localtoken", "");
 
-//        if (TextUtils.isEmpty(localtoken)) {
         getBaseToken();
-//        } else {
         LogUtil.e("localtoken = " + localtoken);
-//        }
 
         //判断是否有权限
         if (hasPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE)) {
@@ -295,6 +300,57 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
         };
         strinRequest.setTag("login");
         AppContext.getHttpQueue().add(strinRequest);
+    }
+
+    /**
+     * 获取基本请求token
+     */
+    public void getBaseToken() {
+        StringRequest tokenrequest = new StringRequest(Request.Method.POST, Constants.URL_API_REQUESTTOKEN,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            JSONObject obj = new JSONObject(response);
+                            String localtoken = obj.getString("access_token");
+                            PreferenceUtil.save(LoginActivity.this, "localtoken", localtoken);
+                            LogUtil.e("localtoken1 = " + localtoken);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                getBaseToken();
+            }
+        }) {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                String base64EncodedString = null;
+                try {
+                    String encodedConsumerKey = URLEncoder.encode("defA8Dq2ambB", "UTF-8");
+                    String encodedConsumerSecret = URLEncoder.encode("WM7Ei5mzrrHl42HHXuGkNR0bVJexq4P", "UTF-8");
+                    String authString = encodedConsumerKey + ":" + encodedConsumerSecret;
+                    base64EncodedString = Base64.encodeToString(authString.getBytes("UTF-8"), Base64.NO_WRAP);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                HashMap<String, String> headers = new HashMap<>();
+                headers.put("Authorization", "Basic " + base64EncodedString);
+                return headers;
+            }
+
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                HashMap<String, String> headers = new HashMap<>();
+                headers.put("grant_type", "client_credentials");
+                headers.put("scope", "");
+                return headers;
+            }
+        };
+        tokenrequest.setTag("login");
+        AppContext.getHttpQueue().add(tokenrequest);
     }
 
     /**

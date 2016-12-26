@@ -6,7 +6,7 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.RatingBar;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.android.volley.AuthFailureError;
@@ -29,15 +29,18 @@ import java.util.Map;
 /**
  * Created by Administrator on 2016/12/19.
  */
-public class StoreCommentActivity extends BaseActivity {
+public class StoreCommentActivity extends BaseActivity implements View.OnClickListener {
 
     private TextView mTxtStoreName;
     private EditText mEdtComment;
-    private RatingBar mRatingBar;
+    private ImageView mImgGood, mImgMedium, mImgBad;
 
     private String URL_COMMENT = "http://api.iyuce.com/v1/store/submitcomment";
 
     private String local_order_id;
+
+    //默认好评
+    private String local_comment_star = "Good";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,7 +53,13 @@ public class StoreCommentActivity extends BaseActivity {
     private void initView() {
         local_order_id = getIntent().getStringExtra("local_order_id");
 
-        mRatingBar = (RatingBar) findViewById(R.id.ratingbar_activity_storecomment_start);
+        mImgGood = (ImageView) findViewById(R.id.img_activity_storecomment_good);
+        mImgMedium = (ImageView) findViewById(R.id.img_activity_storecomment_medium);
+        mImgBad = (ImageView) findViewById(R.id.img_activity_storecomment_bad);
+        mImgGood.setOnClickListener(this);
+        mImgMedium.setOnClickListener(this);
+        mImgBad.setOnClickListener(this);
+
         mEdtComment = (EditText) findViewById(R.id.edt_activity_storecomment_content);
         mTxtStoreName = (TextView) findViewById(R.id.txt_activity_storecomment_storename);
         mTxtStoreName.setText("商品名称: " + getIntent().getStringExtra("goods_name"));
@@ -63,7 +72,7 @@ public class StoreCommentActivity extends BaseActivity {
      * @param userid
      * @param user_comment
      */
-    private void storeCommentRequest(String url, final String userid, final String user_comment, final Float start) {
+    private void storeCommentRequest(String url, final String userid, final String user_comment, final String local_comment_star) {
         StringRequest storeCommentRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String s) {
@@ -98,15 +107,7 @@ public class StoreCommentActivity extends BaseActivity {
                 map.put("user_id", userid);
                 map.put("item_id", local_order_id);
                 map.put("cmt_text", user_comment);
-                if (start == 1) {
-                    map.put("satisfaction", "Bad");
-                }
-                if (start == 2) {
-                    map.put("satisfaction", "Medium");
-                }
-                if (start == 3) {
-                    map.put("satisfaction", "Good");
-                }
+                map.put("satisfaction", local_comment_star);
                 return map;
             }
         };
@@ -122,10 +123,41 @@ public class StoreCommentActivity extends BaseActivity {
         //这里拼接URL
         String user_id = PreferenceUtil.getSharePre(this).getString("userId", null);
         String user_comment = mEdtComment.getText().toString();
-        storeCommentRequest(URL_COMMENT, user_id, user_comment, mRatingBar.getRating());
+        storeCommentRequest(URL_COMMENT, user_id, user_comment, local_comment_star);
     }
 
     public void back(View view) {
         finish();
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.img_activity_storecomment_good:
+                resetImg();
+                mImgGood.setBackgroundResource(R.mipmap.icon_star_yellow);
+                mImgMedium.setBackgroundResource(R.mipmap.icon_star_yellow);
+                mImgBad.setBackgroundResource(R.mipmap.icon_star_yellow);
+                local_comment_star = "Good";
+                break;
+            case R.id.img_activity_storecomment_medium:
+                resetImg();
+                mImgMedium.setBackgroundResource(R.mipmap.icon_star_yellow);
+                mImgBad.setBackgroundResource(R.mipmap.icon_star_yellow);
+                local_comment_star = "Medium";
+                break;
+            case R.id.img_activity_storecomment_bad:
+                resetImg();
+                mImgBad.setBackgroundResource(R.mipmap.icon_star_yellow);
+                local_comment_star = "Bad";
+                break;
+
+        }
+    }
+
+    private void resetImg() {
+        mImgGood.setBackgroundResource(R.mipmap.icon_star_gray);
+        mImgMedium.setBackgroundResource(R.mipmap.icon_star_gray);
+        mImgBad.setBackgroundResource(R.mipmap.icon_star_gray);
     }
 }
