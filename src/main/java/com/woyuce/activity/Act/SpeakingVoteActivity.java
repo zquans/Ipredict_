@@ -291,15 +291,15 @@ public class SpeakingVoteActivity extends BaseActivity implements View.OnClickLi
     public void onNothingSelected(AdapterView<?> parent) {
     }
 
-    private void showShare(String title,String message){
+    private void showShare(String title, String message) {
         try {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             String mDatetime = sdf.format(new Date());
-            String  encode_collage  =   java.net.URLEncoder.encode(localRoomName,"utf-8");
+            String encode_collage = java.net.URLEncoder.encode(localRoomName, "utf-8");
 //			String  encode_title  =   java.net.URLEncoder.encode("我在" + localRoomName + "把票投给了话题" + localsubName + "。你呢？","utf-8");
-            String  encode_title  =   java.net.URLEncoder.encode("我在" + localRoomName + "把票投给了话题" +localsubName,"utf-8");
-            String URLcode = encode_title.replace("+","%20");
-            String url = "http://xm.iyuce.com/app/fenxiang.html?viewid=2&img="+localUrl+"&title="+ URLcode +"&collage="+ encode_collage +"&datetime=" + mDatetime;
+            String encode_title = java.net.URLEncoder.encode("我在" + localRoomName + "把票投给了话题" + localsubName, "utf-8");
+            String URLcode = encode_title.replace("+", "%20");
+            String url = "http://xm.iyuce.com/app/fenxiang.html?viewid=2&img=" + localUrl + "&title=" + URLcode + "&collage=" + encode_collage + "&datetime=" + mDatetime;
 
             ShareSDK.initSDK(SpeakingVoteActivity.this);
             OnekeyShare oks = new OnekeyShare();

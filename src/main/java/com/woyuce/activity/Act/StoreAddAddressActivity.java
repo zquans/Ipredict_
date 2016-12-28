@@ -5,6 +5,8 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.text.InputFilter;
+import android.text.InputType;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
@@ -178,34 +180,6 @@ public class StoreAddAddressActivity extends BaseActivity implements View.OnClic
         AppContext.getHttpQueue().add(addressOpreaRequest);
     }
 
-//    /**
-//     * 发送手机验证码及验证手机验证码的请求
-//     */
-//    private void requestPhoneValidate(final String url) {
-//        StringRequest validateRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
-//            @Override
-//            public void onResponse(String s) {
-//                try {
-//                    JSONObject obj = new JSONObject(s);
-//                    if (obj.getString("code").equals("0")) {
-//                        if (url.contains(URL_SEND_MSG)) {
-//                            ToastUtil.showMessage(StoreAddAddressActivity.this, "验证码发送成功");
-//                        } else {
-//                            ToastUtil.showMessage(StoreAddAddressActivity.this, "验证成功");
-//                            LocalMobileVeriCodeId = obj.getString("data");
-//                        }
-//                    } else {
-//                        ToastUtil.showMessage(StoreAddAddressActivity.this, obj.getString("message"));
-//                    }
-//                } catch (JSONException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//        }, null);
-//        validateRequest.setTag("storeAddAddressRequest");
-//        AppContext.getHttpQueue().add(validateRequest);
-//    }
-
     /**
      * 操作地址(保存、修改、删除)
      *
@@ -217,8 +191,6 @@ public class StoreAddAddressActivity extends BaseActivity implements View.OnClic
 //            return;
 //        }
 //        requestValidate(URL_TO_VALIDATE);
-
-
         if (!TextUtils.isEmpty(getIntent().getStringExtra("local_name"))) {
             isValidated = true;
         }
@@ -345,8 +317,14 @@ public class StoreAddAddressActivity extends BaseActivity implements View.OnClic
                 mChooseTwo.setBackgroundColor(Color.parseColor("#fbfbfb"));
                 mChooseOne.setTextColor(Color.parseColor("#fbfbfb"));
                 mChooseOne.setBackgroundColor(Color.parseColor("#f7941d"));
-                mEdtEmail.setHint("请输入邮箱");
                 mEdtPhone.setHint("请输入手机号码");
+                mEdtPhone.setFilters(new InputFilter[]{new InputFilter.LengthFilter(11)});
+                mEdtPhone.setInputType(InputType.TYPE_CLASS_NUMBER);
+                mEdtPhone.setText("");
+                mEdtEmail.setHint("请输入邮箱");
+                mEdtEmail.setInputType(InputType.TYPE_CLASS_TEXT);
+                mEdtEmail.setFilters(new InputFilter[]{new InputFilter.LengthFilter(32)});
+                mEdtEmail.setText("");
                 mTxtEmail.setText("邮箱");
                 mTxtPhone.setText("手机号");
                 isPhoneNotEmail = true;
@@ -356,10 +334,16 @@ public class StoreAddAddressActivity extends BaseActivity implements View.OnClic
                 mChooseOne.setBackgroundColor(Color.parseColor("#fbfbfb"));
                 mChooseTwo.setTextColor(Color.parseColor("#fbfbfb"));
                 mChooseTwo.setBackgroundColor(Color.parseColor("#f7941d"));
-                mEdtPhone.setHint("请输入邮箱");
                 mEdtEmail.setHint("请输入手机号码");
-                mTxtPhone.setText("邮箱");
+                mEdtEmail.setFilters(new InputFilter[]{new InputFilter.LengthFilter(11)});
+                mEdtEmail.setInputType(InputType.TYPE_CLASS_NUMBER);
+                mEdtEmail.setText("");
+                mEdtPhone.setHint("请输入邮箱");
+                mEdtPhone.setInputType(InputType.TYPE_CLASS_TEXT);
+                mEdtPhone.setFilters(new InputFilter[]{new InputFilter.LengthFilter(32)});
+                mEdtPhone.setText("");
                 mTxtEmail.setText("手机号");
+                mTxtPhone.setText("邮箱");
                 isPhoneNotEmail = false;
                 break;
             case R.id.btn_activity_storeaddaddress_sendmsg:

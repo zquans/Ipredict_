@@ -1,6 +1,5 @@
 package com.woyuce.activity.Act;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.view.PagerAdapter;
@@ -18,7 +17,7 @@ import java.util.List;
 /**
  * Created by Administrator on 2016/10/17.
  */
-public class WelcomeActivity extends Activity {
+public class WelcomeActivity extends BaseActivity {
 
     private ViewPager mViewpager;
     private List<View> mList = new ArrayList<>();

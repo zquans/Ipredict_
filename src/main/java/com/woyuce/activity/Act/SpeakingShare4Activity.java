@@ -1,7 +1,6 @@
 package com.woyuce.activity.Act;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -33,7 +32,7 @@ import cn.sharesdk.onekeyshare.OnekeyShare;
 /**
  * Created by Administrator on 2016/9/22.
  */
-public class SpeakingShare4Activity extends Activity implements View.OnClickListener {
+public class SpeakingShare4Activity extends BaseActivity implements View.OnClickListener {
 
     private Button btnBack;
     private LinearLayout llBack;
@@ -144,7 +143,7 @@ public class SpeakingShare4Activity extends Activity implements View.OnClickList
     }
 
     //多社交平台分享
-    private void showShare(String title,String message){
+    private void showShare(String title, String message) {
         try {
             String pingjie = null;
             switch (subnameList.size()) {
@@ -152,18 +151,18 @@ public class SpeakingShare4Activity extends Activity implements View.OnClickList
                     pingjie = "";
                     break;
                 case 1:
-                    pingjie= subnameList.get(0);
+                    pingjie = subnameList.get(0);
                     break;
                 case 2:
-                    pingjie= subnameList.get(0) + "," + subnameList.get(1);
+                    pingjie = subnameList.get(0) + "," + subnameList.get(1);
                     break;
                 case 3:
-                    pingjie= subnameList.get(0) + "," + subnameList.get(1)+ "," + subnameList.get(2);
+                    pingjie = subnameList.get(0) + "," + subnameList.get(1) + "," + subnameList.get(2);
                     break;
             }
-            String encode_collage = URLEncoder.encode(localRoom,"utf-8");
-            String encode_title = URLEncoder.encode(subnameList.get(0),"utf-8");
-            String URLcode = encode_title.replace("+","%20");
+            String encode_collage = URLEncoder.encode(localRoom, "utf-8");
+            String encode_title = URLEncoder.encode(subnameList.get(0), "utf-8");
+            String URLcode = encode_title.replace("+", "%20");
             String url = "http://xm.iyuce.com/app/fenxiang.html?viewid=1&collage=" + encode_collage
                     + "&title=" + URLcode + "&datetime=" + localTime + "&img=&part1=" + pingjie
                     + "&part2= " + localsubname + "&message=" + localMessage;

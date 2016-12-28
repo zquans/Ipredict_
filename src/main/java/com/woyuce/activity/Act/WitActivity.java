@@ -1,6 +1,5 @@
 package com.woyuce.activity.Act;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -27,7 +26,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-public class WitActivity extends Activity implements OnClickListener, OnItemClickListener {
+public class WitActivity extends BaseActivity implements OnClickListener, OnItemClickListener {
 
     private GridView gvCategory;
     private ImageView imgBack;

@@ -33,6 +33,7 @@ import com.umeng.message.common.inter.ITagManager;
 import com.umeng.message.tag.TagManager;
 import com.woyuce.activity.Application.AppContext;
 import com.woyuce.activity.R;
+import com.woyuce.activity.Utils.ActivityManager;
 import com.woyuce.activity.Utils.LogUtil;
 import com.woyuce.activity.Utils.PreferenceUtil;
 import com.woyuce.activity.Utils.ToastUtil;
@@ -102,7 +103,7 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
     public void onBackPressed() {
         super.onBackPressed();
         LogUtil.i("onBackPressed = ");
-        android.os.Process.killProcess(android.os.Process.myPid());
+        ActivityManager.getAppManager().finishAllActivity();
     }
 
     @Override

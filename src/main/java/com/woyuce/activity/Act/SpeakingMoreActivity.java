@@ -1,6 +1,5 @@
 package com.woyuce.activity.Act;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -38,7 +37,7 @@ import java.util.Map;
 /**
  * Created by Administrator on 2016/9/22.
  */
-public class SpeakingMoreActivity extends Activity implements AdapterView.OnItemClickListener, View.OnClickListener {
+public class SpeakingMoreActivity extends BaseActivity implements AdapterView.OnItemClickListener, View.OnClickListener {
 
     //顶部导航条
     private ImageView mImgBack;
@@ -157,7 +156,7 @@ public class SpeakingMoreActivity extends Activity implements AdapterView.OnItem
         finish();
         overridePendingTransition(0, 0);
     }
-    
+
     @Override
     public void onClick(View v) {
         switch (v.getId()) {

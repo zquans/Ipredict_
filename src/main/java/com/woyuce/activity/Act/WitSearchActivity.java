@@ -1,13 +1,15 @@
 package com.woyuce.activity.Act;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.ListView;
+import android.widget.TextView;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request.Method;
@@ -21,28 +23,25 @@ import com.woyuce.activity.Bean.WitSearch;
 import com.woyuce.activity.R;
 import com.woyuce.activity.Utils.LogUtil;
 
-import android.app.Activity;
-import android.content.Intent;
-import android.os.Bundle;
-import android.view.View;
-import android.view.View.OnClickListener;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
-import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.ListView;
-import android.widget.TextView;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
-public class WitSearchActivity extends Activity implements OnClickListener, OnItemClickListener {
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-	private TextView txtResult;
-	private Button btnBack;
-	private ImageView mImgView;
-	private ListView witsearchlistview;
+public class WitSearchActivity extends BaseActivity implements OnClickListener, OnItemClickListener {
 
-	private String URL_SEARCH = "http://iphone.ipredicting.com/xzsubSearch.aspx";
-	private String localkey, localid, localsubid;
-	private List<WitSearch> witsearchList = new ArrayList<WitSearch>();
+    private TextView txtResult;
+    private Button btnBack;
+    private ImageView mImgView;
+    private ListView witsearchlistview;
+
+    private String URL_SEARCH = "http://iphone.ipredicting.com/xzsubSearch.aspx";
+    private String localkey, localid, localsubid;
+    private List<WitSearch> witsearchList = new ArrayList<WitSearch>();
 
     @Override
     protected void onStop() {

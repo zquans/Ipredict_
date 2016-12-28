@@ -1,6 +1,5 @@
 package com.woyuce.activity.Act;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -10,7 +9,7 @@ import android.widget.TextView;
 
 import com.woyuce.activity.R;
 
-public class GongyiActivity extends Activity implements OnClickListener {
+public class GongyiActivity extends BaseActivity implements OnClickListener {
 
     private TextView titleback;
     private LinearLayout llAudio, llTencent;

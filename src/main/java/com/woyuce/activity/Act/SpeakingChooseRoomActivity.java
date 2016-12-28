@@ -1,6 +1,5 @@
 package com.woyuce.activity.Act;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -35,7 +34,7 @@ import java.util.Map;
 /**
  * Created by Administrator on 2016/9/22.
  */
-public class SpeakingChooseRoomActivity extends Activity implements View.OnClickListener, AdapterView.OnItemSelectedListener {
+public class SpeakingChooseRoomActivity extends BaseActivity implements View.OnClickListener, AdapterView.OnItemSelectedListener {
 
     private Spinner spnArea, spnCity, spnRoom;
     private Button btnSure, btnCancel;

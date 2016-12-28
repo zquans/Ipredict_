@@ -24,10 +24,10 @@ public class SpeakingShare3Activity extends BaseActivity implements View.OnClick
 
     private ImageView mImgBack;
     private Button btnBack, btnNext;
-    private LinearLayout llBack ,btnPartOne, btnPartTwo;
+    private LinearLayout llBack, btnPartOne, btnPartTwo;
 
     // 上一级传来的数据,还需要传递到下一级
-    private String localRoomID, localTime, localMessage ,localRoom;
+    private String localRoomID, localTime, localMessage, localRoom;
     //Fragment中传递到下一级数据
     private String localsubname;
     private List<String> subidList = new ArrayList<>();
@@ -139,9 +139,8 @@ public class SpeakingShare3Activity extends BaseActivity implements View.OnClick
                     return;                         //这个return太妙
                 } else if (subidList.size() == 0 && subid2 != null) {
                     subidList.add(subid2);
-                } else if (subidList.size() !=0 && subid2 == null) {
-                }
-                else if (subidList.size() !=0 && subid2 != null) {
+                } else if (subidList.size() != 0 && subid2 == null) {
+                } else if (subidList.size() != 0 && subid2 != null) {
                     subidList.add(subid2);
                 }
                 Intent it_share4 = new Intent(this, SpeakingShare4Activity.class);

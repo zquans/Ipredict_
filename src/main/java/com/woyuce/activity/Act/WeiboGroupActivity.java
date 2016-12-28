@@ -1,6 +1,5 @@
 package com.woyuce.activity.Act;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -27,7 +26,7 @@ import java.util.Map;
 /**
  * Created by Administrator on 2016/10/12.
  */
-public class WeiboGroupActivity extends Activity implements AdapterView.OnItemClickListener {
+public class WeiboGroupActivity extends BaseActivity implements AdapterView.OnItemClickListener {
 
     private String local_token;
     private String URL = "http://api.iyuce.com/v1/bbs/getcategories?categoryid=";

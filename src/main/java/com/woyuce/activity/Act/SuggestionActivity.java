@@ -1,6 +1,5 @@
 package com.woyuce.activity.Act;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
@@ -27,7 +26,7 @@ import java.util.Map;
 /**
  * Created by Administrator on 2016/9/23.
  */
-public class SuggestionActivity extends Activity implements View.OnClickListener {
+public class SuggestionActivity extends BaseActivity implements View.OnClickListener {
 
     private TextView txtBack;
     private EditText edt;

@@ -1,6 +1,5 @@
 package com.woyuce.activity.Act;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -34,7 +33,7 @@ import java.util.Map;
 /**
  * Created by Administrator on 2016/9/22.
  */
-public class SpeakingSearchActivity extends Activity implements AdapterView.OnItemClickListener, View.OnClickListener {
+public class SpeakingSearchActivity extends BaseActivity implements AdapterView.OnItemClickListener, View.OnClickListener {
 
     //顶部导航条
     private ImageView mImgBack;

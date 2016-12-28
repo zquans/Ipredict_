@@ -77,7 +77,7 @@ public class LoginResetActivity extends BaseActivity implements View.OnClickList
                         ToastUtil.showMessage(LoginResetActivity.this, "恭喜您，密码重置成功啦");
                         startActivity(new Intent(LoginResetActivity.this, LoginActivity.class));
                         finish();
-                    }else{
+                    } else {
                         ToastUtil.showMessage(LoginResetActivity.this, obj.getString("message"));
                     }
                 } catch (JSONException e) {

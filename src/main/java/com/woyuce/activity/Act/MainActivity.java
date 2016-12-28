@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -24,6 +23,7 @@ import com.woyuce.activity.Fragment.Fragmentfive;
 import com.woyuce.activity.Fragment.Fragmentone;
 import com.woyuce.activity.Fragment.Fragmentthree;
 import com.woyuce.activity.R;
+import com.woyuce.activity.Utils.ActivityManager;
 import com.woyuce.activity.Utils.PreferenceUtil;
 import com.woyuce.activity.View.NoScrollViewPager;
 
@@ -65,6 +65,8 @@ public class MainActivity extends FragmentActivity implements OnClickListener, O
         initEvent();
         setSelect(0);
 
+        //因为已经集成了FragmentActivity,加入Activity管理栈
+        ActivityManager.getAppManager().addActivity(this);
         //TODO 微博相册图片辅助类初始化(这一步必须，开启异步，否则后面相册无法打开，会崩溃)
 //        LocalImageHelper.init(AppContext.getInstance());
     }

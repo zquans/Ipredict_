@@ -1,6 +1,5 @@
 package com.woyuce.activity.Act;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
@@ -11,7 +10,7 @@ import com.woyuce.activity.R;
 /**
  * Created by Administrator on 2016/9/22.
  */
-public class SpeakingDetailActivity extends Activity implements View.OnClickListener {
+public class SpeakingDetailActivity extends BaseActivity implements View.OnClickListener {
 
     private TextView txtBack, txtName, txtTime, txtRoom, txtContent;
     private SpeakingBean localspeaking;

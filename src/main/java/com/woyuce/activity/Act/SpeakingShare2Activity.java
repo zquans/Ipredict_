@@ -1,6 +1,5 @@
 package com.woyuce.activity.Act;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -16,7 +15,7 @@ import com.woyuce.activity.Utils.LogUtil;
 /**
  * Created by Administrator on 2016/9/22.
  */
-public class SpeakingShare2Activity extends Activity implements View.OnClickListener {
+public class SpeakingShare2Activity extends BaseActivity implements View.OnClickListener {
 
     private ImageView mImgBack;
     private Button btnBack, btnNext;

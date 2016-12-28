@@ -11,6 +11,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 
 import com.umeng.analytics.MobclickAgent;
+import com.woyuce.activity.Utils.ActivityManager;
 import com.woyuce.activity.Utils.ToastUtil;
 import com.woyuce.activity.common.Constants;
 
@@ -43,6 +44,7 @@ public class BaseActivity extends Activity {
         } else {
             // toast("链接成功");
         }
+        ActivityManager.getAppManager().addActivity(this);
     }
 
     /**

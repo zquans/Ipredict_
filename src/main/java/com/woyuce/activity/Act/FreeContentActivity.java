@@ -1,6 +1,5 @@
 package com.woyuce.activity.Act;
 
-import android.app.Activity;
 import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -41,7 +40,7 @@ import uk.co.senab.photoview.PhotoView;
 /**
  * Created by Administrator on 2016/9/21.
  */
-public class FreeContentActivity extends Activity implements View.OnClickListener, AdapterView.OnItemClickListener, FragmentCheckSpell.IShowButton {
+public class FreeContentActivity extends BaseActivity implements View.OnClickListener, AdapterView.OnItemClickListener, FragmentCheckSpell.IShowButton {
 
     private ImageView mBack, mPre, mNext;
     private PhotoView mContent;

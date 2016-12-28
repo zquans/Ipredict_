@@ -1,6 +1,5 @@
 package com.woyuce.activity.Act;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -44,7 +43,7 @@ import java.util.Map;
 /**
  * Created by Administrator on 2016/10/11.
  */
-public class WeiboInfoActivity extends Activity implements AdapterView.OnItemClickListener {
+public class WeiboInfoActivity extends BaseActivity implements AdapterView.OnItemClickListener {
 
     //接收上一级传递过来的信息
     private String local_headurl, local_body, local_time, local_author, local_reply_count, local_token;

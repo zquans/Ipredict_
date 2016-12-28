@@ -1,6 +1,5 @@
 package com.woyuce.activity.Act;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
@@ -19,7 +18,7 @@ import com.woyuce.activity.common.Constants;
  * @Description:WeiboActivity基类
  * @date 2015-3-30
  */
-public class WeiboBaseActivity extends Activity {
+public class WeiboBaseActivity extends BaseActivity {
     //应用是否销毁标志
     protected boolean isDestroy;
     //防止重复点击设置的标志，涉及到点击打开其他Activity时，将该标志设置为false，在onResume事件中设置为true

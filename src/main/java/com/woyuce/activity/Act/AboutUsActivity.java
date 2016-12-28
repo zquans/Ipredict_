@@ -1,6 +1,5 @@
 package com.woyuce.activity.Act;
 
-import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.os.Bundle;
@@ -12,7 +11,7 @@ import com.woyuce.activity.Utils.LogUtil;
 /**
  * Created by Administrator on 2016/9/23.
  */
-public class AboutUsActivity extends Activity {
+public class AboutUsActivity extends BaseActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
