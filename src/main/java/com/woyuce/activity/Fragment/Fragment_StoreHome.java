@@ -30,10 +30,10 @@ import com.woyuce.activity.Application.AppContext;
 import com.woyuce.activity.Bean.StoreBean;
 import com.woyuce.activity.Bean.StoreGoods;
 import com.woyuce.activity.R;
-import com.woyuce.activity.View.CycleAdViewPageAdapter;
 import com.woyuce.activity.Utils.LogUtil;
 import com.woyuce.activity.Utils.PreferenceUtil;
 import com.woyuce.activity.Utils.ToastUtil;
+import com.woyuce.activity.View.CycleAdViewPageAdapter;
 import com.woyuce.activity.View.FillingMissListener;
 import com.woyuce.activity.View.FillingMissRecyclerView;
 
@@ -129,7 +129,9 @@ public class Fragment_StoreHome extends Fragment implements View.OnClickListener
     @Override
     public void onStop() {
         super.onStop();
-        mTimer.cancel();
+        if (mTimer != null) {
+            mTimer.cancel();
+        }
     }
 
     @Override

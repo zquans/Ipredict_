@@ -14,10 +14,10 @@ public class Constants {
     //WebView访问的URL汇总
     public static final String URL_WEB_ZHIBO = "https://iyuce.ke.qq.com/";
     public static final String URL_WEB_LUBO = "http://store.iyuce.com/";
+    //网络班跳转商城获取商品信息
+    public static final String URL_GetGoods = "http://api.iyuce.com/v1/store/getactivegoods";
+
 //    public static final String URL_WEB_LUBO = "https://iyuce.ke.qq.com/";
-
-
-
 
 
 }

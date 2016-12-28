@@ -477,22 +477,45 @@ public class FreePageActivity extends BaseActivity implements View.OnClickListen
                 .setPositiveButton("报名录播", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        Intent intent = new Intent(FreePageActivity.this, WebActivity.class);
-                        intent.putExtra("URL", Constants.URL_WEB_LUBO);
-                        intent.putExtra("TITLE", "网络班录播报名");
-                        intent.putExtra("COLOR", "#e7604a");
-                        startActivity(intent);
+                        getactivegoods();
                     }
                 }).setNegativeButton("报名直播", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                Intent intent = new Intent(FreePageActivity.this, WebActivity.class);
+                Intent intent = new Intent(FreePageActivity.this, WebNoCookieActivity.class);
                 intent.putExtra("URL", Constants.URL_WEB_ZHIBO);
                 intent.putExtra("TITLE", "网络班直播报名");
                 intent.putExtra("COLOR", "#1e87e2");
                 startActivity(intent);
             }
         }).setNeutralButton("再想想", null).show();
+    }
+
+    /**
+     * 获取商城商品信息
+     */
+    private void getactivegoods() {
+        StringRequest getGoodsRequest = new StringRequest(Request.Method.GET, Constants.URL_GetGoods, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String s) {
+                try {
+                    JSONObject obj = new JSONObject(s);
+                    if (obj.getString("code").equals("0")) {
+                        obj = obj.getJSONObject("data");
+                        Intent intent = new Intent(FreePageActivity.this, StoreGoodsActivity.class);
+                        intent.putExtra("goods_id", obj.getString("goods_id"));
+                        intent.putExtra("goods_sku_id", obj.getString("goods_sku_id"));
+                        intent.putExtra("goods_title", obj.getString("goods_title"));
+                        intent.putExtra("sales_price", obj.getString("sales_price"));
+                        startActivity(intent);
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }, null);
+        getGoodsRequest.setTag("page");
+        AppContext.getHttpQueue().add(getGoodsRequest);
     }
 
     /**

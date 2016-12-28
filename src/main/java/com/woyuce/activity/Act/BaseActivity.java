@@ -31,7 +31,7 @@ public class BaseActivity extends Activity {
         MobclickAgent.onPause(this);
     }
 
-    public ProgressDialog progressdialog;
+    private ProgressDialog mProgressdialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,17 +96,25 @@ public class BaseActivity extends Activity {
     public void doUpdate() {
     }
 
-    public void progressdialogshow(Context context) {
-        progressdialog = new ProgressDialog(context);
-        progressdialog.setTitle("加载中，请稍候");
-        progressdialog.setMessage("Loading...");
-        progressdialog.setCanceledOnTouchOutside(false);
-//         progressdialog.setCancelable(false);
-        progressdialog.show();
+    private void show() {
+        mProgressdialog.setTitle("加载中，请稍候");
+        mProgressdialog.setMessage("Loading...");
+        mProgressdialog.setCanceledOnTouchOutside(false);
+//        mProgressdialog.setCancelable(false);
+        mProgressdialog.show();
+    }
+
+    public ProgressDialog progressdialogshow(Context context) {
+        if (mProgressdialog == null) {
+            mProgressdialog = new ProgressDialog(context);
+            show();
+            return mProgressdialog;
+        }
+        show();
+        return mProgressdialog;
     }
 
     public void progressdialogcancel() {
-        progressdialog.cancel();
+        mProgressdialog.cancel();
     }
-
 }

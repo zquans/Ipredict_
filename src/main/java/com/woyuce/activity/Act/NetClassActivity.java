@@ -200,7 +200,9 @@ public class NetClassActivity extends BaseActivity
         spnclass.setOnItemSelectedListener(this);
     }
 
-    /* 获取spn的数据 */
+    /**
+     * 获取spn的数据
+     */
     private void getWebCourse() {
         progressdialogshow(this);
         StringRequest strinrequest = new StringRequest(Request.Method.POST, URL_WebCourse, new Response.Listener<String>() {
@@ -253,24 +255,49 @@ public class NetClassActivity extends BaseActivity
         AppContext.getHttpQueue().add(strinrequest);
     }
 
+    /**
+     * 获取商城商品信息
+     */
+    private void getactivegoods() {
+        StringRequest getGoodsRequest = new StringRequest(Request.Method.GET, Constants.URL_GetGoods, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String s) {
+                try {
+                    JSONObject obj = new JSONObject(s);
+                    if (obj.getString("code").equals("0")) {
+                        obj = obj.getJSONObject("data");
+                        Intent intent = new Intent(NetClassActivity.this, StoreGoodsActivity.class);
+                        intent.putExtra("goods_id", obj.getString("goods_id"));
+                        intent.putExtra("goods_sku_id", obj.getString("goods_sku_id"));
+                        intent.putExtra("goods_title", obj.getString("goods_title"));
+                        intent.putExtra("sales_price", obj.getString("sales_price"));
+                        startActivity(intent);
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }, null);
+        getGoodsRequest.setTag("wangluobanlesson");
+        AppContext.getHttpQueue().add(getGoodsRequest);
+    }
+
     @Override
     public void onClick(View v) {
-        Intent intent = new Intent(this, WebActivity.class);
         switch (v.getId()) {
             case R.id.arrow_back:
                 finish();
                 break;
             case R.id.btn_wangluoban_zhibo:
+                Intent intent = new Intent(this, WebNoCookieActivity.class);
                 intent.putExtra("URL", Constants.URL_WEB_ZHIBO);
                 intent.putExtra("TITLE", "网络班直播报名");
                 intent.putExtra("COLOR", "#1e87e2");
                 startActivity(intent);
                 break;
             case R.id.btn_wangluoban_lubo:
-                intent.putExtra("URL", Constants.URL_WEB_LUBO);
-                intent.putExtra("TITLE", "网络班录播报名");
-                intent.putExtra("COLOR", "#e7604a");
-                startActivity(intent);
+                //跳转商城商品
+                getactivegoods();
                 break;
         }
     }

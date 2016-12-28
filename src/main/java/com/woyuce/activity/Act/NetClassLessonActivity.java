@@ -154,7 +154,9 @@ public class NetClassLessonActivity extends BaseActivity implements AdapterView.
         AppContext.getHttpQueue().add(strinrequest);
     }
 
-    // 检查权限
+    /**
+     * 检查权限
+     */
     private void checkRight() {
         // 检测用户ID，若无则未登录，无法验证权限
         String localuserId = PreferenceUtil.getSharePre(NetClassLessonActivity.this).getString("userId", "");
@@ -207,7 +209,7 @@ public class NetClassLessonActivity extends BaseActivity implements AdapterView.
                                             .setNeutralButton("购买直播课程", new DialogInterface.OnClickListener() {
                                                 @Override
                                                 public void onClick(DialogInterface dialog, int which) {
-                                                    Intent intent = new Intent(NetClassLessonActivity.this, WebActivity.class);
+                                                    Intent intent = new Intent(NetClassLessonActivity.this, WebNoCookieActivity.class);
                                                     intent.putExtra("URL", Constants.URL_WEB_ZHIBO);
                                                     intent.putExtra("TITLE", "网络班直播报名");
                                                     intent.putExtra("COLOR", "#1e87e2");
@@ -217,11 +219,8 @@ public class NetClassLessonActivity extends BaseActivity implements AdapterView.
                                             .setPositiveButton("购买录播课程", new DialogInterface.OnClickListener() {
                                                 @Override
                                                 public void onClick(DialogInterface dialog, int which) {
-                                                    Intent intent = new Intent(NetClassLessonActivity.this, WebActivity.class);
-                                                    intent.putExtra("URL", Constants.URL_WEB_LUBO);
-                                                    intent.putExtra("TITLE", "网络班录播报名");
-                                                    intent.putExtra("COLOR", "#e7604a");
-                                                    startActivity(intent);
+                                                    //跳转商城商品
+                                                    getactivegoods();
                                                 }
                                             })
                                             .show();
@@ -267,7 +266,38 @@ public class NetClassLessonActivity extends BaseActivity implements AdapterView.
         AppContext.getHttpQueue().add(checkrequest);
     }
 
-    // 输入激活码
+
+    /**
+     * 获取商城商品信息
+     */
+    private void getactivegoods() {
+        StringRequest getGoodsRequest = new StringRequest(Request.Method.GET, Constants.URL_GetGoods, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String s) {
+                try {
+                    JSONObject obj = new JSONObject(s);
+                    if (obj.getString("code").equals("0")) {
+                        obj = obj.getJSONObject("data");
+                        Intent intent = new Intent(NetClassLessonActivity.this, StoreGoodsActivity.class);
+                        intent.putExtra("goods_id", obj.getString("goods_id"));
+                        intent.putExtra("goods_sku_id", obj.getString("goods_sku_id"));
+                        intent.putExtra("goods_title", obj.getString("goods_title"));
+                        intent.putExtra("sales_price", obj.getString("sales_price"));
+                        startActivity(intent);
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }, null);
+        getGoodsRequest.setTag("wangluobanlesson");
+        AppContext.getHttpQueue().add(getGoodsRequest);
+    }
+
+
+    /**
+     * 输入激活码
+     */
     private void CheckCode() {
         // 简单防暴力破解，做次数限制。 //复杂的可以考虑放到share preference中去做
         if (localtry >= 3 && localtry < 5) {
