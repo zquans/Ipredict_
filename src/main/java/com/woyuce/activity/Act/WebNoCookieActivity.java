@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.View;
 import android.webkit.WebChromeClient;
@@ -27,19 +28,25 @@ public class WebNoCookieActivity extends BaseActivity implements View.OnClickLis
     private ImageView imgClose, imgBack;
     private LinearLayout mLinearlayout;
 
-    private String local_URL, local_title, local_color;
+    private String local_URL, local_title, local_color, local_back_main_activity;
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
-            if (web.canGoBack()) {
-                web.goBack();
-            } else {
-                WebNoCookieActivity.this.finish();
+            goBack();
+        }
+        return true;
+    }
+
+    private void goBack() {
+        if (web.canGoBack()) {
+            web.goBack();
+        } else {
+            WebNoCookieActivity.this.finish();
+            if (!TextUtils.isEmpty(local_back_main_activity)) {
                 startActivity(new Intent(this, MainActivity.class));
             }
         }
-        return true;
     }
 
     @Override
@@ -55,6 +62,7 @@ public class WebNoCookieActivity extends BaseActivity implements View.OnClickLis
         local_URL = getIntent().getStringExtra("URL");
         local_title = getIntent().getStringExtra("TITLE");
         local_color = getIntent().getStringExtra("COLOR");
+        local_back_main_activity = getIntent().getStringExtra("BACK_MAIN_ACTIVITY");
 
         mTitle = (TextView) findViewById(R.id.web_title);
         web = (WebView) findViewById(R.id.web);
@@ -159,12 +167,7 @@ public class WebNoCookieActivity extends BaseActivity implements View.OnClickLis
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.img_back:
-                if (web.canGoBack()) {
-                    web.goBack();
-                } else {
-                    WebNoCookieActivity.this.finish();
-                    startActivity(new Intent(this, MainActivity.class));
-                }
+                goBack();
                 break;
             case R.id.img_close:
                 WebNoCookieActivity.this.finish();

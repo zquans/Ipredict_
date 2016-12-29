@@ -217,7 +217,7 @@ public class StoreOrderActivity extends BaseActivity implements View.OnClickList
                                         .show();
                             } else if (obj.getString("code").equals("2")) {
                                 //金币支付不成功,跳转现金支付
-                                ToastUtil.showMessage(StoreOrderActivity.this, "金币不足抵扣,去调支付宝或者微信");
+//                                ToastUtil.showMessage(StoreOrderActivity.this, "金币不足抵扣,去调支付宝或者微信");
                                 //现金支付请求
                                 LogUtil.i("cashrequest url = " + url + local_order_id);
                                 cashRequest(method, url + local_order_id);
@@ -255,7 +255,7 @@ public class StoreOrderActivity extends BaseActivity implements View.OnClickList
                     if (obj.getString("code").equals("0")) {
                         //**************如果是阿里支付****************
                         if (method.equals("alipay")) {
-                            ToastUtil.showMessage(StoreOrderActivity.this, "去调支付宝吧 = ");
+//                            ToastUtil.showMessage(StoreOrderActivity.this, "去调支付宝吧 = ");
                             obj = obj.getJSONObject("data");
                             local_alipay_data = obj.getString("paydata");
                             //必须异步调用支付宝
@@ -293,7 +293,7 @@ public class StoreOrderActivity extends BaseActivity implements View.OnClickList
                             req.sign = obj.getString("sign");
                             // 调起请求之前先将该app注册到微信
                             boolean b = api.sendReq(req);
-                            ToastUtil.showMessage(StoreOrderActivity.this, "去调微信支付吧 = " + b);
+//                            ToastUtil.showMessage(StoreOrderActivity.this, "去调微信支付吧 = " + b);
                         }
                     } else {
                         ToastUtil.showMessage(StoreOrderActivity.this, "调用支付宝或微信失败");

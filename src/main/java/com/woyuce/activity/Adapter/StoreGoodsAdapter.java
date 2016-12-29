@@ -64,6 +64,7 @@ public class StoreGoodsAdapter extends RecyclerView.Adapter<StoreGoodsAdapter.MV
                     intent.putExtra("URL", mDatas.get(position).getGoods_title());
                     intent.putExtra("TITLE", "淘宝商品");
                     intent.putExtra("COLOR", "#f7941d");
+                    intent.putExtra("BACK_MAIN_ACTIVITY", "yes");
                     mContext.startActivity(intent);
                 } else {
                     Intent intent = new Intent(mContext, StoreGoodsActivity.class);

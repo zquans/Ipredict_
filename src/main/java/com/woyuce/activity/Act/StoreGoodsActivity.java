@@ -8,6 +8,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
@@ -204,15 +205,19 @@ public class StoreGoodsActivity extends BaseActivity implements View.OnClickList
     }
 
     public void back(View view) {
-        StoreGoodsActivity.this.finish();
-        startActivity(new Intent(this, MainActivity.class));
+        doBack();
     }
 
     @Override
     public void onBackPressed() {
         super.onBackPressed();
+        doBack();
+    }
+
+    private void doBack() {
         StoreGoodsActivity.this.finish();
-        startActivity(new Intent(this, MainActivity.class));
+        if (TextUtils.isEmpty(getIntent().getStringExtra("can_go_store_back")))
+            startActivity(new Intent(this, MainActivity.class));
     }
 
     private boolean is_first_line = true;

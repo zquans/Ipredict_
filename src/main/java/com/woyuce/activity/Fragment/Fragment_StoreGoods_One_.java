@@ -342,7 +342,7 @@ public class Fragment_StoreGoods_One_ extends BaseFragment implements AdapterVie
         for (int i = 0; i < list.size(); i++) {
             parent.getChildAt(i).findViewById(R.id.txt_storegoods_spc).setBackgroundColor(Color.parseColor("#f0f2f5"));
         }
-        view.findViewById(R.id.txt_storegoods_spc).setBackgroundColor(Color.parseColor("#cccccc"));
+        view.findViewById(R.id.txt_storegoods_spc).setBackgroundResource(R.drawable.buttonstyle_orangestroke_address);
     }
 
     @Override

@@ -506,6 +506,7 @@ public class FreePageActivity extends BaseActivity implements View.OnClickListen
                         intent.putExtra("goods_sku_id", obj.getString("goods_sku_id"));
                         intent.putExtra("goods_title", obj.getString("goods_title"));
                         intent.putExtra("sales_price", obj.getString("sales_price"));
+                        intent.putExtra("can_go_store_back", "yes");
                         startActivity(intent);
                     }
                 } catch (JSONException e) {
