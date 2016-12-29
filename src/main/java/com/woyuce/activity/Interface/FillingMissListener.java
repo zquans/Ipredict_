@@ -1,4 +1,4 @@
-package com.woyuce.activity.View;
+package com.woyuce.activity.Interface;
 
 /**
  * Created by Administrator on 2016/12/20.

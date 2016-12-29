@@ -11,6 +11,8 @@
     <TextView
         android:id="@+id/txt_listitem_storeaddress_name"
         android:layout_width="wrap_content"
+        android:drawableLeft="@mipmap/icon_cart_name"
+        android:drawablePadding="4dp"
         android:layout_height="wrap_content"
         android:text="姓名" />
 

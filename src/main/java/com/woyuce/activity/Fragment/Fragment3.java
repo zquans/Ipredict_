@@ -16,7 +16,7 @@ import android.widget.ImageView;
 
 import com.woyuce.activity.Act.WebActivity;
 import com.woyuce.activity.R;
-import com.woyuce.activity.Utils.JsInterface;
+import com.woyuce.activity.Interface.JsInterface;
 import com.woyuce.activity.Utils.PreferenceUtil;
 
 /**

@@ -233,6 +233,10 @@
             android:name=".Act.StoreCommentActivity"
             android:launchMode="standard"
             android:screenOrientation="portrait" />
+        <activity
+            android:name=".Act.ShowImgActivity"
+            android:launchMode="standard"
+            android:screenOrientation="portrait" />
 
         <!-- 意见反馈Activity -->
         <activity

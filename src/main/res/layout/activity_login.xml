@@ -28,15 +28,6 @@
             android:gravity="center_vertical"
             android:orientation="horizontal">
 
-            <!--<FrameLayout-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="wrap_content">-->
-
-            <!--<View-->
-            <!--android:id="@+id/backview_activity_login"-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="32dp" />-->
-
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="32dp"
@@ -65,7 +56,6 @@
                     android:text="手机动态登录"
                     android:textColor="#329fe9" />
             </LinearLayout>
-            <!--</FrameLayout>-->
         </LinearLayout>
 
         <LinearLayout

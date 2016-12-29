@@ -21,8 +21,8 @@ public class CycleAdViewPageAdapter extends PagerAdapter {
 
     @Override
     public int getCount() {
-        //设置成最大，使用户看不到边界
-        return Integer.MAX_VALUE;
+        //设置成最大，使用户看不到边界,有时候会ANR
+        return viewlist.size();
     }
 
     @Override

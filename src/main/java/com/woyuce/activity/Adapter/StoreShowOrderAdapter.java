@@ -2,6 +2,7 @@ package com.woyuce.activity.Adapter;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,6 +14,7 @@ import android.widget.TextView;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.display.RoundedBitmapDisplayer;
+import com.woyuce.activity.Act.ShowImgActivity;
 import com.woyuce.activity.Bean.StoreGoods;
 import com.woyuce.activity.R;
 
@@ -23,10 +25,20 @@ import java.util.ArrayList;
  */
 public class StoreShowOrderAdapter extends BaseAdapter {
 
+    private Context mContext;
     private LayoutInflater mInflater;
     private ArrayList<StoreGoods> mList = new ArrayList<>();
 
+    DisplayImageOptions options = new DisplayImageOptions.Builder()
+            .showImageOnLoading(R.mipmap.img_error_horizon)
+            .showImageOnFail(R.mipmap.img_error_horizon)
+            .displayer(new RoundedBitmapDisplayer(10))
+            .cacheInMemory(true)
+            .cacheOnDisk(true)
+            .bitmapConfig(Bitmap.Config.RGB_565).build();
+
     public StoreShowOrderAdapter(Context context, ArrayList<StoreGoods> mShowOrderList) {
+        this.mContext = context;
         mInflater = LayoutInflater.from(context);
         this.mList = mShowOrderList;
     }
@@ -48,8 +60,8 @@ public class StoreShowOrderAdapter extends BaseAdapter {
 
     @SuppressLint("InflateParams")
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        ViewHolder viewHolder = null;
+    public View getView(final int position, View convertView, ViewGroup parent) {
+        ViewHolder viewHolder;
         if (convertView == null) {
             viewHolder = new ViewHolder();
             convertView = mInflater.inflate(R.layout.listitem_storeshoworder, null);
@@ -66,14 +78,16 @@ public class StoreShowOrderAdapter extends BaseAdapter {
         viewHolder.mTxtTime.setText(mList.get(position).getShow_at());
         viewHolder.mTxtContent.setText(mList.get(position).getComment_text());
 
-        DisplayImageOptions options = new DisplayImageOptions.Builder()
-                .showImageOnLoading(R.mipmap.img_error_horizon)
-                .showImageOnFail(R.mipmap.img_error_horizon)
-                .displayer(new RoundedBitmapDisplayer(10))
-                .cacheInMemory(true)
-                .cacheOnDisk(true)
-                .bitmapConfig(Bitmap.Config.RGB_565).build();
         ImageLoader.getInstance().displayImage(mList.get(position).getImg_url(), viewHolder.mImg, options);
+
+        viewHolder.mImg.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(mContext, ShowImgActivity.class);
+                intent.putExtra("img_url", mList.get(position).getImg_url());
+                mContext.startActivity(intent);
+            }
+        });
         return convertView;
     }
 

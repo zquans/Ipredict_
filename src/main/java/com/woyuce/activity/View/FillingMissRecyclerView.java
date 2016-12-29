@@ -6,7 +6,7 @@ import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 
-import com.woyuce.activity.Utils.LogUtil;
+import com.woyuce.activity.Interface.FillingMissListener;
 
 /**
  * Created by Administrator on 2016/12/20.
@@ -39,14 +39,14 @@ public class FillingMissRecyclerView extends RecyclerView {
         switch (action) {
             case MotionEvent.ACTION_DOWN:
                 startY = event.getY();
-                LogUtil.i("---" + startY);
+//                LogUtil.i("---" + startY);
                 break;
             case MotionEvent.ACTION_MOVE:
 
                 break;
             case MotionEvent.ACTION_UP:
                 endY = event.getY();
-                LogUtil.i(endY + " ------" + startY);
+//                LogUtil.i(endY + " ------" + startY);
                 if (mListener != null) {
                     if (endY > startY) {
                         mListener.show();

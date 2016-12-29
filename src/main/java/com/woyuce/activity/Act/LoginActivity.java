@@ -54,7 +54,6 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
     * 用于做界面手机登录*/
     private LinearLayout mLinearLayoutChooseOne, mLinearLayoutChooseTwo;
     private TextView mTxtChooseOne, mTxtChooseTwo;
-    private View mBackChooseView;
 
     private Button btninto, btnLogin, btnRegister, btnApply, btnGetCode;
     private EditText edtUsername, edtPassword, edtMobile, edtValidateCode;
@@ -102,6 +101,7 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
     public void onBackPressed() {
         super.onBackPressed();
         LogUtil.i("onBackPressed = ");
+        //修复强踢可返回Bug
         ActivityManager.getAppManager().finishAllActivity();
     }
 
@@ -123,6 +123,7 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
             requestPermission(Constants.CODE_WRITE_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE);
         }
 
+        //推送初始化
         mPushAgent = PushAgent.getInstance(this);
         mPushAgent.onAppStart();
     }
@@ -178,12 +179,7 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
         mTxtChooseTwo = (TextView) findViewById(R.id.txt_activity_login_choose_two);
         edtMobile = (EditText) findViewById(R.id.edt_mobile);
         edtValidateCode = (EditText) findViewById(R.id.edt_mobile_validate_code);
-//        mBackChooseView = findViewById(R.id.backview_activity_login);
         btnGetCode = (Button) findViewById(R.id.btn_actvity_login_get_code);
-//        //动态设置背景的宽度为总体的一半
-//        ViewGroup.LayoutParams mLayoutParams = mBackChooseView.getLayoutParams();
-//        mLayoutParams.width = mBackChooseView.getWidth() / 2;
-//        mBackChooseView.setLayoutParams(mLayoutParams);
         mTxtChooseOne.setOnClickListener(this);
         mTxtChooseTwo.setOnClickListener(this);
         btnGetCode.setOnClickListener(this);
@@ -573,12 +569,6 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
             case R.id.btn_loginAtOnce:
                 startActivity(new Intent(this, MainActivity.class));
                 PreferenceUtil.removeall(this); // 只留下了版本号
-//                PreferenceUtil.removestoretbisexist(this);
-//                SQLiteDatabase mDatabase = openOrCreateDatabase("aipu.db", Context.MODE_PRIVATE, null);
-//                mDatabase.execSQL("drop table storetb");
-//                mDatabase.close();
-//                CookieManager.getInstance().removeAllCookie();
-                // PreferenceUtil.clear(this);
                 finish();
                 break;
             case R.id.btn_apply:
@@ -592,7 +582,6 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
                 final Intent intent_loginforget = new Intent(this, LoginRegisterActivity.class);
                 intent_loginforget.putExtra("method", "forget_password");
                 doAlertDialog(intent_loginforget, "请选择找回方式", "国内请选择手机找回，国外请选择邮箱找回", "手机找回", "邮箱找回");
-//                startActivity(new Intent(this, LoginForgetActivity.class));
                 break;
             case R.id.txt_activity_login_active_email:
                 Intent intent_activity_email = new Intent(this, LoginRegisterActivity.class);
@@ -632,8 +621,6 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
                 mTxtChooseTwo.setTextColor(Color.parseColor("#ffffff"));
                 mTxtChooseOne.setBackgroundColor(Color.parseColor("#00000000"));
                 mTxtChooseTwo.setBackgroundColor(Color.parseColor("#329fe9"));
-//                ObjectAnimator mAnimator = ObjectAnimator.ofFloat(mBackChooseView, "translationX", 0, mBackChooseView.getWidth());
-//                mAnimator.setDuration(1000).start();
                 break;
             case R.id.btn_actvity_login_get_code:
                 ToastUtil.showMessage(this, "获取验证码");

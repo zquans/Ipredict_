@@ -1,4 +1,4 @@
-package com.woyuce.activity.Utils;
+package com.woyuce.activity.Interface;
 
 import android.content.Context;
 import android.content.Intent;
@@ -7,6 +7,9 @@ import android.net.Uri;
 import android.os.Handler;
 import android.os.Looper;
 import android.webkit.JavascriptInterface;
+
+import com.woyuce.activity.Utils.LogUtil;
+import com.woyuce.activity.Utils.ToastUtil;
 
 /**
  * Created by Administrator on 2016/12/22.
