@@ -7,12 +7,12 @@
 
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="@dimen/title_bar_height">
 
         <TextView
             android:id="@+id/txt_page_title"
             android:layout_width="match_parent"
-            android:layout_height="48dp"
+            android:layout_height="@dimen/title_bar_height"
             android:background="#f25f11"
             android:gravity="center"
             android:textColor="#ffffff"

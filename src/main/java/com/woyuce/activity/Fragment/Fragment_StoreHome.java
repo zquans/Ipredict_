@@ -154,6 +154,7 @@ public class Fragment_StoreHome extends Fragment implements View.OnClickListener
         //自定义可隐藏广告的轮播的RecyclerView
         mRecycler = (FillingMissRecyclerView) view.findViewById(R.id.recycler_fragment_store_tab1);
         mRecycler.setMissListener(this);
+        mRecycler.setHasFixedSize(true);
 
         //广告轮播
         mViewPager = (ViewPager) view.findViewById(R.id.viewpager_fragment_store_home);

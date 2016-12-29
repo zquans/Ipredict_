@@ -67,6 +67,7 @@ public class StoreOrderListActivity extends BaseActivity {
     private void initView() {
         local_user_id = PreferenceUtil.getSharePre(this).getString("userId", "");
         mRecyclerView = (RecyclerView) findViewById(R.id.recycler_activity_store_orderlist);
+        mRecyclerView.setHasFixedSize(true);
         mRefreshLayout = (RecyclerRefreshLayout) findViewById(R.id.refresh_layout_activity_storeorderlist);
         mRefreshLayout.setOnRefreshListener(new RecyclerRefreshLayout.OnRefreshListener() {
             @Override

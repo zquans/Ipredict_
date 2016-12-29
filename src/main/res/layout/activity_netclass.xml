@@ -14,13 +14,13 @@
         <ImageView
             android:id="@+id/arrow_back"
             android:layout_width="40.0dp"
-            android:layout_height="40.0dp"
+            android:layout_height="@dimen/title_bar_height"
             android:scaleType="center"
             android:src="@mipmap/arrow_white_back" />
 
         <TextView
             android:layout_width="match_parent"
-            android:layout_height="40.0dp"
+            android:layout_height="@dimen/title_bar_height"
             android:gravity="center"
             android:text="网络班专属"
             android:textColor="#ffffff"

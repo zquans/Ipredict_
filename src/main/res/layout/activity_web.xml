@@ -7,7 +7,7 @@
     <LinearLayout
         android:id="@+id/linearlayout_webview_title"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="@dimen/title_bar_height"
         android:background="#e7604a"
         android:orientation="horizontal">
 
@@ -18,7 +18,7 @@
             <TextView
                 android:id="@+id/web_title"
                 android:layout_width="match_parent"
-                android:layout_height="40dp"
+                android:layout_height="match_parent"
                 android:gravity="center"
                 android:text="网络班录播报名"
                 android:textColor="#ffffff"

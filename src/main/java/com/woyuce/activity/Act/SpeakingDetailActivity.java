@@ -18,7 +18,6 @@ public class SpeakingDetailActivity extends BaseActivity implements View.OnClick
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        localspeaking = (SpeakingBean) getIntent().getSerializableExtra("localspeaking");
         setContentView(R.layout.activity_speakingdetail);
 
         initView();
@@ -26,6 +25,8 @@ public class SpeakingDetailActivity extends BaseActivity implements View.OnClick
     }
 
     private void initView() {
+        localspeaking = (SpeakingBean) getIntent().getSerializableExtra("localspeaking");
+        
         txtBack = (TextView) findViewById(R.id.txt_speakingdetail_back);
         txtName = (TextView) findViewById(R.id.txt_speakingdetail_username);
         txtTime = (TextView) findViewById(R.id.txt_speakingdetail_examtime);

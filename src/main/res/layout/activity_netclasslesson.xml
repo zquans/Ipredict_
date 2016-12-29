@@ -3,31 +3,31 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#ffffff"
-    android:orientation="vertical" >
+    android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="#ffffff"
-        android:orientation="vertical" >
+        android:orientation="vertical">
 
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="#e7604a"
-            android:gravity="center_vertical" >
+            android:gravity="center_vertical">
 
             <ImageView
                 android:id="@+id/arrow_back"
                 android:layout_width="40.0dp"
-                android:layout_height="40.0dp"
+                android:layout_height="@dimen/title_bar_height"
                 android:scaleType="center"
                 android:src="@mipmap/arrow_white_back" />
 
             <TextView
                 android:id="@+id/title_activity_wangluobanlesson"
                 android:layout_width="match_parent"
-                android:layout_height="40.0dp"
+                android:layout_height="@dimen/title_bar_height"
                 android:gravity="center"
                 android:text="考前突击小范围"
                 android:textColor="#ffffff"
@@ -37,7 +37,7 @@
             <Button
                 android:id="@+id/btn_wangluobanlesson_clearcache"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="@dimen/title_bar_height"
                 android:layout_gravity="center_vertical|right"
                 android:layout_marginRight="2dp"
                 android:background="@drawable/buttonstyle"
@@ -52,8 +52,7 @@
             android:layout_marginTop="32dp"
             android:gravity="center"
             android:numColumns="2"
-            android:verticalSpacing="48dp" >
-        </GridView>
+            android:verticalSpacing="48dp"></GridView>
     </LinearLayout>
 
     <ImageView

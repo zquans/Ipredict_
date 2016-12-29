@@ -8,7 +8,7 @@
     <TextView
         android:id="@+id/txt_speakingdetail_back"
         android:layout_width="match_parent"
-        android:layout_height="40dp"
+        android:layout_height="@dimen/title_bar_height"
         android:background="#2299cc"
         android:drawableLeft="@mipmap/arrow_white_back"
         android:gravity="center"

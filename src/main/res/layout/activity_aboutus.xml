@@ -8,7 +8,7 @@
     <Button
         android:id="@+id/txt_aboutus_back"
         android:layout_width="match_parent"
-        android:layout_height="44dp"
+        android:layout_height="@dimen/title_bar_height"
         android:background="#f7941d"
         android:drawableLeft="@mipmap/arrow_white_back"
         android:gravity="center"

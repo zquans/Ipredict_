@@ -54,7 +54,6 @@ public class FreeRangeActivity extends BaseActivity implements OnItemClickListen
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_freerange);
 
         initView();
