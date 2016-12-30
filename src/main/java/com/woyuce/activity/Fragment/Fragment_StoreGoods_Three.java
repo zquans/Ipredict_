@@ -56,6 +56,7 @@ public class Fragment_StoreGoods_Three extends BaseFragment implements View.OnCl
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_storegoods_three, null);
         initView(view);
+        requestData();
         LogUtil.i("three = onCreateView ");
         return view;
     }
@@ -64,7 +65,6 @@ public class Fragment_StoreGoods_Three extends BaseFragment implements View.OnCl
     public void onStart() {
         super.onStart();
         //数据请求
-        requestData();
         LogUtil.i("three = onCreateView ");
     }
 

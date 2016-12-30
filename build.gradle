@@ -8,8 +8,8 @@ android {
         applicationId "com.woyuce.activity"
         minSdkVersion 15
         targetSdkVersion 24
-        versionCode 27
-        versionName "2.7"
+        versionCode 30
+        versionName "3.0"
         manifestPlaceholders = [
                 umeng_channel: "update"
         ]

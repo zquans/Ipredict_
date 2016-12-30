@@ -13,8 +13,9 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_centerVertical="true"
-            android:layout_marginLeft="8dp"
             android:background="#0000"
+            android:gravity="bottom|center_horizontal"
+            android:paddingBottom="8dp"
             android:text="客服"
             android:textColor="#fff" />
 
@@ -32,8 +33,9 @@
             android:layout_height="match_parent"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
-            android:layout_marginRight="8dp"
             android:background="#0000"
+            android:gravity="bottom|center_horizontal"
+            android:paddingBottom="8dp"
             android:text="购物车"
             android:textColor="#fff" />
 

@@ -1,6 +1,6 @@
 <resources>
     <!--所有TitleBar的高度-->
-    <dimen name="title_bar_height">60dp</dimen>
+    <dimen name="title_bar_height">48dp</dimen>
 
     <dimen name="padding_2">2.0dip</dimen>
     <dimen name="padding_3">3.0dip</dimen>

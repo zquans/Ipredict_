@@ -60,6 +60,7 @@ public class StoreOrderGoodsAdapter extends RecyclerView.Adapter<StoreOrderGoods
                 intent.putExtra("goods_sku_id", mList.get(position).getGoods_sku_id());
                 intent.putExtra("goods_title", mList.get(position).getGoods_title());
                 intent.putExtra("sales_price", mList.get(position).getSales_price());
+                intent.putExtra("can_go_store_back", "yes");
                 mContext.startActivity(intent);
             }
         });
