@@ -64,6 +64,7 @@ public class StoreOrderListAdapter extends RecyclerView.Adapter<StoreOrderListAd
             });
         }
         holder.mRecycler.setLayoutManager(new LinearLayoutManager(context));
+        holder.mRecycler.setHasFixedSize(true);
         RecyclerView.Adapter mAdapter = new StoreOrderGoodsAdapter(context, mList.get(pos).getUser_order_details(), isPay);
         holder.mRecycler.setAdapter(mAdapter);
     }

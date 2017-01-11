@@ -3,9 +3,14 @@ package com.woyuce.activity.Act;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.Gravity;
 import android.view.View;
+import android.widget.TextView;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
@@ -41,10 +46,38 @@ public class StoreOrderListActivity extends BaseActivity implements XRecyclerVie
     private String URL = "http://api.iyuce.com/v1/store/orderlist?pageSize=10&userid=";
     private String URL_Del = "http://api.iyuce.com/v1/store/orderdelete?userid=";
 
+    private static final int GET_DATA_OK = 0;
+    private static final int UPDATE_DATA_OK = 1;
+    private int local_page_number = 1;
+
+    private Handler mHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            if (msg.what == GET_DATA_OK) {
+                if (mList.size() == 0) {
+                    TextView textView = new TextView(StoreOrderListActivity.this);
+                    textView.setText("您没有购买过商品哦!");
+                    textView.setGravity(Gravity.CENTER);
+                    mRecyclerView.setEmptyView(textView);
+                    return;
+                }
+                mAdapter = new StoreOrderListAdapter(StoreOrderListActivity.this, mList);
+                mRecyclerView.setLayoutManager(new LinearLayoutManager(StoreOrderListActivity.this));
+                mRecyclerView.setAdapter(mAdapter);
+                doRecyclerItemClick();
+            }
+            if (msg.what == UPDATE_DATA_OK) {
+                mAdapter.notifyDataSetChanged();
+            }
+        }
+    };
+
     @Override
     protected void onStop() {
         super.onStop();
         AppContext.getHttpQueue().cancelAll("StoreOrderList");
+        local_page_number = 1;
     }
 
     @Override
@@ -55,22 +88,13 @@ public class StoreOrderListActivity extends BaseActivity implements XRecyclerVie
         initView();
     }
 
-    @Override
-    protected void onRestart() {
-        super.onRestart();
-        mList.clear();
-        requestData();
-    }
-
-    //改为RecyclerView
     private void initView() {
         local_user_id = PreferenceUtil.getSharePre(this).getString("userId", "");
         mRecyclerView = (XRecyclerView) findViewById(R.id.recycler_activity_store_orderlist);
+        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mRecyclerView.setHasFixedSize(true);
-        mRecyclerView.setPullRefreshEnabled(false);
-        mRecyclerView.setLoadingMoreEnabled(false);
         mRecyclerView.setLoadingListener(this);
-        requestData();
+        requestData(GET_DATA_OK, URL + local_user_id);
     }
 
     public void back(View view) {
@@ -80,10 +104,8 @@ public class StoreOrderListActivity extends BaseActivity implements XRecyclerVie
     /**
      * 请求数据列表
      */
-    private void requestData() {
-        progressdialogshow(StoreOrderListActivity.this);
-        StringRequest orderListRequest = new StringRequest(Request.Method.GET,
-                URL + local_user_id, new Response.Listener<String>() {
+    private void requestData(final int code, String url) {
+        StringRequest orderListRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String s) {
                 LogUtil.i("s = " + s);
@@ -129,21 +151,26 @@ public class StoreOrderListActivity extends BaseActivity implements XRecyclerVie
                         }
 
                         LogUtil.i("mList = " + mList);
-                        mAdapter = new StoreOrderListAdapter(StoreOrderListActivity.this, mList);
-                        mRecyclerView.setLayoutManager(new LinearLayoutManager(StoreOrderListActivity.this));
-                        mRecyclerView.setAdapter(mAdapter);
-                        doRecyclerItemClick();
+                        Message msg = new Message();
+                        //第一次获取数据，或者下拉刷新数据
+                        if (code == GET_DATA_OK) {
+                            msg.what = GET_DATA_OK;
+                        }
+                        //分页加载更多数据
+                        if (code == UPDATE_DATA_OK) {
+                            msg.what = UPDATE_DATA_OK;
+                        }
+                        msg.obj = mList;
+                        mHandler.sendMessage(msg);
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                progressdialogcancel();
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError volleyError) {
                 LogUtil.e("volleyError = " + volleyError.getMessage());
-                progressdialogcancel();
             }
         });
         orderListRequest.setTag("StoreOrderList");
@@ -165,7 +192,8 @@ public class StoreOrderListActivity extends BaseActivity implements XRecyclerVie
                     obj = new JSONObject(s);
                     if (obj.getString("code").equals("0")) {
                         mList.remove(position);
-                        mAdapter.notifyDataSetChanged();
+                        mAdapter.notifyItemRemoved(position);
+//                        mAdapter.notifyDataSetChanged();
                         ToastUtil.showMessage(StoreOrderListActivity.this, "订单删除成功");
                     } else {
                         ToastUtil.showMessage(StoreOrderListActivity.this, "订单删除失败");
@@ -205,7 +233,7 @@ public class StoreOrderListActivity extends BaseActivity implements XRecyclerVie
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
                                         //删除某项订单
-                                        delRequest(position, URL_Del + local_user_id + "&id=" + mList.get(position).getId());
+                                        delRequest(position, URL_Del + local_user_id + "&id=" + mList.get(position - 1).getId());
                                     }
                                 }).setNegativeButton("取消", null).show();
                     }
@@ -214,9 +242,20 @@ public class StoreOrderListActivity extends BaseActivity implements XRecyclerVie
 
     @Override
     public void onRefresh() {
+        LogUtil.i("onRefresh = ");
+        mList.clear();
+        requestData(UPDATE_DATA_OK, URL + local_user_id);
+        mAdapter.notifyDataSetChanged();
+        mRecyclerView.refreshComplete();
+        local_page_number = 1;
     }
 
     @Override
     public void onLoadMore() {
+        LogUtil.i("onLoadMore = ");
+        local_page_number++;
+        String url = URL + local_user_id + "&pageNum=" + local_page_number;
+        requestData(UPDATE_DATA_OK, url);
+        mRecyclerView.loadMoreComplete();
     }
 }
