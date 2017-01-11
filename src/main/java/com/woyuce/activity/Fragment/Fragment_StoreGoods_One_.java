@@ -8,22 +8,23 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
-import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.ViewFlipper;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
-import com.nostra13.universalimageloader.core.ImageLoader;
 import com.woyuce.activity.Adapter.StoreSpcAdapter_;
 import com.woyuce.activity.Application.AppContext;
 import com.woyuce.activity.Bean.StoreGoods;
 import com.woyuce.activity.R;
+import com.woyuce.activity.Utils.GlideImageLoader;
 import com.woyuce.activity.Utils.LogUtil;
 import com.woyuce.activity.Utils.ToastUtil;
+import com.youth.banner.Banner;
+import com.youth.banner.BannerConfig;
+import com.youth.banner.Transformer;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -36,8 +37,7 @@ import java.util.ArrayList;
  */
 public class Fragment_StoreGoods_One_ extends BaseFragment implements AdapterView.OnItemClickListener {
 
-    private ViewFlipper mFlipper;
-
+    private Banner mBanner;
     private TextView mTxtGoodsTitle, mTxtGoodsPrice, mTxtTotalSale, mTxtGoodComment, mTxtShowOrder, mTxtPresentPoint;
     private TextView mTxtSpcOne, mTxtSpcTwo, mTxtSpcThree;
 
@@ -45,22 +45,18 @@ public class Fragment_StoreGoods_One_ extends BaseFragment implements AdapterVie
     private String return_local_goodsid, return_local_goods_sku_id, return_local_specname, return_local_price;
 
     public String returenGoodsId() {
-//        LogUtil.i("return_local_goodsid = " + return_local_goodsid);
         return return_local_goodsid;
     }
 
     public String returenGoodsSkuId() {
-//        LogUtil.i("return_local_goods_sku_id = " + return_local_goods_sku_id);
         return return_local_goods_sku_id;
     }
 
     public String returenGoodsSpecName() {
-//        LogUtil.i("return_local_name = " + return_local_specname);
         return return_local_specname;
     }
 
     public String returenGoodsPrice() {
-//        LogUtil.i("return_local_price = " + return_local_price);
         return return_local_price;
     }
 
@@ -69,6 +65,13 @@ public class Fragment_StoreGoods_One_ extends BaseFragment implements AdapterVie
         super.onStop();
         LogUtil.i("one = onStop ");
         AppContext.getHttpQueue().cancelAll("goodsSpeRequest");
+        mBanner.stopAutoPlay();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        mBanner.startAutoPlay();
     }
 
     @Override
@@ -90,8 +93,7 @@ public class Fragment_StoreGoods_One_ extends BaseFragment implements AdapterVie
         local_skuid = getArguments().getString("goods_sku_id");
         URL = "http://api.iyuce.com/v1/store/goodsdetail?goodsid=" + local_goodsid;
 
-        mFlipper = (ViewFlipper) view.findViewById(R.id.viewflip_activity_storegoods);
-
+        mBanner = (Banner) view.findViewById(R.id.banner_fragment_store_goods);
         mTxtGoodsTitle = (TextView) view.findViewById(R.id.txt_activity_storegoods_goodstitle);
         mTxtGoodsPrice = (TextView) view.findViewById(R.id.txt_activity_storegoods_goodsprice);
         mTxtTotalSale = (TextView) view.findViewById(R.id.txt_storegoods_fragmentone_salenum);
@@ -124,7 +126,7 @@ public class Fragment_StoreGoods_One_ extends BaseFragment implements AdapterVie
                 .bitmapConfig(Bitmap.Config.RGB_565).build();
 
         //将获取到的数据设置到View上
-        ArrayList<String> mList = getArguments().getStringArrayList("mList");
+        ArrayList<String> mImgList = getArguments().getStringArrayList("mList");
         mTxtGoodsTitle.setText(getArguments().getString("goods_title"));
         mTxtGoodsPrice.setText(getArguments().getString("sales_price"));
         mTxtTotalSale.setText("销量" + getArguments().getString("total_sales_volume"));
@@ -132,18 +134,15 @@ public class Fragment_StoreGoods_One_ extends BaseFragment implements AdapterVie
         mTxtShowOrder.setText("晒单" + getArguments().getString("total_show_order_volume"));
 
         //查看是否有轮播图
-        if (mList.size() == 0) {
-            mFlipper.setVisibility(View.GONE);
+        if (mImgList.size() == 0) {
+            mBanner.setVisibility(View.GONE);
         } else {
-            for (int i = 0; i < mList.size(); i++) {
-                ImageView img = new ImageView(getActivity());
-                img.setScaleType(ImageView.ScaleType.CENTER_CROP);
-                ImageLoader.getInstance().displayImage(mList.get(i), img, options);
-                mFlipper.addView(img);
-            }
-            mFlipper.setInAnimation(getActivity(), R.anim.left_in);
-            mFlipper.setOutAnimation(getActivity(), R.anim.left_out);
-            mFlipper.startFlipping();
+            mBanner.setImageLoader(new GlideImageLoader());
+            mBanner.setImages(mImgList);
+            mBanner.setIndicatorGravity(BannerConfig.RIGHT);
+            mBanner.setBannerStyle(BannerConfig.NUM_INDICATOR);
+            mBanner.setBannerAnimation(Transformer.ZoomOutSlide);
+            mBanner.start();
         }
     }
 

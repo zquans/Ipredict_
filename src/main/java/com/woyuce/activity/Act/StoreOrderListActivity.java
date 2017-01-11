@@ -11,7 +11,7 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
-import com.dinuscxj.refresh.RecyclerRefreshLayout;
+import com.jcodecraeer.xrecyclerview.XRecyclerView;
 import com.woyuce.activity.Adapter.StoreOrderListAdapter;
 import com.woyuce.activity.Application.AppContext;
 import com.woyuce.activity.Bean.StoreGoods;
@@ -31,10 +31,9 @@ import java.util.ArrayList;
 /**
  * Created by Administrator on 2016/11/25.
  */
-public class StoreOrderListActivity extends BaseActivity {
+public class StoreOrderListActivity extends BaseActivity implements XRecyclerView.LoadingListener {
 
-    private RecyclerRefreshLayout mRefreshLayout;
-    private RecyclerView mRecyclerView;
+    private XRecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
     private ArrayList<StoreOrder> mList = new ArrayList<>();
 
@@ -66,15 +65,11 @@ public class StoreOrderListActivity extends BaseActivity {
     //改为RecyclerView
     private void initView() {
         local_user_id = PreferenceUtil.getSharePre(this).getString("userId", "");
-        mRecyclerView = (RecyclerView) findViewById(R.id.recycler_activity_store_orderlist);
+        mRecyclerView = (XRecyclerView) findViewById(R.id.recycler_activity_store_orderlist);
         mRecyclerView.setHasFixedSize(true);
-        mRefreshLayout = (RecyclerRefreshLayout) findViewById(R.id.refresh_layout_activity_storeorderlist);
-        mRefreshLayout.setOnRefreshListener(new RecyclerRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                mRefreshLayout.setRefreshing(false);
-            }
-        });
+        mRecyclerView.setPullRefreshEnabled(false);
+        mRecyclerView.setLoadingMoreEnabled(false);
+        mRecyclerView.setLoadingListener(this);
         requestData();
     }
 
@@ -215,5 +210,13 @@ public class StoreOrderListActivity extends BaseActivity {
                                 }).setNegativeButton("取消", null).show();
                     }
                 }));
+    }
+
+    @Override
+    public void onRefresh() {
+    }
+
+    @Override
+    public void onLoadMore() {
     }
 }

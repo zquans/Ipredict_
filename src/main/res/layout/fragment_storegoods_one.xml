@@ -12,8 +12,13 @@
         android:layout_height="4dp"
         android:background="#f0f2f5" />
 
-    <ViewFlipper
-        android:id="@+id/viewflip_activity_storegoods"
+    <!--<ViewFlipper-->
+    <!--android:id="@+id/viewflip_activity_storegoods"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="144dp" />-->
+
+    <com.youth.banner.Banner
+        android:id="@+id/banner_fragment_store_goods"
         android:layout_width="match_parent"
         android:layout_height="144dp" />
 
