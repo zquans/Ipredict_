@@ -64,14 +64,6 @@
       <sourceFolder url="file://$MODULE_DIR$/src/Tecent/jni" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/Tecent/rs" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/Tecent/shaders" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/testTecent/res" type="java-test-resource" />
-      <sourceFolder url="file://$MODULE_DIR$/src/testTecent/resources" type="java-test-resource" />
-      <sourceFolder url="file://$MODULE_DIR$/src/testTecent/assets" type="java-test-resource" />
-      <sourceFolder url="file://$MODULE_DIR$/src/testTecent/aidl" isTestSource="true" />
-      <sourceFolder url="file://$MODULE_DIR$/src/testTecent/java" isTestSource="true" />
-      <sourceFolder url="file://$MODULE_DIR$/src/testTecent/jni" isTestSource="true" />
-      <sourceFolder url="file://$MODULE_DIR$/src/testTecent/rs" isTestSource="true" />
-      <sourceFolder url="file://$MODULE_DIR$/src/testTecent/shaders" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/src/androidTestTecent/res" type="java-test-resource" />
       <sourceFolder url="file://$MODULE_DIR$/src/androidTestTecent/resources" type="java-test-resource" />
       <sourceFolder url="file://$MODULE_DIR$/src/androidTestTecent/assets" type="java-test-resource" />
@@ -80,6 +72,14 @@
       <sourceFolder url="file://$MODULE_DIR$/src/androidTestTecent/jni" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/src/androidTestTecent/rs" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/src/androidTestTecent/shaders" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/src/testTecent/res" type="java-test-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/src/testTecent/resources" type="java-test-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/src/testTecent/assets" type="java-test-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/src/testTecent/aidl" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/src/testTecent/java" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/src/testTecent/jni" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/src/testTecent/rs" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/src/testTecent/shaders" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/src/debug/res" type="java-resource" />
       <sourceFolder url="file://$MODULE_DIR$/src/debug/resources" type="java-resource" />
       <sourceFolder url="file://$MODULE_DIR$/src/debug/assets" type="java-resource" />
@@ -128,7 +128,7 @@
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/dependency-cache" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.android.support/design/24.2.0/jars" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.android.support/recyclerview-v7/24.2.0/jars" />
-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.dinuscxj/recyclerrefreshlayout/2.0.3/jars" />
+      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.jcodecraeer/xrecyclerview/1.3.2/jars" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.youth.banner/banner/1.4.8/jars" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/incremental" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/incremental-classes" />
@@ -153,11 +153,11 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" exported="" name="support-compat-24.2.0" level="project" />
     <orderEntry type="library" exported="" name="support-v4-24.2.0" level="project" />
+    <orderEntry type="library" exported="" name="xrecyclerview-1.3.2" level="project" />
     <orderEntry type="library" exported="" name="ShareSDK-Wechat-2.7.7" level="project" />
     <orderEntry type="library" exported="" name="volley" level="project" />
     <orderEntry type="library" exported="" name="uk-co-senab-photoview-source" level="project" />
     <orderEntry type="library" exported="" name="libammsdk" level="project" />
-    <orderEntry type="library" exported="" name="recyclerrefreshlayout-2.0.3" level="project" />
     <orderEntry type="library" exported="" name="support-fragment-24.2.0" level="project" />
     <orderEntry type="library" exported="" name="animated-vector-drawable-24.2.0" level="project" />
     <orderEntry type="library" exported="" name="design-24.2.0" level="project" />

@@ -41,14 +41,17 @@
 
     </RelativeLayout>
 
-    <com.youth.banner.Banner
-        android:id="@+id/banner_fragment_store_home"
-        android:layout_width="match_parent"
-        android:layout_height="160dp" />
+    <!--<com.youth.banner.Banner-->
+    <!--android:id="@+id/banner_fragment_store_home"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="160dp" />-->
 
-    <com.woyuce.activity.View.FillingMissRecyclerView
+    <com.jcodecraeer.xrecyclerview.XRecyclerView
         android:id="@+id/recycler_fragment_store_tab1"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:scrollbarFadeDuration="1"
+        android:scrollbarSize="4dp"
+        android:scrollbars="vertical" />
 
 </LinearLayout>

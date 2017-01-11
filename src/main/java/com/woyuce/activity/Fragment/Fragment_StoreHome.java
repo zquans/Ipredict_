@@ -17,6 +17,7 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
+import com.jcodecraeer.xrecyclerview.XRecyclerView;
 import com.woyuce.activity.Act.CustomServiceActivity;
 import com.woyuce.activity.Act.StoreCarActivity;
 import com.woyuce.activity.Act.StoreGoodsActivity;
@@ -30,7 +31,6 @@ import com.woyuce.activity.Utils.GlideImageLoader;
 import com.woyuce.activity.Utils.LogUtil;
 import com.woyuce.activity.Utils.PreferenceUtil;
 import com.woyuce.activity.Utils.ToastUtil;
-import com.woyuce.activity.View.FillingMissRecyclerView;
 import com.youth.banner.Banner;
 import com.youth.banner.BannerConfig;
 import com.youth.banner.Transformer;
@@ -48,7 +48,7 @@ public class Fragment_StoreHome extends Fragment implements View.OnClickListener
     private Button mBtnToCustom, mBtnToStoreCar;
     private Banner mBanner;
 
-    private FillingMissRecyclerView mRecycler;
+    private XRecyclerView mRecycler;
     private RecyclerView.Adapter mAdapter;
     private List<StoreBean> mImgData = new ArrayList<>();
     private List<StoreBean> mList = new ArrayList<>();
@@ -129,19 +129,30 @@ public class Fragment_StoreHome extends Fragment implements View.OnClickListener
         //给Item中的Image宽高用
         screen_width = getActivity().getWindowManager().getDefaultDisplay().getWidth();
 
-        mBanner = (Banner) view.findViewById(R.id.banner_fragment_store_home);
         mBtnToCustom = (Button) view.findViewById(R.id.imgbtn_store_toCustom);
         mBtnToStoreCar = (Button) view.findViewById(R.id.imgbtn_store_toStoreCar);
         mBtnToCustom.setOnClickListener(this);
         mBtnToStoreCar.setOnClickListener(this);
 
-        //自定义可隐藏广告的轮播的RecyclerView
-        mRecycler = (FillingMissRecyclerView) view.findViewById(R.id.recycler_fragment_store_tab1);
-        mRecycler.setMissListener(this);
-        mRecycler.setHasFixedSize(true);
+        mRecycler = (XRecyclerView) view.findViewById(R.id.recycler_fragment_store_tab1);
+        setHeadBanner(view);
 
         //请求所有商城数据
         requestData();
+    }
+
+    /**
+     * xrecyclerView设置Banner嵌套
+     *
+     * @param view
+     */
+    private void setHeadBanner(View view) {
+        View header = LayoutInflater.from(getActivity()).inflate(R.layout.header_view, (ViewGroup) view.findViewById(android.R.id.content), false);
+        mRecycler.addHeaderView(header);
+        mBanner = (Banner) header.findViewById(R.id.banner_fragment_store_home);
+        mRecycler.setHasFixedSize(true);
+        mRecycler.setPullRefreshEnabled(false);
+        mRecycler.setLoadingMoreEnabled(false);
     }
 
     private void requestData() {
