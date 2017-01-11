@@ -29,14 +29,18 @@ public class JsInterface {
         new Handler(Looper.getMainLooper()).post(new Runnable() {
             @Override
             public void run() {
-//                    String url = "weixin://";  //微信
-//                    String url = "mqqwpa://im/chat?chat_type=wpa&uin=3217852966";   //QQ
-                // 主线程更新UI
+//                String url = "alipays://";  //支付宝
+//                String url = "weixin://";   //微信
+//                String url = "mqqwpa://";   //腾讯QQ
+
+                //主线程更新UI
                 LogUtil.i("JS 调用了 JAVA --->" + url);
                 //判断微信
                 ToDoOrNotToDoJs(url, "weixin", "com.tencent.mm", "微信");
                 //判断QQ
                 ToDoOrNotToDoJs(url, "mqqwpa", "com.tencent.mobileqq", "QQ");
+//                判断支付宝
+//                ToDoOrNotToDoJs(url, "alipays", "com.eg.android.AlipayGphone", "支付宝");
             }
         });
     }

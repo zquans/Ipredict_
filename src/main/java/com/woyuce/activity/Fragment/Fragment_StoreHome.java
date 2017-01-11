@@ -1,12 +1,10 @@
 package com.woyuce.activity.Fragment;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.Fragment;
-import android.support.v4.view.ViewPager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
@@ -14,14 +12,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ImageView;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
-import com.nostra13.universalimageloader.core.DisplayImageOptions;
-import com.nostra13.universalimageloader.core.ImageLoader;
 import com.woyuce.activity.Act.CustomServiceActivity;
 import com.woyuce.activity.Act.StoreCarActivity;
 import com.woyuce.activity.Act.StoreGoodsActivity;
@@ -31,11 +26,15 @@ import com.woyuce.activity.Bean.StoreBean;
 import com.woyuce.activity.Bean.StoreGoods;
 import com.woyuce.activity.Interface.FillingMissListener;
 import com.woyuce.activity.R;
+import com.woyuce.activity.Utils.GlideImageLoader;
 import com.woyuce.activity.Utils.LogUtil;
 import com.woyuce.activity.Utils.PreferenceUtil;
 import com.woyuce.activity.Utils.ToastUtil;
-import com.woyuce.activity.View.CycleAdViewPageAdapter;
 import com.woyuce.activity.View.FillingMissRecyclerView;
+import com.youth.banner.Banner;
+import com.youth.banner.BannerConfig;
+import com.youth.banner.Transformer;
+import com.youth.banner.listener.OnBannerClickListener;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -47,7 +46,7 @@ import java.util.List;
 public class Fragment_StoreHome extends Fragment implements View.OnClickListener, FillingMissListener {
 
     private Button mBtnToCustom, mBtnToStoreCar;
-    private ViewPager mViewPager;
+    private Banner mBanner;
 
     private FillingMissRecyclerView mRecycler;
     private RecyclerView.Adapter mAdapter;
@@ -59,15 +58,10 @@ public class Fragment_StoreHome extends Fragment implements View.OnClickListener
     private static final int FLAG_VIEWFLIPPER = 1;
     private static final int FLAG_RECYCLERVIEW = 2;
 
+    //轮播图
+    private ArrayList<String> mImgList = new ArrayList<>();
     //子Item中测量宽高需要
     private int screen_width;
-
-    DisplayImageOptions options = new DisplayImageOptions.Builder().showImageOnLoading(R.mipmap.img_error_horizon)
-            .showImageOnFail(R.mipmap.img_error_horizon).cacheInMemory(true).cacheOnDisk(true)
-            .bitmapConfig(Bitmap.Config.RGB_565).build();
-
-    //创建一个Handler去处理倒计时事件
-    private Handler mAdTimeHandler = new Handler();
 
     private Handler mHandler = new Handler() {
         @Override
@@ -76,34 +70,30 @@ public class Fragment_StoreHome extends Fragment implements View.OnClickListener
             switch (msg.what) {
                 //广告轮播
                 case FLAG_VIEWFLIPPER:
-                    ArrayList<ImageView> views = new ArrayList<>();
                     for (int i = 0; i < mImgData.size(); i++) {
-                        ImageView mImg = new ImageView(getActivity());
-                        mImg.setScaleType(ImageView.ScaleType.CENTER_CROP);
-                        ImageLoader.getInstance().displayImage(mImgData.get(i).getIcon_mobile_url(), mImg, options);
-                        final int finalI = i;
-                        //图片对应的商品内容，做点击可进入
-                        mImg.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                LogUtil.i("mImgData.get(finalI).getGoods_id() = " + mImgData.get(finalI).getGoods_id());
-                                if (!TextUtils.isEmpty(mImgData.get(finalI).getGoods_id())) {
-                                    Intent intent = new Intent(getActivity(), StoreGoodsActivity.class);
-                                    intent.putExtra("goods_id", mImgData.get(finalI).getGoods_id());
-                                    intent.putExtra("goods_sku_id", mImgData.get(finalI).getGoods_sku_id());
-                                    intent.putExtra("goods_title", mImgData.get(finalI).getGoods_title());
-                                    intent.putExtra("sales_price", mImgData.get(finalI).getSales_price());
-                                    getActivity().startActivity(intent);
-                                }
-                            }
-                        });
-                        views.add(mImg);
+                        mImgList.add(mImgData.get(i).getIcon_mobile_url());
                     }
-                    LogUtil.i("views = " + views.size());
-                    mViewPager.setAdapter(new CycleAdViewPageAdapter(views));
-                    //广告轮播
-                    toActAd(mImgData.size());
-                    LogUtil.i("mData = " + mImgData.toString());
+                    mBanner.setImageLoader(new GlideImageLoader());
+                    mBanner.setImages(mImgList);
+                    mBanner.setIndicatorGravity(BannerConfig.RIGHT);
+                    mBanner.setBannerStyle(BannerConfig.NUM_INDICATOR);
+                    mBanner.setBannerAnimation(Transformer.ZoomOutSlide);
+                    mBanner.setOnBannerClickListener(new OnBannerClickListener() {
+                        @Override
+                        public void OnBannerClick(int position) {
+                            if (!TextUtils.isEmpty(mImgData.get(position - 1).getGoods_id())) {
+                                Intent intent = new Intent(getActivity(), StoreGoodsActivity.class);
+                                intent.putExtra("goods_id", mImgData.get(position - 1).getGoods_id());
+                                intent.putExtra("goods_sku_id", mImgData.get(position - 1).getGoods_sku_id());
+                                intent.putExtra("goods_title", mImgData.get(position - 1).getGoods_title());
+                                intent.putExtra("sales_price", mImgData.get(position - 1).getSales_price());
+                                getActivity().startActivity(intent);
+                            }
+                        }
+                    });
+                    //可以留着设置标题栏
+//                    mBanner.setBannerTitles(titleList);
+                    mBanner.start();
                     break;
                 case FLAG_RECYCLERVIEW:
                     //全部商品RecyclerView列表
@@ -114,6 +104,18 @@ public class Fragment_StoreHome extends Fragment implements View.OnClickListener
             }
         }
     };
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        mBanner.stopAutoPlay();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        mBanner.startAutoPlay();
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -127,6 +129,7 @@ public class Fragment_StoreHome extends Fragment implements View.OnClickListener
         //给Item中的Image宽高用
         screen_width = getActivity().getWindowManager().getDefaultDisplay().getWidth();
 
+        mBanner = (Banner) view.findViewById(R.id.banner_fragment_store_home);
         mBtnToCustom = (Button) view.findViewById(R.id.imgbtn_store_toCustom);
         mBtnToStoreCar = (Button) view.findViewById(R.id.imgbtn_store_toStoreCar);
         mBtnToCustom.setOnClickListener(this);
@@ -137,8 +140,6 @@ public class Fragment_StoreHome extends Fragment implements View.OnClickListener
         mRecycler.setMissListener(this);
         mRecycler.setHasFixedSize(true);
 
-        //广告轮播
-        mViewPager = (ViewPager) view.findViewById(R.id.viewpager_fragment_store_home);
         //请求所有商城数据
         requestData();
     }
@@ -239,37 +240,17 @@ public class Fragment_StoreHome extends Fragment implements View.OnClickListener
         }
     }
 
-    /**
-     * 广告轮播
-     */
-    private void toActAd(final int total_item) {
-        mAdTimeHandler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                int IncrementItem = mViewPager.getCurrentItem();
-                IncrementItem++;
-                int currentItem = IncrementItem % total_item;
-                mViewPager.setCurrentItem(currentItem);
-                mAdTimeHandler.postDelayed(this, 3000);
-                LogUtil.i("get Y = " + mRecycler.getChildAt(0).getY());
-            }
-        }, 3000);
-    }
-
     @Override
     public void miss() {
         if (mRecycler.getChildAt(0).getY() <= 0) {
-            mViewPager.setVisibility(View.GONE);
+            mBanner.setVisibility(View.GONE);
         }
-//        ObjectAnimator mAnimator = ObjectAnimator.ofFloat(mViewFlipper, "alpha", 0, 0.4f, 0.6f, 0.8f, 1f);
-//        mAnimator.setDuration(1000).start();
-//        ToastUtil.showMessage(getActivity(), "should gone");
     }
 
     @Override
     public void show() {
         if (mRecycler.getChildAt(0).getY() == 0) {
-            mViewPager.setVisibility(View.VISIBLE);
+            mBanner.setVisibility(View.VISIBLE);
         }
     }
 }

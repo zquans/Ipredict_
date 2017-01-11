@@ -82,7 +82,7 @@ public class Fragment_StoreGoods_One extends Fragment implements AdapterView.OnI
         local_skuid = getArguments().getString("goods_sku_id");
         URL = "http://api.iyuce.com/v1/store/goodsdetail?goodsid=" + local_goodsid;
 
-        mFlipper = (ViewFlipper) view.findViewById(R.id.viewflip_activity_storegoods);
+//        mFlipper = (ViewFlipper) view.findViewById(R.id.viewflip_activity_storegoods);
 
         mTxtGoodsTitle = (TextView) view.findViewById(R.id.txt_activity_storegoods_goodstitle);
         mTxtGoodsPrice = (TextView) view.findViewById(R.id.txt_activity_storegoods_goodsprice);
