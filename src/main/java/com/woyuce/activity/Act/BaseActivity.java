@@ -84,7 +84,7 @@ public class BaseActivity extends Activity {
 
             @Override
             public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
-                LogUtil.i("onScroll distanceX = " + distanceX);
+//                LogUtil.i("onScroll distanceX = " + distanceX);
                 return false;
             }
 
@@ -95,7 +95,7 @@ public class BaseActivity extends Activity {
 
             @Override
             public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-                LogUtil.i("onFling  velocityX  = " + velocityX);
+//                LogUtil.i("onFling  velocityX  = " + velocityX);
                 if (velocityX > 200) {
                     BaseActivity.this.finish();
                 }

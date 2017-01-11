@@ -49,6 +49,13 @@ import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import cn.sharesdk.framework.Platform;
+import cn.sharesdk.framework.PlatformActionListener;
+import cn.sharesdk.framework.ShareSDK;
+import cn.sharesdk.sina.weibo.SinaWeibo;
+import cn.sharesdk.tencent.qq.QQ;
+import cn.sharesdk.wechat.friends.Wechat;
+
 public class LoginActivity extends BaseActivity implements OnClickListener {
 
     /*creat_at 2016/12/20
@@ -688,5 +695,55 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
                 }
             }
         }, 500, 1000);
+    }
+
+    /**
+     * 第三方登录
+     *
+     * @param view
+     */
+    public void sinaLogin(View view) {
+        doShareLogin("sina");
+    }
+
+    public void wechatLogin(View view) {
+        doShareLogin("wechat");
+    }
+
+    public void qqLogin(View view) {
+        doShareLogin("qq");
+    }
+
+    private void doShareLogin(String arg) {
+        ShareSDK.initSDK(this);
+        Platform mplatform;
+        if (arg.equals("sina")) {
+            mplatform = ShareSDK.getPlatform(this, SinaWeibo.NAME);
+        } else if (arg.equals("wechat")) {
+            mplatform = ShareSDK.getPlatform(this, Wechat.NAME);
+        } else {
+            mplatform = ShareSDK.getPlatform(this, QQ.NAME);
+            String accessToken = mplatform.getDb().getToken(); // 获取授权token
+            String openId = mplatform.getDb().getUserId(); // 获取用户在此平台的ID
+            String nickname = mplatform.getDb().getUserName(); // 获取用户昵称
+            LogUtil.i("nickname = " + nickname + "openId = " + openId + ",accessToken" + accessToken);
+        }
+        mplatform.setPlatformActionListener(new PlatformActionListener() {
+            @Override
+            public void onComplete(Platform platform, int i, HashMap<String, Object> hashMap) {
+                LogUtil.i("qqLogin onComplete" + hashMap.toString());
+            }
+
+            @Override
+            public void onError(Platform platform, int i, Throwable throwable) {
+                LogUtil.i("qqLogin onError");
+            }
+
+            @Override
+            public void onCancel(Platform platform, int i) {
+                LogUtil.i("qqLogin onCancel");
+            }
+        });
+        mplatform.authorize();
     }
 }
