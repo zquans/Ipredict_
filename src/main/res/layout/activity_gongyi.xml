@@ -30,11 +30,11 @@
     <LinearLayout
         android:id="@+id/ll_gongyi_audio"
         android:layout_width="match_parent"
-        android:layout_height="48dp"
+        android:layout_height="56dp"
         android:layout_marginLeft="32dp"
         android:layout_marginRight="32dp"
         android:layout_marginTop="64dp"
-        android:background="#208b91"
+        android:background="@drawable/shape_gongyi"
         android:orientation="horizontal">
 
         <ImageView
@@ -63,7 +63,7 @@
         android:layout_marginLeft="32dp"
         android:layout_marginRight="32dp"
         android:layout_marginTop="32dp"
-        android:background="#208b91"
+        android:background="@drawable/shape_gongyi"
         android:orientation="horizontal">
 
         <ImageView

@@ -5,10 +5,9 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v7.widget.LinearLayoutManager;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.Button;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import com.android.volley.AuthFailureError;
@@ -16,12 +15,16 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
+import com.jcodecraeer.xrecyclerview.ProgressStyle;
+import com.jcodecraeer.xrecyclerview.XRecyclerView;
 import com.woyuce.activity.Adapter.GongyiLessonAdapter;
 import com.woyuce.activity.Application.AppContext;
 import com.woyuce.activity.Bean.GongyiAudio;
 import com.woyuce.activity.R;
 import com.woyuce.activity.Utils.LogUtil;
 import com.woyuce.activity.Utils.PreferenceUtil;
+import com.woyuce.activity.Utils.RecyclerItemClickListener;
+import com.woyuce.activity.common.Constants;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -29,35 +32,39 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
  * Created by Administrator on 2016/9/21.
  */
-public class GongyiLessonActivity extends BaseActivity implements AdapterView.OnItemClickListener, View.OnClickListener {
+public class GongyiLessonActivity extends BaseActivity implements View.OnClickListener, XRecyclerView.LoadingListener {
 
     private TextView txtback;
     private Button btnListening, btnSpeaking, btnReading, btnWritting;
-    private ListView listview;
+    private XRecyclerView recyclerview;
 
     private GongyiLessonAdapter adapter;
     private ArrayList<GongyiAudio> audioList = new ArrayList<>();
     private ArrayList<GongyiAudio> audioTypeList = new ArrayList<>();
 
-    private String URL_LIST = "http://api.iyuce.com/v1/exam/audios";
-    private String URL_TYPE = "http://api.iyuce.com/v1/exam/audiotypes";
-
-    private static final int AUDIO_LIST = 0;
+    private static final int GET_DATA_OK = 2;    //获取数据
+    private static final int LOAD_MORE_DATA_OK = 1; //加载更多数据
+    private int page_num = 1;
+    private int local_type = 0;
+    private boolean isRefresh = true;
 
     private Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
             switch (msg.what) {
-                case AUDIO_LIST:
-                    adapter = new GongyiLessonAdapter(GongyiLessonActivity.this, (List<GongyiAudio>) msg.obj);
-                    listview.setAdapter(adapter);
+                case GET_DATA_OK:
+                    adapter.notifyDataSetChanged();
+                    recyclerview.refreshComplete();
+                    break;
+                case LOAD_MORE_DATA_OK:
+                    adapter.notifyDataSetChanged();
+                    recyclerview.loadMoreComplete();
                     break;
             }
         }
@@ -75,18 +82,38 @@ public class GongyiLessonActivity extends BaseActivity implements AdapterView.On
         setContentView(R.layout.activity_gongyilesson);
 
         initView();
-        getTypeRequest(URL_TYPE);
+        getTypeRequest(Constants.URL_GET_AUDIO_TYPE);
     }
 
     private void initView() {
-        listview = (ListView) findViewById(R.id.listview_audiolesson);
         txtback = (TextView) findViewById(R.id.txt_audiolesson_back);
         btnListening = (Button) findViewById(R.id.btn_audiolesson_listening);
         btnSpeaking = (Button) findViewById(R.id.btn_audiolesson_reading);
         btnReading = (Button) findViewById(R.id.btn_audiolesson_speaking);
         btnWritting = (Button) findViewById(R.id.btn_audiolesson_writting);
-
-        listview.setOnItemClickListener(this);
+        recyclerview = (XRecyclerView) findViewById(R.id.xrecyclerview_audiolesson);
+        adapter = new GongyiLessonAdapter(GongyiLessonActivity.this, audioList);
+        recyclerview.setAdapter(adapter);
+        recyclerview.setLayoutManager(new LinearLayoutManager(this));
+        recyclerview.setHasFixedSize(true);
+        recyclerview.setLoadingMoreProgressStyle(ProgressStyle.BallGridBeat);
+        recyclerview.setRefreshProgressStyle(ProgressStyle.BallSpinFadeLoader);
+        recyclerview.setLoadingListener(this);
+//        recyclerview.addOnItemTouchListener(new RecyclerItemClickListener(this, recyclerview,
+//                new RecyclerItemClickListener.OnItemClickListener() {
+//                    @Override
+//                    public void onItemClick(View view, int position) {
+//                        GongyiAudio audio = audioList.get(position - 1);
+//                        Intent intent = new Intent(GongyiLessonActivity.this, GongyiContentActivity.class);
+//                        intent.putExtra("url", audio.getUrl());
+//                        intent.putExtra("title", audio.getTitle());
+//                        startActivity(intent);
+//                    }
+//
+//                    @Override
+//                    public void onItemLongClick(View view, final int position) {
+//                    }
+//                }));
         txtback.setOnClickListener(this);
         btnListening.setOnClickListener(this);
         btnSpeaking.setOnClickListener(this);
@@ -94,7 +121,7 @@ public class GongyiLessonActivity extends BaseActivity implements AdapterView.On
         btnWritting.setOnClickListener(this);
     }
 
-    private void getListRequest(String url, final String type_id) {
+    private void getListRequest(final int code, String url, final String type_id, final int page_num) {
         progressdialogshow(this);
         StringRequest audioListRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
             @Override
@@ -107,6 +134,9 @@ public class GongyiLessonActivity extends BaseActivity implements AdapterView.On
                     obj = new JSONObject(response);
                     if (obj.getInt("code") == 0) {
                         arr = obj.getJSONArray("data");
+                        if (isRefresh) {
+                            audioList.clear();
+                        }
                         for (int i = 0; i < arr.length(); i++) {
                             audio = new GongyiAudio();
                             obj = arr.getJSONObject(i);
@@ -116,9 +146,15 @@ public class GongyiLessonActivity extends BaseActivity implements AdapterView.On
                             audioList.add(audio);
                         }
                         Message msg = new Message();
-                        msg.what = AUDIO_LIST;
                         msg.obj = audioList;
-                        mHandler.sendMessage(msg);
+                        if (code == GET_DATA_OK) {
+                            msg.what = GET_DATA_OK;
+                            mHandler.sendMessage(msg);
+                        }
+                        if (code == LOAD_MORE_DATA_OK) {
+                            msg.what = LOAD_MORE_DATA_OK;
+                            mHandler.sendMessageDelayed(msg, 100);
+                        }
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -144,7 +180,7 @@ public class GongyiLessonActivity extends BaseActivity implements AdapterView.On
                 HashMap<String, String> map = new HashMap<>();
                 map.put("type_id", type_id);
                 map.put("date", "");
-                map.put("page", "1");
+                map.put("page", page_num + "");
                 return map;
             }
         };
@@ -175,7 +211,7 @@ public class GongyiLessonActivity extends BaseActivity implements AdapterView.On
                             audio.setId(obj.getString("id"));
                             audioTypeList.add(audio);
                         }
-                        getListRequest(URL_LIST, audioTypeList.get(0).getId());
+                        getListRequest(GET_DATA_OK, Constants.URL_POST_AUDIO_LIST, audioTypeList.get(0).getId(), page_num);
                         btnListening.setText(audioTypeList.get(0).getType_title());
                         btnSpeaking.setText(audioTypeList.get(1).getType_title());
                         btnReading.setText(audioTypeList.get(2).getType_title());
@@ -196,15 +232,6 @@ public class GongyiLessonActivity extends BaseActivity implements AdapterView.On
         };
         audioTypeRequest.setTag("audiolesson");
         AppContext.getHttpQueue().add(audioTypeRequest);
-    }
-
-    @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        GongyiAudio audio = audioList.get(position);
-        Intent intent = new Intent(this, GongyiContentActivity.class);
-        intent.putExtra("url", audio.getUrl());
-        intent.putExtra("title", audio.getTitle());
-        startActivity(intent);
     }
 
     @Override
@@ -229,9 +256,26 @@ public class GongyiLessonActivity extends BaseActivity implements AdapterView.On
     }
 
     private void chooseType(View v, int pos) {
+        //指定获取的音频类型
+        local_type = pos;
         ObjectAnimator mAnimator = ObjectAnimator.ofFloat(v, "rotationY", 0, 360);
         mAnimator.setDuration(500).start();
         audioList.clear();
-        getListRequest(URL_LIST, audioTypeList.get(pos).getId());
+        page_num = 1;
+        getListRequest(GET_DATA_OK, Constants.URL_POST_AUDIO_LIST, audioTypeList.get(pos).getId(), page_num);
+    }
+
+    @Override
+    public void onRefresh() {
+        isRefresh = true;
+        page_num = 1;
+        getListRequest(GET_DATA_OK, Constants.URL_POST_AUDIO_LIST, audioTypeList.get(local_type).getId(), page_num);
+    }
+
+    @Override
+    public void onLoadMore() {
+        isRefresh = false;
+        page_num++;
+        getListRequest(LOAD_MORE_DATA_OK, Constants.URL_POST_AUDIO_LIST, audioTypeList.get(local_type).getId(), page_num);
     }
 }

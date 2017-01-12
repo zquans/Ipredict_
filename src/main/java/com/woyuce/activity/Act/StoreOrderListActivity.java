@@ -8,14 +8,13 @@ import android.os.Message;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.view.Gravity;
 import android.view.View;
-import android.widget.TextView;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
+import com.jcodecraeer.xrecyclerview.ProgressStyle;
 import com.jcodecraeer.xrecyclerview.XRecyclerView;
 import com.woyuce.activity.Adapter.StoreOrderListAdapter;
 import com.woyuce.activity.Application.AppContext;
@@ -46,34 +45,23 @@ public class StoreOrderListActivity extends BaseActivity implements XRecyclerVie
     private String URL = "http://api.iyuce.com/v1/store/orderlist?pageSize=10&userid=";
     private String URL_Del = "http://api.iyuce.com/v1/store/orderdelete?userid=";
 
-    private static final int GET_DATA_OK = 0;
-    private static final int UPDATE_DATA_OK = 1;
+    private static final int GET_DATA_OK = 0;      //获取数据
+    private static final int LOAD_MORE_DATA_OK = 1;   //加载更多数据
     private int local_page_number = 1;
+
+    private boolean isRefresh = true;
 
     private Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
             if (msg.what == GET_DATA_OK) {
-                if (mList.size() == 0) {
-                    TextView textView = new TextView(StoreOrderListActivity.this);
-                    textView.setText("您没有购买过商品哦!");
-                    textView.setGravity(Gravity.CENTER);
-                    mRecyclerView.setEmptyView(textView);
-                    return;
-                }
-                mAdapter = new StoreOrderListAdapter(StoreOrderListActivity.this, mList);
-                mRecyclerView.setLayoutManager(new LinearLayoutManager(StoreOrderListActivity.this));
-                mRecyclerView.setAdapter(mAdapter);
-                doRecyclerItemClick();
+                mAdapter.notifyDataSetChanged();
+                mRecyclerView.refreshComplete();
             }
-            if (msg.what == UPDATE_DATA_OK) {
-                try {
-                    Thread.sleep(350);
-                    mAdapter.notifyDataSetChanged();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+            if (msg.what == LOAD_MORE_DATA_OK) {
+                mAdapter.notifyDataSetChanged();
+                mRecyclerView.loadMoreComplete();
             }
         }
     };
@@ -96,7 +84,13 @@ public class StoreOrderListActivity extends BaseActivity implements XRecyclerVie
     private void initView() {
         local_user_id = PreferenceUtil.getSharePre(this).getString("userId", "");
         mRecyclerView = (XRecyclerView) findViewById(R.id.recycler_activity_store_orderlist);
+        mAdapter = new StoreOrderListAdapter(StoreOrderListActivity.this, mList);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(StoreOrderListActivity.this));
+        mRecyclerView.setAdapter(mAdapter);
+        doRecyclerItemClick();
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        mRecyclerView.setRefreshProgressStyle(ProgressStyle.BallSpinFadeLoader);
+        mRecyclerView.setLoadingMoreProgressStyle(ProgressStyle.BallGridBeat);
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setLoadingListener(this);
         requestData(GET_DATA_OK, URL + local_user_id);
@@ -125,6 +119,9 @@ public class StoreOrderListActivity extends BaseActivity implements XRecyclerVie
                     if (obj.getString("code").equals("0")) {
                         obj = obj.getJSONObject("orderlist");
                         arr = obj.getJSONArray("data");
+                        if (isRefresh) {
+                            mList.clear();
+                        }
                         for (int i = 0; i < arr.length(); i++) {
                             order = new StoreOrder();
                             obj = arr.getJSONObject(i);
@@ -162,8 +159,8 @@ public class StoreOrderListActivity extends BaseActivity implements XRecyclerVie
                             msg.what = GET_DATA_OK;
                         }
                         //分页加载更多数据
-                        if (code == UPDATE_DATA_OK) {
-                            msg.what = UPDATE_DATA_OK;
+                        if (code == LOAD_MORE_DATA_OK) {
+                            msg.what = LOAD_MORE_DATA_OK;
                         }
                         msg.obj = mList;
                         mHandler.sendMessage(msg);
@@ -247,20 +244,19 @@ public class StoreOrderListActivity extends BaseActivity implements XRecyclerVie
 
     @Override
     public void onRefresh() {
+        isRefresh = true;
         LogUtil.i("onRefresh = ");
-        mList.clear();
-        requestData(UPDATE_DATA_OK, URL + local_user_id);
-        mAdapter.notifyDataSetChanged();
-        mRecyclerView.refreshComplete();
         local_page_number = 1;
+        String url = URL + local_user_id + "&pageNum=" + local_page_number;
+        requestData(GET_DATA_OK, url);
     }
 
     @Override
     public void onLoadMore() {
+        isRefresh = false;
         LogUtil.i("onLoadMore = ");
         local_page_number++;
         String url = URL + local_user_id + "&pageNum=" + local_page_number;
-        requestData(UPDATE_DATA_OK, url);
-        mRecyclerView.loadMoreComplete();
+        requestData(LOAD_MORE_DATA_OK, url);
     }
 }
