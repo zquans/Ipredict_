@@ -58,8 +58,10 @@ import cn.sharesdk.wechat.friends.Wechat;
 
 public class LoginActivity extends BaseActivity implements OnClickListener {
 
-    /*creat_at 2016/12/20
-    * 用于做界面手机登录*/
+    /**
+     * creat_at 2016/12/20
+     * 用于做界面手机登录
+     */
     private LinearLayout mLinearLayoutChooseOne, mLinearLayoutChooseTwo;
     private TextView mTxtChooseOne, mTxtChooseTwo;
 

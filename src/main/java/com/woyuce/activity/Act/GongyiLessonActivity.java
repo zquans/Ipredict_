@@ -99,21 +99,6 @@ public class GongyiLessonActivity extends BaseActivity implements View.OnClickLi
         recyclerview.setLoadingMoreProgressStyle(ProgressStyle.BallGridBeat);
         recyclerview.setRefreshProgressStyle(ProgressStyle.BallSpinFadeLoader);
         recyclerview.setLoadingListener(this);
-//        recyclerview.addOnItemTouchListener(new RecyclerItemClickListener(this, recyclerview,
-//                new RecyclerItemClickListener.OnItemClickListener() {
-//                    @Override
-//                    public void onItemClick(View view, int position) {
-//                        GongyiAudio audio = audioList.get(position - 1);
-//                        Intent intent = new Intent(GongyiLessonActivity.this, GongyiContentActivity.class);
-//                        intent.putExtra("url", audio.getUrl());
-//                        intent.putExtra("title", audio.getTitle());
-//                        startActivity(intent);
-//                    }
-//
-//                    @Override
-//                    public void onItemLongClick(View view, final int position) {
-//                    }
-//                }));
         txtback.setOnClickListener(this);
         btnListening.setOnClickListener(this);
         btnSpeaking.setOnClickListener(this);
