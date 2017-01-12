@@ -68,7 +68,12 @@ public class StoreOrderListActivity extends BaseActivity implements XRecyclerVie
                 doRecyclerItemClick();
             }
             if (msg.what == UPDATE_DATA_OK) {
-                mAdapter.notifyDataSetChanged();
+                try {
+                    Thread.sleep(350);
+                    mAdapter.notifyDataSetChanged();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
         }
     };

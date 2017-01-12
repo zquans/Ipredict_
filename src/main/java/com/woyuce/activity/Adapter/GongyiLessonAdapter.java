@@ -4,9 +4,12 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.OvershootInterpolator;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
+import com.nineoldandroids.view.ViewHelper;
+import com.nineoldandroids.view.ViewPropertyAnimator;
 import com.woyuce.activity.Bean.GongyiAudio;
 import com.woyuce.activity.R;
 
@@ -48,6 +51,11 @@ public class GongyiLessonAdapter extends BaseAdapter {
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
         }
+        //增加动画效果
+        ViewHelper.setScaleX(viewHolder.txt_name, 0.8f);
+        ViewHelper.setScaleY(viewHolder.txt_name, 0.8f);
+        ViewPropertyAnimator.animate(viewHolder.txt_name).scaleX(1).setDuration(350).setInterpolator(new OvershootInterpolator()).start();
+        ViewPropertyAnimator.animate(viewHolder.txt_name).scaleY(1).setDuration(350).setInterpolator(new OvershootInterpolator()).start();
 
         viewHolder.txt_name.setText(mList.get(position).getTitle());
         return convertView;

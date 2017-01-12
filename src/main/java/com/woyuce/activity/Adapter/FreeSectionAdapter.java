@@ -2,6 +2,8 @@ package com.woyuce.activity.Adapter;
 
 import java.util.List;
 
+import com.nineoldandroids.view.ViewHelper;
+import com.nineoldandroids.view.ViewPropertyAnimator;
 import com.woyuce.activity.Bean.FreeSection;
 import com.woyuce.activity.R;
 
@@ -10,6 +12,7 @@ import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.OvershootInterpolator;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
@@ -49,6 +52,12 @@ public class FreeSectionAdapter extends BaseAdapter{
 		}else{
 			viewHolder = (ViewHolder) convertView.getTag();
 		}
+		//增加动画效果
+		ViewHelper.setScaleX(viewHolder.txtsection, 0.8f);
+		ViewHelper.setScaleY(viewHolder.txtsection, 0.8f);
+		ViewPropertyAnimator.animate(viewHolder.txtsection).scaleX(1).setDuration(350).setInterpolator(new OvershootInterpolator()).start();
+		ViewPropertyAnimator.animate(viewHolder.txtsection).scaleY(1).setDuration(350).setInterpolator(new OvershootInterpolator()).start();
+
 		viewHolder.txtsection.setBackgroundColor(Color.parseColor(mList.get(position).sectioncolor));   //   Color.parseColor(localPage.tag)��ɫ�����Ĺؼ�����
 		viewHolder.txtsection.setText(mList.get(position).sectionname);
 		return convertView;

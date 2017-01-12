@@ -6,8 +6,11 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.OvershootInterpolator;
 import android.widget.TextView;
 
+import com.nineoldandroids.view.ViewHelper;
+import com.nineoldandroids.view.ViewPropertyAnimator;
 import com.woyuce.activity.Bean.StoreBean;
 import com.woyuce.activity.R;
 
@@ -23,7 +26,7 @@ public class StoreHomeAdapter extends RecyclerView.Adapter<StoreHomeAdapter.MyVi
     private Context context;
     private Integer screen_width;
 
-    public StoreHomeAdapter(Context context, List<StoreBean> mList,Integer screen_width) {
+    public StoreHomeAdapter(Context context, List<StoreBean> mList, Integer screen_width) {
         this.mDatas = mList;
         this.context = context;
         mLayoutInflater = LayoutInflater.from(context);
@@ -39,6 +42,12 @@ public class StoreHomeAdapter extends RecyclerView.Adapter<StoreHomeAdapter.MyVi
 
     @Override
     public void onBindViewHolder(final MyViewHolder holder, final int pos) {
+        //增加动画效果
+        ViewHelper.setScaleX(holder.itemView, 0.8f);
+        ViewHelper.setScaleY(holder.itemView, 0.8f);
+        ViewPropertyAnimator.animate(holder.itemView).scaleX(1).setDuration(350).setInterpolator(new OvershootInterpolator()).start();
+        ViewPropertyAnimator.animate(holder.itemView).scaleY(1).setDuration(350).setInterpolator(new OvershootInterpolator()).start();
+
         holder.mTxt.setText(mDatas.get(pos).getTitle());
         GridLayoutManager mGridLayoutManager = new GridLayoutManager(context, 2);
         mGridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
@@ -51,7 +60,7 @@ public class StoreHomeAdapter extends RecyclerView.Adapter<StoreHomeAdapter.MyVi
             }
         });
         holder.mRecycler.setLayoutManager(mGridLayoutManager);
-        RecyclerView.Adapter mmAdapter = new StoreGoodsAdapter(context, mDatas.get(pos).getGoods_result(),screen_width);
+        RecyclerView.Adapter mmAdapter = new StoreGoodsAdapter(context, mDatas.get(pos).getGoods_result(), screen_width);
         holder.mRecycler.setAdapter(mmAdapter);
     }
 

@@ -7,8 +7,11 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.OvershootInterpolator;
 import android.widget.TextView;
 
+import com.nineoldandroids.view.ViewHelper;
+import com.nineoldandroids.view.ViewPropertyAnimator;
 import com.woyuce.activity.Act.StoreOrderActivity;
 import com.woyuce.activity.Bean.StoreOrder;
 import com.woyuce.activity.R;
@@ -39,6 +42,11 @@ public class StoreOrderListAdapter extends RecyclerView.Adapter<StoreOrderListAd
 
     @Override
     public void onBindViewHolder(MyViewHolder holder, final int pos) {
+        //增加动画效果
+        ViewHelper.setScaleX(holder.itemView, 0.8f);
+        ViewHelper.setScaleY(holder.itemView, 0.8f);
+        ViewPropertyAnimator.animate(holder.itemView).scaleX(1).setDuration(350).setInterpolator(new OvershootInterpolator()).start();
+        ViewPropertyAnimator.animate(holder.itemView).scaleY(1).setDuration(350).setInterpolator(new OvershootInterpolator()).start();
         holder.mTxtOrder.setText("订单号:" + mList.get(pos).getOrder_no());
         holder.mTxtTime.setText("订单时间:" + mList.get(pos).getCreate_at());
         holder.mTxtPrice.setText("实付款:" + mList.get(pos).getPrice());
