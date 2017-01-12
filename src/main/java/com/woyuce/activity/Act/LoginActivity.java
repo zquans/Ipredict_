@@ -677,7 +677,6 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
                 .show();
     }
 
-
     /**
      * 倒计时
      */

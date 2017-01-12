@@ -97,7 +97,7 @@ public class BaseActivity extends Activity {
             public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
 //                LogUtil.i("onFling  velocityX  = " + velocityX);
                 if (velocityX > 200) {
-                    BaseActivity.this.finish();
+//                    BaseActivity.this.finish();
                 }
                 return true;
             }
