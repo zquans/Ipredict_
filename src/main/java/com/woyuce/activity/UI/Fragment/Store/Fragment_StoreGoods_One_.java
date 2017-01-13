@@ -15,7 +15,7 @@ import com.android.volley.toolbox.StringRequest;
 import com.woyuce.activity.Adapter.Store.StoreSpcAdapter_;
 import com.woyuce.activity.AppContext;
 import com.woyuce.activity.Bean.Store.StoreGoods;
-import com.woyuce.activity.UI.Fragment.BaseFragment;
+import com.woyuce.activity.BaseFragment;
 import com.woyuce.activity.R;
 import com.woyuce.activity.Utils.GlideImageLoader;
 import com.woyuce.activity.Utils.LogUtil;

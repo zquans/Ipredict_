@@ -20,7 +20,7 @@ import com.tencent.mm.sdk.modelbase.BaseResp;
 import com.tencent.mm.sdk.openapi.IWXAPI;
 import com.tencent.mm.sdk.openapi.IWXAPIEventHandler;
 import com.tencent.mm.sdk.openapi.WXAPIFactory;
-import com.woyuce.activity.UI.Act.MainActivity;
+import com.woyuce.activity.UI.Activity.MainActivity;
 import com.woyuce.activity.AppContext;
 import com.woyuce.activity.R;
 import com.woyuce.activity.Utils.LogUtil;

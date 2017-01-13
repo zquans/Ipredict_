@@ -10,7 +10,7 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
-import com.woyuce.activity.UI.Fragment.BaseFragment;
+import com.woyuce.activity.BaseFragment;
 import com.woyuce.activity.R;
 import com.woyuce.activity.Utils.LogUtil;
 

@@ -14,7 +14,7 @@ import android.widget.TextView;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.display.RoundedBitmapDisplayer;
-import com.woyuce.activity.UI.Act.Store.ShowImgActivity;
+import com.woyuce.activity.UI.Activity.Store.ShowImgActivity;
 import com.woyuce.activity.Bean.Store.StoreGoods;
 import com.woyuce.activity.R;
 

@@ -15,7 +15,7 @@ import com.woyuce.activity.Adapter.Store.StoreGoodsCommentAdapter;
 import com.woyuce.activity.Adapter.Store.StoreShowOrderAdapter;
 import com.woyuce.activity.AppContext;
 import com.woyuce.activity.Bean.Store.StoreGoods;
-import com.woyuce.activity.UI.Fragment.BaseFragment;
+import com.woyuce.activity.BaseFragment;
 import com.woyuce.activity.R;
 import com.woyuce.activity.Utils.LogUtil;
 
