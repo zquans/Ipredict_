@@ -10,7 +10,6 @@ import android.widget.TextView;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
-import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.woyuce.activity.Adapter.StoreGoodsCommentAdapter;
 import com.woyuce.activity.Adapter.StoreShowOrderAdapter;
@@ -41,31 +40,15 @@ public class Fragment_StoreGoods_Three extends BaseFragment implements View.OnCl
     @Override
     public void onStop() {
         super.onStop();
-        LogUtil.i("three = onStop ");
         AppContext.getHttpQueue().cancelAll("goodsCommentRequest");
     }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        LogUtil.i("three = onDestroyView ");
-    }
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_storegoods_three, null);
         initView(view);
         requestData();
-        LogUtil.i("three = onCreateView ");
         return view;
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        //数据请求
-        LogUtil.i("three = onCreateView ");
     }
 
     private void initView(View view) {
@@ -93,7 +76,6 @@ public class Fragment_StoreGoods_Three extends BaseFragment implements View.OnCl
     }
 
     private void requestData() {
-        progressdialogshow(getActivity());
         StringRequest goodsCommentRequest = new StringRequest(Request.Method.GET,
                 URL + "?goodsid=" + getArguments().getString("goods_id") + "&pageindex=" + "1" + "&pagesize=" + "30",
                 new Response.Listener<String>() {
@@ -124,15 +106,8 @@ public class Fragment_StoreGoods_Three extends BaseFragment implements View.OnCl
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
-                        progressdialogcancel();
                     }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError volleyError) {
-                LogUtil.i("Fragment_three volleyError = " + volleyError.getMessage());
-                progressdialogcancel();
-            }
-        });
+                }, null);
         goodsCommentRequest.setTag("goodsCommentRequest");
         AppContext.getHttpQueue().add(goodsCommentRequest);
     }

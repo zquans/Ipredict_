@@ -1,6 +1,5 @@
 package com.woyuce.activity.Fragment;
 
-import android.app.ProgressDialog;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -20,26 +19,11 @@ public class Fragment_StoreGoods_Two extends BaseFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_storegoods_two, null);
         initView(view);
-        LogUtil.i("two = onCreateView ");
         return view;
     }
 
-    @Override
-    public void onStop() {
-        super.onStop();
-        LogUtil.i("two = onStop ");
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        LogUtil.i("two = onDestroyView ");
-    }
-
     private void initView(View view) {
-        //真实数据
         LogUtil.i("mImgList = " + getArguments().getString("mImgList"));
-        //伪数据
         WebView web = (WebView) view.findViewById(R.id.web_test);
 
         web.getSettings().setJavaScriptEnabled(true);
@@ -71,15 +55,11 @@ public class Fragment_StoreGoods_Two extends BaseFragment {
             @Override
             public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
-                progressdialogcancel();
-                LogUtil.e("onPageFinished");
             }
 
             @Override
             public void onPageStarted(WebView view, String url, Bitmap favicon) {
                 super.onPageStarted(view, url, favicon);
-                progressdialogshow(getActivity());
-                LogUtil.e("onPageStarted");
             }
         });
         web.loadUrl(getArguments().getString("mImgList").toString().trim());

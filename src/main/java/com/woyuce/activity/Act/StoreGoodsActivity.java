@@ -8,6 +8,10 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,7 +38,11 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-public class StoreGoodsActivity extends BaseActivity implements View.OnClickListener {
+public class StoreGoodsActivity extends FragmentActivity implements View.OnClickListener {
+
+    private ViewPager mViewPager;
+    private FragmentPagerAdapter mAdapter;
+    private ArrayList<Fragment> mFragmentList;
 
     private TextView mTxtTabOne, mTxtTabTwo, mTxtTabThree, mTxtToCustom;
     private Button mBtnGoToCar, mBtnPutIntoCar, mBtnBuyNow;
@@ -44,9 +52,9 @@ public class StoreGoodsActivity extends BaseActivity implements View.OnClickList
     private List<String> mList = new ArrayList<>();
     private String mImgList = null;//或者是个数组
 
-    Fragment_StoreGoods_One_ mFrgOne;
+    private Fragment_StoreGoods_One_ mFrgOne;
 
-    private static final int OPEN_FRAGMENT = 0x001;
+    private static final int GET_DATA_DONE = 0;
     //线宽及线动画的终点
     private int line_width, line_end;
 
@@ -57,9 +65,9 @@ public class StoreGoodsActivity extends BaseActivity implements View.OnClickList
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
             switch (msg.what) {
-                case OPEN_FRAGMENT:
+                case GET_DATA_DONE:
                     Bundle bundle = new Bundle();
-                    mFrgOne = new Fragment_StoreGoods_One_();
+                    //Tab1需要的
                     bundle.putString("goods_id", getIntent().getStringExtra("goods_id"));
                     bundle.putString("goods_sku_id", getIntent().getStringExtra("goods_sku_id"));
                     bundle.putString("goods_title", getIntent().getStringExtra("goods_title"));
@@ -67,10 +75,42 @@ public class StoreGoodsActivity extends BaseActivity implements View.OnClickList
                     bundle.putString("total_sales_volume", total_sales_volume);
                     bundle.putString("total_good_volume", total_good_volume);
                     bundle.putString("total_show_order_volume", total_show_order_volume);
-                    mFrgOne.setArguments(bundle);
                     bundle.putStringArrayList("mList", (ArrayList<String>) mList);
-                    //传递参数给Fragment，始终保持数据最新
-                    getFragmentManager().beginTransaction().replace(R.id.frame_activity_storegoods_fragment, mFrgOne).disallowAddToBackStack().commit();
+                    //Tab2需要的
+                    bundle.putString("mImgList", mImgList);
+                    //Tab3需要的
+//                    bundle.putString("goods_id", getIntent().getStringExtra("goods_id"));
+//                    bundle.putString("total_sales_volume", total_sales_volume);
+//                    bundle.putString("total_good_volume", total_good_volume);
+//                    bundle.putString("total_show_order_volume", total_show_order_volume);
+                    bundle.putString("total_bad_volume", total_bad_volume);
+                    bundle.putString("total_medium_volume", total_medium_volume);
+
+                    //FragmentOne不做局部变量的原因是需要给底部栏操作相应参数
+                    mFrgOne = new Fragment_StoreGoods_One_();
+                    Fragment_StoreGoods_Two mFrgTwo = new Fragment_StoreGoods_Two();
+                    Fragment_StoreGoods_Three mFrgThree = new Fragment_StoreGoods_Three();
+                    mFrgOne.setArguments(bundle);
+                    mFrgTwo.setArguments(bundle);
+                    mFrgThree.setArguments(bundle);
+
+                    mAdapter = new FragmentPagerAdapter(getSupportFragmentManager()) {
+                        @Override
+                        public Fragment getItem(int position) {
+                            return mFragmentList.get(position);
+                        }
+
+                        @Override
+                        public int getCount() {
+                            return mFragmentList.size();
+                        }
+                    };
+                    mFragmentList = new ArrayList<>();
+                    mFragmentList.add(mFrgOne);
+                    mFragmentList.add(mFrgTwo);
+                    mFragmentList.add(mFrgThree);
+                    mViewPager.setAdapter(mAdapter);
+                    mViewPager.setOffscreenPageLimit(2);
                     break;
             }
         }
@@ -86,6 +126,8 @@ public class StoreGoodsActivity extends BaseActivity implements View.OnClickList
 
     private void initView() {
         local_goods_title = getIntent().getStringExtra("goods_title");
+
+        mViewPager = (ViewPager) findViewById(R.id.viewpager_activity_storegoods_fragment);
         mTxtTabOne = (TextView) findViewById(R.id.txt_storegoods_tab_one);
         mTxtTabTwo = (TextView) findViewById(R.id.txt_storegoods_tab_two);
         mTxtTabThree = (TextView) findViewById(R.id.txt_storegoods_tab_three);
@@ -153,7 +195,7 @@ public class StoreGoodsActivity extends BaseActivity implements View.OnClickList
                                     mList.add(obj.getString("original_img"));
                                 }
                                 Message msg = new Message();
-                                msg.what = OPEN_FRAGMENT;
+                                msg.what = GET_DATA_DONE;
                                 mHandler.sendMessage(msg);
                             } else {
                                 ToastUtil.showMessage(getApplicationContext(), "获取商品信息失败");
@@ -228,9 +270,7 @@ public class StoreGoodsActivity extends BaseActivity implements View.OnClickList
             return;
         }
         //这些参数是传递给底部操作栏的，跟购物车相关
-        Bundle bundle = new Bundle();
         String local_id = PreferenceUtil.getSharePre(this).getString("userId", "");
-        //这些应该从Fragment中获取
         String local_goodsid = mFrgOne.returenGoodsId();
         String local_goods_sku_id = mFrgOne.returenGoodsSkuId();
         String local_name = local_goods_title;
@@ -239,50 +279,21 @@ public class StoreGoodsActivity extends BaseActivity implements View.OnClickList
         String local_num = "1";
         switch (v.getId()) {
             case R.id.txt_storegoods_tab_one:
-                getFragmentManager().beginTransaction().remove(mFrgOne).commit();
                 resetTxtTab(mTxtTabOne, line_end, 0);
-                Fragment_StoreGoods_One_ mFrgOne_ = new Fragment_StoreGoods_One_();
-                bundle.putString("goods_id", getIntent().getStringExtra("goods_id"));
-                bundle.putString("goods_sku_id", getIntent().getStringExtra("goods_sku_id"));
-                bundle.putString("goods_title", getIntent().getStringExtra("goods_title"));
-                bundle.putString("sales_price", getIntent().getStringExtra("sales_price"));
-                bundle.putString("total_sales_volume", total_sales_volume);
-                bundle.putString("total_good_volume", total_good_volume);
-                bundle.putString("total_show_order_volume", total_show_order_volume);
-                bundle.putStringArrayList("mList", (ArrayList<String>) mList);
-                mFrgOne_.setArguments(bundle);
-                //传递参数给Fragment，始终保持数据最新
-                getFragmentManager().beginTransaction().replace(R.id.frame_activity_storegoods_fragment, mFrgOne_).disallowAddToBackStack().commit();
                 break;
             case R.id.txt_storegoods_tab_two:
-                getFragmentManager().beginTransaction().remove(mFrgOne).commit();
                 if (is_first_line) {
                     resetTxtTab(mTxtTabTwo, 0, line_width / 3 * 1);
                     is_first_line = false;
                 }
                 resetTxtTab(mTxtTabTwo, line_end, line_width / 3 * 1);
-                Fragment_StoreGoods_Two mFrgTwo = new Fragment_StoreGoods_Two();
-                bundle.putString("mImgList", mImgList);
-                mFrgTwo.setArguments(bundle);
-                //传递参数给Fragment，始终保持数据最新
-                getFragmentManager().beginTransaction().replace(R.id.frame_activity_storegoods_fragment, mFrgTwo).disallowAddToBackStack().commit();
                 break;
             case R.id.txt_storegoods_tab_three:
-                getFragmentManager().beginTransaction().remove(mFrgOne).commit();
                 if (is_first_line) {
                     is_first_line = false;
                     resetTxtTab(mTxtTabThree, 0, line_width / 3 * 2);
                 }
                 resetTxtTab(mTxtTabThree, line_end, line_width / 3 * 2);
-                Fragment_StoreGoods_Three mFrgThree = new Fragment_StoreGoods_Three();
-                bundle.putString("goods_id", getIntent().getStringExtra("goods_id"));
-                bundle.putString("total_sales_volume", total_sales_volume);
-                bundle.putString("total_good_volume", total_good_volume);
-                bundle.putString("total_bad_volume", total_bad_volume);
-                bundle.putString("total_medium_volume", total_medium_volume);
-                bundle.putString("total_show_order_volume", total_show_order_volume);
-                mFrgThree.setArguments(bundle);
-                getFragmentManager().beginTransaction().replace(R.id.frame_activity_storegoods_fragment, mFrgThree).disallowAddToBackStack().commit();
                 break;
             case R.id.btn_activity_storegoods_buynow:
                 //保存进数据库

@@ -1,6 +1,5 @@
 package com.woyuce.activity.Fragment;
 
-import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -12,9 +11,7 @@ import android.widget.TextView;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
-import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
-import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.woyuce.activity.Adapter.StoreSpcAdapter_;
 import com.woyuce.activity.Application.AppContext;
 import com.woyuce.activity.Bean.StoreGoods;
@@ -63,7 +60,6 @@ public class Fragment_StoreGoods_One_ extends BaseFragment implements AdapterVie
     @Override
     public void onStop() {
         super.onStop();
-        LogUtil.i("one = onStop ");
         AppContext.getHttpQueue().cancelAll("goodsSpeRequest");
         mBanner.stopAutoPlay();
     }
@@ -75,16 +71,9 @@ public class Fragment_StoreGoods_One_ extends BaseFragment implements AdapterVie
     }
 
     @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        LogUtil.i("one = onDestroyView ");
-    }
-
-    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_storegoods_one, null);
         initView(view);
-        LogUtil.i("one = onCreateView ");
         return view;
     }
 
@@ -121,10 +110,6 @@ public class Fragment_StoreGoods_One_ extends BaseFragment implements AdapterVie
      * 第一部分:将上一级获取到的数据设置在View上
      */
     private void setView() {
-        DisplayImageOptions options = new DisplayImageOptions.Builder().showImageOnLoading(R.mipmap.img_error_horizon)
-                .showImageOnFail(R.mipmap.img_error_horizon).cacheInMemory(true).cacheOnDisk(true)
-                .bitmapConfig(Bitmap.Config.RGB_565).build();
-
         //将获取到的数据设置到View上
         ArrayList<String> mImgList = getArguments().getStringArrayList("mList");
         mTxtGoodsTitle.setText(getArguments().getString("goods_title"));
@@ -161,7 +146,6 @@ public class Fragment_StoreGoods_One_ extends BaseFragment implements AdapterVie
     private ArrayList<String> mSelectSpcList = new ArrayList<>();
 
     private void requestGoodsSpe(String url, final boolean need_notify) {
-        progressdialogshow(getActivity());
         StringRequest goodsSpeRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String s) {
@@ -279,15 +263,8 @@ public class Fragment_StoreGoods_One_ extends BaseFragment implements AdapterVie
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                progressdialogcancel();
             }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError volleyError) {
-                LogUtil.i("Fragment_one volleyError = " + volleyError);
-                progressdialogcancel();
-            }
-        });
+        }, null);
         goodsSpeRequest.setTag("goodsSpeRequest");
         AppContext.getHttpQueue().add(goodsSpeRequest);
     }

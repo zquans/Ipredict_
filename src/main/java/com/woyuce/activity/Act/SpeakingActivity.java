@@ -67,8 +67,6 @@ public class SpeakingActivity extends BaseActivity implements View.OnClickListen
         llStatis = (LinearLayout) findViewById(R.id.ll_speaking_stastis);
         btnShare = (Button) findViewById(R.id.button_speaking_share);
         mListView = (ListView) findViewById(R.id.listview_speaking_vote);
-        adapter = new SpeakingAdapter(SpeakingActivity.this, speakingList);
-        mListView.setAdapter(adapter);
 
         llStatis.setOnClickListener(this);
         btnShare.setOnClickListener(this);
@@ -96,6 +94,8 @@ public class SpeakingActivity extends BaseActivity implements View.OnClickListen
                             speaking.vtime = jsonObject.getString("vtime");
                             speakingList.add(speaking);
                         }
+                        adapter = new SpeakingAdapter(SpeakingActivity.this, speakingList);
+                        mListView.setAdapter(adapter);
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();

@@ -81,19 +81,12 @@
         android:layout_height="2dp"
         android:background="#f7941d" />
 
-    <FrameLayout
-    android:id="@+id/frame_activity_storegoods_fragment"
-    android:layout_width="match_parent"
-    android:layout_height="0dp"
-    android:layout_weight="1"
-    android:background="#ffffff" />
-
-    <!--<android.support.v4.view.ViewPager-->
-        <!--android:id="@+id/viewpager_activity_storegoods_fragment"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="0dp"-->
-        <!--android:layout_weight="1"-->
-        <!--android:background="#ffffff" />-->
+    <android.support.v4.view.ViewPager
+        android:id="@+id/viewpager_activity_storegoods_fragment"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="#ffffff" />
 
     <View
         android:layout_width="match_parent"
