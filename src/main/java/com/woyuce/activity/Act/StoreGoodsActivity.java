@@ -1,21 +1,18 @@
 package com.woyuce.activity.Act;
 
-import android.animation.ObjectAnimator;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.text.TextUtils;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -40,13 +37,14 @@ import java.util.List;
 
 public class StoreGoodsActivity extends FragmentActivity implements View.OnClickListener {
 
+    private TabLayout mTab;
     private ViewPager mViewPager;
     private FragmentPagerAdapter mAdapter;
     private ArrayList<Fragment> mFragmentList;
+    private ArrayList<String> mTabList = new ArrayList<>();
 
-    private TextView mTxtTabOne, mTxtTabTwo, mTxtTabThree, mTxtToCustom;
+    private TextView mTxtToCustom;
     private Button mBtnGoToCar, mBtnPutIntoCar, mBtnBuyNow;
-    private View mLine;
 
     //存放数据
     private List<String> mList = new ArrayList<>();
@@ -55,8 +53,6 @@ public class StoreGoodsActivity extends FragmentActivity implements View.OnClick
     private Fragment_StoreGoods_One_ mFrgOne;
 
     private static final int GET_DATA_DONE = 0;
-    //线宽及线动画的终点
-    private int line_width, line_end;
 
     private String local_goods_title;
 
@@ -94,8 +90,14 @@ public class StoreGoodsActivity extends FragmentActivity implements View.OnClick
                     mFrgTwo.setArguments(bundle);
                     mFrgThree.setArguments(bundle);
 
+                    mTabList.add("商品");
+                    mTabList.add("详情");
+                    mTabList.add("晒单评价");
+                    mTab.setupWithViewPager(mViewPager);
+
                     mAdapter = new FragmentPagerAdapter(getSupportFragmentManager()) {
                         @Override
+
                         public Fragment getItem(int position) {
                             return mFragmentList.get(position);
                         }
@@ -103,6 +105,11 @@ public class StoreGoodsActivity extends FragmentActivity implements View.OnClick
                         @Override
                         public int getCount() {
                             return mFragmentList.size();
+                        }
+
+                        @Override
+                        public CharSequence getPageTitle(int position) {
+                            return mTabList.get(position);
                         }
                     };
                     mFragmentList = new ArrayList<>();
@@ -127,34 +134,19 @@ public class StoreGoodsActivity extends FragmentActivity implements View.OnClick
     private void initView() {
         local_goods_title = getIntent().getStringExtra("goods_title");
 
+        mTab = (TabLayout) findViewById(R.id.tab_activity_storegoods_fragment);
         mViewPager = (ViewPager) findViewById(R.id.viewpager_activity_storegoods_fragment);
-        mTxtTabOne = (TextView) findViewById(R.id.txt_storegoods_tab_one);
-        mTxtTabTwo = (TextView) findViewById(R.id.txt_storegoods_tab_two);
-        mTxtTabThree = (TextView) findViewById(R.id.txt_storegoods_tab_three);
         mBtnGoToCar = (Button) findViewById(R.id.btn_activity_storegoods_tocar);
         mBtnPutIntoCar = (Button) findViewById(R.id.btn_activity_storegoods_putincar);
         mBtnBuyNow = (Button) findViewById(R.id.btn_activity_storegoods_buynow);
-        mLine = findViewById(R.id.line_activity_storegoods);
         mTxtToCustom = (TextView) findViewById(R.id.txt_store_to_custom);
         mTxtToCustom.setOnClickListener(this);
         mBtnGoToCar.setOnClickListener(this);
         mBtnPutIntoCar.setOnClickListener(this);
         mBtnBuyNow.setOnClickListener(this);
-        mTxtTabOne.setOnClickListener(this);
-        mTxtTabTwo.setOnClickListener(this);
-        mTxtTabThree.setOnClickListener(this);
 
         //请求数据
         requestData();
-        //重设Tab的样式
-        resetTxtTab(mTxtTabOne, 0, 0);
-        //设置线宽
-        line_width = this.getWindowManager().getDefaultDisplay().getWidth();
-        ViewGroup.LayoutParams mLayoutParams = mLine.getLayoutParams();
-        mLayoutParams.width = line_width / 3;
-        mLine.setLayoutParams(mLayoutParams);
-
-        mTxtTabOne.setTextColor(Color.parseColor("#f7941d"));
     }
 
     /**
@@ -210,20 +202,6 @@ public class StoreGoodsActivity extends FragmentActivity implements View.OnClick
     }
 
     /**
-     * 重设Tab样式
-     */
-    private void resetTxtTab(TextView txt, int start, int end) {
-        ObjectAnimator mAnimator = ObjectAnimator.ofFloat(mLine, "translationX", start, end);
-        mAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
-        mAnimator.setDuration(500).start();
-        mTxtTabOne.setTextColor(Color.parseColor("#a7a7a7"));
-        mTxtTabTwo.setTextColor(Color.parseColor("#a7a7a7"));
-        mTxtTabThree.setTextColor(Color.parseColor("#a7a7a7"));
-        txt.setTextColor(Color.parseColor("#f7941d"));
-        line_end = end;
-    }
-
-    /**
      * 开数据库建一张表
      */
     private void saveStoreInfo(String id, String goodsid, String goodsskuid, String name, String specname, String num, String price) {
@@ -262,8 +240,6 @@ public class StoreGoodsActivity extends FragmentActivity implements View.OnClick
             startActivity(new Intent(this, MainActivity.class));
     }
 
-    private boolean is_first_line = true;
-
     @Override
     public void onClick(View v) {//前三个case是顶部导航栏，后三个是底部导航栏
         if (mFrgOne == null) {
@@ -278,23 +254,6 @@ public class StoreGoodsActivity extends FragmentActivity implements View.OnClick
         String local_price = mFrgOne.returenGoodsPrice();
         String local_num = "1";
         switch (v.getId()) {
-            case R.id.txt_storegoods_tab_one:
-                resetTxtTab(mTxtTabOne, line_end, 0);
-                break;
-            case R.id.txt_storegoods_tab_two:
-                if (is_first_line) {
-                    resetTxtTab(mTxtTabTwo, 0, line_width / 3 * 1);
-                    is_first_line = false;
-                }
-                resetTxtTab(mTxtTabTwo, line_end, line_width / 3 * 1);
-                break;
-            case R.id.txt_storegoods_tab_three:
-                if (is_first_line) {
-                    is_first_line = false;
-                    resetTxtTab(mTxtTabThree, 0, line_width / 3 * 2);
-                }
-                resetTxtTab(mTxtTabThree, line_end, line_width / 3 * 2);
-                break;
             case R.id.btn_activity_storegoods_buynow:
                 //保存进数据库
                 saveStoreInfo(local_id, local_goodsid, local_goods_sku_id, local_name, local_specname, local_num, local_price);
