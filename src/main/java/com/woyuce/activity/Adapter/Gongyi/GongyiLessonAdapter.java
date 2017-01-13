@@ -12,7 +12,7 @@ import android.widget.TextView;
 
 import com.nineoldandroids.view.ViewHelper;
 import com.nineoldandroids.view.ViewPropertyAnimator;
-import com.woyuce.activity.Act.Gongyi.GongyiContentActivity;
+import com.woyuce.activity.UI.Act.Gongyi.GongyiContentActivity;
 import com.woyuce.activity.Bean.Gongyi.GongyiAudio;
 import com.woyuce.activity.R;
 

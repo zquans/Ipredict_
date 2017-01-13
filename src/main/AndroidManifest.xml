@@ -19,14 +19,14 @@
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
 
     <application
-        android:name=".Application.AppContext"
+        android:name=".AppContext"
         android:allowBackup="false"
         android:icon="@mipmap/icon_logo"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".Act.WelcomeActivity"
+            android:name=".UI.Act.WelcomeActivity"
             android:launchMode="singleTop"
             android:windowSoftInputMode="adjustPan">
             <intent-filter>
@@ -36,7 +36,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".Act.Login.LoginActivity"
+            android:name=".UI.Act.Login.LoginActivity"
             android:launchMode="singleTop"
             android:windowSoftInputMode="adjustPan" />
         <!--<activity-->
@@ -44,137 +44,137 @@
         <!--android:launchMode="standard"-->
         <!--android:screenOrientation="portrait" />-->
         <activity
-            android:name=".Act.Login.LoginResetActivity"
+            android:name=".UI.Act.Login.LoginResetActivity"
             android:launchMode="standard"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".Act.Login.LoginRegisterActivity"
+            android:name=".UI.Act.Login.LoginRegisterActivity"
             android:launchMode="singleTop"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".Act.Login.LoginRegisterInfoActivity"
+            android:name=".UI.Act.Login.LoginRegisterInfoActivity"
             android:launchMode="singleTop"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".Act.MainActivity"
+            android:name=".UI.Act.MainActivity"
             android:launchMode="singleTask"
             android:windowSoftInputMode="adjustPan" />
 
         <!-- Tab1 -->
         <!-- 第一模块 口语高频 的Activity -->
         <activity
-            android:name=".Act.Speaking.SpeakingActivity"
+            android:name=".UI.Act.Speaking.SpeakingActivity"
             android:launchMode="singleTask"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".Act.Speaking.SpeakingDetailActivity"
+            android:name=".UI.Act.Speaking.SpeakingDetailActivity"
             android:launchMode="standard"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".Act.Speaking.SpeakingShare1Activity"
+            android:name=".UI.Act.Speaking.SpeakingShare1Activity"
             android:launchMode="singleTask"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".Act.Speaking.SpeakingChooseRoomActivity"
+            android:name=".UI.Act.Speaking.SpeakingChooseRoomActivity"
             android:launchMode="standard"
             android:screenOrientation="portrait"
             android:theme="@style/dialogActivity" />
         <activity
-            android:name=".Act.Speaking.SpeakingShare2Activity"
+            android:name=".UI.Act.Speaking.SpeakingShare2Activity"
             android:launchMode="singleTask"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".Act.Speaking.SpeakingShare3Activity"
+            android:name=".UI.Act.Speaking.SpeakingShare3Activity"
             android:launchMode="singleTask"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".Act.Speaking.SpeakingShare4Activity"
+            android:name=".UI.Act.Speaking.SpeakingShare4Activity"
             android:launchMode="singleTask"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".Act.Speaking.SpeakingStatisActivity"
+            android:name=".UI.Act.Speaking.SpeakingStatisActivity"
             android:launchMode="singleTask"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".Act.Speaking.SpeakingMoreActivity"
+            android:name=".UI.Act.Speaking.SpeakingMoreActivity"
             android:launchMode="singleTop"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".Act.Speaking.SpeakingContentActivity"
+            android:name=".UI.Act.Speaking.SpeakingContentActivity"
             android:launchMode="singleTop"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".Act.Speaking.SpeakingSearchActivity"
+            android:name=".UI.Act.Speaking.SpeakingSearchActivity"
             android:launchMode="standard"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".Act.Speaking.SpeakingVoteActivity"
+            android:name=".UI.Act.Speaking.SpeakingVoteActivity"
             android:launchMode="standard"
             android:screenOrientation="portrait"
             android:theme="@style/dialogActivity" />
 
         <!-- 第二模块 免费范围/笔试预测 的Activity -->
         <activity
-            android:name=".Act.Free.FreeRangeActivity"
+            android:name=".UI.Act.Free.FreeRangeActivity"
             android:launchMode="singleTop"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".Act.Free.FreeLessonActivity"
+            android:name=".UI.Act.Free.FreeLessonActivity"
             android:launchMode="singleTop"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".Act.Free.FreeBookActivity"
+            android:name=".UI.Act.Free.FreeBookActivity"
             android:launchMode="singleTask"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".Act.Free.FreePageActivity"
+            android:name=".UI.Act.Free.FreePageActivity"
             android:launchMode="singleTop"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".Act.Free.FreeContentActivity"
+            android:name=".UI.Act.Free.FreeContentActivity"
             android:launchMode="singleTop"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateAlwaysHidden|adjustPan" />
 
         <!-- 第三模块公益课堂 的Activity -->
         <activity
-            android:name=".Act.Gongyi.GongyiActivity"
+            android:name=".UI.Act.Gongyi.GongyiActivity"
             android:launchMode="singleTop"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".Act.Gongyi.GongyiLessonActivity"
+            android:name=".UI.Act.Gongyi.GongyiLessonActivity"
             android:launchMode="standard"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".Act.Gongyi.GongyiContentActivity"
+            android:name=".UI.Act.Gongyi.GongyiContentActivity"
             android:launchMode="standard"
             android:screenOrientation="portrait" />
 
         <!-- 第四模块网络班专属 的Activity -->
         <activity
-            android:name=".Act.Free.Net.NetClassActivity"
+            android:name=".UI.Act.Free.Net.NetClassActivity"
             android:launchMode="singleTop"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".Act.Free.Net.NetClassLessonActivity"
+            android:name=".UI.Act.Free.Net.NetClassLessonActivity"
             android:launchMode="singleTop"
             android:screenOrientation="portrait" />
 
         <!-- 第五模块 写作题库 的Activity -->
         <activity
-            android:name=".Act.Writting.WitActivity"
+            android:name=".UI.Act.Writting.WitActivity"
             android:launchMode="singleTop"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".Act.Writting.WitSubcategoryActivity"
+            android:name=".UI.Act.Writting.WitSubcategoryActivity"
             android:launchMode="standard"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".Act.Writting.WitSearchActivity"
+            android:name=".UI.Act.Writting.WitSearchActivity"
             android:launchMode="standard"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".Act.Writting.WitContentActivity"
+            android:name=".UI.Act.Writting.WitContentActivity"
             android:launchMode="standard"
             android:screenOrientation="portrait" />
 
@@ -202,65 +202,65 @@
 
         <!-- Tab5 -->
         <activity
-            android:name=".Act.Store.StoreGoodsActivity"
+            android:name=".UI.Act.Store.StoreGoodsActivity"
             android:launchMode="standard"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".Act.Store.StoreCarActivity"
+            android:name=".UI.Act.Store.StoreCarActivity"
             android:launchMode="standard"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".Act.Store.StorePayActivity"
+            android:name=".UI.Act.Store.StorePayActivity"
             android:launchMode="standard"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".Act.Store.StoreAddressActivity"
+            android:name=".UI.Act.Store.StoreAddressActivity"
             android:launchMode="standard"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".Act.Store.StoreAddAddressActivity"
+            android:name=".UI.Act.Store.StoreAddAddressActivity"
             android:launchMode="standard"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".Act.Store.StoreOrderActivity"
+            android:name=".UI.Act.Store.StoreOrderActivity"
             android:launchMode="standard"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".Act.Store.StoreOrderListActivity"
+            android:name=".UI.Act.Store.StoreOrderListActivity"
             android:launchMode="standard"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".Act.Store.StoreCommentActivity"
+            android:name=".UI.Act.Store.StoreCommentActivity"
             android:launchMode="standard"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".Act.Store.ShowImgActivity"
+            android:name=".UI.Act.Store.ShowImgActivity"
             android:launchMode="standard"
             android:screenOrientation="portrait" />
 
         <!-- 意见反馈Activity -->
         <activity
-            android:name=".Act.Common.SuggestionActivity"
+            android:name=".UI.Act.Common.SuggestionActivity"
             android:launchMode="standard"
             android:screenOrientation="portrait" />
         <!-- 关于我们Activity -->
         <activity
-            android:name=".Act.Common.AboutUsActivity"
+            android:name=".UI.Act.Common.AboutUsActivity"
             android:launchMode="standard"
             android:screenOrientation="portrait" />
         <!-- 客服Activity -->
         <activity
-            android:name=".Act.Common.CustomServiceActivity"
+            android:name=".UI.Act.Common.CustomServiceActivity"
             android:launchMode="standard"
             android:screenOrientation="portrait" />
 
         <!-- WebView专用Activity -->
         <activity
-            android:name=".Act.Common.WebActivity"
+            android:name=".UI.Act.Common.WebActivity"
             android:launchMode="standard"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".Act.Common.WebNoCookieActivity"
+            android:name=".UI.Act.Common.WebNoCookieActivity"
             android:launchMode="standard"
             android:screenOrientation="portrait" />
 

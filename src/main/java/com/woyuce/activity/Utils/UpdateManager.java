@@ -20,7 +20,7 @@ import android.widget.ProgressBar;
 import com.android.volley.Request.Method;
 import com.android.volley.Response.Listener;
 import com.android.volley.toolbox.StringRequest;
-import com.woyuce.activity.Application.AppContext;
+import com.woyuce.activity.AppContext;
 import com.woyuce.activity.R;
 
 import org.json.JSONArray;
