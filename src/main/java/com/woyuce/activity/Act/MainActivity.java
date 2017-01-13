@@ -15,12 +15,12 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.woyuce.activity.Fragment.Fragment3;
-import com.woyuce.activity.Fragment.FragmentTwo;
-import com.woyuce.activity.Fragment.Fragment_StoreHome;
-import com.woyuce.activity.Fragment.Fragmentfive;
-import com.woyuce.activity.Fragment.Fragmentone;
-import com.woyuce.activity.Fragment.Fragmentthree;
+import com.woyuce.activity.Fragment.Main.Fragment3;
+import com.woyuce.activity.Fragment.Main.FragmentTwo;
+import com.woyuce.activity.Fragment.Store.Fragment_StoreHome;
+import com.woyuce.activity.Fragment.Main.Fragmentfive;
+import com.woyuce.activity.Fragment.Main.Fragmentone;
+import com.woyuce.activity.Fragment.Main.Fragmentthree;
 import com.woyuce.activity.R;
 import com.woyuce.activity.Utils.ActivityManager;
 import com.woyuce.activity.Utils.PreferenceUtil;

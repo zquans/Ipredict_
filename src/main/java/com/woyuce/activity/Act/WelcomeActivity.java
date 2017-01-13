@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.woyuce.activity.Act.Login.LoginActivity;
 import com.woyuce.activity.R;
 import com.woyuce.activity.Utils.PreferenceUtil;
 
