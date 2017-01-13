@@ -1,7 +1,6 @@
 package com.woyuce.activity.Act;
 
 import android.animation.ObjectAnimator;
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -13,7 +12,6 @@ import android.widget.TextView;
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.Response;
-import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.jcodecraeer.xrecyclerview.ProgressStyle;
 import com.jcodecraeer.xrecyclerview.XRecyclerView;
@@ -23,7 +21,6 @@ import com.woyuce.activity.Bean.GongyiAudio;
 import com.woyuce.activity.R;
 import com.woyuce.activity.Utils.LogUtil;
 import com.woyuce.activity.Utils.PreferenceUtil;
-import com.woyuce.activity.Utils.RecyclerItemClickListener;
 import com.woyuce.activity.common.Constants;
 
 import org.json.JSONArray;
@@ -107,7 +104,6 @@ public class GongyiLessonActivity extends BaseActivity implements View.OnClickLi
     }
 
     private void getListRequest(final int code, String url, final String type_id, final int page_num) {
-        progressdialogshow(this);
         StringRequest audioListRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
@@ -144,14 +140,8 @@ public class GongyiLessonActivity extends BaseActivity implements View.OnClickLi
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                progressdialogcancel();
             }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError volleyError) {
-                progressdialogcancel();
-            }
-        }) {
+        }, null) {
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
                 HashMap<String, String> headers = new HashMap<>();
