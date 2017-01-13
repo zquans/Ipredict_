@@ -19,5 +19,7 @@ public class Constants {
 
 //    public static final String URL_WEB_LUBO = "https://iyuce.ke.qq.com/";
 
-
+    //公益课堂音频接口
+    public static final String URL_GET_AUDIO_TYPE = "http://api.iyuce.com/v1/exam/audiotypes";
+    public static final String URL_POST_AUDIO_LIST = "http://api.iyuce.com/v1/exam/audios";
 }

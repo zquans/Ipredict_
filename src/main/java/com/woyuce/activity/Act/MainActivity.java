@@ -3,7 +3,6 @@ package com.woyuce.activity.Act;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.graphics.Color;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -16,12 +15,12 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.woyuce.activity.Fragment.Fragment3;
-import com.woyuce.activity.Fragment.FragmentTwo;
-import com.woyuce.activity.Fragment.Fragment_StoreHome;
-import com.woyuce.activity.Fragment.Fragmentfive;
-import com.woyuce.activity.Fragment.Fragmentone;
-import com.woyuce.activity.Fragment.Fragmentthree;
+import com.woyuce.activity.Fragment.Main.Fragment3;
+import com.woyuce.activity.Fragment.Main.FragmentTwo;
+import com.woyuce.activity.Fragment.Store.Fragment_StoreHome;
+import com.woyuce.activity.Fragment.Main.Fragmentfive;
+import com.woyuce.activity.Fragment.Main.Fragmentone;
+import com.woyuce.activity.Fragment.Main.Fragmentthree;
 import com.woyuce.activity.R;
 import com.woyuce.activity.Utils.ActivityManager;
 import com.woyuce.activity.Utils.PreferenceUtil;
@@ -59,12 +58,12 @@ public class MainActivity extends FragmentActivity implements OnClickListener, O
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //沉浸式状态栏
-        if (Build.VERSION.SDK_INT >= 21) {
-            View decorView = getWindow().getDecorView();
-            decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                    | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
-            getWindow().setStatusBarColor(Color.TRANSPARENT);
-        }
+//        if (Build.VERSION.SDK_INT >= 21) {
+//            View decorView = getWindow().getDecorView();
+//            decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+//                    | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
+//            getWindow().setStatusBarColor(Color.TRANSPARENT);
+//        }
         setContentView(R.layout.activity_main);
 
         initView();

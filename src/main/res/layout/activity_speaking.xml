@@ -43,29 +43,14 @@
         android:layout_marginTop="4dp"
         android:background="#cccccc" />
 
-    <LinearLayout
+    <ListView
+        android:id="@+id/listview_speaking_vote"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
         android:background="#ffffff"
-        android:orientation="vertical">
-
-        <TextView
-            android:id="@+id/txt_speaking_refreshtitle"
-            android:layout_width="match_parent"
-            android:layout_height="32dp"
-            android:gravity="center_horizontal"
-            android:text="加载中，请稍候"
-            android:visibility="gone" />
-
-        <ListView
-            android:id="@+id/listview_speaking_vote"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="#ffffff"
-            android:divider="#cccccc"
-            android:dividerHeight="0.5dp"
-            android:scrollbars="none" />
-    </LinearLayout>
+        android:divider="#cccccc"
+        android:dividerHeight="0.5dp"
+        android:scrollbars="none" />
 
 </LinearLayout>

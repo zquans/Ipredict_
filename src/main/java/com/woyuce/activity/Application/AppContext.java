@@ -19,23 +19,23 @@ import com.umeng.message.PushAgent;
 import com.umeng.message.UmengMessageHandler;
 import com.umeng.message.UmengNotificationClickHandler;
 import com.umeng.message.entity.UMessage;
-import com.woyuce.activity.Act.LoginActivity;
+import com.woyuce.activity.Act.Login.LoginActivity;
 import com.woyuce.activity.Utils.LogUtil;
 import com.woyuce.activity.Utils.PreferenceUtil;
-import com.woyuce.activity.Utils.ToastUtil;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Map;
 
 /**
  * 全局应用程序类：用于保存和调用全局应用配置及访问网络数据
  *
- * @author linjizong
+ * @author LeBang
  * @created 2015-3-22
  */
 public class AppContext extends Application {
-    private static final String TAG = AppContext.class.getSimpleName();
-    private static final String APP_CACAHE_DIRNAME = "/webcache";
+    //    private static final String TAG = AppContext.class.getSimpleName();
+//    private static final String APP_CACAHE_DIRNAME = "/webcache";
     private static String DEVICE_TOKEN;
 
     //singleton
@@ -59,22 +59,21 @@ public class AppContext extends Application {
              */
             @Override
             public void dealWithCustomMessage(final Context context, final UMessage msg) {
-                LogUtil.i("linx", "dealWithCustomMessage----msg:" + msg.custom);
-                if (msg.custom.equals(PreferenceUtil.getSharePre(context).getString("userId", ""))) {
-                    Intent startLogin = new Intent(context, LoginActivity.class);
-                    startLogin.putExtra("local_push_code", msg.custom);
-                    startLogin.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    context.startActivity(startLogin);
-                }
                 //自定义参数
+                LogUtil.i("linx", "dealWithCustomMessage----msg:" + msg.custom);
                 LogUtil.i("linx", "dealWithCustomMessage----extra:" + msg.extra);
+                ArrayList<String> valuelist = new ArrayList<>();
                 for (Map.Entry<String, String> entry : msg.extra.entrySet()) {
-                    //键值自己拼装，2016/12/07全蛋说只会传一组数据key不变，所以我只拿了value
                     String key = entry.getKey();
                     String value = entry.getValue();
-                    if (value.equals(PreferenceUtil.getSharePre(context).getString("userId", ""))) {
+                    valuelist.add(value);
+                }
+                LogUtil.i("valuelist = " + valuelist);
+                LogUtil.i("valuelist = " + valuelist.get(0) + "|||" + valuelist.get(1));
+                if (!valuelist.get(1).equals(DEVICE_TOKEN)) {
+                    if (valuelist.get(0).equals(PreferenceUtil.getSharePre(context).getString("userId", ""))) {
                         Intent startLogin = new Intent(context, LoginActivity.class);
-                        startLogin.putExtra("local_push_code", value);
+                        startLogin.putExtra("local_push_code", valuelist.get(0));
                         startLogin.putExtra("local_push_message", msg.custom);
                         startLogin.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                         context.startActivity(startLogin);
@@ -96,14 +95,14 @@ public class AppContext extends Application {
             @Override
             public Notification getNotification(Context context, UMessage uMessage) {
                 LogUtil.i("linx", "getNotification----custom:" + uMessage.custom);
-                if (uMessage.custom.equals(PreferenceUtil.getSharePre(context).getString("userId", ""))) {
-                    Intent startLogin = new Intent(context, LoginActivity.class);
-                    startLogin.putExtra("local_push_code", uMessage.custom);
-                    startLogin.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    context.startActivity(startLogin);
-                } else if (uMessage.custom.equals("notification")) {
-                    ToastUtil.showMessage(context, "您收到了一条最新消息");
-                }
+//                if (uMessage.custom.equals(PreferenceUtil.getSharePre(context).getString("userId", ""))) {
+//                    Intent startLogin = new Intent(context, LoginActivity.class);
+//                    startLogin.putExtra("local_push_code", uMessage.custom);
+//                    startLogin.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//                    context.startActivity(startLogin);
+//                } else if (uMessage.custom.equals("notification")) {
+//                    ToastUtil.showMessage(context, "您收到了一条最新消息");
+//                }
                 return super.getNotification(context, uMessage);
             }
         };
@@ -164,7 +163,6 @@ public class AppContext extends Application {
             display = windowManager.getDefaultDisplay();
         }
     }
-
 
     public static void initImageLoader(Context context) {
         ImageLoaderConfiguration.Builder config = new ImageLoaderConfiguration.Builder(context);

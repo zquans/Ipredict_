@@ -60,7 +60,7 @@
                 android:layout_marginLeft="8dp"
                 android:layout_weight="1"
                 android:background="@drawable/buttonstyle_greenstroke"
-                android:text="口语"
+                android:text="写作"
                 android:textColor="#30999f"
                 android:textSize="16sp" />
 
@@ -83,18 +83,17 @@
                 android:layout_marginRight="8dp"
                 android:layout_weight="1"
                 android:background="@drawable/buttonstyle_greenstroke"
-                android:text="写作"
+                android:text="口语"
                 android:textColor="#30999f"
                 android:textSize="16sp" />
         </LinearLayout>
     </FrameLayout>
 
-    <ListView
-        android:id="@+id/listview_audiolesson"
+    <com.jcodecraeer.xrecyclerview.XRecyclerView
+        android:id="@+id/xrecyclerview_audiolesson"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="center"
-        android:fadingEdgeLength="0dp"
         android:padding="8dp"
         android:scrollbars="none" />
 
