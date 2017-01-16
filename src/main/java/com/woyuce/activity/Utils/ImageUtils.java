@@ -27,7 +27,7 @@ import android.provider.MediaStore;
 import android.provider.MediaStore.MediaColumns;
 import android.util.DisplayMetrics;
 
-import com.woyuce.activity.Application.AppContext;
+import com.woyuce.activity.AppContext;
 import com.woyuce.activity.common.MethodsCompat;
 
 import java.io.BufferedOutputStream;

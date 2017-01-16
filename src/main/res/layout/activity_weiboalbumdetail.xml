@@ -12,7 +12,7 @@
         android:background="#ffffff"
         android:gravity="top">
 
-        <com.woyuce.activity.View.FilterImageView
+        <com.woyuce.activity.UI.View.FilterImageView
             android:id="@+id/album_back"
             android:layout_width="wrap_content"
             android:layout_height="fill_parent"
@@ -71,7 +71,7 @@
         android:layout_height="match_parent"
         android:visibility="gone" >
 
-        <com.woyuce.activity.View.AlbumViewPager
+        <com.woyuce.activity.UI.View.AlbumViewPager
             android:id="@+id/albumviewpager"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"

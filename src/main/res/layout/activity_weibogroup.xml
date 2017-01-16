@@ -34,7 +34,7 @@
         android:hint="搜一搜"
         android:paddingLeft="16dp" />
 
-    <com.woyuce.activity.View.InnerListView
+    <com.woyuce.activity.UI.View.InnerListView
         android:id="@+id/listview_activity_weibogroup"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

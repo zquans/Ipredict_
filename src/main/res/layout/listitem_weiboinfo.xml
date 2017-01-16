@@ -46,11 +46,4 @@
         android:paddingRight="8dp"
         android:text="微博精选的内容，这是一个非常精彩的微博" />
 
-    <!--<com.woyuce.activity.View.InnerListView-->
-    <!--android:id="@+id/listview_item_weiboinfo"-->
-    <!--android:layout_width="240dp"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:layout_alignLeft="@+id/body_item_weibo"-->
-    <!--android:layout_marginTop="60dp" />-->
-
 </RelativeLayout>

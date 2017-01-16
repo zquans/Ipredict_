@@ -97,7 +97,7 @@
                 android:paddingLeft="@dimen/padding_10"
                 android:paddingRight="@dimen/padding_10">
 
-                <com.woyuce.activity.View.FilterImageView
+                <com.woyuce.activity.UI.View.FilterImageView
                     android:id="@+id/post_add_pic"
                     android:layout_width="@dimen/size_100"
                     android:layout_height="@dimen/size_100"
@@ -129,7 +129,7 @@
         android:layout_height="match_parent"
         android:visibility="gone">
 
-        <com.woyuce.activity.View.AlbumViewPager
+        <com.woyuce.activity.UI.View.AlbumViewPager
             android:id="@+id/albumviewpager"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"

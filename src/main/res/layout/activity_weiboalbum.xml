@@ -12,7 +12,7 @@
         android:background="#ffffff"
         android:gravity="top">
 
-        <com.woyuce.activity.View.FilterImageView
+        <com.woyuce.activity.UI.View.FilterImageView
             android:id="@+id/album_back"
             android:layout_width="wrap_content"
             android:layout_height="fill_parent"
@@ -32,7 +32,7 @@
             android:textColor="@color/title_text_color"
             android:textSize="@dimen/textsize_18" />
 
-        <com.woyuce.activity.View.FilterImageView
+        <com.woyuce.activity.UI.View.FilterImageView
             android:id="@+id/loacal_album_camera"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
