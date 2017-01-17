@@ -15,9 +15,9 @@ import com.android.volley.Response;
 import com.android.volley.toolbox.StringRequest;
 import com.jcodecraeer.xrecyclerview.ProgressStyle;
 import com.jcodecraeer.xrecyclerview.XRecyclerView;
-import com.woyuce.activity.BaseActivity;
 import com.woyuce.activity.Adapter.Gongyi.GongyiLessonAdapter;
 import com.woyuce.activity.AppContext;
+import com.woyuce.activity.BaseActivity;
 import com.woyuce.activity.Bean.Gongyi.GongyiAudio;
 import com.woyuce.activity.R;
 import com.woyuce.activity.Utils.LogUtil;
@@ -212,6 +212,7 @@ public class GongyiLessonActivity extends BaseActivity implements View.OnClickLi
 
     @Override
     public void onClick(View v) {
+        //TODO 多一个类型(四个按钮应该做成横向RecyclerView)
         switch (v.getId()) {
             case R.id.txt_audiolesson_back:
                 finish();

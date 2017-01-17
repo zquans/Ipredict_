@@ -8,8 +8,8 @@ import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
-import com.woyuce.activity.BaseActivity;
 import com.woyuce.activity.AppContext;
+import com.woyuce.activity.BaseActivity;
 import com.woyuce.activity.R;
 import com.woyuce.activity.Utils.LogUtil;
 
