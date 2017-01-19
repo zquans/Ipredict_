@@ -11,27 +11,23 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request.Method;
-import com.android.volley.Response.ErrorListener;
-import com.android.volley.Response.Listener;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.woyuce.activity.BaseActivity;
+import com.lzy.okgo.OkGo;
+import com.lzy.okgo.callback.StringCallback;
+import com.lzy.okgo.model.HttpParams;
 import com.woyuce.activity.Adapter.Writting.WitSearchAdapter;
-import com.woyuce.activity.AppContext;
+import com.woyuce.activity.BaseActivity;
 import com.woyuce.activity.Bean.Writting.WitSearch;
 import com.woyuce.activity.R;
-import com.woyuce.activity.Utils.LogUtil;
+import com.woyuce.activity.common.Constants;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+
+import okhttp3.Call;
+import okhttp3.Response;
 
 public class WitSearchActivity extends BaseActivity implements OnClickListener, OnItemClickListener {
 
@@ -40,14 +36,13 @@ public class WitSearchActivity extends BaseActivity implements OnClickListener, 
     private ImageView mImgView;
     private ListView witsearchlistview;
 
-    private String URL_SEARCH = "http://iphone.ipredicting.com/xzsubSearch.aspx";
     private String localkey, localid, localsubid;
-    private List<WitSearch> witsearchList = new ArrayList<WitSearch>();
+    private ArrayList<WitSearch> witsearchList = new ArrayList<>();
 
     @Override
     protected void onStop() {
         super.onStop();
-        AppContext.getHttpQueue().cancelAll("witsearch");
+        OkGo.getInstance().cancelTag(Constants.ACTIVITY_WIT_SEARCH);
     }
 
     @Override
@@ -75,56 +70,50 @@ public class WitSearchActivity extends BaseActivity implements OnClickListener, 
     }
 
     private void getJson() {
-        StringRequest strinrequest = new StringRequest(Method.POST, URL_SEARCH, new Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                WitSearch witsearch;
-                JSONObject jsonobj;
-                try {
-                    jsonobj = new JSONObject(response);
-                    int result = jsonobj.getInt("code");
-                    if (result == 0) {
-                        JSONArray data = jsonobj.getJSONArray("data");
-                        if (data.length() == 0) {
-                            txtResult.setText("没有找到您要的结果呢，亲...");
-                        }
-                        for (int i = 0; i < data.length(); i++) {
-                            jsonobj = data.getJSONObject(i);
-                            witsearch = new WitSearch();
-                            witsearch.subid = jsonobj.getString("subid");
-                            witsearch.subname = jsonobj.getString("subname");
-                            witsearchList.add(witsearch);
-                        }
-                        WitSearchAdapter adapter = new WitSearchAdapter(WitSearchActivity.this, witsearchList);
-                        witsearchlistview.setAdapter(adapter);
-                    } else {
-                        txtResult.setText("您没有输入内容哦，亲!");
-                        LogUtil.e("Code Wrong", "请求失败 =" + jsonobj);
+        HttpParams params = new HttpParams();
+        params.put("key", localkey);
+        if (localid != null) {
+            params.put("categoryid", localid);
+        }
+        OkGo.post(Constants.URL_POST_WRITTING_SEARCH).tag(Constants.ACTIVITY_WIT_SEARCH).params(params)
+                .execute(new StringCallback() {
+                    @Override
+                    public void onSuccess(String s, Call call, Response response) {
+                        doSuccess(s);
                     }
-                } catch (JSONException e) {
-                    e.printStackTrace();
+
+                    @Override
+                    public void onError(Call call, Response response, Exception e) {
+                        super.onError(call, response, e);
+                        txtResult.setText("没有找到您要的结果呢，亲...");
+                    }
+                });
+    }
+
+    private void doSuccess(String response) {
+        WitSearch witsearch;
+        JSONObject jsonobj;
+        try {
+            jsonobj = new JSONObject(response);
+            int result = jsonobj.getInt("code");
+            if (result == 0) {
+                JSONArray data = jsonobj.getJSONArray("data");
+                if (data.length() == 0) {
+                    txtResult.setText("没有找到您要的结果呢，亲...");
                 }
-                // Log.e("all response", "response = " + response);
-            }
-        }, new ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                txtResult.setText("没有找到您要的结果呢，亲...");
-                LogUtil.e("Request Wrong", "请求失败 =" + error);
-            }
-        }) {
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                Map<String, String> hashMap = new HashMap<String, String>();
-                hashMap.put("key", localkey);
-                if (localid != null) {
-                    hashMap.put("categoryid", localid);
+                for (int i = 0; i < data.length(); i++) {
+                    jsonobj = data.getJSONObject(i);
+                    witsearch = new WitSearch();
+                    witsearch.subid = jsonobj.getString("subid");
+                    witsearch.subname = jsonobj.getString("subname");
+                    witsearchList.add(witsearch);
                 }
-                return hashMap;
+                WitSearchAdapter adapter = new WitSearchAdapter(WitSearchActivity.this, witsearchList);
+                witsearchlistview.setAdapter(adapter);
             }
-        };
-        strinrequest.setTag("witsearch");
-        AppContext.getHttpQueue().add(strinrequest);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -141,10 +130,10 @@ public class WitSearchActivity extends BaseActivity implements OnClickListener, 
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        WitSearch witsearch = (WitSearch) witsearchList.get(position);
+        WitSearch witsearch = witsearchList.get(position);
         localsubid = witsearch.subid;
-        Intent it_witcontent = new Intent(this, WitContentActivity.class);
-        it_witcontent.putExtra("localsubid", localsubid);
-        startActivity(it_witcontent);
+        Intent intent = new Intent(this, WitContentActivity.class);
+        intent.putExtra("localsubid", localsubid);
+        startActivity(intent);
     }
 }

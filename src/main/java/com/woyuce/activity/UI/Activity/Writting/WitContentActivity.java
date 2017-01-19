@@ -9,28 +9,23 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request.Method;
-import com.android.volley.Response.ErrorListener;
-import com.android.volley.Response.Listener;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
+import com.lzy.okgo.OkGo;
+import com.lzy.okgo.callback.StringCallback;
+import com.lzy.okgo.model.HttpParams;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.woyuce.activity.BaseActivity;
-import com.woyuce.activity.UI.Activity.Common.WebActivity;
-import com.woyuce.activity.AppContext;
 import com.woyuce.activity.Bean.Writting.WitContent;
 import com.woyuce.activity.R;
-import com.woyuce.activity.Utils.LogUtil;
+import com.woyuce.activity.UI.Activity.Common.WebActivity;
+import com.woyuce.activity.common.Constants;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.HashMap;
-import java.util.Map;
-
+import okhttp3.Call;
+import okhttp3.Response;
 import uk.co.senab.photoview.PhotoView;
 
 public class WitContentActivity extends BaseActivity implements OnClickListener {
@@ -40,13 +35,12 @@ public class WitContentActivity extends BaseActivity implements OnClickListener 
     private ImageView mImgview;
     private PhotoView photoView;
 
-    private String URL = "http://iphone.ipredicting.com/xzsubContent.aspx";
     private String localsubCategoryid, localname, localsubid, localimgUrl, localanswerUrl;
 
     @Override
     protected void onStop() {
         super.onStop();
-        AppContext.getHttpQueue().cancelAll("witcontent");
+        OkGo.getInstance().cancelTag(Constants.ACTIVITY_WIT_CONTENT);
     }
 
     @Override
@@ -83,54 +77,42 @@ public class WitContentActivity extends BaseActivity implements OnClickListener 
     }
 
     private void getJson() {
-        progressdialogshow(WitContentActivity.this);
-        StringRequest strinrequest = new StringRequest(Method.POST, URL, new Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                JSONObject jsonobj;
-                WitContent witcontent;
-                try {
-                    jsonobj = new JSONObject(response);
-                    int result = jsonobj.getInt("code");
-                    if (result == 0) {
-                        JSONArray data = jsonobj.getJSONArray("data");
-                        jsonobj = data.getJSONObject(0);
-                        witcontent = new WitContent();
-                        witcontent.subname = jsonobj.getString("subname");
-                        witcontent.subimg = jsonobj.getString("subimg");
-                        witcontent.answerUrl = jsonobj.getString("answerUrl");
-                        localanswerUrl = witcontent.answerUrl; // 拿到了答案地址
-                        localimgUrl = witcontent.subimg; // 拿到了图片地址
-                        txtContent.setText(witcontent.subname);
-                        progressdialogcancel();
-                    } else {
-                        LogUtil.e("Code Wrong", "请求失败 =" + response);
+        HttpParams params = new HttpParams();
+        if (localsubid == null) {
+            params.put("subCategoryid", localsubCategoryid);
+        } else {
+            params.put("subid", localsubid);
+        }
+        OkGo.post(Constants.URL_POST_WRITTING_CONTENT).tag(Constants.ACTIVITY_WIT_CONTENT).params(params)
+                .execute(new StringCallback() {
+                    @Override
+                    public void onSuccess(String s, Call call, Response response) {
+                        doSuccess(s);
                     }
-                    showImage();
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+                });
+    }
+
+    private void doSuccess(String response) {
+        JSONObject jsonobj;
+        WitContent witcontent;
+        try {
+            jsonobj = new JSONObject(response);
+            int result = jsonobj.getInt("code");
+            if (result == 0) {
+                JSONArray data = jsonobj.getJSONArray("data");
+                jsonobj = data.getJSONObject(0);
+                witcontent = new WitContent();
+                witcontent.subname = jsonobj.getString("subname");
+                witcontent.subimg = jsonobj.getString("subimg");
+                witcontent.answerUrl = jsonobj.getString("answerUrl");
+                localanswerUrl = witcontent.answerUrl; // 拿到了答案地址
+                localimgUrl = witcontent.subimg; // 拿到了图片地址
+                txtContent.setText(witcontent.subname);
             }
-        }, new ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                LogUtil.e("Request Wrong", "请求失败 =" + error);
-                progressdialogcancel();
-            }
-        }) {
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                Map<String, String> hashMap = new HashMap<>();
-                if (localsubid == null) {
-                    hashMap.put("subCategoryid", localsubCategoryid);
-                } else {
-                    hashMap.put("subid", localsubid);
-                }
-                return hashMap;
-            }
-        };
-        strinrequest.setTag("witcontent");
-        AppContext.getHttpQueue().add(strinrequest);
+            showImage();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     private void showImage() {

@@ -43,7 +43,29 @@ public class Constants {
     public static final String URL_POST_FREE_ANSWER_TAGCAN = "http://api.iyuce.com/v1/exam/completepractice";
     public static final String URL_POST_FREE_ANSWER_TAGCANT = "http://api.iyuce.com/v1/exam/cancelexams";
 
-    //公益课堂音频接口
+    //网络班
+    public static final String ACTIVITY_NET = "wangluoban";
+    public static final String ACTIVITY_NET_LESSON = "wangluobanlesson";
+    public static final String URL_POST_NET_TIME = "http://api.iyuce.com/v1/exam/notifydropdownlist";
+    public static final String URL_POST_NET_NOTICE = "http://api.iyuce.com/v1/exam/notifycontent";
+    public static final String URL_POST_NET_WEB_COURSE = "http://api.iyuce.com/v1/exam/webcoursegroup";
+    public static final String URL_POST_NET_LESSON = "http://api.iyuce.com/v1/exam/examunit";
+    public static final String URL_POST_NET_LESSON_Check = "http://api.iyuce.com/v1/exam/checkuserforwlb";
+    public static final String URL_POST_NET_LESSON_CheckCode = "http://api.iyuce.com/v1/exam/activecodeforwlb";
+
+    //公益课堂音频
     public static final String URL_GET_AUDIO_TYPE = "http://api.iyuce.com/v1/exam/audiotypes";
     public static final String URL_POST_AUDIO_LIST = "http://api.iyuce.com/v1/exam/audios";
+
+    //写作
+    public static final String ACTIVITY_WIT = "writting";
+    public static final String ACTIVITY_WIT_SEARCH = "witsearch";
+    public static final String ACTIVITY_WIT_SUBCATEGORY = "witsubcategory";
+    public static final String ACTIVITY_WIT_CONTENT = "witcontent";
+    public static final String URL_POST_WRITTING_CATEGORY = "http://iphone.ipredicting.com/xzCategoryApi.aspx";
+    public static final String URL_POST_WRITTING_SEARCH = "http://iphone.ipredicting.com/xzsubSearch.aspx";
+    public static final String URL_POST_WRITTING_SUBCATEGORY = "http://iphone.ipredicting.com/xzsubCategory.aspx";
+    public static final String URL_POST_WRITTING_TOTAL = "http://iphone.ipredicting.com/xzCategoryApi.aspx";
+    public static final String URL_POST_WRITTING_CONTENT = "http://iphone.ipredicting.com/xzsubContent.aspx";
+
 }

@@ -11,21 +11,22 @@ import android.widget.Button;
 import android.widget.GridView;
 import android.widget.ImageView;
 
-import com.android.volley.Request.Method;
-import com.android.volley.Response.Listener;
-import com.android.volley.toolbox.StringRequest;
-import com.woyuce.activity.BaseActivity;
+import com.lzy.okgo.OkGo;
+import com.lzy.okgo.callback.StringCallback;
 import com.woyuce.activity.Adapter.Writting.WittingAdapter;
-import com.woyuce.activity.AppContext;
+import com.woyuce.activity.BaseActivity;
 import com.woyuce.activity.Bean.Writting.WitCategory;
 import com.woyuce.activity.R;
+import com.woyuce.activity.common.Constants;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.List;
+
+import okhttp3.Call;
+import okhttp3.Response;
 
 public class WitActivity extends BaseActivity implements OnClickListener, OnItemClickListener {
 
@@ -34,14 +35,13 @@ public class WitActivity extends BaseActivity implements OnClickListener, OnItem
     private Button btnSearch;
     private AutoCompleteTextView autoTxt;
 
-    private String URL_WITCATEGORY = "http://iphone.ipredicting.com/xzCategoryApi.aspx";
     private String localid, localname, localkey;
-    private List<WitCategory> witcategoryList = new ArrayList<>();
+    private ArrayList<WitCategory> witcategoryList = new ArrayList<>();
 
     @Override
     protected void onStop() {
         super.onStop();
-        AppContext.getHttpQueue().cancelAll("writting");
+        OkGo.getInstance().cancelTag(Constants.ACTIVITY_WIT);
     }
 
     @Override
@@ -65,35 +65,36 @@ public class WitActivity extends BaseActivity implements OnClickListener, OnItem
     }
 
     private void getJson() {
-        StringRequest strinRequest = new StringRequest(Method.POST, URL_WITCATEGORY, new Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                WitCategory witcategory;
-                JSONObject obj;
-                try {
-                    obj = new JSONObject(response);
-                    int result = obj.getInt("code");
-                    if (result == 0) {
-                        JSONArray data = obj.getJSONArray("data");
-                        for (int i = 0; i < data.length(); i++) {
-                            obj = data.getJSONObject(i);
-                            witcategory = new WitCategory();
-                            witcategory.name = obj.getString("name");
-                            witcategory.id = obj.getString("id");
-                            witcategoryList.add(witcategory);
-                        }
-                    } else {
-                        System.out.println("result ��= 0");
+        OkGo.get(Constants.URL_POST_WRITTING_CATEGORY).tag(Constants.ACTIVITY_WIT)
+                .execute(new StringCallback() {
+                    @Override
+                    public void onSuccess(String s, Call call, Response response) {
+                        doSuccess(s);
                     }
-                    WittingAdapter adapter = new WittingAdapter(WitActivity.this, witcategoryList);
-                    gvCategory.setAdapter(adapter);
-                } catch (JSONException e) {
-                    e.printStackTrace();
+                });
+    }
+
+    private void doSuccess(String response) {
+        WitCategory witcategory;
+        JSONObject obj;
+        try {
+            obj = new JSONObject(response);
+            int result = obj.getInt("code");
+            if (result == 0) {
+                JSONArray data = obj.getJSONArray("data");
+                for (int i = 0; i < data.length(); i++) {
+                    obj = data.getJSONObject(i);
+                    witcategory = new WitCategory();
+                    witcategory.name = obj.getString("name");
+                    witcategory.id = obj.getString("id");
+                    witcategoryList.add(witcategory);
                 }
             }
-        }, null);
-        strinRequest.setTag("writting");
-        AppContext.getHttpQueue().add(strinRequest);
+            WittingAdapter adapter = new WittingAdapter(WitActivity.this, witcategoryList);
+            gvCategory.setAdapter(adapter);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -101,9 +102,9 @@ public class WitActivity extends BaseActivity implements OnClickListener, OnItem
         switch (v.getId()) {
             case R.id.btn_writting_search:
                 localkey = autoTxt.getText().toString();
-                Intent it_search = new Intent(this, WitSearchActivity.class);
-                it_search.putExtra("localkey", localkey);
-                startActivity(it_search);
+                Intent intent = new Intent(this, WitSearchActivity.class);
+                intent.putExtra("localkey", localkey);
+                startActivity(intent);
                 break;
             case R.id.arrow_back:
                 finish();
@@ -113,7 +114,7 @@ public class WitActivity extends BaseActivity implements OnClickListener, OnItem
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        WitCategory witcategory = (WitCategory) witcategoryList.get(position);
+        WitCategory witcategory = witcategoryList.get(position);
         localid = witcategory.id;
         localname = witcategory.name;
         Intent it_witSubcategory = new Intent(this, WitSubcategoryActivity.class);

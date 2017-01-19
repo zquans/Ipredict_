@@ -11,19 +11,16 @@ import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.woyuce.activity.BaseActivity;
-import com.woyuce.activity.UI.Activity.Store.StoreGoodsActivity;
-import com.woyuce.activity.UI.Activity.Common.WebNoCookieActivity;
+import com.lzy.okgo.OkGo;
+import com.lzy.okgo.callback.StringCallback;
+import com.lzy.okgo.model.HttpHeaders;
+import com.lzy.okgo.model.HttpParams;
 import com.woyuce.activity.Adapter.Free.Net.NetClassCourseAdapter;
-import com.woyuce.activity.AppContext;
+import com.woyuce.activity.BaseActivity;
 import com.woyuce.activity.Bean.Free.Net.NetBean;
 import com.woyuce.activity.R;
-import com.woyuce.activity.Utils.LogUtil;
+import com.woyuce.activity.UI.Activity.Common.WebNoCookieActivity;
+import com.woyuce.activity.UI.Activity.Store.StoreGoodsActivity;
 import com.woyuce.activity.Utils.PreferenceUtil;
 import com.woyuce.activity.common.Constants;
 
@@ -32,9 +29,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+
+import okhttp3.Call;
 
 /**
  * Created by Administrator on 2016/9/21.
@@ -57,15 +54,12 @@ public class NetClassActivity extends BaseActivity
     private List<String> classidList = new ArrayList<>();
 
     private List<NetBean> wcgList = new ArrayList<>();
-    private static final String URL_TIME = "http://api.iyuce.com/v1/exam/notifydropdownlist";
-    private static final String URL_NOTICE = "http://api.iyuce.com/v1/exam/notifycontent";
-    private static final String URL_WebCourse = "http://api.iyuce.com/v1/exam/webcoursegroup";
     private String localtoken;
 
     @Override
     protected void onStop() {
         super.onStop();
-        AppContext.getHttpQueue().cancelAll("wangluoban");
+        OkGo.getInstance().cancelTag(Constants.ACTIVITY_NET);
     }
 
     @Override
@@ -97,95 +91,82 @@ public class NetClassActivity extends BaseActivity
 
     /* 获取notice的数据，初始传值为null */
     private void getNoticeJson() {
-        StringRequest strinRequest = new StringRequest(Request.Method.POST, URL_NOTICE, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                LogUtil.e("getNoticeJson = ");
-                JSONObject obj;
-                JSONArray arr;
-                try {
-                    obj = new JSONObject(response);
-                    arr = obj.getJSONArray("data");
-                    if (arr.length() >= 1) {
-                        txtcontent.setText(arr.getString(0));
-                    } else {
-                        txtcontent.setText("还没有复习计划，敬请关注哦，亲!");
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-        }, null) {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<>();
-                headers.put("Authorization", "Bearer " + localtoken);
-                return headers;
-            }
+        localtoken = PreferenceUtil.getSharePre(this).getString("localtoken", "");
+        HttpHeaders headers = new HttpHeaders();
+        headers.put("Authorization", "Bearer " + localtoken);
+        HttpParams params = new HttpParams();
+        params.put("exam_time", localdate);
+        params.put("class_type", localclass);
 
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                HashMap<String, String> map = new HashMap<>();
-                map.put("exam_time", localdate);
-                map.put("class_type", localclass);
-                return map;
+        OkGo.post(Constants.URL_POST_NET_NOTICE).tag(Constants.ACTIVITY_NET).headers(headers).params(params)
+                .execute(new StringCallback() {
+                    @Override
+                    public void onSuccess(String s, Call call, okhttp3.Response response) {
+                        doNoticeSuccess(s);
+                    }
+                });
+    }
+
+    private void doNoticeSuccess(String s) {
+        JSONObject obj;
+        JSONArray arr;
+        try {
+            obj = new JSONObject(s);
+            arr = obj.getJSONArray("data");
+            if (arr.length() >= 1) {
+                txtcontent.setText(arr.getString(0));
+            } else {
+                txtcontent.setText("还没有复习计划，敬请关注哦，亲!");
             }
-        };
-        strinRequest.setTag("wangluoban");
-        AppContext.getHttpQueue().add(strinRequest);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     /* 获取spn的数据 */
     private void getSpinnerJson() {
-        StringRequest strinrequest = new StringRequest(Request.Method.POST, URL_TIME, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                LogUtil.e("getSpinnerJson = ");
-                JSONArray arr;
-                JSONArray examtime;
-                JSONObject obj;
-                String examdate;
-                try {
-                    obj = new JSONObject(response);
-                    int result = obj.getInt("code");
-                    if (result == 0) {
-                        obj = obj.getJSONObject("data");
-                        arr = obj.getJSONArray("class_type");
-                        examtime = obj.getJSONArray("exam_time");
-                        /* 遍历取网络班时间 */
-                        for (int i = 0; i < examtime.length(); i++) {
-                            examdate = examtime.getString(i);
-                            dateList.add(examdate);
-                        }
-                        /* 遍历取网络班类型 */
-                        for (int i = 0; i < arr.length(); i++) {
-                            obj = arr.getJSONObject(i);
-                            classnameList.add(obj.getString("wcg_name"));
-                            classidList.add(obj.getString("wcg_id"));
-                        }
-                    } else {
-                        // Log.e("Code Error", "code spnTimewrong" + response);
+        localtoken = PreferenceUtil.getSharePre(this).getString("localtoken", "");
+        HttpHeaders headers = new HttpHeaders();
+        headers.put("Authorization", "Bearer " + localtoken);
+
+        OkGo.post(Constants.URL_POST_NET_TIME).tag(Constants.ACTIVITY_NET).headers(headers)
+                .execute(new StringCallback() {
+                    @Override
+                    public void onSuccess(String s, Call call, okhttp3.Response response) {
+                        doTimeSuccess(s);
                     }
-                    //数据加载完后放入
-                    setSpnDate();
-                } catch (JSONException e) {
-                    e.printStackTrace();
+                });
+    }
+
+    private void doTimeSuccess(String response) {
+        JSONArray arr;
+        JSONArray examtime;
+        JSONObject obj;
+        String examdate;
+        try {
+            obj = new JSONObject(response);
+            int result = obj.getInt("code");
+            if (result == 0) {
+                obj = obj.getJSONObject("data");
+                arr = obj.getJSONArray("class_type");
+                examtime = obj.getJSONArray("exam_time");
+                /* 遍历取网络班时间 */
+                for (int i = 0; i < examtime.length(); i++) {
+                    examdate = examtime.getString(i);
+                    dateList.add(examdate);
+                }
+                /* 遍历取网络班类型 */
+                for (int i = 0; i < arr.length(); i++) {
+                    obj = arr.getJSONObject(i);
+                    classnameList.add(obj.getString("wcg_name"));
+                    classidList.add(obj.getString("wcg_id"));
                 }
             }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-            }
-        }) {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
-                headers.put("Authorization", "Bearer " + localtoken);
-                return headers;
-            }
-        };
-        strinrequest.setTag("wangluoban");
-        AppContext.getHttpQueue().add(strinrequest);
+            //数据加载完后放入
+            setSpnDate();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -207,83 +188,76 @@ public class NetClassActivity extends BaseActivity
      * 获取spn的数据
      */
     private void getWebCourse() {
-        progressdialogshow(this);
-        StringRequest strinrequest = new StringRequest(Request.Method.POST, URL_WebCourse, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                LogUtil.e("getWebCourse = ");
-                JSONArray arr;
-                JSONObject obj;
-                try {
-                    obj = new JSONObject(response);
-                    int result = obj.getInt("code");
-                    if (result == 0) {
-                        arr = obj.getJSONArray("data");
-                        NetBean wcgbean;
-                        for (int i = 0; i < arr.length(); i++) {
-                            wcgbean = new NetBean();
-                            obj = arr.getJSONObject(i);
-                            wcgbean.setWcg_name(obj.getString("wcg_name"));
-                            wcgbean.setWcg_id(obj.getString("wcg_id"));
-                            wcgbean.setWcg_powerid(obj.getString("wcg_powerid"));
-                            wcgbean.setMonthId(obj.getString("month_id"));
-                            wcgbean.setImgUrl(obj.getString("img_url"));
-                            wcgList.add(wcgbean);
-                        }
-                    } else {
-                        // Log.e("Code Error", "code spnTimewrong" + response);
+        localtoken = PreferenceUtil.getSharePre(this).getString("localtoken", "");
+        HttpHeaders headers = new HttpHeaders();
+        headers.put("Authorization", "Bearer " + localtoken);
+
+        OkGo.post(Constants.URL_POST_NET_WEB_COURSE).tag(Constants.ACTIVITY_NET).headers(headers)
+                .execute(new StringCallback() {
+                    @Override
+                    public void onSuccess(String s, Call call, okhttp3.Response response) {
+                        doWebCourseSuccess(s);
                     }
-                    /* gridview设置adapter */
-                    webcourseAdapter = new NetClassCourseAdapter(NetClassActivity.this, wcgList);
-                    gridview.setAdapter(webcourseAdapter);
-                } catch (JSONException e) {
-                    e.printStackTrace();
+                });
+    }
+
+    private void doWebCourseSuccess(String response) {
+        JSONArray arr;
+        JSONObject obj;
+        try {
+            obj = new JSONObject(response);
+            int result = obj.getInt("code");
+            if (result == 0) {
+                arr = obj.getJSONArray("data");
+                NetBean wcgbean;
+                for (int i = 0; i < arr.length(); i++) {
+                    wcgbean = new NetBean();
+                    obj = arr.getJSONObject(i);
+                    wcgbean.setWcg_name(obj.getString("wcg_name"));
+                    wcgbean.setWcg_id(obj.getString("wcg_id"));
+                    wcgbean.setWcg_powerid(obj.getString("wcg_powerid"));
+                    wcgbean.setMonthId(obj.getString("month_id"));
+                    wcgbean.setImgUrl(obj.getString("img_url"));
+                    wcgList.add(wcgbean);
                 }
-                progressdialogcancel();
             }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                progressdialogcancel();
-            }
-        }) {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<>();
-                headers.put("Authorization", "Bearer " + localtoken);
-                return headers;
-            }
-        };
-        strinrequest.setTag("wangluoban");
-        AppContext.getHttpQueue().add(strinrequest);
+            /* gridview设置adapter */
+            webcourseAdapter = new NetClassCourseAdapter(NetClassActivity.this, wcgList);
+            gridview.setAdapter(webcourseAdapter);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
      * 获取商城商品信息
      */
     private void getactivegoods() {
-        StringRequest getGoodsRequest = new StringRequest(Request.Method.GET, Constants.URL_GetGoods, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String s) {
-                try {
-                    JSONObject obj = new JSONObject(s);
-                    if (obj.getString("code").equals("0")) {
-                        obj = obj.getJSONObject("data");
-                        Intent intent = new Intent(NetClassActivity.this, StoreGoodsActivity.class);
-                        intent.putExtra("goods_id", obj.getString("goods_id"));
-                        intent.putExtra("goods_sku_id", obj.getString("goods_sku_id"));
-                        intent.putExtra("goods_title", obj.getString("goods_title"));
-                        intent.putExtra("sales_price", obj.getString("sales_price"));
-                        intent.putExtra("can_go_store_back", "yes");
-                        startActivity(intent);
+        OkGo.get(Constants.URL_GetGoods).tag(Constants.ACTIVITY_NET)
+                .execute(new StringCallback() {
+                    @Override
+                    public void onSuccess(String s, Call call, okhttp3.Response response) {
+                        getStoreGoodsSuccess(s);
                     }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+                });
+    }
+
+    private void getStoreGoodsSuccess(String s) {
+        try {
+            JSONObject obj = new JSONObject(s);
+            if (obj.getString("code").equals("0")) {
+                obj = obj.getJSONObject("data");
+                Intent intent = new Intent(NetClassActivity.this, StoreGoodsActivity.class);
+                intent.putExtra("goods_id", obj.getString("goods_id"));
+                intent.putExtra("goods_sku_id", obj.getString("goods_sku_id"));
+                intent.putExtra("goods_title", obj.getString("goods_title"));
+                intent.putExtra("sales_price", obj.getString("sales_price"));
+                intent.putExtra("can_go_store_back", "yes");
+                startActivity(intent);
             }
-        }, null);
-        getGoodsRequest.setTag("wangluobanlesson");
-        AppContext.getHttpQueue().add(getGoodsRequest);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -326,7 +300,6 @@ public class NetClassActivity extends BaseActivity
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        // 传递相应的localwcg_id
         String localwcg_id = wcgList.get(position).getWcg_id();
         String localwcg_pid = wcgList.get(position).getWcg_powerid();
         String localwcg_mid = wcgList.get(position).getMonthId();

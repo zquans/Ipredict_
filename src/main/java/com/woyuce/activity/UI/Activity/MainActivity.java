@@ -15,16 +15,15 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.woyuce.activity.R;
 import com.woyuce.activity.UI.Fragment.Main.Fragment3;
 import com.woyuce.activity.UI.Fragment.Main.FragmentTwo;
-import com.woyuce.activity.UI.Fragment.Store.Fragment_StoreHome;
 import com.woyuce.activity.UI.Fragment.Main.Fragmentfive;
 import com.woyuce.activity.UI.Fragment.Main.Fragmentone;
-import com.woyuce.activity.UI.Fragment.Main.Fragmentthree;
-import com.woyuce.activity.R;
+import com.woyuce.activity.UI.Fragment.Store.Fragment_StoreHome;
+import com.woyuce.activity.UI.View.NoScrollViewPager;
 import com.woyuce.activity.Utils.ActivityManager;
 import com.woyuce.activity.Utils.PreferenceUtil;
-import com.woyuce.activity.UI.View.NoScrollViewPager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -99,17 +98,14 @@ public class MainActivity extends FragmentActivity implements OnClickListener, O
         mFragments = new ArrayList<>();
         Fragment mTab01 = new Fragmentone();
         Fragment mTab02 = new FragmentTwo();
-        //两个Tab3可以相互替换
-        Fragment mTab03 = new Fragmentthree();
-        Fragment mTab03_ = new Fragment3();
-//        Fragment mTab04 = new Fragmentfour();
+        Fragment mTab03 = new Fragment3();
+        Fragment mTab04 = new Fragment_StoreHome();
         Fragment mTab05 = new Fragmentfive();
-        Fragment mTab04_ = new Fragment_StoreHome();
 
         mFragments.add(mTab01);
         mFragments.add(mTab02);
-        mFragments.add(mTab03_);
-        mFragments.add(mTab04_);
+        mFragments.add(mTab03);
+        mFragments.add(mTab04);
         mFragments.add(mTab05);
 
         mAdapter = new FragmentPagerAdapter(getSupportFragmentManager()) {

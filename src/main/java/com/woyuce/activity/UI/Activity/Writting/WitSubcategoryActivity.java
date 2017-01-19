@@ -15,20 +15,17 @@ import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request.Method;
-import com.android.volley.Response.Listener;
-import com.android.volley.toolbox.StringRequest;
+import com.lzy.okgo.OkGo;
+import com.lzy.okgo.callback.StringCallback;
+import com.lzy.okgo.model.HttpParams;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.woyuce.activity.Adapter.Writting.WitSubcategoryAdapter;
 import com.woyuce.activity.Adapter.Writting.WitspnAdapter;
-import com.woyuce.activity.AppContext;
 import com.woyuce.activity.BaseActivity;
 import com.woyuce.activity.Bean.Writting.WitCategory;
 import com.woyuce.activity.Bean.Writting.WitSubcategory;
 import com.woyuce.activity.R;
-import com.woyuce.activity.Utils.LogUtil;
 import com.woyuce.activity.common.Constants;
 
 import org.json.JSONArray;
@@ -36,9 +33,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+
+import okhttp3.Call;
+import okhttp3.Response;
 
 public class WitSubcategoryActivity extends BaseActivity
         implements OnClickListener, OnItemClickListener, OnItemSelectedListener {
@@ -54,14 +52,12 @@ public class WitSubcategoryActivity extends BaseActivity
     private List<WitCategory> witcategoryList = new ArrayList<>();
     private String localid, localname;
     private String localsubCategoryid;
-    private String URL_CATEGORY = "http://iphone.ipredicting.com/xzsubCategory.aspx";
-    private String URL_TOTAL = "http://iphone.ipredicting.com/xzCategoryApi.aspx";
     private boolean isfirst = true;
 
     @Override
     protected void onStop() {
         super.onStop();
-        AppContext.getHttpQueue().cancelAll("witsubcategory");
+        OkGo.getInstance().cancelTag(Constants.ACTIVITY_WIT_SUBCATEGORY);
     }
 
     @Override
@@ -100,7 +96,6 @@ public class WitSubcategoryActivity extends BaseActivity
         spnCategory.setOnItemSelectedListener(this);
     }
 
-    // ��ʼ���ص��ʶͼ
     private void initGuidemap() {
         DisplayImageOptions options = new DisplayImageOptions.Builder().cacheInMemory(true).cacheOnDisk(true)
                 .bitmapConfig(Bitmap.Config.RGB_565).build();
@@ -108,75 +103,72 @@ public class WitSubcategoryActivity extends BaseActivity
     }
 
     private void getSpinnerJson() {
-        StringRequest strinrequest = new StringRequest(Method.POST, URL_TOTAL, new Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                JSONObject jsonobj;
-                WitCategory witcategory;
-                try {
-                    jsonobj = new JSONObject(response);
-                    int result = jsonobj.getInt("code");
-                    if (result == 0) {
-                        JSONArray data = jsonobj.getJSONArray("data");
-                        for (int i = 0; i < data.length(); i++) {
-                            jsonobj = data.getJSONObject(i);
-                            witcategory = new WitCategory();
-                            witcategory.name = jsonobj.getString("name");
-                            witcategory.id = jsonobj.getString("id");
-                            witcategoryList.add(witcategory);
-                        }
-                    } else {
-                        LogUtil.e("Code Error", "code spinnerwrong" + response);
+        OkGo.post(Constants.URL_POST_WRITTING_TOTAL).tag(Constants.ACTIVITY_WIT_SUBCATEGORY)
+                .execute(new StringCallback() {
+                    @Override
+                    public void onSuccess(String s, Call call, Response response) {
+                        doSpannerSuccess(s);
                     }
-                    setspnDate(); // ���ݼ�����ɺ��ٷ���
-                } catch (JSONException e) {
-                    e.printStackTrace();
+                });
+    }
+
+    private void doSpannerSuccess(String response) {
+        JSONObject jsonobj;
+        WitCategory witcategory;
+        try {
+            jsonobj = new JSONObject(response);
+            int result = jsonobj.getInt("code");
+            if (result == 0) {
+                JSONArray data = jsonobj.getJSONArray("data");
+                for (int i = 0; i < data.length(); i++) {
+                    jsonobj = data.getJSONObject(i);
+                    witcategory = new WitCategory();
+                    witcategory.name = jsonobj.getString("name");
+                    witcategory.id = jsonobj.getString("id");
+                    witcategoryList.add(witcategory);
                 }
             }
-        }, null);
-        strinrequest.setTag("witsubcategory");
-        AppContext.getHttpQueue().add(strinrequest);
+            setspnDate();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     private void getJson() {
-        StringRequest strinrequest = new StringRequest(Method.POST, URL_CATEGORY, new Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                JSONObject jsonobj;
-                WitSubcategory witsubcategory;
-                try {
-                    jsonobj = new JSONObject(response);
-                    int result = jsonobj.getInt("code");
-                    if (result == 0) {
-                        JSONArray data = jsonobj.getJSONArray("data");
-                        for (int i = 0; i < data.length(); i++) {
-                            jsonobj = data.getJSONObject(i);
-                            witsubcategory = new WitSubcategory();
-                            witsubcategory.bgColor = jsonobj.getString("bgColor").trim();
-                            witsubcategory.name = jsonobj.getString("name");
-                            witsubcategory.subCategoryid = jsonobj.getString("subCategoryid");
-                            witsubcategoryList.add(witsubcategory);
-                        }
-                    } else {
-                        LogUtil.e("Code Error", "code wrong" + response);
+        HttpParams params = new HttpParams();
+        params.put("categoryid", localid);
+        OkGo.post(Constants.URL_POST_WRITTING_SUBCATEGORY).tag(Constants.ACTIVITY_WIT_SUBCATEGORY).params(params)
+                .execute(new StringCallback() {
+                    @Override
+                    public void onSuccess(String s, Call call, Response response) {
+                        doSuccess(s);
                     }
-                    WitSubcategoryAdapter adapter = new WitSubcategoryAdapter(WitSubcategoryActivity.this,
-                            witsubcategoryList);
-                    gridView.setAdapter(adapter);
-                } catch (JSONException e) {
-                    e.printStackTrace();
+                });
+    }
+
+    private void doSuccess(String response) {
+        JSONObject jsonobj;
+        WitSubcategory witsubcategory;
+        try {
+            jsonobj = new JSONObject(response);
+            int result = jsonobj.getInt("code");
+            if (result == 0) {
+                JSONArray data = jsonobj.getJSONArray("data");
+                for (int i = 0; i < data.length(); i++) {
+                    jsonobj = data.getJSONObject(i);
+                    witsubcategory = new WitSubcategory();
+                    witsubcategory.bgColor = jsonobj.getString("bgColor").trim();
+                    witsubcategory.name = jsonobj.getString("name");
+                    witsubcategory.subCategoryid = jsonobj.getString("subCategoryid");
+                    witsubcategoryList.add(witsubcategory);
                 }
             }
-        }, null) {
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                Map<String, String> hashMap = new HashMap<>();
-                hashMap.put("categoryid", localid);
-                return hashMap;
-            }
-        };
-        strinrequest.setTag("witsubcategory");
-        AppContext.getHttpQueue().add(strinrequest);
+            WitSubcategoryAdapter adapter = new WitSubcategoryAdapter(WitSubcategoryActivity.this,
+                    witsubcategoryList);
+            gridView.setAdapter(adapter);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -197,13 +189,13 @@ public class WitSubcategoryActivity extends BaseActivity
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        WitSubcategory witsubcategory = (WitSubcategory) witsubcategoryList.get(position);
+        WitSubcategory witsubcategory = witsubcategoryList.get(position);
         localsubCategoryid = witsubcategory.subCategoryid;
         String localname = witsubcategory.name;
-        Intent it_witContent = new Intent(this, WitContentActivity.class);
-        it_witContent.putExtra("localsubCategoryid", localsubCategoryid);
-        it_witContent.putExtra("localname", localname);
-        startActivity(it_witContent);
+        Intent intent = new Intent(this, WitContentActivity.class);
+        intent.putExtra("localsubCategoryid", localsubCategoryid);
+        intent.putExtra("localname", localname);
+        startActivity(intent);
     }
 
     @Override
@@ -211,7 +203,7 @@ public class WitSubcategoryActivity extends BaseActivity
         if (isfirst == true) {
             isfirst = false;
         } else {
-            WitCategory witcategory = (WitCategory) witcategoryList.get(position);
+            WitCategory witcategory = witcategoryList.get(position);
             localid = witcategory.id;
             localname = witcategory.name;
             txtTitle.setText(localname);
