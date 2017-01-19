@@ -11,30 +11,29 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.toolbox.StringRequest;
+import com.lzy.okgo.OkGo;
+import com.lzy.okgo.callback.StringCallback;
+import com.lzy.okgo.model.HttpHeaders;
+import com.lzy.okgo.model.HttpParams;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
-import com.woyuce.activity.BaseActivity;
 import com.woyuce.activity.Adapter.Free.FreeListPageAdapter;
-import com.woyuce.activity.AppContext;
-import com.woyuce.activity.UI.Fragment.Free.FragmentCheckSpell;
+import com.woyuce.activity.BaseActivity;
 import com.woyuce.activity.R;
+import com.woyuce.activity.UI.Fragment.Free.FragmentCheckSpell;
 import com.woyuce.activity.Utils.LogUtil;
 import com.woyuce.activity.Utils.PreferenceUtil;
 import com.woyuce.activity.Utils.ToastUtil;
+import com.woyuce.activity.common.Constants;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
+import okhttp3.Call;
 import uk.co.senab.photoview.PhotoView;
 
 /**
@@ -67,13 +66,10 @@ public class FreeContentActivity extends BaseActivity implements View.OnClickLis
     //第一次引导用的动画
     private ImageView mImgGuide;
 
-    // 留给Fragment用的答案准备
-    private String URL_TOANSWER = "http://api.iyuce.com/v1/exam/answers";
-
     @Override
     protected void onDestroy() {
-        AppContext.getHttpQueue().cancelAll("content");
         super.onDestroy();
+        OkGo.getInstance().cancelTag(Constants.ACTIVITY_CONTENT);
     }
 
     @Override
@@ -96,7 +92,6 @@ public class FreeContentActivity extends BaseActivity implements View.OnClickLis
         pageIdlist = intent.getStringArrayListExtra("pageIdlist");
         pageColorlist = intent.getStringArrayListExtra("pageColorlist");
         pageEmptyImglist = intent.getStringArrayListExtra("pageEmptyImglist");
-        LogUtil.e("pageColorlist = " + pageColorlist);
 
         mBack = (ImageView) findViewById(R.id.back);
         mPre = (ImageView) findViewById(R.id.img_pre);
@@ -150,69 +145,53 @@ public class FreeContentActivity extends BaseActivity implements View.OnClickLis
      * 拼写检查,如果答案的长度为0，则不显示Fragment
      */
     private void requestJson() {
-        StringRequest toanswerRequest = new StringRequest(Request.Method.POST, URL_TOANSWER, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                LogUtil.e("requestJson() =");
-                JSONObject obj;
-                JSONArray arr;
-                try {
-                    obj = new JSONObject(response);
-                    int result = obj.getInt("code");
-                    if (result == 0) {
-                        arr = obj.getJSONArray("data");
-                        if (arr.length() == 0) {
-                            ToastUtil.showMessage(FreeContentActivity.this, "亲，真遗憾，本页答案还未制作好哦");
-                        } else {
-                            // 构造Fragement向下传递
-                            getImage(pageEmptyImglist.get(localposition));
-                            FragmentTransaction mTransaction = getFragmentManager().beginTransaction();
-                            String localtoken = PreferenceUtil.getSharePre(FreeContentActivity.this).getString("localtoken",
-                                    "");
+        String localtoken = PreferenceUtil.getSharePre(this).getString("localtoken", "");
+        HttpHeaders headers = new HttpHeaders();
+        headers.put("Authorization", "Bearer " + localtoken);
+        HttpParams params = new HttpParams();
+        params.put("", pageIdlist.get(localposition));
 
-//							淘汰该方法(构造函数传值)，换为Bundle传值，Fragment还是空构造
-//							mFragment = new FragmentCheckSpell(pageIdlist.get(localposition), localtoken, pageEmptyImglist.get(localposition),localunit_id,
-//									localsection_id);
-//							add(R.id.frame_activity_content, mFragment).addToBackStack(null).commit();
-                            mFragment = new FragmentCheckSpell();
-                            Bundle bundle = new Bundle();
-                            bundle.putString("localsubid", pageIdlist.get(localposition));
-                            bundle.putString("localtoken", localtoken);
-                            bundle.putString("localimgurl", pageEmptyImglist.get(localposition));
-                            bundle.putString("localsectionId", localunit_id);
-                            bundle.putString("localunitId", localsection_id);
-                            bundle.putString("localunit_name", localunit_name);
-                            bundle.putString("localpageno", pagenNolist.get(localposition));
-                            mFragment.setArguments(bundle);
-                            mTransaction.replace(R.id.frame_activity_content, mFragment).commit();
-                            mBtnToShowFrame.setVisibility(View.GONE);
-                        }
-                    } else {
-                        // 失败的处理
+        OkGo.post(Constants.URL_POST_FREE_TOANSWER).tag(Constants.ACTIVITY_CONTENT).headers(headers).params(params)
+                .execute(new StringCallback() {
+                    @Override
+                    public void onSuccess(String s, Call call, okhttp3.Response response) {
+                        doSuccess(s);
                     }
-                } catch (JSONException e) {
-                    e.printStackTrace();
+                });
+    }
+
+    private void doSuccess(String response) {
+        JSONObject obj;
+        JSONArray arr;
+        try {
+            obj = new JSONObject(response);
+            int result = obj.getInt("code");
+            if (result == 0) {
+                arr = obj.getJSONArray("data");
+                if (arr.length() == 0) {
+                    ToastUtil.showMessage(FreeContentActivity.this, "亲，真遗憾，本页答案还未制作好哦");
+                } else {
+                    // 构造Fragement向下传递
+                    getImage(pageEmptyImglist.get(localposition));
+                    FragmentTransaction mTransaction = getFragmentManager().beginTransaction();
+                    String localtoken = PreferenceUtil.getSharePre(FreeContentActivity.this).getString("localtoken", "");
+                    mFragment = new FragmentCheckSpell();
+                    Bundle bundle = new Bundle();
+                    bundle.putString("localsubid", pageIdlist.get(localposition));
+                    bundle.putString("localtoken", localtoken);
+                    bundle.putString("localimgurl", pageEmptyImglist.get(localposition));
+                    bundle.putString("localsectionId", localunit_id);
+                    bundle.putString("localunitId", localsection_id);
+                    bundle.putString("localunit_name", localunit_name);
+                    bundle.putString("localpageno", pagenNolist.get(localposition));
+                    mFragment.setArguments(bundle);
+                    mTransaction.replace(R.id.frame_activity_content, mFragment).commit();
+                    mBtnToShowFrame.setVisibility(View.GONE);
                 }
             }
-        }, null) {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<>();
-                String localtoken = PreferenceUtil.getSharePre(FreeContentActivity.this).getString("localtoken", "");
-                headers.put("Authorization", "Bearer " + localtoken);
-                return headers;
-            }
-
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                HashMap<String, String> map = new HashMap<String, String>();
-                map.put("", pageIdlist.get(localposition));
-                LogUtil.e(" pageIdlist.get(localposition) = " + pageImglist.get(localposition));
-                return map;
-            }
-        };
-        toanswerRequest.setTag("content");
-        AppContext.getHttpQueue().add(toanswerRequest);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -254,7 +233,6 @@ public class FreeContentActivity extends BaseActivity implements View.OnClickLis
                     ToastUtil.showMessage(FreeContentActivity.this, "已经是第一页啦，亲");
                     break;
                 }
-
                 //mFragment不为空，则移除
                 if (mFragment != null) {
                     FragmentTransaction mTransaction = getFragmentManager().beginTransaction();
@@ -273,7 +251,6 @@ public class FreeContentActivity extends BaseActivity implements View.OnClickLis
                     ToastUtil.showMessage(FreeContentActivity.this, "已经是最后一页啦，亲");
                     break;
                 }
-
                 //mFragment不为空，则移除
                 if (mFragment != null) {
                     FragmentTransaction mTransaction = getFragmentManager().beginTransaction();
@@ -309,7 +286,6 @@ public class FreeContentActivity extends BaseActivity implements View.OnClickLis
         }
     }
 
-    // Fragment相关接口，在关闭时显示出Button
     @Override
     public void showButton() {
         LogUtil.e("showButton() = ");

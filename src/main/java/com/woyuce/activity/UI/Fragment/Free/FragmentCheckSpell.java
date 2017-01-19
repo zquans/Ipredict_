@@ -12,19 +12,17 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ListView;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request.Method;
-import com.android.volley.Response;
-import com.android.volley.Response.ErrorListener;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
+import com.lzy.okgo.OkGo;
+import com.lzy.okgo.callback.StringCallback;
+import com.lzy.okgo.model.HttpHeaders;
+import com.lzy.okgo.model.HttpParams;
 import com.woyuce.activity.Adapter.Free.FreeSpellAdapter;
-import com.woyuce.activity.AppContext;
 import com.woyuce.activity.Bean.Free.FreeSpellBean;
 import com.woyuce.activity.R;
 import com.woyuce.activity.Utils.LogUtil;
 import com.woyuce.activity.Utils.PreferenceUtil;
 import com.woyuce.activity.Utils.ToastUtil;
+import com.woyuce.activity.common.Constants;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -35,12 +33,11 @@ import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import cn.sharesdk.framework.ShareSDK;
 import cn.sharesdk.onekeyshare.OnekeyShare;
+import okhttp3.Call;
 
 public class FragmentCheckSpell extends Fragment implements OnClickListener {
 
@@ -59,9 +56,6 @@ public class FragmentCheckSpell extends Fragment implements OnClickListener {
 
     // 获取需要的subid
     private String localsubid, localtoken, localimgurl, localsectionId, localunitId, localunit_name, localpage_no;
-    private String URL_TOANSWER = "http://api.iyuce.com/v1/exam/answers";
-    private String URL_TAGCAN = "http://api.iyuce.com/v1/exam/completepractice";
-    private String URL_TAGCANT = "http://api.iyuce.com/v1/exam/cancelexams";
 
     //记分用
     private String mShowCount;
@@ -74,6 +68,7 @@ public class FragmentCheckSpell extends Fragment implements OnClickListener {
         super.onDestroyView();
         mShowbutton.showButton();
         spellbeanList.clear();
+        OkGo.getInstance().cancelTag(Constants.FRAGMENT_CONTENT);
     }
 
     /**
@@ -83,8 +78,6 @@ public class FragmentCheckSpell extends Fragment implements OnClickListener {
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         mShowbutton = (IShowButton) activity;
-        // 初始化MOB
-//		ShareSDK.initSDK(getActivity());
     }
 
     @Override
@@ -114,54 +107,46 @@ public class FragmentCheckSpell extends Fragment implements OnClickListener {
     }
 
     private void requestJson() {
-        StringRequest toanswerRequest = new StringRequest(Method.POST, URL_TOANSWER, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                JSONObject obj;
-                JSONArray arr;
-                try {
-                    obj = new JSONObject(response);
-                    int result = obj.getInt("code");
-                    if (result == 0) {
-                        arr = obj.getJSONArray("data");
-                        FreeSpellBean spellbean;
-                        for (int i = 0; i < arr.length(); i++) {
-                            obj = arr.getJSONObject(i);
-                            spellbean = new FreeSpellBean();
-                            spellbean.answer = obj.getString("answer");
-                            spellbean.num = obj.getString("num");
-                            spellbean.spell = " ";
-                            answerList.add(spellbean.answer);
-                            spellbeanList.add(spellbean);
-                        }
-                    } else {
-                        LogUtil.e("code!=0 Data-BACK", "读取页面失败： " + obj.getString("message"));
+        localtoken = PreferenceUtil.getSharePre(getActivity()).getString("localtoken", "");
+        HttpHeaders headers = new HttpHeaders();
+        headers.put("Authorization", "Bearer " + localtoken);
+        HttpParams params = new HttpParams();
+        params.put("", localsubid);
+
+        OkGo.post(Constants.URL_POST_FREE_TOANSWER).tag(Constants.FRAGMENT_CONTENT).headers(headers).params(params)
+                .execute(new StringCallback() {
+                    @Override
+                    public void onSuccess(String s, Call call, okhttp3.Response response) {
+                        doSuccess(s);
                     }
-                    // 将数据放到适配器中
-                    mAdapters = new FreeSpellAdapter(getActivity(), spellbeanList, FLAG, answerList);
-                    mListview.setAdapter(mAdapters);
-                } catch (JSONException e) {
-                    e.printStackTrace();
+                });
+    }
+
+    private void doSuccess(String response) {
+        JSONObject obj;
+        JSONArray arr;
+        try {
+            obj = new JSONObject(response);
+            int result = obj.getInt("code");
+            if (result == 0) {
+                arr = obj.getJSONArray("data");
+                FreeSpellBean spellbean;
+                for (int i = 0; i < arr.length(); i++) {
+                    obj = arr.getJSONObject(i);
+                    spellbean = new FreeSpellBean();
+                    spellbean.answer = obj.getString("answer");
+                    spellbean.num = obj.getString("num");
+                    spellbean.spell = " ";
+                    answerList.add(spellbean.answer);
+                    spellbeanList.add(spellbean);
                 }
             }
-        }, null) {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<>();
-                localtoken = PreferenceUtil.getSharePre(getActivity()).getString("localtoken", "");
-                headers.put("Authorization", "Bearer " + localtoken);
-                return headers;
-            }
-
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                HashMap<String, String> map = new HashMap<>();
-                map.put("", localsubid);
-                return map;
-            }
-        };
-        toanswerRequest.setTag("post");
-        AppContext.getHttpQueue().add(toanswerRequest);
+            // 将数据放到适配器中
+            mAdapters = new FreeSpellAdapter(getActivity(), spellbeanList, FLAG, answerList);
+            mListview.setAdapter(mAdapters);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -170,56 +155,41 @@ public class FragmentCheckSpell extends Fragment implements OnClickListener {
      * @param url
      */
     private void tagTo(final String url) {
-        StringRequest toTagRequest = new StringRequest(Method.POST, url, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                LogUtil.e("can or cant" + response);
-                JSONObject obj;
-                try {
-                    obj = new JSONObject(response);
-                    int result = obj.getInt("code");
-                    if (result == 0) {
-                        ToastUtil.showMessage(getActivity(), "标记成功");
-                    } else {
-                        ToastUtil.showMessage(getActivity(), "标记失败，请稍候再试");
-                    }
-                    // 将数据放到适配器中
-                    mAdapters = new FreeSpellAdapter(getActivity(), spellbeanList, FLAG, answerList);
-                    mListview.setAdapter(mAdapters);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-        }, new ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                LogUtil.e("Wrong_BACK", "联接错误原因： " + error.getMessage());
-            }
-        }) {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<>();
-                localtoken = PreferenceUtil.getSharePre(getActivity()).getString("localtoken", "");
-                headers.put("Authorization", "Bearer " + localtoken);
-                return headers;
-            }
+        HttpHeaders headers = new HttpHeaders();
+        headers.put("Authorization", "Bearer " + localtoken);
+        HttpParams params = new HttpParams();
+        if (url.equals(Constants.URL_POST_FREE_ANSWER_TAGCAN)) {
+            params.put("user_id", PreferenceUtil.getSharePre(getActivity()).getString("userId", ""));
+            params.put("sub_id", localsubid);
+        } else if (url.equals(Constants.URL_POST_FREE_ANSWER_TAGCANT)) {
+            params.put("user_id", PreferenceUtil.getSharePre(getActivity()).getString("userId", ""));
+            params.put("unit_id", localunitId);
+            params.put("section_id", localsectionId);
+        }
 
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                HashMap<String, String> map = new HashMap<>();
-                if (url.equals(URL_TAGCAN)) {
-                    map.put("user_id", PreferenceUtil.getSharePre(getActivity()).getString("userId", ""));
-                    map.put("sub_id", localsubid);
-                } else if (url.equals(URL_TAGCANT)) {
-                    map.put("user_id", PreferenceUtil.getSharePre(getActivity()).getString("userId", ""));
-                    map.put("unit_id", localunitId);
-                    map.put("section_id", localsectionId);
-                }
-                return map;
-            }
-        };
-        toTagRequest.setTag("post");
-        AppContext.getHttpQueue().add(toTagRequest);
+        OkGo.post(url).tag(Constants.ACTIVITY_CONTENT).headers(headers).params(params)
+                .execute(new StringCallback() {
+                    @Override
+                    public void onSuccess(String s, Call call, okhttp3.Response response) {
+                        LogUtil.e("can or cant" + response);
+                        JSONObject obj;
+                        try {
+                            obj = new JSONObject(s);
+                            int result = obj.getInt("code");
+                            if (result == 0) {
+                                ToastUtil.showMessage(getActivity(), "标记成功");
+                            } else {
+                                ToastUtil.showMessage(getActivity(), "标记失败，请稍候再试");
+                            }
+                            // 将数据放到适配器中
+                            mAdapters = new FreeSpellAdapter(getActivity(), spellbeanList, FLAG, answerList);
+                            mListview.setAdapter(mAdapters);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+
     }
 
     @Override
@@ -250,7 +220,7 @@ public class FragmentCheckSpell extends Fragment implements OnClickListener {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
                                     // 标记本页为会做
-                                    tagTo(URL_TAGCAN);
+                                    tagTo(Constants.URL_POST_FREE_ANSWER_TAGCAN);
                                 }
                             }).setNegativeButton("分享成绩", new DialogInterface.OnClickListener() {
                         @Override
@@ -281,9 +251,9 @@ public class FragmentCheckSpell extends Fragment implements OnClickListener {
      * 定义一个接口供Activity调用,实现showButton方法
      */
     public interface IShowButton {
-        public void showButton();
+        void showButton();
 
-        public void cancelFragment();
+        void cancelFragment();
     }
 
     /**

@@ -9,29 +9,28 @@ import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
+import com.lzy.okgo.OkGo;
+import com.lzy.okgo.callback.StringCallback;
+import com.lzy.okgo.model.HttpHeaders;
+import com.lzy.okgo.model.HttpParams;
 import com.nostra13.universalimageloader.core.ImageLoader;
-import com.woyuce.activity.BaseActivity;
 import com.woyuce.activity.Adapter.Free.FreeLessonAdapter;
-import com.woyuce.activity.AppContext;
+import com.woyuce.activity.BaseActivity;
 import com.woyuce.activity.Bean.Free.FreeLesson;
 import com.woyuce.activity.R;
 import com.woyuce.activity.Utils.LogUtil;
 import com.woyuce.activity.Utils.PreferenceUtil;
 import com.woyuce.activity.Utils.ToastUtil;
+import com.woyuce.activity.common.Constants;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+
+import okhttp3.Call;
 
 /**
  * Created by Administrator on 2016/9/21.
@@ -43,14 +42,13 @@ public class FreeLessonActivity extends BaseActivity implements AdapterView.OnIt
     private ImageView mBack;
     private GridView mGridView;
 
-    private String URL = "http://api.iyuce.com/v1/exam/freeexamtype";
     private String localtoken, localMonthid, localTitle;
     private List<FreeLesson> lessonList = new ArrayList<>();
 
     @Override
     protected void onStop() {
         super.onStop();
-        AppContext.getHttpQueue().cancelAll("lesson");
+        OkGo.getInstance().cancelTag(Constants.ACTIVITY_LESSON);
     }
 
     @Override
@@ -80,36 +78,19 @@ public class FreeLessonActivity extends BaseActivity implements AdapterView.OnIt
 
     // 请求接口
     private void getJson() {
-        progressdialogshow(this);
-        StringRequest lessonRequest = new StringRequest(Request.Method.POST, URL, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                doSuccess(response);
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                LogUtil.e("Wrong-BACK", "连接错误原因： " + error.getMessage() + error);
-                progressdialogcancel();
-            }
-        }) {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<>();
-                localtoken = PreferenceUtil.getSharePre(FreeLessonActivity.this).getString("localtoken", "");
-                headers.put("Authorization", "Bearer " + localtoken);
-                return headers;
-            }
+        localtoken = PreferenceUtil.getSharePre(this).getString("localtoken", "");
+        HttpHeaders headers = new HttpHeaders();
+        headers.put("Authorization", "Bearer " + localtoken);
+        HttpParams params = new HttpParams();
+        params.put("", localMonthid);
 
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                HashMap<String, String> map = new HashMap<>();
-                map.put("", localMonthid);
-                return map;
-            }
-        };
-        lessonRequest.setTag("lesson");
-        AppContext.getHttpQueue().add(lessonRequest);
+        OkGo.post(Constants.URL_POST_FREE_LESSON).tag(Constants.ACTIVITY_LESSON).headers(headers).params(params)
+                .execute(new StringCallback() {
+                    @Override
+                    public void onSuccess(String s, Call call, okhttp3.Response response) {
+                        doSuccess(s);
+                    }
+                });
     }
 
     /**
@@ -141,7 +122,6 @@ public class FreeLessonActivity extends BaseActivity implements AdapterView.OnIt
             // 第二步，将数据放到适配器中
             FreeLessonAdapter adapter = new FreeLessonAdapter(FreeLessonActivity.this, lessonList);
             mGridView.setAdapter(adapter);
-            progressdialogcancel();
         } catch (JSONException e) {
             e.printStackTrace();
         }

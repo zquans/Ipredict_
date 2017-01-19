@@ -9,29 +9,28 @@ import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
+import com.lzy.okgo.OkGo;
+import com.lzy.okgo.callback.StringCallback;
+import com.lzy.okgo.model.HttpHeaders;
+import com.lzy.okgo.model.HttpParams;
 import com.nostra13.universalimageloader.core.ImageLoader;
-import com.woyuce.activity.BaseActivity;
 import com.woyuce.activity.Adapter.Free.FreeBookAdapter;
-import com.woyuce.activity.AppContext;
+import com.woyuce.activity.BaseActivity;
 import com.woyuce.activity.Bean.Free.FreeBook;
 import com.woyuce.activity.R;
 import com.woyuce.activity.Utils.LogUtil;
 import com.woyuce.activity.Utils.PreferenceUtil;
 import com.woyuce.activity.Utils.ToastUtil;
+import com.woyuce.activity.common.Constants;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+
+import okhttp3.Call;
 
 /**
  * Created by Administrator on 2016/9/21.
@@ -43,14 +42,14 @@ public class FreeBookActivity extends BaseActivity implements AdapterView.OnItem
     private ImageView mBack;
     private GridView mGridView;
 
-    private String URL = "http://api.iyuce.com/v1/exam/freeexamunits";
     private String localtoken, localtitle, localMid, localPid, localtypeid;
     private List<FreeBook> bookList = new ArrayList<>();
+
 
     @Override
     protected void onStop() {
         super.onStop();
-        AppContext.getHttpQueue().cancelAll("book");
+        OkGo.getInstance().cancelTag(Constants.ACTIVITY_BOOK);
     }
 
     @Override
@@ -82,64 +81,49 @@ public class FreeBookActivity extends BaseActivity implements AdapterView.OnItem
     }
 
     private void getJson() {
-        progressdialogshow(this);
-        StringRequest strinRequest = new StringRequest(Request.Method.POST, URL, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                JSONObject jsonObject;
-                FreeBook book;
-                try {
-                    jsonObject = new JSONObject(response);
-                    int result = jsonObject.getInt("code");
-                    if (result == 0) {
-                        JSONArray data = jsonObject.getJSONArray("data");
-                        for (int i = 0; i < data.length(); i++) {
-                            jsonObject = data.getJSONObject(i);
-                            book = new FreeBook();
-                            book.unit_name = jsonObject.getString("unit_name");
-                            book.unit_id = jsonObject.getString("unit_id");
-                            book.show_type_id = jsonObject.getString("show_type_id");
-                            book.img_path = jsonObject.getString("img_path");
-                            bookList.add(book);
-                        }
-                    } else {
-                        LogUtil.e("code!=0 Data-BACK", "读取页面失败： " + jsonObject.getString("message"));
-                    }
-                    // 第二步，将数据放到适配器中
-                    FreeBookAdapter adapter = new FreeBookAdapter(FreeBookActivity.this, bookList);
-                    mGridView.setAdapter(adapter);
-                    progressdialogcancel();
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                // Log.e("DATA-BACK", "JSON接口返回的信息： " + response);
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                LogUtil.e("Wrong_BACK", "联接错误原因： " + error.getMessage());
-                progressdialogcancel();
-            }
-        }) {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
-                localtoken = PreferenceUtil.getSharePre(FreeBookActivity.this).getString("localtoken", "");
-                headers.put("Authorization", "Bearer " + localtoken);
-                return headers;
-            }
+        localtoken = PreferenceUtil.getSharePre(this).getString("localtoken", "");
+        HttpHeaders headers = new HttpHeaders();
+        headers.put("Authorization", "Bearer " + localtoken);
+        HttpParams params = new HttpParams();
+        params.put("month_id", localMid);
+        params.put("user_power_type_id", localPid);
+        params.put("type_id", localtypeid);
 
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                HashMap<String, String> map = new HashMap<String, String>();
-                map.put("month_id", localMid);
-                map.put("user_power_type_id", localPid);
-                map.put("type_id", localtypeid);
-                return map;
+        OkGo.post(Constants.URL_POST_FREE_BOOK).tag(Constants.ACTIVITY_BOOK).headers(headers).params(params)
+                .execute(new StringCallback() {
+                    @Override
+                    public void onSuccess(String s, Call call, okhttp3.Response response) {
+                        doSuccess(s);
+                    }
+                });
+    }
+
+    private void doSuccess(String response) {
+        JSONObject jsonObject;
+        FreeBook book;
+        try {
+            jsonObject = new JSONObject(response);
+            int result = jsonObject.getInt("code");
+            if (result == 0) {
+                JSONArray data = jsonObject.getJSONArray("data");
+                for (int i = 0; i < data.length(); i++) {
+                    jsonObject = data.getJSONObject(i);
+                    book = new FreeBook();
+                    book.unit_name = jsonObject.getString("unit_name");
+                    book.unit_id = jsonObject.getString("unit_id");
+                    book.show_type_id = jsonObject.getString("show_type_id");
+                    book.img_path = jsonObject.getString("img_path");
+                    bookList.add(book);
+                }
+            } else {
+                LogUtil.e("code!=0 Data-BACK", "读取页面失败： " + jsonObject.getString("message"));
             }
-        };
-        strinRequest.setTag("book");
-        AppContext.getHttpQueue().add(strinRequest);
+            // 第二步，将数据放到适配器中
+            FreeBookAdapter adapter = new FreeBookAdapter(FreeBookActivity.this, bookList);
+            mGridView.setAdapter(adapter);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

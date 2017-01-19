@@ -10,30 +10,27 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request.Method;
-import com.android.volley.Response;
-import com.android.volley.Response.ErrorListener;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
+import com.lzy.okgo.OkGo;
+import com.lzy.okgo.callback.StringCallback;
+import com.lzy.okgo.model.HttpHeaders;
 import com.nostra13.universalimageloader.core.ImageLoader;
-import com.woyuce.activity.BaseActivity;
 import com.woyuce.activity.Adapter.Free.FreeRangeAdapter;
-import com.woyuce.activity.AppContext;
+import com.woyuce.activity.BaseActivity;
 import com.woyuce.activity.Bean.Free.FreeRange;
 import com.woyuce.activity.R;
 import com.woyuce.activity.Utils.LogUtil;
 import com.woyuce.activity.Utils.PreferenceUtil;
 import com.woyuce.activity.Utils.ToastUtil;
+import com.woyuce.activity.common.Constants;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+
+import okhttp3.Call;
 
 public class FreeRangeActivity extends BaseActivity implements OnItemClickListener, OnClickListener {
 
@@ -42,13 +39,12 @@ public class FreeRangeActivity extends BaseActivity implements OnItemClickListen
     private ListView mListView;
 
     private String localtoken;
-    private String URL = "http://api.iyuce.com/v1/exam/free";
     private List<FreeRange> rangeList = new ArrayList<>();
 
     @Override
     protected void onStop() {
         super.onStop();
-        AppContext.getHttpQueue().cancelAll("range");
+        OkGo.getInstance().cancelTag(Constants.ACTIVITY_RANGE);
     }
 
     @Override
@@ -79,29 +75,16 @@ public class FreeRangeActivity extends BaseActivity implements OnItemClickListen
     }
 
     private void requestJson() {
-        progressdialogshow(this);
-        StringRequest rangeRequest = new StringRequest(Method.POST, URL, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                doSuccess(response);
-            }
-        }, new ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                progressdialogcancel();
-                LogUtil.e("Wrong-BACK", "联接错误原因： " + error.getMessage());
-            }
-        }) {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<>();
-                localtoken = PreferenceUtil.getSharePre(FreeRangeActivity.this).getString("localtoken", "");
-                headers.put("Authorization", "Bearer " + localtoken);
-                return headers;
-            }
-        };
-        rangeRequest.setTag("range");
-        AppContext.getHttpQueue().add(rangeRequest);
+        localtoken = PreferenceUtil.getSharePre(FreeRangeActivity.this).getString("localtoken", "");
+        HttpHeaders headers = new HttpHeaders();
+        headers.put("Authorization", "Bearer " + localtoken);
+        OkGo.post(Constants.URL_POST_FREE_RANGE).headers(headers).tag(Constants.ACTIVITY_RANGE)
+                .execute(new StringCallback() {
+                    @Override
+                    public void onSuccess(String s, Call call, okhttp3.Response response) {
+                        doSuccess(s);
+                    }
+                });
     }
 
     /**
@@ -133,7 +116,6 @@ public class FreeRangeActivity extends BaseActivity implements OnItemClickListen
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        progressdialogcancel();
     }
 
     @Override

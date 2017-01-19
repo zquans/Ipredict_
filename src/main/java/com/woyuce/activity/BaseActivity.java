@@ -189,6 +189,9 @@ public class BaseActivity extends Activity {
     }
 
     public void progressdialogcancel() {
+        if (mProgressdialog == null) {
+            return;
+        }
         mProgressdialog.cancel();
     }
 }

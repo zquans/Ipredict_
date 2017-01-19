@@ -19,13 +19,14 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
-import com.woyuce.activity.BaseActivity;
-import com.woyuce.activity.UI.Activity.MainActivity;
 import com.woyuce.activity.Adapter.Speaking.SpeakingMoreAdapter;
 import com.woyuce.activity.AppContext;
+import com.woyuce.activity.BaseActivity;
 import com.woyuce.activity.Bean.Speaking.SpeakingMore;
 import com.woyuce.activity.R;
+import com.woyuce.activity.UI.Activity.MainActivity;
 import com.woyuce.activity.Utils.LogUtil;
+import com.woyuce.activity.common.Constants;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -97,7 +98,7 @@ public class SpeakingMoreActivity extends BaseActivity implements AdapterView.On
     private void initGuidemap() {
         DisplayImageOptions options = new DisplayImageOptions.Builder().cacheInMemory(true).cacheOnDisk(true)
                 .bitmapConfig(Bitmap.Config.RGB_565).build();
-        ImageLoader.getInstance().displayImage("http://www.iyuce.com/res/images/ky.jpg", mGuidemap, options);
+        ImageLoader.getInstance().displayImage(Constants.URL_GUIDE_IMG_SPEAKING, mGuidemap, options);
     }
 
     public void getJson() {

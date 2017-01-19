@@ -13,23 +13,20 @@ import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
+import com.lzy.okgo.OkGo;
+import com.lzy.okgo.callback.StringCallback;
+import com.lzy.okgo.model.HttpHeaders;
+import com.lzy.okgo.model.HttpParams;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
-import com.woyuce.activity.BaseActivity;
-import com.woyuce.activity.UI.Activity.Store.StoreGoodsActivity;
-import com.woyuce.activity.UI.Activity.Common.WebNoCookieActivity;
 import com.woyuce.activity.Adapter.Free.FreePageAdapter;
 import com.woyuce.activity.Adapter.Free.FreeSectionAdapter;
-import com.woyuce.activity.AppContext;
+import com.woyuce.activity.BaseActivity;
 import com.woyuce.activity.Bean.Free.FreePage;
 import com.woyuce.activity.Bean.Free.FreeSection;
 import com.woyuce.activity.R;
-import com.woyuce.activity.Utils.LogUtil;
+import com.woyuce.activity.UI.Activity.Common.WebNoCookieActivity;
+import com.woyuce.activity.UI.Activity.Store.StoreGoodsActivity;
 import com.woyuce.activity.Utils.PreferenceUtil;
 import com.woyuce.activity.Utils.ToastUtil;
 import com.woyuce.activity.common.Constants;
@@ -39,9 +36,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+
+import okhttp3.Call;
 
 /**
  * Created by Administrator on 2016/9/21.
@@ -53,12 +50,6 @@ public class FreePageActivity extends BaseActivity implements View.OnClickListen
     private ImageView mBack, mGuidemap;
     private GridView mGridViewPage, mGridViewSection;
     private FrameLayout flSection;
-
-    // URL地址
-    private String URL_SECTION = "http://api.iyuce.com/v1/exam/section";
-    private String URL_PAGE = "http://api.iyuce.com/v1/exam/subjects";
-    private String URL_CHECKRIGHT = "http://api.iyuce.com/v1/exam/checkuserforwlb";
-    private String URL_CANCELTAG = "http://api.iyuce.com/v1/exam/cancelexams";
 
     private int mSectionlength;
     // 用于判断状态的boolean值
@@ -81,7 +72,7 @@ public class FreePageActivity extends BaseActivity implements View.OnClickListen
     @Override
     protected void onStop() {
         super.onStop();
-        AppContext.getHttpQueue().cancelAll("page");
+        OkGo.getInstance().cancelTag(Constants.ACTIVITY_PAGE);
     }
 
     @Override
@@ -131,213 +122,191 @@ public class FreePageActivity extends BaseActivity implements View.OnClickListen
         DisplayImageOptions options = new DisplayImageOptions.Builder().cacheInMemory(true).cacheOnDisk(true)
                 .bitmapConfig(Bitmap.Config.RGB_565).build();
         if (imgurl.equals("wangluoban")) {
-            ImageLoader.getInstance().displayImage("http://www.iyuce.com/res/images/assault.jpg", mGuidemap, options);
+            ImageLoader.getInstance().displayImage(Constants.URL_GUIDE_IMG_NET, mGuidemap, options);
         } else {
-            ImageLoader.getInstance().displayImage("http://www.iyuce.com/res/images/tl.jpg", mGuidemap, options);
+            ImageLoader.getInstance().displayImage(Constants.URL_GUIDE_IMG_FREE, mGuidemap, options);
         }
     }
 
     // 加载章节
     private void getSectionJson() {
-        StringRequest strinRequest = new StringRequest(Request.Method.POST, URL_SECTION, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                JSONObject obj;
-                JSONArray arr;
-                try {
-                    obj = new JSONObject(response);
-                    int result = obj.getInt("code");
-                    if (result == 0) {
-                        arr = obj.getJSONArray("data");
-                        FreeSection section;
-                        mSectionlength = arr.length();
-                        if (mSectionlength != 0) {
-                            flSection.setVisibility(View.VISIBLE);
-                            for (int i = 0; i < mSectionlength; i++) {
-                                section = new FreeSection();
-                                obj = arr.getJSONObject(i);
-                                section.sectionid = obj.getString("section_id");
-                                section.sectionname = obj.getString("name");
-                                section.sectioncolor = obj.getString("color");
-                                section.sectionstate = obj.getString("state");
-                                section.range_type = obj.getString("range_type");
-                                // 章节状态如果是不可读，则设为灰色
-                                if (section.sectionstate.equals("0")) {
-                                    section.sectioncolor = "#cccccc";
-                                    // 在不可读前提下，如果是重点，则跳过
-                                    if (isSectionImportants == IMPORTANT_TRUE) {
-                                        continue;
-                                    }
-                                }
-                                sectionList.add(section);
-                            }
-                        }
-                        // 如果章节不为空，则章节ID设为第一个章节的ID,颜色也设为第一个章节的颜色
-                        if (mSectionlength != 0) {
-                            // TODO 应该做一个循环，把第一项章节的状态赋给它
-                            localsection_id = sectionList.get(0).sectionid;
-                            localsection_color = sectionList.get(0).sectioncolor;
-                            if (isSectionImportants == IMPORTANT_TRUE) {
-                                isPageImportants = IMPORTANT_NULL;
-                            }
-                        }
-                        getPageJson();
-                    } else {
-                        // LogUtil.e("读取章节失败");
+        localtoken = PreferenceUtil.getSharePre(this).getString("localtoken", "");
+        HttpHeaders headers = new HttpHeaders();
+        headers.put("Authorization", "Bearer " + localtoken);
+        HttpParams params = new HttpParams();
+        params.put("unit_id", localunit_id);
+        if (isPageImportants == IMPORTANT_NULL) {
+            params.put("important", "");
+        } else if (isPageImportants == IMPORTANT_TRUE) {
+            params.put("important", "true");
+        }
+
+        OkGo.post(Constants.URL_POST_FREE_SECTION).tag(Constants.ACTIVITY_PAGE).headers(headers).params(params)
+                .execute(new StringCallback() {
+                    @Override
+                    public void onSuccess(String s, Call call, okhttp3.Response response) {
+                        doSectionSuccess(s);
                     }
-                    FreeSectionAdapter adapter = new FreeSectionAdapter(FreePageActivity.this, sectionList);
-                    mGridViewSection.setAdapter(adapter);
+                });
+    }
 
-                } catch (JSONException e) {
-                    e.printStackTrace();
+    private void doSectionSuccess(String response) {
+        JSONObject obj;
+        JSONArray arr;
+        try {
+            obj = new JSONObject(response);
+            int result = obj.getInt("code");
+            if (result == 0) {
+                arr = obj.getJSONArray("data");
+                FreeSection section;
+                mSectionlength = arr.length();
+                if (mSectionlength != 0) {
+                    flSection.setVisibility(View.VISIBLE);
+                    for (int i = 0; i < mSectionlength; i++) {
+                        section = new FreeSection();
+                        obj = arr.getJSONObject(i);
+                        section.sectionid = obj.getString("section_id");
+                        section.sectionname = obj.getString("name");
+                        section.sectioncolor = obj.getString("color");
+                        section.sectionstate = obj.getString("state");
+                        section.range_type = obj.getString("range_type");
+                        // 章节状态如果是不可读，则设为灰色
+                        if (section.sectionstate.equals("0")) {
+                            section.sectioncolor = "#cccccc";
+                            // 在不可读前提下，如果是重点，则跳过
+                            if (isSectionImportants == IMPORTANT_TRUE) {
+                                continue;
+                            }
+                        }
+                        sectionList.add(section);
+                    }
                 }
-            }
-        }, null) {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<>();
-                localtoken = PreferenceUtil.getSharePre(FreePageActivity.this).getString("localtoken", "");
-                headers.put("Authorization", "Bearer " + localtoken);
-                return headers;
-            }
-
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                HashMap<String, String> map = new HashMap<>();
-                map.put("unit_id", localunit_id);
-                if (isPageImportants == IMPORTANT_NULL) {
-                    map.put("important", "");
-                } else if (isPageImportants == IMPORTANT_TRUE) {
-                    map.put("important", "true");
+                // 如果章节不为空，则章节ID设为第一个章节的ID,颜色也设为第一个章节的颜色
+                if (mSectionlength != 0) {
+                    // TODO 应该做一个循环，把第一项章节的状态赋给它
+                    localsection_id = sectionList.get(0).sectionid;
+                    localsection_color = sectionList.get(0).sectioncolor;
+                    if (isSectionImportants == IMPORTANT_TRUE) {
+                        isPageImportants = IMPORTANT_NULL;
+                    }
                 }
-                return map;
+                //请求页码
+                getPageJson();
+            } else {
+                // LogUtil.e("读取章节失败");
             }
+            FreeSectionAdapter adapter = new FreeSectionAdapter(FreePageActivity.this, sectionList);
+            mGridViewSection.setAdapter(adapter);
 
-        };
-        strinRequest.setTag("page");
-        AppContext.getHttpQueue().add(strinRequest);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     // 加载书页
     private void getPageJson() {
-        progressdialogshow(this);
-        StringRequest strinRequest = new StringRequest(Request.Method.POST, URL_PAGE, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                JSONObject obj;
-                JSONArray arr;
-                FreePage page;
-                try {
-                    obj = new JSONObject(response);
-                    int result = obj.getInt("code");
-                    if (result == 0) {
-                        arr = obj.getJSONArray("data");
-                        for (int i = 0; i < arr.length(); i++) {
-                            obj = arr.getJSONObject(i);
-                            page = new FreePage();
-                            page.sub_id = obj.getString("sub_id");
-                            page.sub_name = obj.getString("sub_name");
-                            page.sub_color = obj.getString("sub_color");
-                            page.sub_img = obj.getString("sub_img");
-                            page.sub_state = obj.getString("sub_state");
-                            page.sub_range_type = obj.getString("sub_range_type");
-                            page.addtime = obj.getString("addtime");
-                            page.sub_img_empty = obj.getString("sub_img_empty");
-                            // 如果有章节存在，页码的颜色和状态等于章节的颜色和状态
-                            if (mSectionlength != 0) {
-                                // 如果页码本身有状态为不可读，则设为灰色
-                                if (page.sub_state.equals("0")) {
-                                    page.sub_color = "#cccccc";
-                                    // 如果是灰色的，在只看重点时，移除
-                                    if (isSectionImportants == IMPORTANT_TRUE) {
-                                        continue;
-                                    }
-                                } else {
-                                    page.sub_color = localsection_color;
-                                }
-                            }
-                            // 如果无章节且页码为不可读，则设为灰色
-                            if (mSectionlength == 0 && page.sub_state.equals("0")) {
-                                page.sub_color = "#cccccc";
-                                // 在此基础上，如果是重点，则跳过显示
-                                if (isPageImportants == IMPORTANT_TRUE) {
-                                    continue;
-                                }
-                            }
-                            String pageno = page.sub_name;
-                            String pageid = page.sub_id;
-                            String pagecolor = page.sub_color;
-                            String pageimg = page.sub_img;
-                            String pagestate = page.sub_state;
-                            pagenNolist.add(pageno);
-                            pageStatelist.add(pagestate);
-                            pageImglist.add(pageimg);
-                            pageIdlist.add(pageid);
-                            pageColorlist.add(pagecolor);
-                            pageEmptyImglist.add(page.sub_img_empty);
-                            pageList.add(page);
-                        }
-                    } else {
+        localtoken = PreferenceUtil.getSharePre(this).getString("localtoken", "");
+        HttpHeaders headers = new HttpHeaders();
+        headers.put("Authorization", "Bearer " + localtoken);
+        HttpParams params = new HttpParams();
+        params.put("unit_id", localunit_id);
+        params.put("unit_id", localunit_id);
+        params.put("user_id", PreferenceUtil.getSharePre(FreePageActivity.this).getString("userId", ""));
+
+        // 判断获取到的章节数组是否为空
+        if (localsection_id == null) {
+            params.put("section_id", "");
+        } else {
+            params.put("section_id", localsection_id);
+        }
+
+        // 判断是否查看会做,三种状态的boolean
+        if (isCanDo == CANDO_FALSE) {
+            params.put("is_can_do", "false");
+        } else if (isCanDo == CANDO_NULL) {
+            params.put("is_can_do", "");
+        } else if (isCanDo == CANDO_TRUE) {
+            params.put("is_can_do", "true");
+        }
+        // 判断是否查看重点,三种状态的boolean
+        if (isPageImportants == IMPORTANT_NULL) {
+            params.put("important", "");
+        } else if (isPageImportants == IMPORTANT_TRUE) {
+            params.put("important", "true");
+        }
+
+        OkGo.post(Constants.URL_POST_FREE_PAGE).tag(Constants.ACTIVITY_PAGE).headers(headers).params(params)
+                .execute(new StringCallback() {
+                    @Override
+                    public void onSuccess(String s, Call call, okhttp3.Response response) {
+                        doPageSuccess(s);
                     }
-                    // 第二步，将数据放到适配器中
-                    FreePageAdapter adapter = new FreePageAdapter(FreePageActivity.this, pageList);
-                    mGridViewPage.setAdapter(adapter);
-                    progressdialogcancel();
-                } catch (JSONException e) {
-                    e.printStackTrace();
+                });
+    }
+
+    private void doPageSuccess(String response) {
+        JSONObject obj;
+        JSONArray arr;
+        FreePage page;
+        try {
+            obj = new JSONObject(response);
+            int result = obj.getInt("code");
+            if (result == 0) {
+                arr = obj.getJSONArray("data");
+                for (int i = 0; i < arr.length(); i++) {
+                    obj = arr.getJSONObject(i);
+                    page = new FreePage();
+                    page.sub_id = obj.getString("sub_id");
+                    page.sub_name = obj.getString("sub_name");
+                    page.sub_color = obj.getString("sub_color");
+                    page.sub_img = obj.getString("sub_img");
+                    page.sub_state = obj.getString("sub_state");
+                    page.sub_range_type = obj.getString("sub_range_type");
+                    page.addtime = obj.getString("addtime");
+                    page.sub_img_empty = obj.getString("sub_img_empty");
+                    // 如果有章节存在，页码的颜色和状态等于章节的颜色和状态
+                    if (mSectionlength != 0) {
+                        // 如果页码本身有状态为不可读，则设为灰色
+                        if (page.sub_state.equals("0")) {
+                            page.sub_color = "#cccccc";
+                            // 如果是灰色的，在只看重点时，移除
+                            if (isSectionImportants == IMPORTANT_TRUE) {
+                                continue;
+                            }
+                        } else {
+                            page.sub_color = localsection_color;
+                        }
+                    }
+                    // 如果无章节且页码为不可读，则设为灰色
+                    if (mSectionlength == 0 && page.sub_state.equals("0")) {
+                        page.sub_color = "#cccccc";
+                        // 在此基础上，如果是重点，则跳过显示
+                        if (isPageImportants == IMPORTANT_TRUE) {
+                            continue;
+                        }
+                    }
+                    String pageno = page.sub_name;
+                    String pageid = page.sub_id;
+                    String pagecolor = page.sub_color;
+                    String pageimg = page.sub_img;
+                    String pagestate = page.sub_state;
+                    pagenNolist.add(pageno);
+                    pageStatelist.add(pagestate);
+                    pageImglist.add(pageimg);
+                    pageIdlist.add(pageid);
+                    pageColorlist.add(pagecolor);
+                    pageEmptyImglist.add(page.sub_img_empty);
+                    pageList.add(page);
                 }
+            } else {
             }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                progressdialogcancel();
-            }
-        }) {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<>();
-                localtoken = PreferenceUtil.getSharePre(FreePageActivity.this).getString("localtoken", "");
-                headers.put("Authorization", "Bearer " + localtoken);
-                return headers;
-            }
-
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                HashMap<String, String> map = new HashMap<>();
-                map.put("unit_id", localunit_id);
-                map.put("user_id", PreferenceUtil.getSharePre(FreePageActivity.this).getString("userId", ""));
-
-                // 判断获取到的章节数组是否为空
-                if (localsection_id == null) {
-                    map.put("section_id", "");
-                } else {
-                    map.put("section_id", localsection_id);
-                }
-
-                // 判断是否查看会做,三种状态的boolean
-                if (isCanDo == CANDO_FALSE) {
-                    map.put("is_can_do", "false");
-                } else if (isCanDo == CANDO_NULL) {
-                    map.put("is_can_do", "");
-                } else if (isCanDo == CANDO_TRUE) {
-                    map.put("is_can_do", "true");
-                }
-
-                // 判断是否查看重点,三种状态的boolean
-                if (isPageImportants == IMPORTANT_NULL) {
-                    map.put("important", "");
-                } else if (isPageImportants == IMPORTANT_TRUE) {
-                    map.put("important", "true");
-                }
-
-                LogUtil.e("localunit_id" + localunit_id + ",,"
-                        + PreferenceUtil.getSharePre(FreePageActivity.this).getString("userId", "") + ",,");
-                return map;
-            }
-
-        };
-        strinRequest.setTag("page");
-        AppContext.getHttpQueue().add(strinRequest);
+            // 第二步，将数据放到适配器中
+            FreePageAdapter adapter = new FreePageAdapter(FreePageActivity.this, pageList);
+            mGridViewPage.setAdapter(adapter);
+            progressdialogcancel();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -360,10 +329,6 @@ public class FreePageActivity extends BaseActivity implements View.OnClickListen
                 mAnimator4.setDuration(500).start();
 
                 checkRight(CANDO_FALSE);
-                // if (!localshow_type_id.equals("wangluoban")) {
-                // showBuyAd();
-                // break;
-                // }
                 break;
             case R.id.txt_page_imptnothold:
                 // 只看已会重点
@@ -496,137 +461,118 @@ public class FreePageActivity extends BaseActivity implements View.OnClickListen
      * 获取商城商品信息
      */
     private void getactivegoods() {
-        StringRequest getGoodsRequest = new StringRequest(Request.Method.GET, Constants.URL_GetGoods, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String s) {
-                try {
-                    JSONObject obj = new JSONObject(s);
-                    if (obj.getString("code").equals("0")) {
-                        obj = obj.getJSONObject("data");
-                        Intent intent = new Intent(FreePageActivity.this, StoreGoodsActivity.class);
-                        intent.putExtra("goods_id", obj.getString("goods_id"));
-                        intent.putExtra("goods_sku_id", obj.getString("goods_sku_id"));
-                        intent.putExtra("goods_title", obj.getString("goods_title"));
-                        intent.putExtra("sales_price", obj.getString("sales_price"));
-                        intent.putExtra("can_go_store_back", "yes");
-                        startActivity(intent);
+        OkGo.get(Constants.URL_GetGoods).tag(Constants.ACTIVITY_PAGE)
+                .execute(new StringCallback() {
+                    @Override
+                    public void onSuccess(String s, Call call, okhttp3.Response response) {
+                        try {
+                            JSONObject obj = new JSONObject(s);
+                            if (obj.getString("code").equals("0")) {
+                                obj = obj.getJSONObject("data");
+                                Intent intent = new Intent(FreePageActivity.this, StoreGoodsActivity.class);
+                                intent.putExtra("goods_id", obj.getString("goods_id"));
+                                intent.putExtra("goods_sku_id", obj.getString("goods_sku_id"));
+                                intent.putExtra("goods_title", obj.getString("goods_title"));
+                                intent.putExtra("sales_price", obj.getString("sales_price"));
+                                intent.putExtra("can_go_store_back", "yes");
+                                startActivity(intent);
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
                     }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-        }, null);
-        getGoodsRequest.setTag("page");
-        AppContext.getHttpQueue().add(getGoodsRequest);
+                });
     }
 
     /**
      * 检测有无网络班权限
      */
     private void checkRight(final int flag) {
-        StringRequest strinrequest = new StringRequest(Request.Method.POST, URL_CHECKRIGHT, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                JSONArray arr;
-                JSONObject obj;
-                try {
-                    obj = new JSONObject(response);
-                    int result = obj.getInt("code");
-                    if (result == 0 && obj.getString("data").equals("1")) {
-                        // 取消的标识，则做取消的请求
-                        if (flag == CANCEL_TAG) {
-                            new AlertDialog.Builder(FreePageActivity.this, AlertDialog.THEME_DEVICE_DEFAULT_LIGHT)
-                                    .setIcon(android.R.drawable.ic_dialog_info).setTitle("确定要取消所有重点标记吗？")
-                                    .setPositiveButton("确定", new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialog, int which) {
-                                            requestCancealtag();
-                                        }
-                                    }).setNegativeButton("取消", null).show();
-                        }
-                        // 否则，则做是否会做的标识
-                        else {
-                            isCanDo = flag;
-                            isSectionImportants = IMPORTANT_TRUE;
-                            isPageImportants = IMPORTANT_TRUE;
-                            sectionList.clear();
-                            pageList.clear();
-                            pagenNolist.clear();
-                            pageStatelist.clear();
-                            pageImglist.clear();
-                            pageIdlist.clear();
-                            pageColorlist.clear();
-                            pageEmptyImglist.clear();
+        localtoken = PreferenceUtil.getSharePre(this).getString("localtoken", "");
+        HttpHeaders headers = new HttpHeaders();
+        headers.put("Authorization", "Bearer " + localtoken);
+        HttpParams params = new HttpParams();
+        params.put("user_id", PreferenceUtil.getSharePre(FreePageActivity.this).getString("userId", ""));
+        params.put("gid", "99");
 
-                            getSectionJson();
-                        }
-
-                    } else {
-                        showBuyAd();
+        OkGo.post(Constants.URL_POST_NET_CHECKRIGHT).tag(Constants.ACTIVITY_PAGE).headers(headers).params(params)
+                .execute(new StringCallback() {
+                    @Override
+                    public void onSuccess(String s, Call call, okhttp3.Response response) {
+                        doCheckRightSuccess(s, flag);
                     }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-        }, null) {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<>();
-                headers.put("Authorization", "Bearer " + localtoken);
-                return headers;
-            }
+                });
+    }
 
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                HashMap<String, String> map = new HashMap<>();
-                map.put("user_id", PreferenceUtil.getSharePre(FreePageActivity.this).getString("userId", ""));
-                map.put("gid", "99");
-                return map;
+    private void doCheckRightSuccess(String response, int flag) {
+        JSONObject obj;
+        try {
+            obj = new JSONObject(response);
+            int result = obj.getInt("code");
+            if (result == 0 && obj.getString("data").equals("1")) {
+                // 取消的标识，则做取消的请求
+                if (flag == CANCEL_TAG) {
+                    new AlertDialog.Builder(FreePageActivity.this, AlertDialog.THEME_DEVICE_DEFAULT_LIGHT)
+                            .setIcon(android.R.drawable.ic_dialog_info).setTitle("确定要取消所有重点标记吗？")
+                            .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    requestCancealtag();
+                                }
+                            }).setNegativeButton("取消", null).show();
+                }
+                // 否则，则做是否会做的标识
+                else {
+                    isCanDo = flag;
+                    isSectionImportants = IMPORTANT_TRUE;
+                    isPageImportants = IMPORTANT_TRUE;
+                    sectionList.clear();
+                    pageList.clear();
+                    pagenNolist.clear();
+                    pageStatelist.clear();
+                    pageImglist.clear();
+                    pageIdlist.clear();
+                    pageColorlist.clear();
+                    pageEmptyImglist.clear();
+                    getSectionJson();
+                }
+            } else {
+                showBuyAd();
             }
-        };
-        strinrequest.setTag("page");
-        AppContext.getHttpQueue().add(strinrequest);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
      * 取消所有标识
      */
     private void requestCancealtag() {
-        StringRequest requestCanceltag = new StringRequest(Request.Method.POST, URL_CANCELTAG, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                JSONArray arr;
-                JSONObject obj;
-                try {
-                    obj = new JSONObject(response);
-                    int result = obj.getInt("code");
-                    if (result == 0) {
-                        ToastUtil.showMessage(FreePageActivity.this, "取消成功");
-                    } else {
-                        ToastUtil.showMessage(FreePageActivity.this, "取消失败");
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-        }, null) {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<>();
-                headers.put("Authorization", "Bearer " + localtoken);
-                return headers;
-            }
+        localtoken = PreferenceUtil.getSharePre(this).getString("localtoken", "");
+        HttpHeaders headers = new HttpHeaders();
+        headers.put("Authorization", "Bearer " + localtoken);
+        HttpParams params = new HttpParams();
+        params.put("user_id", PreferenceUtil.getSharePre(FreePageActivity.this).getString("userId", ""));
+        params.put("unit_id", "");
+        params.put("section_id", "");
 
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                HashMap<String, String> map = new HashMap<>();
-                map.put("user_id", PreferenceUtil.getSharePre(FreePageActivity.this).getString("userId", ""));
-                map.put("unit_id", "");
-                map.put("section_id", "");
-                return map;
-            }
-        };
-        requestCanceltag.setTag("page");
-        AppContext.getHttpQueue().add(requestCanceltag);
+        OkGo.post(Constants.URL_POST_NET_CANCELTAG).tag(Constants.ACTIVITY_PAGE).headers(headers).params(params)
+                .execute(new StringCallback() {
+                    @Override
+                    public void onSuccess(String s, Call call, okhttp3.Response response) {
+                        JSONObject obj;
+                        try {
+                            obj = new JSONObject(s);
+                            int result = obj.getInt("code");
+                            if (result == 0) {
+                                ToastUtil.showMessage(FreePageActivity.this, "取消成功");
+                            } else {
+                                ToastUtil.showMessage(FreePageActivity.this, "取消失败");
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
     }
 }
