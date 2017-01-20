@@ -18,15 +18,29 @@ public class Constants {
     public static final String URL_GUIDE_IMG_SPEAKING = "http://www.iyuce.com/res/images/ky.jpg";
     public static final String URL_GUIDE_IMG_WRITTING = "http://www.iyuce.com/res/images/xz.jpg";
 
-    //API_TOKEN
-    public static final String URL_API_REQUESTTOKEN = "http://api.iyuce.com/api/token";
-
     //WebView访问的URL汇总
     public static final String URL_WEB_ZHIBO = "https://iyuce.ke.qq.com/";
     public static final String URL_WEB_LUBO = "http://store.iyuce.com/";
 
     //网络班跳转商城获取商品信息
     public static final String URL_GetGoods = "http://api.iyuce.com/v1/store/getactivegoods";
+
+    //登录
+    public static final String ACTIVITY_LOGIN = "login";
+    public static final String ACTIVITY_LOGIN_REGISTER = "loginregister";
+    public static final String ACTIVITY_LOGIN_REGISTER_INFO = "loginregisterinfo";
+    public static final String ACTIVITY_LOGIN_RESET = "loginreset";
+    public static final String URL_API_REQUESTTOKEN = "http://api.iyuce.com/api/token";
+    public static final String URL_POST_LOGIN = "http://api.iyuce.com/v1001/account/login";
+    public static final String URL_POST_LOGIN_UPLOADTIME = "http://api.iyuce.com/v1/exam/setexamtime";
+    public static final String URL_POST_LOGIN_SEND_PHONE_MSG = "http://api.iyuce.com/v1/common/sendsmsvericode";
+    public static final String URL_POST_LOGIN_SEND_EMAIL_MSG = "http://api.iyuce.com/v1/common/sendemailvericode";
+    public static final String URL_POST_LOGIN_WITH_MESSAGE = "http://api.iyuce.com/v1/account/smslogin";
+    public static final String URL_POST_LOGIN_VERIFY_CODE = "http://api.iyuce.com/v1/common/verifycode";
+    public static final String URL_POST_LOGIN_VAILD = "http://api.iyuce.com/v1/account/valid";
+    public static final String URL_POST_LOGIN_ACTIVITE_EMAIL = "http://api.iyuce.com/v1/account/active_email";
+    public static final String URL_POST_LOGIN_RESET_PASSWORD = "http://api.iyuce.com/v1/account/reset_password";
+    public static final String URL_POST_LOGIN_REGISTER = "http://api.iyuce.com/v1/account/register";
 
     //口语
     public static final String ACTIVITY_SPEAKING = "speaking";

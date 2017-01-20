@@ -7,22 +7,20 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.toolbox.StringRequest;
+import com.lzy.okgo.OkGo;
+import com.lzy.okgo.callback.StringCallback;
+import com.lzy.okgo.model.HttpHeaders;
+import com.lzy.okgo.model.HttpParams;
 import com.woyuce.activity.BaseActivity;
-import com.woyuce.activity.AppContext;
 import com.woyuce.activity.R;
-import com.woyuce.activity.Utils.LogUtil;
 import com.woyuce.activity.Utils.PreferenceUtil;
 import com.woyuce.activity.Utils.ToastUtil;
+import com.woyuce.activity.common.Constants;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.HashMap;
-import java.util.Map;
+import okhttp3.Call;
 
 /**
  * Created by Administrator on 2016/11/21.
@@ -33,12 +31,11 @@ public class LoginResetActivity extends BaseActivity implements View.OnClickList
     private Button mBtnSubmit;
 
     private String localtoken, local_phone_or_email;
-    private String URL_RESET_PASSWORD = "http://api.iyuce.com/v1/account/reset_password";
 
     @Override
     protected void onStop() {
         super.onStop();
-        AppContext.getHttpQueue().cancelAll("forgetActivityRequest");
+        OkGo.getInstance().cancelTag(Constants.ACTIVITY_LOGIN_RESET);
     }
 
     @Override
@@ -67,43 +64,35 @@ public class LoginResetActivity extends BaseActivity implements View.OnClickList
      * 重置密码
      */
     private void resetPassword() {
-        StringRequest resetRequest = new StringRequest(Request.Method.POST, URL_RESET_PASSWORD, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                LogUtil.i("response = " + response);
-                JSONObject obj;
-                try {
-                    obj = new JSONObject(response);
-                    if (obj.getString("code").equals("0")) {
-                        ToastUtil.showMessage(LoginResetActivity.this, "恭喜您，密码重置成功啦");
-                        startActivity(new Intent(LoginResetActivity.this, LoginActivity.class));
-                        finish();
-                    } else {
-                        ToastUtil.showMessage(LoginResetActivity.this, obj.getString("message"));
+        HttpHeaders headers = new HttpHeaders();
+        localtoken = PreferenceUtil.getSharePre(LoginResetActivity.this).getString("localtoken", "");
+        headers.put("Authorization", "Bearer " + localtoken);
+        HttpParams params = new HttpParams();
+        params.put("key", local_phone_or_email);
+        params.put("value", mEdtPassword.getText().toString().trim());
+        OkGo.post(Constants.URL_POST_LOGIN_RESET_PASSWORD).tag(Constants.ACTIVITY_LOGIN_RESET).headers(headers).params(params)
+                .execute(new StringCallback() {
+                    @Override
+                    public void onSuccess(String s, Call call, okhttp3.Response response) {
+                        doSuccess(s);
                     }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-        }, null) {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<>();
-                localtoken = PreferenceUtil.getSharePre(LoginResetActivity.this).getString("localtoken", "");
-                headers.put("Authorization", "Bearer " + localtoken);
-                return headers;
-            }
+                });
+    }
 
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                HashMap<String, String> map = new HashMap<>();
-                map.put("key", local_phone_or_email);
-                map.put("value", mEdtPassword.getText().toString().trim());
-                return map;
+    private void doSuccess(String response) {
+        JSONObject obj;
+        try {
+            obj = new JSONObject(response);
+            if (obj.getString("code").equals("0")) {
+                ToastUtil.showMessage(LoginResetActivity.this, "恭喜您，密码重置成功啦");
+                startActivity(new Intent(LoginResetActivity.this, LoginActivity.class));
+                finish();
+            } else {
+                ToastUtil.showMessage(LoginResetActivity.this, obj.getString("message"));
             }
-        };
-        resetRequest.setTag("forgetActivityRequest");
-        AppContext.getHttpQueue().add(resetRequest);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

@@ -20,13 +20,10 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.Request.Method;
-import com.android.volley.Response;
-import com.android.volley.Response.ErrorListener;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
+import com.lzy.okgo.OkGo;
+import com.lzy.okgo.callback.StringCallback;
+import com.lzy.okgo.model.HttpHeaders;
+import com.lzy.okgo.model.HttpParams;
 import com.umeng.message.PushAgent;
 import com.umeng.message.UTrack;
 import com.umeng.message.common.inter.ITagManager;
@@ -47,10 +44,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.net.URLEncoder;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import okhttp3.Call;
 
 public class LoginActivity extends BaseActivity implements OnClickListener {
 
@@ -68,10 +65,6 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 
     private String strPassword, strUserName; // 本类中变量，用于下次登录时作自动登录的数据
     private String localtoken;
-    private String LOGIN_URL = "http://api.iyuce.com/v1001/account/login";
-    private String URL_UPLOADTIME = "http://api.iyuce.com/v1/exam/setexamtime";
-    private String URL_SEND_PHONE_MSG = "http://api.iyuce.com/v1/common/sendsmsvericode";
-    private String URL_LOGIN_WITH_MESSAGE = "http://api.iyuce.com/v1/account/smslogin";
 
     // 注册页面跳转过来用
     private String username_register, password_register, timer_register;
@@ -106,7 +99,6 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        LogUtil.i("onBackPressed = ");
         //修复强踢可返回Bug
         ActivityManager.getAppManager().finishAllActivity();
     }
@@ -154,7 +146,7 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
     @Override
     protected void onStop() {
         super.onStop();
-        AppContext.getHttpQueue().cancelAll("login");
+        OkGo.getInstance().cancelTag(Constants.ACTIVITY_LOGIN);
     }
 
     /**
@@ -171,7 +163,6 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
                             .setPositiveButton("知道了", null)
                             .show();
                     LogUtil.e("----" + local_push_code + "------" + AppContext.getDeviceToken());
-
                     local_push_code = null;
                 }
             }
@@ -222,7 +213,6 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
             edtUsername.setText(PreferenceUtil.getSharePre(this).getString("username", ""));
             edtPassword.setText(PreferenceUtil.getSharePre(this).getString("password", ""));
         }
-        LogUtil.e("username_register = " + username_register + "-----" + password_register);
     }
 
     /**
@@ -252,8 +242,6 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
         //别名和分组(别名应该用user_id)
         String alias = userid;
         String aliasType = "user_id";
-        //TODO 如果设备ID为null，return
-        LogUtil.i("device_token = " + alias);
         mPushAgent.addAlias(alias, aliasType, new UTrack.ICallBack() {
             @Override
             public void onMessage(boolean isSuccess, String message) {
@@ -273,52 +261,56 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
      * @param mTime
      */
     private void uploadTime(final String mTime, final String userid) {
-        StringRequest strinRequest = new StringRequest(Method.POST, URL_UPLOADTIME, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                JSONObject obj;
-                try {
-                    obj = new JSONObject(response);
-                    String code = obj.getString("code");
-                    if (code.equals("0")) {
-                        LogUtil.e("settime,success");
-                    } else {
-                        LogUtil.e("settime,false");
+        HttpHeaders headers = new HttpHeaders();
+        headers.put("Authorization", "Bearer " + localtoken);
+        HttpParams params = new HttpParams();
+        params.put("user_id", userid);
+        params.put("exam_time", mTime);
+        OkGo.post(Constants.URL_POST_LOGIN_UPLOADTIME).tag(Constants.ACTIVITY_LOGIN).headers(headers).params(params)
+                .execute(new StringCallback() {
+                    @Override
+                    public void onSuccess(String s, Call call, okhttp3.Response response) {
+                        JSONObject obj;
+                        try {
+                            obj = new JSONObject(s);
+                            String code = obj.getString("code");
+                            if (code.equals("0")) {
+                                LogUtil.e("settime,success");
+                            } else {
+                                LogUtil.e("settime,false");
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
                     }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-        }, null) {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<>();
-                headers.put("Authorization", "Bearer " + localtoken);
-                return headers;
-            }
-
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                HashMap<String, String> map = new HashMap<>();
-                map.put("user_id", userid);
-                map.put("exam_time", mTime);
-                return map;
-            }
-        };
-        strinRequest.setTag("login");
-        AppContext.getHttpQueue().add(strinRequest);
+                });
     }
 
     /**
      * 获取基本请求token
      */
     public void getBaseToken() {
-        StringRequest tokenrequest = new StringRequest(Request.Method.POST, Constants.URL_API_REQUESTTOKEN,
-                new Response.Listener<String>() {
+        HttpHeaders headers = new HttpHeaders();
+        String base64EncodedString = null;
+        try {
+            String encodedConsumerKey = URLEncoder.encode("defA8Dq2ambB", "UTF-8");
+            String encodedConsumerSecret = URLEncoder.encode("WM7Ei5mzrrHl42HHXuGkNR0bVJexq4P", "UTF-8");
+            String authString = encodedConsumerKey + ":" + encodedConsumerSecret;
+            base64EncodedString = Base64.encodeToString(authString.getBytes("UTF-8"), Base64.NO_WRAP);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        headers.put("Authorization", "Basic " + base64EncodedString);
+
+        HttpParams params = new HttpParams();
+        params.put("grant_type", "client_credentials");
+        params.put("scope", "");
+        OkGo.post(Constants.URL_API_REQUESTTOKEN).tag(Constants.ACTIVITY_LOGIN).headers(headers).params(params)
+                .execute(new StringCallback() {
                     @Override
-                    public void onResponse(String response) {
+                    public void onSuccess(String s, Call call, okhttp3.Response response) {
                         try {
-                            JSONObject obj = new JSONObject(response);
+                            JSONObject obj = new JSONObject(s);
                             String localtoken = obj.getString("access_token");
                             PreferenceUtil.save(LoginActivity.this, "localtoken", localtoken);
                             LogUtil.e("localtoken1 = " + localtoken);
@@ -326,85 +318,59 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
                             e.printStackTrace();
                         }
                     }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                getBaseToken();
-            }
-        }) {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                String base64EncodedString = null;
-                try {
-                    String encodedConsumerKey = URLEncoder.encode("defA8Dq2ambB", "UTF-8");
-                    String encodedConsumerSecret = URLEncoder.encode("WM7Ei5mzrrHl42HHXuGkNR0bVJexq4P", "UTF-8");
-                    String authString = encodedConsumerKey + ":" + encodedConsumerSecret;
-                    base64EncodedString = Base64.encodeToString(authString.getBytes("UTF-8"), Base64.NO_WRAP);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                HashMap<String, String> headers = new HashMap<>();
-                headers.put("Authorization", "Basic " + base64EncodedString);
-                return headers;
-            }
 
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<>();
-                headers.put("grant_type", "client_credentials");
-                headers.put("scope", "");
-                return headers;
-            }
-        };
-        tokenrequest.setTag("login");
-        AppContext.getHttpQueue().add(tokenrequest);
+                    @Override
+                    public void onError(Call call, okhttp3.Response response, Exception e) {
+                        super.onError(call, response, e);
+                        getBaseToken();
+                    }
+                });
     }
 
     /**
      * 请求用户名登录
      */
-    private void loginRequest() {
-        progressdialogshow(this);
-        StringRequest stringRequest = new StringRequest(Method.POST, LOGIN_URL, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                LogUtil.e("response + time = " + response);
-                doSuccess(response);
-            }
-        }, new ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                progressdialogcancel();
-                LogUtil.e("Wrong-Back", "连接错误原因： " + error.getMessage());
-                ToastUtil.showMessage(LoginActivity.this, "网络错误" + error.getMessage() + "，请重试");
-            }
-        }) {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<>();
-                localtoken = PreferenceUtil.getSharePre(LoginActivity.this).getString("localtoken", "");
-                headers.put("Authorization", "Bearer " + localtoken);
-                return headers;
-            }
-
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                HashMap<String, String> map = new HashMap<>();
-                map.put("username", strUserName);
-                map.put("password", strPassword);
-                map.put("deviceid", AppContext.getDeviceToken());
-                return map;
-            }
-        };
-        stringRequest.setTag("login");
-        AppContext.getHttpQueue().add(stringRequest);
+    private void loginRequest(final String username, final String password) {
+        HttpParams params = new HttpParams();
+        params.put("username", username);
+        params.put("password", password);
+        params.put("deviceid", AppContext.getDeviceToken());
+        //执行登录操作
+        doLogin(params, Constants.URL_POST_LOGIN);
     }
 
     /**
-     * 处理成功获取的JSON
-     *
-     * @param response
+     * 手机号登录
      */
+    private void loginWithMessageRequest(final String mobile, final String validatecode) {
+        HttpParams params = new HttpParams();
+        params.put("accountmobile", mobile);
+        params.put("smsvalidcode", validatecode);
+        params.put("deviceid", AppContext.getDeviceToken());
+        //执行登录操作
+        doLogin(params, Constants.URL_POST_LOGIN_WITH_MESSAGE);
+    }
+
+    private void doLogin(HttpParams params, String url) {
+        progressdialogshow(this);
+        HttpHeaders headers = new HttpHeaders();
+        localtoken = PreferenceUtil.getSharePre(LoginActivity.this).getString("localtoken", "");
+        headers.put("Authorization", "Bearer " + localtoken);
+        OkGo.post(url).tag(Constants.ACTIVITY_LOGIN).headers(headers).params(params)
+                .execute(new StringCallback() {
+                    @Override
+                    public void onSuccess(String s, Call call, okhttp3.Response response) {
+                        doSuccess(s);
+                    }
+
+                    @Override
+                    public void onError(Call call, okhttp3.Response response, Exception e) {
+                        super.onError(call, response, e);
+                        progressdialogcancel();
+                    }
+                });
+    }
+
     private void doSuccess(String response) {
         JSONObject jsonObject;
         try {
@@ -436,16 +402,15 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
                 PreferenceUtil.save(LoginActivity.this, "update", update);
                 PreferenceUtil.save(LoginActivity.this, "mtimer", localtimer);
                 // 拿到JSON中的token 打印出来
-                LogUtil.e("所有数据 " + userId + "->" + mUserName + "->" + Permission + "->" + money + "->");
-                /*将userId作为推送的分组别名*/
-//                        addAlias(userId);
-                /*将userId作为推送的分组标签*/
-//                        addTag(userId);
+                LogUtil.e("data = " + userId + "->" + mUserName + "->" + Permission + "->" + money + "->");
+                //将userId作为推送的分组别名
+                //addAlias(userId);
+                //将userId作为推送的分组标签
+                // addTag(userId);
                 // 取消加载对话框
                 progressdialogcancel();
                 // 上传注册时设定的考试时间
-//                        uploadTime(timer_register, userId);
-                // 启动主页面
+                //uploadTime(timer_register, userId);
                 startActivity(new Intent(LoginActivity.this, MainActivity.class));
                 finish();
             } else {
@@ -454,47 +419,8 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
             }
         } catch (JSONException e) {
             e.printStackTrace();
+            progressdialogcancel();
         }
-    }
-
-    /**
-     * 请求手机号登录
-     */
-    private void loginWithMessageRequest(final String mobile, final String validatecode) {
-        progressdialogshow(this);
-        StringRequest loginWithMessageRequest = new StringRequest(Method.POST, URL_LOGIN_WITH_MESSAGE, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                LogUtil.e("loginWithMessageRequest = " + response);
-                doSuccess(response);
-            }
-        }, new ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                progressdialogcancel();
-                LogUtil.e("Wrong-Back", "连接错误原因： " + error.getMessage());
-                ToastUtil.showMessage(LoginActivity.this, "网络错误" + error.getMessage() + "，请重试");
-            }
-        }) {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<>();
-                localtoken = PreferenceUtil.getSharePre(LoginActivity.this).getString("localtoken", "");
-                headers.put("Authorization", "Bearer " + localtoken);
-                return headers;
-            }
-
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                HashMap<String, String> map = new HashMap<>();
-                map.put("accountmobile", mobile);
-                map.put("smsvalidcode", validatecode);
-                map.put("deviceid", AppContext.getDeviceToken());
-                return map;
-            }
-        };
-        loginWithMessageRequest.setTag("login");
-        AppContext.getHttpQueue().add(loginWithMessageRequest);
     }
 
     /**
@@ -502,50 +428,42 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
      */
     private void RequestMsg() {
         progressdialogshow(this);
-        StringRequest MsgRequest = new StringRequest(Request.Method.POST, URL_SEND_PHONE_MSG, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                LogUtil.e("response 2 = " + response);
-                JSONObject obj;
-                try {
-                    obj = new JSONObject(response);
-                    if (obj.getString("code").equals("0")) {
-                        //倒计时
-                        toCount();
-                    } else {
-                        ToastUtil.showMessage(LoginActivity.this, obj.getString("message"));
+        HttpHeaders headers = new HttpHeaders();
+        localtoken = PreferenceUtil.getSharePre(LoginActivity.this).getString("localtoken", "");
+        headers.put("Authorization", "Bearer " + localtoken);
+        HttpParams params = new HttpParams();
+        params.put("phone", edtMobile.getText().toString().trim());
+        params.put("template", "VeriCode");
+        OkGo.post(Constants.URL_POST_LOGIN_SEND_PHONE_MSG).tag(Constants.ACTIVITY_LOGIN).headers(headers).params(params)
+                .execute(new StringCallback() {
+                    @Override
+                    public void onSuccess(String s, Call call, okhttp3.Response response) {
+                        doSendMsgSuccess(s);
                     }
-                    progressdialogcancel();
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                LogUtil.e("Wrong-Back", "连接错误原因： " + error.getMessage());
-                ToastUtil.showMessage(LoginActivity.this, "网络错误，请稍候再试");
-                progressdialogcancel();
-            }
-        }) {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<>();
-                localtoken = PreferenceUtil.getSharePre(LoginActivity.this).getString("localtoken", "");
-                headers.put("Authorization", "Bearer " + localtoken);
-                return headers;
-            }
 
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                HashMap<String, String> map = new HashMap<>();
-                map.put("phone", edtMobile.getText().toString().trim());
-                map.put("template", "VeriCode");
-                return map;
+                    @Override
+                    public void onError(Call call, okhttp3.Response response, Exception e) {
+                        super.onError(call, response, e);
+                        progressdialogcancel();
+                        ToastUtil.showMessage(LoginActivity.this, "网络错误，请稍候再试");
+                    }
+                });
+    }
+
+    private void doSendMsgSuccess(String response) {
+        JSONObject obj;
+        try {
+            obj = new JSONObject(response);
+            if (obj.getString("code").equals("0")) {
+                //倒计时
+                toCount();
+            } else {
+                ToastUtil.showMessage(LoginActivity.this, obj.getString("message"));
             }
-        };
-        MsgRequest.setTag("login");
-        AppContext.getHttpQueue().add(MsgRequest);
+            progressdialogcancel();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -574,7 +492,7 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
                         return;
                     }
                     //请求登录
-                    loginRequest();
+                    loginRequest(strUserName, strPassword);
 //                CookieManager.getInstance().removeAllCookie();
                 }
                 break;
@@ -757,4 +675,4 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 //            );
 //            mplatform.showUser(null);//执行登录，登录后在回调里面获取用户资料
 //        }
-    }
+}

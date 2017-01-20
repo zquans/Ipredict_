@@ -14,25 +14,23 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
+import com.lzy.okgo.OkGo;
+import com.lzy.okgo.callback.StringCallback;
+import com.lzy.okgo.model.HttpHeaders;
+import com.lzy.okgo.model.HttpParams;
 import com.woyuce.activity.BaseActivity;
-import com.woyuce.activity.AppContext;
 import com.woyuce.activity.R;
-import com.woyuce.activity.Utils.LogUtil;
 import com.woyuce.activity.Utils.PreferenceUtil;
 import com.woyuce.activity.Utils.ToastUtil;
+import com.woyuce.activity.common.Constants;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import okhttp3.Call;
 
 /**
  * Created by Administrator on 2016/9/22.
@@ -46,12 +44,6 @@ public class LoginRegisterActivity extends BaseActivity implements View.OnClickL
 
     //上一级传来，用于判断是短信还是邮件
     private String email_or_phone, forget_password, activity_email;
-
-    private String URL_SEND_PHONE_MSG = "http://api.iyuce.com/v1/common/sendsmsvericode";
-    private String URL_SEND_EMAIL_MSG = "http://api.iyuce.com/v1/common/sendemailvericode";
-    private String URL_TONEXT = "http://api.iyuce.com/v1/common/verifycode";
-    private String URL_ACTIVITY_EMAIL = "http://api.iyuce.com/v1/account/active_email";
-    private String URL_VAILD = "http://api.iyuce.com/v1/account/valid";
 
     private int time_count;
     private boolean isVarify = false;
@@ -79,7 +71,8 @@ public class LoginRegisterActivity extends BaseActivity implements View.OnClickL
     @Override
     protected void onStop() {
         super.onStop();
-        AppContext.getHttpQueue().cancelAll("register");
+        OkGo.getInstance().cancelTag(Constants.ACTIVITY_LOGIN_REGISTER);
+
     }
 
     @Override
@@ -126,241 +119,208 @@ public class LoginRegisterActivity extends BaseActivity implements View.OnClickL
      * 检查电话或邮箱是否可用
      */
     private void RequestVaild() {
-        StringRequest VaildRequest = new StringRequest(Request.Method.POST, URL_VAILD, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                LogUtil.e("response = " + response);
-                JSONObject obj;
-                try {
-                    obj = new JSONObject(response);
-                    int result = obj.getInt("code");
-                    if (result == 0) {
-                        String localdata = obj.getString("data");
-                        if (localdata.equals("1")) {
-                            if (email_or_phone.equals("phone")) {
-                                RequestMsg(URL_SEND_PHONE_MSG);
-                            } else {
-                                RequestMsg(URL_SEND_EMAIL_MSG);
-                            }
-                        } else {
-                            ToastUtil.showMessage(LoginRegisterActivity.this, obj.getString("message"));
-                        }
-                    } else {
-                        ToastUtil.showMessage(LoginRegisterActivity.this, obj.getString("message"));
+        HttpHeaders headers = new HttpHeaders();
+        localtoken = PreferenceUtil.getSharePre(LoginRegisterActivity.this).getString("localtoken", "");
+        headers.put("Authorization", "Bearer " + localtoken);
+        HttpParams params = new HttpParams();
+        if (email_or_phone.equals("phone")) {
+            params.put("key", "mobile");
+        } else {
+            params.put("key", "email");
+        }
+        params.put("value", mEdtPhonenum.getText().toString().trim());
+        OkGo.post(Constants.URL_POST_LOGIN_VAILD).tag(Constants.ACTIVITY_LOGIN_REGISTER).headers(headers).params(params)
+                .execute(new StringCallback() {
+                    @Override
+                    public void onSuccess(String s, Call call, okhttp3.Response response) {
+                        doValidateSuccess(s);
                     }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                LogUtil.e("Wrong-Back", "连接错误原因： " + error.getMessage());
-                ToastUtil.showMessage(LoginRegisterActivity.this, "网络错误，请稍候再试");
-            }
-        }) {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<>();
-                localtoken = PreferenceUtil.getSharePre(LoginRegisterActivity.this).getString("localtoken", "");
-                headers.put("Authorization", "Bearer " + localtoken);
-                return headers;
-            }
 
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                HashMap<String, String> map = new HashMap<>();
-                if (email_or_phone.equals("phone")) {
-                    map.put("key", "mobile");
+                    @Override
+                    public void onError(Call call, okhttp3.Response response, Exception e) {
+                        super.onError(call, response, e);
+                        ToastUtil.showMessage(LoginRegisterActivity.this, "网络错误，请稍候再试");
+                    }
+                });
+    }
+
+    private void doValidateSuccess(String response) {
+        JSONObject obj;
+        try {
+            obj = new JSONObject(response);
+            int result = obj.getInt("code");
+            if (result == 0) {
+                String localdata = obj.getString("data");
+                if (localdata.equals("1")) {
+                    if (email_or_phone.equals("phone")) {
+                        RequestMsg(Constants.URL_POST_LOGIN_SEND_PHONE_MSG);
+                    } else {
+                        RequestMsg(Constants.URL_POST_LOGIN_SEND_EMAIL_MSG);
+                    }
                 } else {
-                    map.put("key", "email");
+                    ToastUtil.showMessage(LoginRegisterActivity.this, obj.getString("message"));
                 }
-                map.put("value", mEdtPhonenum.getText().toString().trim());
-                return map;
+            } else {
+                ToastUtil.showMessage(LoginRegisterActivity.this, obj.getString("message"));
             }
-        };
-        VaildRequest.setTag("register");
-        AppContext.getHttpQueue().add(VaildRequest);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
      * 发送验证码
      */
     private void RequestMsg(String url) {
-        progressdialogshow(this);
         isVarify = true;
-        StringRequest MsgRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                LogUtil.e("response 2 = " + response);
-                JSONObject obj;
-                try {
-                    obj = new JSONObject(response);
-                    if (obj.getString("code").equals("0")) {
-                        if (!TextUtils.isEmpty(activity_email)) {
-                            ToastUtil.showMessage(LoginRegisterActivity.this, "已发送，请查看邮件哦,亲!");
-                        } else {
-                            if (email_or_phone.equals("phone")) {
-                                ToastUtil.showMessage(LoginRegisterActivity.this, "已发送，请查看短信哦,亲!");
-                            } else {
-                                ToastUtil.showMessage(LoginRegisterActivity.this, "已发送，请查看邮件哦,亲!");
-                            }
-                        }
-                        //倒计时
-                        toCount();
-                    } else {
-                        ToastUtil.showMessage(LoginRegisterActivity.this, obj.getString("message"));
-                    }
-                    progressdialogcancel();
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                LogUtil.e("Wrong-Back", "连接错误原因： " + error.getMessage());
-                ToastUtil.showMessage(LoginRegisterActivity.this, "网络错误，请稍候再试");
-                progressdialogcancel();
-            }
-        }) {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<>();
-                localtoken = PreferenceUtil.getSharePre(LoginRegisterActivity.this).getString("localtoken", "");
-                headers.put("Authorization", "Bearer " + localtoken);
-                return headers;
-            }
 
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                HashMap<String, String> map = new HashMap<>();
+        HttpHeaders headers = new HttpHeaders();
+        localtoken = PreferenceUtil.getSharePre(LoginRegisterActivity.this).getString("localtoken", "");
+        headers.put("Authorization", "Bearer " + localtoken);
+        HttpParams params = new HttpParams();
+        if (!TextUtils.isEmpty(activity_email)) {
+            params.put("email", mEdtPhonenum.getText().toString().trim());
+        } else {
+            if (email_or_phone.equals("phone")) {
+                params.put("phone", mEdtPhonenum.getText().toString().trim());
+            } else {
+                params.put("email", mEdtPhonenum.getText().toString().trim());
+            }
+        }
+        params.put("template", "VeriCode");
+        OkGo.post(url).tag(Constants.ACTIVITY_LOGIN_REGISTER).headers(headers).params(params)
+                .execute(new StringCallback() {
+                    @Override
+                    public void onSuccess(String s, Call call, okhttp3.Response response) {
+                        doRequestMsgSuccess(s);
+                    }
+
+                    @Override
+                    public void onError(Call call, okhttp3.Response response, Exception e) {
+                        super.onError(call, response, e);
+                        ToastUtil.showMessage(LoginRegisterActivity.this, "网络错误，请稍候再试");
+                    }
+                });
+    }
+
+    private void doRequestMsgSuccess(String response) {
+        JSONObject obj;
+        try {
+            obj = new JSONObject(response);
+            if (obj.getString("code").equals("0")) {
                 if (!TextUtils.isEmpty(activity_email)) {
-                    map.put("email", mEdtPhonenum.getText().toString().trim());
+                    ToastUtil.showMessage(LoginRegisterActivity.this, "已发送，请查看邮件哦,亲!");
                 } else {
                     if (email_or_phone.equals("phone")) {
-                        map.put("phone", mEdtPhonenum.getText().toString().trim());
+                        ToastUtil.showMessage(LoginRegisterActivity.this, "已发送，请查看短信哦,亲!");
                     } else {
-                        map.put("email", mEdtPhonenum.getText().toString().trim());
+                        ToastUtil.showMessage(LoginRegisterActivity.this, "已发送，请查看邮件哦,亲!");
                     }
                 }
-                map.put("template", "VeriCode");
-                return map;
+                //倒计时
+                toCount();
+            } else {
+                ToastUtil.showMessage(LoginRegisterActivity.this, obj.getString("message"));
             }
-        };
-        MsgRequest.setTag("register");
-        AppContext.getHttpQueue().add(MsgRequest);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
      * 验证验证码
      */
     private void requeToNext(final String arg) {
-        StringRequest CheckRequest = new StringRequest(Request.Method.POST, URL_TONEXT, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                JSONObject jsonObject;
-                try {
-                    jsonObject = new JSONObject(response);
-                    int result = jsonObject.getInt("code");
-                    if (result == 0) {
-                        ToastUtil.showMessage(LoginRegisterActivity.this, "验证成功啦,亲!");
-                        if (arg.equals("forget_password")) {
-                            Intent intent = new Intent(LoginRegisterActivity.this, LoginResetActivity.class);
-                            intent.putExtra("local_phone_or_email", mEdtPhonenum.getText().toString().trim());
-                            startActivity(intent);
-                            finish();
-                        } else {
-                            Intent intent = new Intent(LoginRegisterActivity.this, LoginRegisterInfoActivity.class);
-                            intent.putExtra("email_or_phone", email_or_phone);
-                            intent.putExtra("local_phone_or_email", mEdtPhonenum.getText().toString().trim());
-                            startActivity(intent);
-                            finish();
-                        }
-                    } else {
+        HttpHeaders headers = new HttpHeaders();
+        headers.put("Authorization", "Bearer " + localtoken);
+        HttpParams params = new HttpParams();
+        params.put("email_or_mobile", mEdtPhonenum.getText().toString().trim());
+        params.put("code", localChecknum);
+        OkGo.post(Constants.URL_POST_LOGIN_VERIFY_CODE).tag(Constants.ACTIVITY_LOGIN_REGISTER).headers(headers).params(params)
+                .execute(new StringCallback() {
+                    @Override
+                    public void onSuccess(String s, Call call, okhttp3.Response response) {
+                        doVerifyCodeSuccess(s, arg);
+                    }
+
+                    @Override
+                    public void onError(Call call, okhttp3.Response response, Exception e) {
+                        super.onError(call, response, e);
                         ToastUtil.showMessage(LoginRegisterActivity.this, "验证失败，请重试");
                     }
-                } catch (JSONException e) {
-                    e.printStackTrace();
+                });
+    }
+
+    private void doVerifyCodeSuccess(String response, String arg) {
+        JSONObject jsonObject;
+        try {
+            jsonObject = new JSONObject(response);
+            int result = jsonObject.getInt("code");
+            if (result == 0) {
+                ToastUtil.showMessage(LoginRegisterActivity.this, "验证成功啦,亲!");
+                if (arg.equals("forget_password")) {
+                    Intent intent = new Intent(LoginRegisterActivity.this, LoginResetActivity.class);
+                    intent.putExtra("local_phone_or_email", mEdtPhonenum.getText().toString().trim());
+                    startActivity(intent);
+                    finish();
+                } else {
+                    Intent intent = new Intent(LoginRegisterActivity.this, LoginRegisterInfoActivity.class);
+                    intent.putExtra("email_or_phone", email_or_phone);
+                    intent.putExtra("local_phone_or_email", mEdtPhonenum.getText().toString().trim());
+                    startActivity(intent);
+                    finish();
                 }
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                LogUtil.e("Wrong-Back", "连接错误原因： " + error.getMessage());
+            } else {
                 ToastUtil.showMessage(LoginRegisterActivity.this, "验证失败，请重试");
             }
-        }) {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<>();
-                headers.put("Authorization", "Bearer " + localtoken);
-                return headers;
-            }
-
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                HashMap<String, String> map = new HashMap<>();
-                map.put("email_or_mobile", mEdtPhonenum.getText().toString().trim());
-                map.put("code", localChecknum);
-                return map;
-            }
-        };
-        CheckRequest.setTag("register");
-        AppContext.getHttpQueue().add(CheckRequest);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
      * 激活邮箱
      */
     private void requeActivityEmail(final String key, final String value) {
-        StringRequest activityEmailRequest = new StringRequest(Request.Method.POST, URL_ACTIVITY_EMAIL, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                LogUtil.i("obj = " + response);
-                JSONObject obj;
-                try {
-                    obj = new JSONObject(response);
-                    if (obj.getString("code").equals("0")) {
-                        new AlertDialog.Builder(LoginRegisterActivity.this)
-                                .setMessage(obj.getString("message"))
-                                .setPositiveButton("知道了", new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        LoginRegisterActivity.this.finish();
-                                    }
-                                }).show();
-                    } else {
-                        ToastUtil.showMessage(LoginRegisterActivity.this, obj.getString("message"));
+        HttpHeaders headers = new HttpHeaders();
+        headers.put("Authorization", "Bearer " + localtoken);
+        HttpParams params = new HttpParams();
+        params.put("key", key);
+        params.put("value", value);
+        OkGo.post(Constants.URL_POST_LOGIN_ACTIVITE_EMAIL).tag(Constants.ACTIVITY_LOGIN_REGISTER).headers(headers).params(params)
+                .execute(new StringCallback() {
+                    @Override
+                    public void onSuccess(String s, Call call, okhttp3.Response response) {
+                        doActiviteEmailSuccess(s);
                     }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                LogUtil.e("Wrong-Back", "连接错误原因： " + error.getMessage());
-                ToastUtil.showMessage(LoginRegisterActivity.this, "验证失败，请重试");
-            }
-        }) {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<>();
-                headers.put("Authorization", "Bearer " + localtoken);
-                return headers;
-            }
 
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                HashMap<String, String> map = new HashMap<>();
-                map.put("key", key);
-                map.put("value", value);
-                return map;
+                    @Override
+                    public void onError(Call call, okhttp3.Response response, Exception e) {
+                        super.onError(call, response, e);
+                        ToastUtil.showMessage(LoginRegisterActivity.this, "验证失败，请重试");
+                    }
+                });
+    }
+
+    private void doActiviteEmailSuccess(String response) {
+        JSONObject obj;
+        try {
+            obj = new JSONObject(response);
+            if (obj.getString("code").equals("0")) {
+                new AlertDialog.Builder(LoginRegisterActivity.this)
+                        .setMessage(obj.getString("message"))
+                        .setPositiveButton("知道了", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                LoginRegisterActivity.this.finish();
+                            }
+                        }).show();
+            } else {
+                ToastUtil.showMessage(LoginRegisterActivity.this, obj.getString("message"));
             }
-        };
-        activityEmailRequest.setTag("register");
-        AppContext.getHttpQueue().add(activityEmailRequest);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -381,7 +341,7 @@ public class LoginRegisterActivity extends BaseActivity implements View.OnClickL
                         ToastUtil.showMessage(LoginRegisterActivity.this, "请输入正确的邮箱地址");
                         break;
                     }
-                    RequestMsg(URL_SEND_EMAIL_MSG);
+                    RequestMsg(Constants.URL_POST_LOGIN_SEND_EMAIL_MSG);
                     break;
                 }
                 //发送短信或者邮件
@@ -398,9 +358,9 @@ public class LoginRegisterActivity extends BaseActivity implements View.OnClickL
                 } else {
                     //如果是找回密码，则直接发送验证短信、邮件，不用去判断是否唯一
                     if (email_or_phone.equals("phone")) {
-                        RequestMsg(URL_SEND_PHONE_MSG);
+                        RequestMsg(Constants.URL_POST_LOGIN_SEND_PHONE_MSG);
                     } else {
-                        RequestMsg(URL_SEND_EMAIL_MSG);
+                        RequestMsg(Constants.URL_POST_LOGIN_SEND_EMAIL_MSG);
                     }
                 }
                 break;
