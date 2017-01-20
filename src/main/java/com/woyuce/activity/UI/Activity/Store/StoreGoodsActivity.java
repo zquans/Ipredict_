@@ -16,19 +16,18 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.toolbox.StringRequest;
+import com.lzy.okgo.OkGo;
+import com.lzy.okgo.callback.StringCallback;
+import com.woyuce.activity.R;
 import com.woyuce.activity.UI.Activity.Common.CustomServiceActivity;
 import com.woyuce.activity.UI.Activity.MainActivity;
-import com.woyuce.activity.AppContext;
 import com.woyuce.activity.UI.Fragment.Store.Fragment_StoreGoods_One_;
 import com.woyuce.activity.UI.Fragment.Store.Fragment_StoreGoods_Three;
 import com.woyuce.activity.UI.Fragment.Store.Fragment_StoreGoods_Two;
-import com.woyuce.activity.R;
 import com.woyuce.activity.Utils.LogUtil;
 import com.woyuce.activity.Utils.PreferenceUtil;
 import com.woyuce.activity.Utils.ToastUtil;
+import com.woyuce.activity.common.Constants;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -36,6 +35,8 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import okhttp3.Call;
 
 public class StoreGoodsActivity extends FragmentActivity implements View.OnClickListener {
 
@@ -128,6 +129,12 @@ public class StoreGoodsActivity extends FragmentActivity implements View.OnClick
     };
 
     @Override
+    protected void onStop() {
+        super.onStop();
+        OkGo.getInstance().cancelTag(Constants.ACTIVITY_STORE_GOODS);
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_storegoods);
@@ -157,52 +164,53 @@ public class StoreGoodsActivity extends FragmentActivity implements View.OnClick
      * 获取的是轮播图、商品详情的数据
      */
     private String total_sales_volume, total_good_volume, total_bad_volume, total_medium_volume, total_show_order_volume;
-    private String URL = "http://api.iyuce.com/v1/store/goods";
 
     private void requestData() {
-        StringRequest goodsDetialRequest = new StringRequest(Request.Method.GET,
-                URL + "?goodsid=" + getIntent().getStringExtra("goods_id") + "&skuid="
-                        + getIntent().getStringExtra("goods_sku_id") + "&userid="
-                        + PreferenceUtil.getSharePre(this).getString("userId", ""),
-                new Response.Listener<String>() {
+        String url = Constants.URL_GET_STORE_GOODS + "?goodsid=" + getIntent().getStringExtra("goods_id") + "&skuid="
+                + getIntent().getStringExtra("goods_sku_id") + "&userid="
+                + PreferenceUtil.getSharePre(this).getString("userId", "");
+        OkGo.get(url).tag(Constants.ACTIVITY_STORE_GOODS)
+                .execute(new StringCallback() {
                     @Override
-                    public void onResponse(String s) {
-                        try {
-                            JSONObject obj;
-                            JSONArray arr;
-                            obj = new JSONObject(s);
-                            if (obj.getString("code").equals("0")) {
-                                String store_user_money = obj.getString("user_money");
-                                LogUtil.i("user_money = " + store_user_money);
-                                PreferenceUtil.save(StoreGoodsActivity.this, "store_user_money", store_user_money);
-                                obj = obj.getJSONObject("good");
-                                //给Tab2的商品详情多图
-                                mImgList = obj.getString("goods_desc");
-                                total_sales_volume = obj.getString("total_sales_volume");
-                                total_good_volume = obj.getString("total_good_volume");
-                                total_bad_volume = obj.getString("total_bad_volume");
-                                total_medium_volume = obj.getString("total_medium_volume");
-                                total_show_order_volume = obj.getString("total_show_order_volume");
-
-                                //填充轮播图数据
-                                arr = obj.getJSONArray("goods_albums");
-                                for (int i = 0; i < arr.length(); i++) {
-                                    obj = arr.getJSONObject(i);
-                                    mList.add(obj.getString("original_img"));
-                                }
-                                Message msg = new Message();
-                                msg.what = GET_DATA_DONE;
-                                mHandler.sendMessage(msg);
-                            } else {
-                                ToastUtil.showMessage(getApplicationContext(), "获取商品信息失败");
-                            }
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
+                    public void onSuccess(String s, Call call, okhttp3.Response response) {
+                        doSuccess(s);
                     }
-                }, null);
-        goodsDetialRequest.setTag("goodsDetialRequest");
-        AppContext.getHttpQueue().add(goodsDetialRequest);
+                });
+    }
+
+    private void doSuccess(String s) {
+        try {
+            JSONObject obj;
+            JSONArray arr;
+            obj = new JSONObject(s);
+            if (obj.getString("code").equals("0")) {
+                String store_user_money = obj.getString("user_money");
+                LogUtil.i("user_money = " + store_user_money);
+                PreferenceUtil.save(StoreGoodsActivity.this, "store_user_money", store_user_money);
+                obj = obj.getJSONObject("good");
+                //给Tab2的商品详情多图
+                mImgList = obj.getString("goods_desc");
+                total_sales_volume = obj.getString("total_sales_volume");
+                total_good_volume = obj.getString("total_good_volume");
+                total_bad_volume = obj.getString("total_bad_volume");
+                total_medium_volume = obj.getString("total_medium_volume");
+                total_show_order_volume = obj.getString("total_show_order_volume");
+
+                //填充轮播图数据
+                arr = obj.getJSONArray("goods_albums");
+                for (int i = 0; i < arr.length(); i++) {
+                    obj = arr.getJSONObject(i);
+                    mList.add(obj.getString("original_img"));
+                }
+                Message msg = new Message();
+                msg.what = GET_DATA_DONE;
+                mHandler.sendMessage(msg);
+            } else {
+                ToastUtil.showMessage(getApplicationContext(), "获取商品信息失败");
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     /**

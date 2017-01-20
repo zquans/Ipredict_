@@ -10,19 +10,17 @@ import android.view.View;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.woyuce.activity.BaseActivity;
+import com.lzy.okgo.OkGo;
+import com.lzy.okgo.callback.StringCallback;
 import com.woyuce.activity.Adapter.Store.StoreCarAdapter;
-import com.woyuce.activity.AppContext;
+import com.woyuce.activity.BaseActivity;
 import com.woyuce.activity.Bean.Store.StoreMenu;
 import com.woyuce.activity.R;
 import com.woyuce.activity.Utils.LogUtil;
 import com.woyuce.activity.Utils.MathUtil;
 import com.woyuce.activity.Utils.PreferenceUtil;
 import com.woyuce.activity.Utils.ToastUtil;
+import com.woyuce.activity.common.Constants;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -32,6 +30,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+
+import okhttp3.Call;
 
 /**
  * Created by Administrator on 2016/11/7.
@@ -48,6 +48,12 @@ public class StoreCarActivity extends BaseActivity implements StoreCarAdapter.On
 
     public void back(View view) {
         finish();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        OkGo.getInstance().cancelTag(Constants.ACTIVITY_STORE_CAR);
     }
 
     @Override
@@ -100,48 +106,52 @@ public class StoreCarActivity extends BaseActivity implements StoreCarAdapter.On
         for (int i = 0; i < mFinalList.size(); i++) {
             URL = URL + mFinalList.get(i).getGoodsskuid() + ",";
         }
-        progressdialogshow(this);
         LogUtil.i("URL = " + URL);
-        StringRequest requestRecentGoods = new StringRequest(Request.Method.GET, URL, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String s) {
-                try {
-                    JSONObject obj;
-                    JSONArray arr;
-                    obj = new JSONObject(s);
-                    if (obj.getString("code").equals("0")) {
-                        arr = new JSONArray(obj.getString("data"));
-                        LogUtil.i("arr = " + arr);
-                        for (int i = 0; i < arr.length(); i++) {
-                            obj = arr.getJSONObject(i);
-                            for (int j = 0; j < mFinalList.size(); j++) {
-                                if (obj.getString("Id").equals(mFinalList.get(j).getGoodsskuid())) {
-                                    mFinalList.get(j).setPrice(obj.getString("SalesPrice"));
+
+        progressdialogshow(this);
+        OkGo.get(URL).tag(Constants.ACTIVITY_STORE_CAR)
+                .execute(new StringCallback() {
+                    @Override
+                    public void onSuccess(String s, Call call, okhttp3.Response response) {
+                        doSuccess(s);
+                    }
+
+                    @Override
+                    public void onError(Call call, okhttp3.Response response, Exception e) {
+                        super.onError(call, response, e);
+                        progressdialogcancel();
+                    }
+                });
+    }
+
+    private void doSuccess(String s) {
+        try {
+            JSONObject obj;
+            JSONArray arr;
+            obj = new JSONObject(s);
+            if (obj.getString("code").equals("0")) {
+                arr = new JSONArray(obj.getString("data"));
+                LogUtil.i("arr = " + arr);
+                for (int i = 0; i < arr.length(); i++) {
+                    obj = arr.getJSONObject(i);
+                    for (int j = 0; j < mFinalList.size(); j++) {
+                        if (obj.getString("Id").equals(mFinalList.get(j).getGoodsskuid())) {
+                            mFinalList.get(j).setPrice(obj.getString("SalesPrice"));
 //                                    LogUtil.i("obj.getString(\"Id\") = " + obj.getString("Id") +
 //                                            "-----obj.getString(\"SalesPrice\") = " + obj.getString("SalesPrice")
 //                                    );
-                                    break;
-                                }
-                            }
+                            break;
                         }
-                    } else {
-                        ToastUtil.showMessage(StoreCarActivity.this, "获取最新商品信息失败");
-                        LogUtil.i("oode != 0 " + obj.getString("message"));
                     }
-                } catch (JSONException e) {
-                    e.printStackTrace();
                 }
-                progressdialogcancel();
+            } else {
+                ToastUtil.showMessage(StoreCarActivity.this, "获取最新商品信息失败");
+                LogUtil.i("oode != 0 " + obj.getString("message"));
             }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError volleyError) {
-                LogUtil.e("volleyError = " + volleyError.getMessage());
-                progressdialogcancel();
-            }
-        });
-        requestRecentGoods.setTag("requestRecentGoods");
-        AppContext.getHttpQueue().add(requestRecentGoods);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        progressdialogcancel();
     }
 
     //数据库

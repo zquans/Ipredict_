@@ -14,26 +14,26 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.woyuce.activity.BaseActivity;
-import com.woyuce.activity.UI.Activity.Login.LoginActivity;
+import com.lzy.okgo.OkGo;
+import com.lzy.okgo.callback.StringCallback;
 import com.woyuce.activity.Adapter.Store.StorePayAdapter;
-import com.woyuce.activity.AppContext;
+import com.woyuce.activity.BaseActivity;
 import com.woyuce.activity.Bean.Store.StoreMenu;
 import com.woyuce.activity.R;
+import com.woyuce.activity.UI.Activity.Login.LoginActivity;
 import com.woyuce.activity.Utils.LogUtil;
 import com.woyuce.activity.Utils.MathUtil;
 import com.woyuce.activity.Utils.PreferenceUtil;
 import com.woyuce.activity.Utils.ToastUtil;
+import com.woyuce.activity.common.Constants;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+
+import okhttp3.Call;
 
 /**
  * Created by Administrator on 2016/11/7.
@@ -59,9 +59,6 @@ public class StorePayActivity extends BaseActivity implements View.OnClickListen
     private Double total_price;
     private Double local_store_user_money, max_store_user_money;
 
-    //获取默认收货地址
-    private String URL = "http://api.iyuce.com/v1/store/getdefaultaddr";
-
     public void back(View view) {
         finish();
     }
@@ -77,7 +74,7 @@ public class StorePayActivity extends BaseActivity implements View.OnClickListen
     @Override
     protected void onStop() {
         super.onStop();
-        AppContext.getHttpQueue().cancelAll("StorePayRequest");
+        OkGo.getInstance().cancelTag(Constants.ACTIVITY_STORE_PAY);
     }
 
     private void initView() {
@@ -152,76 +149,78 @@ public class StorePayActivity extends BaseActivity implements View.OnClickListen
         listView.setLayoutParams(params);
     }
 
-
     /**
      * 获取金币请求
      */
-    private String URL_MONEY_INFO = "http://api.iyuce.com/v1/store/getusermoney?userid=";
-
     private void requestMoney() {
-        StringRequest moneyRequest = new StringRequest(Request.Method.GET,
-                URL_MONEY_INFO + PreferenceUtil.getSharePre(StorePayActivity.this).getString("userId", ""), new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                try {
-                    JSONObject obj;
-                    obj = new JSONObject(response);
-                    if (obj.getString("code").equals("0")) {
-                        local_store_user_money = Double.parseDouble(obj.getString("data"));
-                        max_store_user_money = local_store_user_money;
-                        mTxtUserMoney.setText("你有" + local_store_user_money + "个金币,可以抵扣" + local_store_user_money + "元");
-                        //判断该显示的金币数和该显示的实际应付价格,最大金币数不应超过价格
-                        if (local_store_user_money > total_price) {
-                            local_store_user_money = total_price;
-                        }
-                        mEdtMiddle.setText(local_store_user_money.toString());
-                        mTxtFinalPrice.setText("应付总金额:" + MathUtil.sub(total_price, local_store_user_money) + "元");
+        String url_money = Constants.URL_MONEY_INFO + PreferenceUtil.getSharePre(StorePayActivity.this).getString("userId", "");
+        OkGo.get(url_money).tag(Constants.ACTIVITY_STORE_PAY)
+                .execute(new StringCallback() {
+                    @Override
+                    public void onSuccess(String s, Call call, okhttp3.Response response) {
+                        doMoneyInfoSuccess(s);
                     }
-                } catch (JSONException e) {
-                    e.printStackTrace();
+                });
+    }
+
+    private void doMoneyInfoSuccess(String response) {
+        try {
+            JSONObject obj;
+            obj = new JSONObject(response);
+            if (obj.getString("code").equals("0")) {
+                local_store_user_money = Double.parseDouble(obj.getString("data"));
+                max_store_user_money = local_store_user_money;
+                mTxtUserMoney.setText("你有" + local_store_user_money + "个金币,可以抵扣" + local_store_user_money + "元");
+                //判断该显示的金币数和该显示的实际应付价格,最大金币数不应超过价格
+                if (local_store_user_money > total_price) {
+                    local_store_user_money = total_price;
                 }
+                mEdtMiddle.setText(local_store_user_money.toString());
+                mTxtFinalPrice.setText("应付总金额:" + MathUtil.sub(total_price, local_store_user_money) + "元");
             }
-        }, null);
-        moneyRequest.setTag("StorePayRequest");
-        AppContext.getHttpQueue().add(moneyRequest);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
      * 请求收货地址
      */
     private void requestAddress() {
-        progressdialogshow(this);
-        StringRequest addressRequest = new StringRequest(Request.Method.GET,
-                URL + "?userid=" + PreferenceUtil.getSharePre(this).getString("userId", ""), new Response.Listener<String>() {
-            @Override
-            public void onResponse(String s) {
-                JSONObject obj;
-                JSONArray arr;
-                try {
-                    obj = new JSONObject(s);
-                    arr = obj.getJSONArray("address");
-                    if (arr.length() == 0) {
-                        mTxtAddressTwo.setText("去新增地址");
-                        mTxtAddressTwo.setGravity(Gravity.CENTER_HORIZONTAL);
-                    } else {
-                        obj = arr.getJSONObject(0);
-                        mTxtAddressOne.setText(obj.getString("name") + "\r\r" + obj.getString("mobile"));
-                        mTxtAddressTwo.setText("QQ:" + obj.getString("q_q") + "\r\r" + "邮箱" + obj.getString("email"));
-                        local_address_id = obj.getString("id");
+        String url = Constants.URL_GET_STORE_PAY + "?userid=" + PreferenceUtil.getSharePre(this).getString("userId", "");
+        OkGo.get(url).tag(Constants.ACTIVITY_STORE_PAY)
+                .execute(new StringCallback() {
+                    @Override
+                    public void onSuccess(String s, Call call, okhttp3.Response response) {
+                        doSuccess(s);
                     }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                progressdialogcancel();
+
+                    @Override
+                    public void onError(Call call, okhttp3.Response response, Exception e) {
+                        progressdialogcancel();
+                    }
+                });
+    }
+
+    private void doSuccess(String s) {
+        JSONObject obj;
+        JSONArray arr;
+        try {
+            obj = new JSONObject(s);
+            arr = obj.getJSONArray("address");
+            if (arr.length() == 0) {
+                mTxtAddressTwo.setText("去新增地址");
+                mTxtAddressTwo.setGravity(Gravity.CENTER_HORIZONTAL);
+            } else {
+                obj = arr.getJSONObject(0);
+                mTxtAddressOne.setText(obj.getString("name") + "\r\r" + obj.getString("mobile"));
+                mTxtAddressTwo.setText("QQ:" + obj.getString("q_q") + "\r\r" + "邮箱" + obj.getString("email"));
+                local_address_id = obj.getString("id");
             }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError volleyError) {
-                progressdialogcancel();
-            }
-        });
-        addressRequest.setTag("StorePayRequest");
-        AppContext.getHttpQueue().add(addressRequest);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        progressdialogcancel();
     }
 
     public void plusMoney(View view) {
@@ -292,7 +291,7 @@ public class StorePayActivity extends BaseActivity implements View.OnClickListen
             return;
         }
         switch (requestCode) {
-            case REQUEST_CODE_FOR_ADDRESS:
+            case Constants.CODE_START_ACTIVITY_FOR_RESULT:
                 mTxtAddressOne.setText(data.getStringExtra("default_address_name") + "\r\r" + data.getStringExtra("default_address_mobile"));
                 mTxtAddressTwo.setText(data.getStringExtra("default_address_q_q") + "\r\r" + data.getStringExtra("default_address_email"));
                 mTxtAddressTwo.setGravity(Gravity.CENTER_VERTICAL);
@@ -301,14 +300,11 @@ public class StorePayActivity extends BaseActivity implements View.OnClickListen
         }
     }
 
-    /*startActivityForResult的请求码*/
-    private static final int REQUEST_CODE_FOR_ADDRESS = 0x001;
-
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.relative_activity_storepay:
-                startActivityForResult(new Intent(this, StoreAddressActivity.class), REQUEST_CODE_FOR_ADDRESS);
+                startActivityForResult(new Intent(this, StoreAddressActivity.class), Constants.CODE_START_ACTIVITY_FOR_RESULT);
                 break;
         }
     }

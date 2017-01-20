@@ -16,28 +16,27 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.alipay.sdk.app.PayTask;
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
+import com.lzy.okgo.OkGo;
+import com.lzy.okgo.callback.StringCallback;
+import com.lzy.okgo.model.HttpParams;
 import com.tencent.mm.sdk.modelpay.PayReq;
 import com.tencent.mm.sdk.openapi.IWXAPI;
 import com.tencent.mm.sdk.openapi.WXAPIFactory;
 import com.woyuce.activity.BaseActivity;
-import com.woyuce.activity.UI.Activity.MainActivity;
-import com.woyuce.activity.AppContext;
 import com.woyuce.activity.Bean.Store.StorePayResult;
 import com.woyuce.activity.R;
+import com.woyuce.activity.UI.Activity.MainActivity;
 import com.woyuce.activity.Utils.LogUtil;
 import com.woyuce.activity.Utils.PreferenceUtil;
 import com.woyuce.activity.Utils.ToastUtil;
+import com.woyuce.activity.common.Constants;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.HashMap;
 import java.util.Map;
+
+import okhttp3.Call;
 
 /**
  * Created by Administrator on 2016/11/21.
@@ -49,17 +48,10 @@ public class StoreOrderActivity extends BaseActivity implements View.OnClickList
     private EditText mEdtOrder, mEdtMoney;
     private TextView mTxtGoods;
 
-    //生成订单
-    private String URL_TO_ORDER = "http://api.iyuce.com/v1/store/order";
-    private String URL_TO_PAY = "http://api.iyuce.com/v1/store/pay";
-    private String URL_TO_CASH_PAY = "http://api.iyuce.com/v1/store/paywithcash?paytype=alipay&id=";
-    private String URL_TO_WXPAY = "http://api.iyuce.com/v1/store/paywithcash?paytype=wxapp&id=";
-    private String URL_TO_VALID = "http://api.iyuce.com/v1/store/validpaybyapp?paytype=alipay";
-
     private String total_price, local_address_id, local_goods_name, local_skuids, local_store_user_money;
     private String local_user_id, local_order_no, local_order_id, local_alipay_data;
 
-    private static final int SDK_PAY_FLAG = 2;
+    private static final int SDK_PAY_FLAG = 0;
 
     private IWXAPI api;
 
@@ -93,6 +85,12 @@ public class StoreOrderActivity extends BaseActivity implements View.OnClickList
 
     public void back(View view) {
         finish();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+//        OkGo.getInstance().cancelTag(Constants.ACTIVITY_STORE_ORDER);
     }
 
     @Override
@@ -143,245 +141,204 @@ public class StoreOrderActivity extends BaseActivity implements View.OnClickList
      * 生成订单
      */
     private void requestOrder() {
-        StringRequest addressRequest = new StringRequest(Request.Method.POST, URL_TO_ORDER, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String s) {
-                LogUtil.i("requestOrder = " + s);
-                JSONObject obj;
-                try {
-                    obj = new JSONObject(s);
-                    if (obj.getString("code").equals("0")) {
-                        obj = obj.getJSONObject("data");
-                        mEdtOrder.setText(obj.getString("order_no"));
-                        local_order_no = obj.getString("order_no");
-                        local_order_id = obj.getString("id");
-                        mEdtMoney.setText(obj.getString("actual_price"));
-                        total_price = obj.getString("actual_price");
-                    } else {
-                        LogUtil.i("生成订单错误" + obj.getString("message"));
+        HttpParams params = new HttpParams();
+        params.put("discount", local_store_user_money);
+        params.put("address", local_address_id);
+        params.put("userid", local_user_id);
+        params.put("skuids", local_skuids);
+        OkGo.post(Constants.URL_POST_STORE_ORDER_MAKE_ORDER).tag(Constants.ACTIVITY_STORE_ORDER).params(params)
+                .execute(new StringCallback() {
+                    @Override
+                    public void onSuccess(String s, Call call, okhttp3.Response response) {
+                        doMakeOrderSuccess(s);
                     }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+                });
+    }
 
+    private void doMakeOrderSuccess(String s) {
+        JSONObject obj;
+        try {
+            obj = new JSONObject(s);
+            if (obj.getString("code").equals("0")) {
+                obj = obj.getJSONObject("data");
+                mEdtOrder.setText(obj.getString("order_no"));
+                local_order_no = obj.getString("order_no");
+                local_order_id = obj.getString("id");
+                mEdtMoney.setText(obj.getString("actual_price"));
+                total_price = obj.getString("actual_price");
+            } else {
+                LogUtil.i("生成订单错误" + obj.getString("message"));
             }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError volleyError) {
-                LogUtil.i("volleyError = " + volleyError.toString());
-            }
-        }) {
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                HashMap<String, String> map = new HashMap<>();
-                map.put("discount", local_store_user_money);
-                map.put("address", local_address_id);
-                map.put("userid", local_user_id);
-                map.put("skuids", local_skuids);
-                LogUtil.i("aaaa = " + local_store_user_money + "," + local_address_id + "," + local_skuids + ","
-                        + local_user_id);
-                return map;
-            }
-        };
-        addressRequest.setTag("StoreOrderActivity");
-//        addressRequest.setRetryPolicy(new DefaultRetryPolicy(1000, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-        AppContext.getHttpQueue().add(addressRequest);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
      * 支付请求第一步，金币支付
      */
     public void toPay(final String method, final String url) {
-        progressdialogshow(this);
-        StringRequest payRequest = new StringRequest(Request.Method.POST,
-                URL_TO_PAY + "?id=" + local_order_id + "&userid=" + local_user_id,
-                new Response.Listener<String>() {
+        String local_url = Constants.URL_POST_STORE_ORDER_TO_PAY + "?id=" + local_order_id + "&userid=" + local_user_id;
+        OkGo.post(local_url).tag(Constants.ACTIVITY_STORE_ORDER)
+                .execute(new StringCallback() {
                     @Override
-                    public void onResponse(String s) {
-                        LogUtil.i("toPay = " + s);
-                        try {
-                            JSONObject obj;
-                            obj = new JSONObject(s);
-                            if (obj.getString("code").equals("0")) {
-                                //金币支付成功,结束
-                                progressdialogcancel();
-                                new AlertDialog.Builder(StoreOrderActivity.this, AlertDialog.THEME_DEVICE_DEFAULT_LIGHT)
-                                        .setTitle("支付结果")
-                                        .setMessage("支付成功")
-                                        .setPositiveButton("知道了", new DialogInterface.OnClickListener() {
-                                            @Override
-                                            public void onClick(DialogInterface dialog, int which) {
-                                                startActivity(new Intent(StoreOrderActivity.this, MainActivity.class));
-                                                StoreOrderActivity.this.finish();
-                                                deleteSql();
-                                            }
-                                        })
-                                        .show();
-                            } else if (obj.getString("code").equals("2")) {
-                                //金币支付不成功,跳转现金支付
-//                                ToastUtil.showMessage(StoreOrderActivity.this, "金币不足抵扣,去调支付宝或者微信");
-                                //现金支付请求
-                                LogUtil.i("cashrequest url = " + url + local_order_id);
-                                cashRequest(method, url + local_order_id);
-                            } else {
-                                progressdialogcancel();
-                                ToastUtil.showMessage(StoreOrderActivity.this, "支付失败");
-                            }
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
+                    public void onSuccess(String s, Call call, okhttp3.Response response) {
+                        doPay(s, url, method);
                     }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError volleyError) {
-                LogUtil.i("volleyError = " + volleyError);
+                });
+    }
+
+    private void doPay(String s, String url, String method) {
+        try {
+            JSONObject obj;
+            obj = new JSONObject(s);
+            if (obj.getString("code").equals("0")) {
+                //金币支付成功,结束
+                new AlertDialog.Builder(StoreOrderActivity.this, AlertDialog.THEME_DEVICE_DEFAULT_LIGHT)
+                        .setTitle("支付结果")
+                        .setMessage("支付成功")
+                        .setPositiveButton("知道了", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                startActivity(new Intent(StoreOrderActivity.this, MainActivity.class));
+                                StoreOrderActivity.this.finish();
+                                deleteSql();
+                            }
+                        })
+                        .show();
+            } else if (obj.getString("code").equals("2")) {
+                //金币支付不成功,跳转现金支付
+                //ToastUtil.showMessage(StoreOrderActivity.this, "金币不足抵扣,去调支付宝或者微信");
+                //现金支付请求
+                cashRequest(method, url + local_order_id);
+            } else {
                 progressdialogcancel();
+                ToastUtil.showMessage(StoreOrderActivity.this, "支付失败");
             }
-        });
-        payRequest.setTag("StoreOrderActivity");
-//        payRequest.setRetryPolicy(new DefaultRetryPolicy(1000, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-        AppContext.getHttpQueue().add(payRequest);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
      * 支付请求第二步，现金支付宝支付
      */
     private void cashRequest(final String method, String url) {
-        StringRequest cashRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String s) {
-                try {
-                    JSONObject obj;
-                    obj = new JSONObject(s);
-                    progressdialogcancel();
-                    if (obj.getString("code").equals("0")) {
-                        //**************如果是阿里支付****************
-                        if (method.equals("alipay")) {
-//                            ToastUtil.showMessage(StoreOrderActivity.this, "去调支付宝吧 = ");
-                            obj = obj.getJSONObject("data");
-                            local_alipay_data = obj.getString("paydata");
-                            //必须异步调用支付宝
-                            Runnable payRunnable = new Runnable() {
-                                @Override
-                                public void run() {
-                                    PayTask alipay = new PayTask(StoreOrderActivity.this);
-                                    Map<String, String> result = alipay.payV2(local_alipay_data, true);
-
-                                    Message msg = new Message();
-                                    msg.what = SDK_PAY_FLAG;
-                                    msg.obj = result;
-                                    mHandler.sendMessage(msg);
-                                }
-                            };
-                            // 必须异步调用
-                            Thread payThread = new Thread(payRunnable);
-                            payThread.start();
-                        }
-                        //************如果是微信支付****************
-                        if (method.equals("wxapp")) {
-                            obj = obj.getJSONObject("data");
-                            String for_wx_validate = obj.getString("orderno");
-                            LogUtil.i("for_wx_validate = " + for_wx_validate);
-                            //将订单号保存给微信回调做判断
-                            PreferenceUtil.save(StoreOrderActivity.this, "for_wx_validate", for_wx_validate);
-                            obj = obj.getJSONObject("paydata");
-                            PayReq req = new PayReq();
-                            req.appId = obj.getString("appid");
-                            req.partnerId = obj.getString("partnerid");
-                            req.prepayId = obj.getString("prepayid");
-                            req.nonceStr = obj.getString("noncestr");
-                            req.timeStamp = obj.getString("timestamp");
-                            req.packageValue = obj.getString("package");
-                            req.sign = obj.getString("sign");
-                            // 调起请求之前先将该app注册到微信
-                            boolean b = api.sendReq(req);
-//                            ToastUtil.showMessage(StoreOrderActivity.this, "去调微信支付吧 = " + b);
-                        }
-                    } else {
-                        ToastUtil.showMessage(StoreOrderActivity.this, "调用支付宝或微信失败");
-                        LogUtil.i(s);
+        HttpParams params = new HttpParams();
+        params.put("paytype", method);
+        params.put("id", local_order_id);
+        OkGo.post(url).tag(Constants.ACTIVITY_STORE_ORDER).params(params)
+                .execute(new StringCallback() {
+                    @Override
+                    public void onSuccess(String s, Call call, okhttp3.Response response) {
+                        doPaySuccess(s, method);
                     }
-                } catch (JSONException e) {
-                    e.printStackTrace();
+                });
+    }
+
+    private void doPaySuccess(String s, String method) {
+        try {
+            JSONObject obj;
+            obj = new JSONObject(s);
+            progressdialogcancel();
+            if (obj.getString("code").equals("0")) {
+                //**************如果是阿里支付****************
+                if (method.equals("alipay")) {
+//                            ToastUtil.showMessage(StoreOrderActivity.this, "去调支付宝吧 = ");
+                    obj = obj.getJSONObject("data");
+                    local_alipay_data = obj.getString("paydata");
+                    //必须异步调用支付宝
+                    Runnable payRunnable = new Runnable() {
+                        @Override
+                        public void run() {
+                            PayTask alipay = new PayTask(StoreOrderActivity.this);
+                            Map<String, String> result = alipay.payV2(local_alipay_data, true);
+
+                            Message msg = new Message();
+                            msg.what = SDK_PAY_FLAG;
+                            msg.obj = result;
+                            mHandler.sendMessage(msg);
+                        }
+                    };
+                    // 必须异步调用
+                    Thread payThread = new Thread(payRunnable);
+                    payThread.start();
                 }
+                //************如果是微信支付****************
+                if (method.equals("wxapp")) {
+                    obj = obj.getJSONObject("data");
+                    String for_wx_validate = obj.getString("orderno");
+                    LogUtil.i("for_wx_validate = " + for_wx_validate);
+                    //将订单号保存给微信回调做判断
+                    PreferenceUtil.save(StoreOrderActivity.this, "for_wx_validate", for_wx_validate);
+                    obj = obj.getJSONObject("paydata");
+                    PayReq req = new PayReq();
+                    req.appId = obj.getString("appid");
+                    req.partnerId = obj.getString("partnerid");
+                    req.prepayId = obj.getString("prepayid");
+                    req.nonceStr = obj.getString("noncestr");
+                    req.timeStamp = obj.getString("timestamp");
+                    req.packageValue = obj.getString("package");
+                    req.sign = obj.getString("sign");
+                    // 调起请求之前先将该app注册到微信
+                    boolean b = api.sendReq(req);
+//                            ToastUtil.showMessage(StoreOrderActivity.this, "去调微信支付吧 = " + b);
+                }
+            } else {
+                ToastUtil.showMessage(StoreOrderActivity.this, "调用支付宝或微信失败");
+                LogUtil.i(s);
             }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError volleyError) {
-                ToastUtil.showMessage(StoreOrderActivity.this, "支付失败");
-                progressdialogcancel();
-            }
-        }) {
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                HashMap<String, String> map = new HashMap<>();
-                map.put("paytype", method);
-                map.put("id", local_order_id);
-                return map;
-            }
-        };
-        cashRequest.setTag("StoreOrderActivity");
-//        cashRequest.setRetryPolicy(new DefaultRetryPolicy(1000, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-        AppContext.getHttpQueue().add(cashRequest);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
      * 校验支付宝回调结果
      */
     private void validRequest(final String pay_result) {
-        StringRequest validRequest = new StringRequest(Request.Method.POST, URL_TO_VALID, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String s) {
-                LogUtil.i("valid s = " + s);
-                try {
-                    JSONObject obj;
-                    obj = new JSONObject(s);
-                    if (obj.getString("code").equals("0")) {
-                        //删除数据库中该表
-                        deleteSql();
-                        //界面提示处理
-                        new AlertDialog.Builder(StoreOrderActivity.this, AlertDialog.THEME_DEVICE_DEFAULT_LIGHT)
-                                .setTitle("支付宝支付结果")
-                                .setMessage("支付成功")
-                                .setPositiveButton("知道了", new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        startActivity(new Intent(StoreOrderActivity.this, MainActivity.class));
-                                        StoreOrderActivity.this.finish();
-                                    }
-                                })
-                                .show();
-                        LogUtil.i("message" + obj.getString("message"));
-                    } else {
-                        // 该笔订单真实的支付结果，需要依赖服务端的异步通知。
-                        new AlertDialog.Builder(StoreOrderActivity.this, AlertDialog.THEME_DEVICE_DEFAULT_LIGHT)
-                                .setTitle("支付宝支付结果")
-                                .setMessage("支付失败")
-                                .setPositiveButton("知道了", null)
-                                .show();
-                        LogUtil.i("code !=0" + obj.getString("message"));
+        HttpParams params = new HttpParams();
+        params.put("", pay_result);
+        OkGo.post(Constants.URL_POST_STORE_ORDER_TO_ALI_VALID).tag(Constants.ACTIVITY_STORE_ORDER).params(params)
+                .execute(new StringCallback() {
+                    @Override
+                    public void onSuccess(String s, Call call, okhttp3.Response response) {
+                        doValidateSuccess(s);
                     }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+                });
+    }
+
+    private void doValidateSuccess(String s) {
+        try {
+            JSONObject obj;
+            obj = new JSONObject(s);
+            if (obj.getString("code").equals("0")) {
+                //删除数据库中该表
+                deleteSql();
+                //界面提示处理
+                new AlertDialog.Builder(StoreOrderActivity.this, AlertDialog.THEME_DEVICE_DEFAULT_LIGHT)
+                        .setTitle("支付宝支付结果")
+                        .setMessage("支付成功")
+                        .setPositiveButton("知道了", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                startActivity(new Intent(StoreOrderActivity.this, MainActivity.class));
+                                StoreOrderActivity.this.finish();
+                            }
+                        })
+                        .show();
+                LogUtil.i("message" + obj.getString("message"));
+            } else {
+                // 该笔订单真实的支付结果，需要依赖服务端的异步通知。
+                new AlertDialog.Builder(StoreOrderActivity.this, AlertDialog.THEME_DEVICE_DEFAULT_LIGHT)
+                        .setTitle("支付宝支付结果")
+                        .setMessage("支付失败")
+                        .setPositiveButton("知道了", null)
+                        .show();
             }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError volleyError) {
-                LogUtil.e("volleyError = " + volleyError.getMessage());
-            }
-        }) {
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                HashMap<String, String> map = new HashMap<>();
-                map.put("", pay_result);
-                LogUtil.i("pay_result = " + pay_result);
-                return map;
-            }
-        };
-        validRequest.setTag("validRequest");
-//        validRequest.setRetryPolicy(new DefaultRetryPolicy(1000, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-        AppContext.getHttpQueue().add(validRequest);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -412,14 +369,14 @@ public class StoreOrderActivity extends BaseActivity implements View.OnClickList
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.ll_activity_storeorder_payAli:
-                final_url = URL_TO_CASH_PAY;
+                final_url = Constants.URL_POST_STORE_ORDER_TO_ALI_PAY;
                 final_method = "alipay";
                 LogUtil.i(final_url + final_method);
                 mLlayoutAliPay.setBackgroundColor(Color.parseColor("#cccccc"));
                 mLlayoutWxPay.setBackgroundColor(Color.parseColor("#ffffff"));
                 break;
             case R.id.ll_activity_storeorder_payWx:
-                final_url = URL_TO_WXPAY;
+                final_url = Constants.URL_POST_STORE_ORDER_TO_WXPAY_PAY;
                 final_method = "wxapp";
                 LogUtil.i(final_url + final_method);
                 mLlayoutWxPay.setBackgroundColor(Color.parseColor("#cccccc"));

@@ -9,23 +9,19 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
+import com.lzy.okgo.OkGo;
+import com.lzy.okgo.callback.StringCallback;
+import com.lzy.okgo.model.HttpParams;
 import com.woyuce.activity.BaseActivity;
-import com.woyuce.activity.AppContext;
 import com.woyuce.activity.R;
-import com.woyuce.activity.Utils.LogUtil;
 import com.woyuce.activity.Utils.PreferenceUtil;
 import com.woyuce.activity.Utils.ToastUtil;
+import com.woyuce.activity.common.Constants;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.HashMap;
-import java.util.Map;
+import okhttp3.Call;
 
 /**
  * Created by Administrator on 2016/12/19.
@@ -36,12 +32,16 @@ public class StoreCommentActivity extends BaseActivity implements View.OnClickLi
     private EditText mEdtComment;
     private ImageView mImgGood, mImgMedium, mImgBad;
 
-    private String URL_COMMENT = "http://api.iyuce.com/v1/store/submitcomment";
-
     private String local_order_id;
 
     //默认好评
     private String local_comment_star = "Good";
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        OkGo.getInstance().cancelTag(Constants.ACTIVITY_STORE_COMMENT);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,46 +74,38 @@ public class StoreCommentActivity extends BaseActivity implements View.OnClickLi
      * @param user_comment
      */
     private void storeCommentRequest(String url, final String userid, final String user_comment, final String local_comment_star) {
-        StringRequest storeCommentRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String s) {
-                LogUtil.i("comment s = " + s);
-                JSONObject obj;
-                try {
-                    obj = new JSONObject(s);
-                    if (obj.getString("code").equals("0")) {
-                        ToastUtil.showMessage(StoreCommentActivity.this, obj.getString("message"));
-                        new AlertDialog.Builder(StoreCommentActivity.this)
-                                .setMessage("感谢您的评论")
-                                .setPositiveButton("知道了", new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        StoreCommentActivity.this.finish();
-                                    }
-                                }).show();
+        HttpParams params = new HttpParams();
+        params.put("user_id", userid);
+        params.put("item_id", local_order_id);
+        params.put("cmt_text", user_comment);
+        params.put("satisfaction", local_comment_star);
+        OkGo.post(url).tag(Constants.ACTIVITY_STORE_COMMENT).params(params)
+                .execute(new StringCallback() {
+                    @Override
+                    public void onSuccess(String s, Call call, okhttp3.Response response) {
+                        doSuccess(s);
                     }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+                });
+    }
+
+    private void doSuccess(String s) {
+        JSONObject obj;
+        try {
+            obj = new JSONObject(s);
+            if (obj.getString("code").equals("0")) {
+                ToastUtil.showMessage(StoreCommentActivity.this, obj.getString("message"));
+                new AlertDialog.Builder(StoreCommentActivity.this)
+                        .setMessage("感谢您的评论")
+                        .setPositiveButton("知道了", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                StoreCommentActivity.this.finish();
+                            }
+                        }).show();
             }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError volleyError) {
-                LogUtil.i("volleyError = " + volleyError.getMessage());
-            }
-        }) {
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                HashMap<String, String> map = new HashMap<>();
-                map.put("user_id", userid);
-                map.put("item_id", local_order_id);
-                map.put("cmt_text", user_comment);
-                map.put("satisfaction", local_comment_star);
-                return map;
-            }
-        };
-        storeCommentRequest.setTag("storeCommentRequest");
-        AppContext.getHttpQueue().add(storeCommentRequest);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     public void toSubmit(View view) {
@@ -124,7 +116,7 @@ public class StoreCommentActivity extends BaseActivity implements View.OnClickLi
         //这里拼接URL
         String user_id = PreferenceUtil.getSharePre(this).getString("userId", null);
         String user_comment = mEdtComment.getText().toString();
-        storeCommentRequest(URL_COMMENT, user_id, user_comment, local_comment_star);
+        storeCommentRequest(Constants.URL_POST_STORE_COMMENT, user_id, user_comment, local_comment_star);
     }
 
     public void back(View view) {

@@ -14,25 +14,23 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
+import com.lzy.okgo.OkGo;
+import com.lzy.okgo.callback.StringCallback;
+import com.lzy.okgo.model.HttpHeaders;
+import com.lzy.okgo.model.HttpParams;
 import com.woyuce.activity.BaseActivity;
-import com.woyuce.activity.AppContext;
 import com.woyuce.activity.R;
-import com.woyuce.activity.Utils.LogUtil;
 import com.woyuce.activity.Utils.PreferenceUtil;
 import com.woyuce.activity.Utils.ToastUtil;
+import com.woyuce.activity.common.Constants;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import okhttp3.Call;
 
 /**
  * Created by Administrator on 2016/11/16.
@@ -46,13 +44,6 @@ public class StoreAddAddressActivity extends BaseActivity implements View.OnClic
 
     private String local_name, local_mobile, local_qq, local_email, local_id, local_mobile_veri_code_id, local_verified_type;
     private String local_user_id, LocalMobileVeriCodeId;//LocalMobileVeriCodeId验证短信后返回的标识ID
-
-    private String URL = "http://api.iyuce.com/v1/store/OperationAddress";
-    private String URL_SEND_MSG = "http://api.iyuce.com/v1/store/sendsmscode";
-    private String URL_VALIDATE = "http://api.iyuce.com/v1/store/validsmscode";
-    private String URL_SEND_PHONE_MSG = "http://api.iyuce.com/v1/common/sendsmsvericode";
-    private String URL_SEND_EMAIL_MSG = "http://api.iyuce.com/v1/common/sendemailvericode";
-    private String URL_TO_VALIDATE = "http://api.iyuce.com/v1/common/verifycode";
 
     private int time_count;
 
@@ -71,6 +62,12 @@ public class StoreAddAddressActivity extends BaseActivity implements View.OnClic
 
     public void back(View view) {
         finish();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        OkGo.getInstance().cancelTag(Constants.ACTIVITY_STORE_ADD_ADDRESS);
     }
 
     @Override
@@ -135,50 +132,47 @@ public class StoreAddAddressActivity extends BaseActivity implements View.OnClic
      * @param url
      */
     private void operaAddressRequest(String url) {
-        StringRequest addressOpreaRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String s) {
-                LogUtil.i("S = " + s);
-                JSONObject obj;
-                try {
-                    obj = new JSONObject(s);
-                    if (obj.getString("code").equals("0")) {
-                        ToastUtil.showMessage(StoreAddAddressActivity.this, "成功 = " + obj.getString("message"));
-                        StoreAddAddressActivity.this.finish();
-                    } else {
-                        ToastUtil.showMessage(StoreAddAddressActivity.this, "操作失败：" + obj.getString("message"));
+        HttpParams params = new HttpParams();
+        if (isPhoneNotEmail) {
+            params.put("mobile", mEdtPhone.getText().toString());
+            params.put("email", mEdtEmail.getText().toString());
+            params.put("VerifiedType", "mobile");
+        } else {
+            params.put("mobile", mEdtEmail.getText().toString());
+            params.put("email", mEdtPhone.getText().toString());
+            params.put("VerifiedType", "email");
+        }
+        params.put("name", mEdtName.getText().toString());
+        params.put("qq", mEdtQQ.getText().toString());
+        params.put("MobileVeriCodeId", LocalMobileVeriCodeId);
+        //修改的时候传id,新增的时候传0或者空
+        if (TextUtils.isEmpty(local_id)) {
+            params.put("id", "");
+        } else {
+            params.put("id", local_id);
+        }
+        OkGo.post(url).tag(Constants.ACTIVITY_STORE_ADD_ADDRESS).params(params)
+                .execute(new StringCallback() {
+                    @Override
+                    public void onSuccess(String s, Call call, okhttp3.Response response) {
+                        doSuccess(s);
                     }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+                });
+    }
+
+    private void doSuccess(String s) {
+        JSONObject obj;
+        try {
+            obj = new JSONObject(s);
+            if (obj.getString("code").equals("0")) {
+                ToastUtil.showMessage(StoreAddAddressActivity.this, "成功 = " + obj.getString("message"));
+                StoreAddAddressActivity.this.finish();
+            } else {
+                ToastUtil.showMessage(StoreAddAddressActivity.this, "操作失败：" + obj.getString("message"));
             }
-        }, null) {
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                HashMap<String, String> map = new HashMap<>();
-                if (isPhoneNotEmail) {
-                    map.put("mobile", mEdtPhone.getText().toString());
-                    map.put("email", mEdtEmail.getText().toString());
-                    map.put("VerifiedType", "mobile");
-                } else {
-                    map.put("mobile", mEdtEmail.getText().toString());
-                    map.put("email", mEdtPhone.getText().toString());
-                    map.put("VerifiedType", "email");
-                }
-                map.put("name", mEdtName.getText().toString());
-                map.put("qq", mEdtQQ.getText().toString());
-                map.put("MobileVeriCodeId", LocalMobileVeriCodeId);
-                //修改的时候传id,新增的时候传0或者空
-                if (TextUtils.isEmpty(local_id)) {
-                    map.put("id", "");
-                } else {
-                    map.put("id", local_id);
-                }
-                return map;
-            }
-        };
-        addressOpreaRequest.setTag("storeAddAddressRequest");
-        AppContext.getHttpQueue().add(addressOpreaRequest);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -200,10 +194,10 @@ public class StoreAddAddressActivity extends BaseActivity implements View.OnClic
             return;
         }
         if (TextUtils.isEmpty(local_id)) {
-            operaAddressRequest(URL + "?operation=save&userid=" + local_user_id);
+            operaAddressRequest(Constants.URL_POST_STORE_ADD_ADDRESS + "?operation=save&userid=" + local_user_id);
         } else {
             LocalMobileVeriCodeId = local_mobile_veri_code_id;
-            operaAddressRequest(URL + "?operation=save&userid=" + local_user_id);
+            operaAddressRequest(Constants.URL_POST_STORE_ADD_ADDRESS + "?operation=save&userid=" + local_user_id);
         }
     }
 
@@ -211,99 +205,74 @@ public class StoreAddAddressActivity extends BaseActivity implements View.OnClic
      * 发送验证码
      */
     private void RequestMsg(String url, final String key) {
-        progressdialogshow(this);
-        StringRequest MsgRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                LogUtil.e("MsgRequest = " + response);
-                JSONObject obj;
-                try {
-                    obj = new JSONObject(response);
-                    if (obj.getString("code").equals("0")) {
-                        //倒计时
-                        toCount();
-                    } else {
-                        ToastUtil.showMessage(StoreAddAddressActivity.this, obj.getString("message"));
+        HttpHeaders headers = new HttpHeaders();
+        localtoken = PreferenceUtil.getSharePre(StoreAddAddressActivity.this).getString("localtoken", "");
+        headers.put("Authorization", "Bearer " + localtoken);
+        HttpParams params = new HttpParams();
+        params.put(key, mEdtPhone.getText().toString().trim());
+        params.put("template", "VeriCode");
+        OkGo.post(url).tag(Constants.ACTIVITY_STORE_ADD_ADDRESS).headers(headers).params(params)
+                .execute(new StringCallback() {
+                    @Override
+                    public void onSuccess(String s, Call call, okhttp3.Response response) {
+                        doSendSuccess(s);
                     }
-                    progressdialogcancel();
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                LogUtil.e("Wrong-Back", "连接错误原因： " + error.getMessage());
-                ToastUtil.showMessage(StoreAddAddressActivity.this, "网络错误，请稍候再试");
-                progressdialogcancel();
-            }
-        }) {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<>();
-                localtoken = PreferenceUtil.getSharePre(StoreAddAddressActivity.this).getString("localtoken", "");
-                headers.put("Authorization", "Bearer " + localtoken);
-                return headers;
-            }
+                });
+    }
 
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                HashMap<String, String> map = new HashMap<>();
-                map.put(key, mEdtPhone.getText().toString().trim());
-                map.put("template", "VeriCode");
-                return map;
+    private void doSendSuccess(String response) {
+        JSONObject obj;
+        try {
+            obj = new JSONObject(response);
+            if (obj.getString("code").equals("0")) {
+                //倒计时
+                toCount();
+            } else {
+                ToastUtil.showMessage(StoreAddAddressActivity.this, obj.getString("message"));
             }
-        };
-        MsgRequest.setTag("storeAddAddressRequest");
-        AppContext.getHttpQueue().add(MsgRequest);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
      * 验证验证码
      */
     private void requestValidate(String url) {
-        StringRequest requestValidate = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                LogUtil.i("requestValidate = " + response);
-                JSONObject obj;
-                try {
-                    obj = new JSONObject(response);
-                    if (obj.getString("code").equals("0")) {
-                        ToastUtil.showMessage(StoreAddAddressActivity.this, "验证成功啦,亲!");
-                        LocalMobileVeriCodeId = obj.getString("data");
-                        isValidated = true;
-                    } else {
+        HttpHeaders headers = new HttpHeaders();
+        headers.put("Authorization", "Bearer " + localtoken);
+        HttpParams params = new HttpParams();
+        params.put("email_or_mobile", mEdtPhone.getText().toString().trim());
+        params.put("code", mEdtCode.getText().toString().trim());
+        OkGo.post(url).tag(Constants.ACTIVITY_STORE_ADD_ADDRESS).headers(headers).params(params)
+                .execute(new StringCallback() {
+                    @Override
+                    public void onSuccess(String s, Call call, okhttp3.Response response) {
+                        doValidateSuccess(s);
+                    }
+
+                    @Override
+                    public void onError(Call call, okhttp3.Response response, Exception e) {
+                        super.onError(call, response, e);
                         ToastUtil.showMessage(StoreAddAddressActivity.this, "验证失败，请重试");
                     }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                LogUtil.e("Wrong-Back", "连接错误原因： " + error.getMessage());
+                });
+    }
+
+    private void doValidateSuccess(String response) {
+        JSONObject obj;
+        try {
+            obj = new JSONObject(response);
+            if (obj.getString("code").equals("0")) {
+                ToastUtil.showMessage(StoreAddAddressActivity.this, "验证成功啦,亲!");
+                LocalMobileVeriCodeId = obj.getString("data");
+                isValidated = true;
+            } else {
                 ToastUtil.showMessage(StoreAddAddressActivity.this, "验证失败，请重试");
             }
-        }) {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<>();
-                headers.put("Authorization", "Bearer " + localtoken);
-                return headers;
-            }
-
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                HashMap<String, String> map = new HashMap<>();
-                map.put("email_or_mobile", mEdtPhone.getText().toString().trim());
-                map.put("code", mEdtCode.getText().toString().trim());
-                return map;
-            }
-        };
-        requestValidate.setTag("storeAddAddressRequest");
-        AppContext.getHttpQueue().add(requestValidate);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     private String localtoken;
@@ -356,18 +325,16 @@ public class StoreAddAddressActivity extends BaseActivity implements View.OnClic
                     return;
                 }
                 if (isPhoneNotEmail)
-                    RequestMsg(URL_SEND_PHONE_MSG, "phone");
+                    RequestMsg(Constants.URL_POST_LOGIN_SEND_PHONE_MSG, "phone");
                 else
-                    RequestMsg(URL_SEND_EMAIL_MSG, "email");
-//                requestPhoneValidate(URL_SEND_MSG + "?phone=" + mEdtPhone.getText().toString() + "&userid=" + local_user_id);
+                    RequestMsg(Constants.URL_POST_LOGIN_SEND_EMAIL_MSG, "email");
                 break;
             case R.id.btn_activity_storeaddaddress_validate:
                 if (TextUtils.isEmpty(mEdtCode.getText().toString())) {
                     ToastUtil.showMessage(StoreAddAddressActivity.this, "请输入验证码");
                     return;
                 }
-                requestValidate(URL_TO_VALIDATE);
-//                requestPhoneValidate(URL_VALIDATE + "?phone=" + mEdtPhone.getText().toString() + "&code=" + mEdtCode.getText().toString());
+                requestValidate(Constants.URL_POST_LOGIN_VERIFY_CODE);
                 break;
         }
     }

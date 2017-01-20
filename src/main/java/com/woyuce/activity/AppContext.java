@@ -29,6 +29,7 @@ import com.woyuce.activity.Utils.PreferenceUtil;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.logging.Level;
 
 /**
  * 全局应用程序类：用于保存和调用全局应用配置及访问网络数据
@@ -69,8 +70,8 @@ public class AppContext extends Application {
             OkGo.getInstance()
 
                     // 打开该调试开关,打印级别INFO,并不是异常,是为了显眼,不需要就不要加入该行
-                    //TODO 最后的false表示是否打印okgo的内部异常，一般打开方便调试错误
-                    // .debug("OkGo", Level.INFO, false)
+                    //TODO 最后的true表示是否打印okgo的内部异常，一般打开方便调试错误,发布前要关闭日志
+                    .debug("OkGo", Level.INFO, true)
 
                     //如果使用默认的 60秒,以下三行也不需要传
                     .setConnectTimeout(OkGo.DEFAULT_MILLISECONDS)  //全局的连接超时时间
