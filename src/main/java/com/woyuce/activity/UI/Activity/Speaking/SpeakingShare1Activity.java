@@ -11,24 +11,22 @@ import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
+import com.lzy.okgo.OkGo;
+import com.lzy.okgo.callback.StringCallback;
 import com.woyuce.activity.BaseActivity;
-import com.woyuce.activity.UI.Activity.MainActivity;
-import com.woyuce.activity.AppContext;
 import com.woyuce.activity.R;
-import com.woyuce.activity.Utils.LogUtil;
+import com.woyuce.activity.UI.Activity.MainActivity;
 import com.woyuce.activity.Utils.PreferenceUtil;
 import com.woyuce.activity.Utils.ToastUtil;
+import com.woyuce.activity.common.Constants;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.List;
+
+import okhttp3.Call;
 
 /**
  * Created by Administrator on 2016/9/22.
@@ -42,16 +40,15 @@ public class SpeakingShare1Activity extends BaseActivity implements View.OnClick
     private TextView userName;
     private Spinner spnExamTime;
 
-    private List<String> timeList = new ArrayList<>();
+    private ArrayList<String> timeList = new ArrayList<>();
     private ArrayAdapter<String> timeAdapter;
 
-    private String URL_TIME = "http://iphone.ipredicting.com/ksexamtime.aspx";
     private String localRoom, localRoomID, localTime;
 
     @Override
     protected void onStop() {
         super.onStop();
-        AppContext.getHttpQueue().cancelAll("share");
+        OkGo.getInstance().cancelTag(Constants.ACTIVITY_SPEAKING_SHARE_ONE);
     }
 
     @Override
@@ -80,7 +77,8 @@ public class SpeakingShare1Activity extends BaseActivity implements View.OnClick
         btnRoomChoose.setOnClickListener(this);
     }
 
-    private void initEvent() { // Text 显示用户昵称
+    private void initEvent() {
+        // Text 显示用户昵称
         String init = PreferenceUtil.getSharePre(this).getString("mUserName", "").toString();
         if (init != "") {
             userName.setText(init);
@@ -90,37 +88,33 @@ public class SpeakingShare1Activity extends BaseActivity implements View.OnClick
     }
 
     private void getTimeList() {
-        StringRequest strinRequest = new StringRequest(Request.Method.GET, URL_TIME, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                JSONObject jsonObject;
-                String examtime;
-                try {
-                    jsonObject = new JSONObject(response);
-                    int result = jsonObject.getInt("code");
-                    if (result == 0) {
-                        JSONArray data = jsonObject.getJSONArray("data");
-                        for (int i = 0; i < data.length(); i++) {
-                            jsonObject = data.getJSONObject(i);
-                            examtime = jsonObject.getString("examtime");
-                            timeList.add(examtime); // 读取考场事件
-                        }
-                    } else {
-                        LogUtil.e("code!=0 DATA_BACK", "读取页面失败： " + jsonObject.getString("message"));
+        OkGo.get(Constants.URL_GET_SPEAKING_SHARE_ONE).tag(Constants.ACTIVITY_SPEAKING_SHARE_ONE)
+                .execute(new StringCallback() {
+                    @Override
+                    public void onSuccess(String s, Call call, okhttp3.Response response) {
+                        doSuccess(s);
                     }
-                    setTimeData(); // 数据加载完成后再放入
-                } catch (JSONException e) {
-                    e.printStackTrace();
+                });
+    }
+
+    private void doSuccess(String response) {
+        JSONObject jsonObject;
+        String examtime;
+        try {
+            jsonObject = new JSONObject(response);
+            int result = jsonObject.getInt("code");
+            if (result == 0) {
+                JSONArray data = jsonObject.getJSONArray("data");
+                for (int i = 0; i < data.length(); i++) {
+                    jsonObject = data.getJSONObject(i);
+                    examtime = jsonObject.getString("examtime");
+                    timeList.add(examtime); // 读取考场事件
                 }
             }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                LogUtil.e("Wrong-BACK", "连接错误原因： " + error.getMessage()); // 做错误处理
-            }
-        });
-        strinRequest.setTag("share");
-        AppContext.getHttpQueue().add(strinRequest);
+            setTimeData();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     private void setTimeData() {
@@ -133,11 +127,10 @@ public class SpeakingShare1Activity extends BaseActivity implements View.OnClick
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (resultCode) {
-            case 1:
+            case Constants.CODE_START_ACTIVITY_FOR_RESULT:
                 localRoom = data.getExtras().getString("localRoom");
                 localRoomID = data.getExtras().getString("localRoomID");
                 btnRoomChoose.setText(localRoom);
-                LogUtil.e("ALL", "all room = " + localRoom + ", " + localRoomID); // Log数据返回
                 break;
         }
     }
@@ -169,9 +162,9 @@ public class SpeakingShare1Activity extends BaseActivity implements View.OnClick
                 break;
             case R.id.btn_share_RoomChoose:
                 Intent it_roomid = new Intent(this, SpeakingChooseRoomActivity.class);
-                startActivityForResult(it_roomid, 1);
+                startActivityForResult(it_roomid, Constants.CODE_START_ACTIVITY_FOR_RESULT);
                 break;
-            case R.id.button_share_next: // *** 点击"下一步"按钮,启动下一个"分享"界面
+            case R.id.button_share_next:
                 if (localRoom == null || localRoom == "") {
                     ToastUtil.showMessage(SpeakingShare1Activity.this, "请选择考场");
                 } else {

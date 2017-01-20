@@ -31,11 +31,11 @@ import com.umeng.message.PushAgent;
 import com.umeng.message.UTrack;
 import com.umeng.message.common.inter.ITagManager;
 import com.umeng.message.tag.TagManager;
-import com.woyuce.activity.BaseActivity;
-import com.woyuce.activity.UI.Activity.MainActivity;
-import com.woyuce.activity.UI.Activity.Common.WebActivity;
 import com.woyuce.activity.AppContext;
+import com.woyuce.activity.BaseActivity;
 import com.woyuce.activity.R;
+import com.woyuce.activity.UI.Activity.Common.WebActivity;
+import com.woyuce.activity.UI.Activity.MainActivity;
 import com.woyuce.activity.Utils.ActivityManager;
 import com.woyuce.activity.Utils.LogUtil;
 import com.woyuce.activity.Utils.PreferenceUtil;
@@ -51,13 +51,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
-
-import cn.sharesdk.framework.Platform;
-import cn.sharesdk.framework.PlatformActionListener;
-import cn.sharesdk.framework.ShareSDK;
-import cn.sharesdk.sina.weibo.SinaWeibo;
-import cn.sharesdk.tencent.qq.QQ;
-import cn.sharesdk.wechat.friends.Wechat;
 
 public class LoginActivity extends BaseActivity implements OnClickListener {
 
@@ -706,48 +699,62 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
      *
      * @param view
      */
-    public void sinaLogin(View view) {
-        doShareLogin("sina");
+//    public void sinaLogin(View view) {
+//        doShareLogin("sina");
+//    }
+//
+//    public void wechatLogin(View view) {
+//        doShareLogin("wechat");
+//    }
+//
+//    public void qqLogin(View view) {
+//        doShareLogin("qq");
+//    }
+//
+//    private void doShareLogin(String arg) {
+//        ShareSDK.initSDK(this);
+//        Platform mplatform;
+//        if (arg.equals("sina")) {
+//            mplatform = ShareSDK.getPlatform(this, SinaWeibo.NAME);
+//        } else if (arg.equals("wechat")) {
+//            mplatform = ShareSDK.getPlatform(this, Wechat.NAME);
+//        } else {
+//            mplatform = ShareSDK.getPlatform(this, QQ.NAME);
+//        }
+//        mplatform.authorize();
+//        mplatform.setPlatformActionListener(new PlatformActionListener() {
+//            @Override
+//            public void onComplete(Platform platform, int action, HashMap<String, Object> hashMap) {
+//                LogUtil.i("qqLogin onComplete" + hashMap.toString());
+//                    PlatformDb platDB = platform.getDb();//获取数平台数据DB
+//                    //通过DB获取各种数据
+//                    String token = platDB.getToken();
+//                    String openId = platDB.getUserId();
+//                    String userName = platDB.getUserName();
+////                    platDB.getUserGender();
+////                    platDB.getUserIcon();
+//                    LogUtil.e("openId = " + openId + "||| accessToken" + token + "||| nickname = " + userName);
+//
+//                    Iterator ite = hashMap.entrySet().iterator();
+//                    while (ite.hasNext()) {
+//                        Map.Entry entry = (Map.Entry) ite.next();
+//                        Object key = entry.getKey();
+//                        Object value = entry.getValue();
+//                        LogUtil.e(key + "： " + value);
+//                    }
+//            }
+//
+//                @Override
+//                public void onError (Platform platform,int i, Throwable throwable){
+//                    LogUtil.e("onError" + platform.getName().toString());
+//                }
+//
+//                @Override
+//                public void onCancel (Platform platform,int i){
+//                    LogUtil.i(" onCancel");
+//                }
+//            }
+//            );
+//            mplatform.showUser(null);//执行登录，登录后在回调里面获取用户资料
+//        }
     }
-
-    public void wechatLogin(View view) {
-        doShareLogin("wechat");
-    }
-
-    public void qqLogin(View view) {
-        doShareLogin("qq");
-    }
-
-    private void doShareLogin(String arg) {
-        ShareSDK.initSDK(this);
-        Platform mplatform;
-        if (arg.equals("sina")) {
-            mplatform = ShareSDK.getPlatform(this, SinaWeibo.NAME);
-        } else if (arg.equals("wechat")) {
-            mplatform = ShareSDK.getPlatform(this, Wechat.NAME);
-        } else {
-            mplatform = ShareSDK.getPlatform(this, QQ.NAME);
-            String accessToken = mplatform.getDb().getToken(); // 获取授权token
-            String openId = mplatform.getDb().getUserId(); // 获取用户在此平台的ID
-            String nickname = mplatform.getDb().getUserName(); // 获取用户昵称
-            LogUtil.i("nickname = " + nickname + "openId = " + openId + ",accessToken" + accessToken);
-        }
-        mplatform.setPlatformActionListener(new PlatformActionListener() {
-            @Override
-            public void onComplete(Platform platform, int i, HashMap<String, Object> hashMap) {
-                LogUtil.i("qqLogin onComplete" + hashMap.toString());
-            }
-
-            @Override
-            public void onError(Platform platform, int i, Throwable throwable) {
-                LogUtil.i("qqLogin onError");
-            }
-
-            @Override
-            public void onCancel(Platform platform, int i) {
-                LogUtil.i("qqLogin onCancel");
-            }
-        });
-        mplatform.authorize();
-    }
-}

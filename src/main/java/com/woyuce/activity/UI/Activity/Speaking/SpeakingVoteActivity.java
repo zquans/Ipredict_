@@ -7,22 +7,19 @@ import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.woyuce.activity.BaseActivity;
+import com.lzy.okgo.OkGo;
+import com.lzy.okgo.callback.StringCallback;
+import com.lzy.okgo.model.HttpParams;
 import com.woyuce.activity.Adapter.Speaking.SpeakingAreaAdapter;
 import com.woyuce.activity.Adapter.Speaking.SpeakingCityAdapter;
 import com.woyuce.activity.Adapter.Speaking.SpeakingRoomAdapter;
-import com.woyuce.activity.AppContext;
+import com.woyuce.activity.BaseActivity;
 import com.woyuce.activity.Bean.Speaking.SpeakingArea;
 import com.woyuce.activity.Bean.Speaking.SpeakingCity;
 import com.woyuce.activity.Bean.Speaking.SpeakingRoom;
 import com.woyuce.activity.R;
-import com.woyuce.activity.Utils.LogUtil;
 import com.woyuce.activity.Utils.ToastUtil;
+import com.woyuce.activity.common.Constants;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -32,12 +29,11 @@ import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import cn.sharesdk.framework.ShareSDK;
 import cn.sharesdk.onekeyshare.OnekeyShare;
+import okhttp3.Call;
 
 /**
  * Created by Administrator on 2016/9/22.
@@ -49,10 +45,6 @@ public class SpeakingVoteActivity extends BaseActivity implements View.OnClickLi
     private Spinner spnArea, spnCity, spnRoom;
 
     private String localsubID, localsubName, localUrl;
-    private String URL_AREA = "http://iphone.ipredicting.com/kyAreaApi.aspx";
-    private String URL_CITY = "http://iphone.ipredicting.com/kyCityApi.aspx";
-    private String URL_ROOM = "http://iphone.ipredicting.com/kyRoomApi.aspx";
-    private String URL_VOTE = "http://iphone.ipredicting.com/kysubVote.aspx";
     private String localAreaId, localCityId, localRoomId, localRoomName;
 
     private List<SpeakingArea> areaList = new ArrayList<>();
@@ -62,7 +54,7 @@ public class SpeakingVoteActivity extends BaseActivity implements View.OnClickLi
     @Override
     protected void onStop() {
         super.onStop();
-        AppContext.getHttpQueue().cancelAll("vote");
+        OkGo.getInstance().cancelTag(Constants.ACTIVITY_SPEAKING_VOTE);
     }
 
     @Override
@@ -110,159 +102,136 @@ public class SpeakingVoteActivity extends BaseActivity implements View.OnClickLi
     }
 
     private void getAreaJson() {
-        StringRequest strinRequest = new StringRequest(Request.Method.POST, URL_AREA, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                JSONObject jsonObject;
-                try {
-                    jsonObject = new JSONObject(response);
-                    SpeakingArea area;
-                    int result = jsonObject.getInt("code");
-                    if (result == 0) {
-                        JSONArray data = jsonObject.getJSONArray("data");
-                        for (int i = 0; i < data.length(); i++) {
-                            jsonObject = data.getJSONObject(i);
-                            area = new SpeakingArea();
-                            area.subAreaName = jsonObject.getString("subAreaName");
-                            area.subAreaid = jsonObject.getString("subAreaid");
-                            areaList.add(area);
-                        }
-                    } else {
-                        LogUtil.e("code!=0 Data-BACK", "读取页面失败： " + jsonObject.getString("message"));
+        OkGo.post(Constants.URL_POST_SPEAKING_CHOOSE_AREA).tag(Constants.ACTIVITY_SPEAKING_VOTE)
+                .execute(new StringCallback() {
+                    @Override
+                    public void onSuccess(String s, Call call, okhttp3.Response response) {
+                        doAreaSuccess(s);
                     }
-                    // 数据加载完成后再放入
-                    setAreaData();
-                } catch (JSONException e) {
-                    e.printStackTrace();
+                });
+    }
+
+    private void doAreaSuccess(String response) {
+        JSONObject jsonObject;
+        try {
+            jsonObject = new JSONObject(response);
+            SpeakingArea area;
+            int result = jsonObject.getInt("code");
+            if (result == 0) {
+                JSONArray data = jsonObject.getJSONArray("data");
+                for (int i = 0; i < data.length(); i++) {
+                    jsonObject = data.getJSONObject(i);
+                    area = new SpeakingArea();
+                    area.subAreaName = jsonObject.getString("subAreaName");
+                    area.subAreaid = jsonObject.getString("subAreaid");
+                    areaList.add(area);
                 }
             }
-        }, errorListener());
-        strinRequest.setTag("vote");
-        AppContext.getHttpQueue().add(strinRequest);
+            setAreaData();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     private void getCityJson() {
-        StringRequest strinRequest = new StringRequest(Request.Method.POST, URL_CITY, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                JSONObject jsonObject;
-                try {
-                    jsonObject = new JSONObject(response);
-                    SpeakingCity city;
-                    int result = jsonObject.getInt("code");
-                    if (result == 0) {
-                        JSONArray data = jsonObject.getJSONArray("data");
-                        for (int i = 0; i < data.length(); i++) {
-                            jsonObject = data.getJSONObject(i);
-                            city = new SpeakingCity();
-                            city.cityid = jsonObject.getString("cityid");
-                            city.cityname = jsonObject.getString("cityname");
-                            cityList.add(city);
-                        }
-                    } else {
-                        LogUtil.e("code!=0 Data-BACK", "读取页面失败： " + jsonObject.getString("message"));
+        HttpParams params = new HttpParams();
+        if (localAreaId == null) {
+            params.put("areaid", "45");
+        }
+        params.put("areaid", localAreaId);
+        OkGo.post(Constants.URL_POST_SPEAKING_CHOOSE_CITY).tag(Constants.ACTIVITY_SPEAKING_VOTE).params(params)
+                .execute(new StringCallback() {
+                    @Override
+                    public void onSuccess(String s, Call call, okhttp3.Response response) {
+                        doCitySuccess(s);
                     }
-                    // 数据加载完成后再放入
-                    setCityData();
-                } catch (JSONException e) {
-                    e.printStackTrace();
+                });
+    }
+
+    private void doCitySuccess(String response) {
+        JSONObject jsonObject;
+        try {
+            jsonObject = new JSONObject(response);
+            SpeakingCity city;
+            int result = jsonObject.getInt("code");
+            if (result == 0) {
+                JSONArray data = jsonObject.getJSONArray("data");
+                for (int i = 0; i < data.length(); i++) {
+                    jsonObject = data.getJSONObject(i);
+                    city = new SpeakingCity();
+                    city.cityid = jsonObject.getString("cityid");
+                    city.cityname = jsonObject.getString("cityname");
+                    cityList.add(city);
                 }
             }
-        }, errorListener()) {
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                Map<String, String> hashMap = new HashMap<>();
-                if (localAreaId == null) {
-                    hashMap.put("areaid", "45");
-                }
-                hashMap.put("areaid", localAreaId);
-                return hashMap;
-            }
-        };
-        strinRequest.setTag("vote");
-        AppContext.getHttpQueue().add(strinRequest);
+            setCityData();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     private void getRoomJson() {
-        StringRequest strinRequest = new StringRequest(Request.Method.POST, URL_ROOM, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                JSONObject jsonObject;
-                try {
-                    jsonObject = new JSONObject(response);
-                    SpeakingRoom room;
-                    int result = jsonObject.getInt("code");
-                    if (result == 0) {
-                        JSONArray data = jsonObject.getJSONArray("data");
-                        for (int i = 0; i < data.length(); i++) {
-                            jsonObject = data.getJSONObject(i);
-                            room = new SpeakingRoom();
-                            room.roomid = jsonObject.getString("roomid");
-                            room.roomname = jsonObject.getString("roomname");
-                            roomList.add(room);
-                        }
-                    } else {
-                        LogUtil.e("code!=0 Data-BACK", "读取页面失败： " + jsonObject.getString("message"));
+        HttpParams params = new HttpParams();
+        params.put("cityid", localCityId);
+        OkGo.post(Constants.URL_POST_SPEAKING_CHOOSE_ROOM).tag(Constants.ACTIVITY_SPEAKING_VOTE).params(params)
+                .execute(new StringCallback() {
+                    @Override
+                    public void onSuccess(String s, Call call, okhttp3.Response response) {
+                        doRoomSuccess(s);
                     }
-                    // 数据加载完成后再放入
-                    setRoomData();
-                } catch (JSONException e) {
-                    e.printStackTrace();
+                });
+    }
+
+    private void doRoomSuccess(String response) {
+        JSONObject jsonObject;
+        try {
+            jsonObject = new JSONObject(response);
+            SpeakingRoom room;
+            int result = jsonObject.getInt("code");
+            if (result == 0) {
+                JSONArray data = jsonObject.getJSONArray("data");
+                for (int i = 0; i < data.length(); i++) {
+                    jsonObject = data.getJSONObject(i);
+                    room = new SpeakingRoom();
+                    room.roomid = jsonObject.getString("roomid");
+                    room.roomname = jsonObject.getString("roomname");
+                    roomList.add(room);
                 }
             }
-        }, errorListener()) {
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                Map<String, String> hashMap = new HashMap<>();
-                hashMap.put("cityid", localCityId);
-                return hashMap;
-            }
-        };
-        strinRequest.setTag("vote");
-        AppContext.getHttpQueue().add(strinRequest);
+            setRoomData();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     private void toVote() {
-        StringRequest strinRequest = new StringRequest(Request.Method.POST, URL_VOTE, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                JSONObject jsonObject;
-                try {
-                    jsonObject = new JSONObject(response);
-                    int result = jsonObject.getInt("code");
-                    if (result == 0) {
-                        ToastUtil.showMessage(SpeakingVoteActivity.this, "投票成功,分享给好友");
-                        showShare("我们不卖答案，我们是试卷的搬运工", "我把票投给了" + localsubName);
-                        finish();
-                    } else {
-                        LogUtil.e("code!=0 Data-BACK", "读取页面失败： " + jsonObject.getString("message"));
+        HttpParams params = new HttpParams();
+        params.put("areaid", localAreaId);
+        params.put("cityid", localCityId);
+        params.put("roomid", localRoomId);
+        params.put("subid", localsubID);
+        OkGo.post(Constants.URL_POST_SPEAKING_VOTE_VOTE).tag(Constants.ACTIVITY_SPEAKING_VOTE).params(params)
+                .execute(new StringCallback() {
+                    @Override
+                    public void onSuccess(String s, Call call, okhttp3.Response response) {
+                        doVoteSuccess(s);
                     }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-        }, errorListener()) {
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                Map<String, String> hashMap = new HashMap<>();
-                hashMap.put("areaid", localAreaId);
-                hashMap.put("cityid", localCityId);
-                hashMap.put("roomid", localRoomId);
-                hashMap.put("subid", localsubID);
-                return hashMap;
-            }
-        };
-        strinRequest.setTag("vote");
-        AppContext.getHttpQueue().add(strinRequest);
+                });
     }
 
-    private Response.ErrorListener errorListener() { // 抽出的错误报告方法*******************
-        return new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                LogUtil.e("Wrong_BACK", "联接错误原因： " + error.getMessage());
+    private void doVoteSuccess(String response) {
+        JSONObject jsonObject;
+        try {
+            jsonObject = new JSONObject(response);
+            int result = jsonObject.getInt("code");
+            if (result == 0) {
+                ToastUtil.showMessage(SpeakingVoteActivity.this, "投票成功,分享给好友");
+                showShare("我们不卖答案，我们是试卷的搬运工", "我把票投给了" + localsubName);
+                finish();
             }
-        };
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

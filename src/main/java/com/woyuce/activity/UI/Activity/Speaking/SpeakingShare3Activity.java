@@ -9,12 +9,14 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
+import com.lzy.okgo.OkGo;
 import com.woyuce.activity.BaseActivity;
+import com.woyuce.activity.R;
 import com.woyuce.activity.UI.Activity.MainActivity;
 import com.woyuce.activity.UI.Fragment.Speaking.FragmentPartOne;
 import com.woyuce.activity.UI.Fragment.Speaking.FragmentPartTwo;
-import com.woyuce.activity.R;
 import com.woyuce.activity.Utils.ToastUtil;
+import com.woyuce.activity.common.Constants;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,6 +40,12 @@ public class SpeakingShare3Activity extends BaseActivity implements View.OnClick
     private FragmentPartOne fragmentpartone;
     private FragmentPartTwo fragmentparttwo;
     private FragmentManager fragmentManager;
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        OkGo.getInstance().cancelTag(Constants.FRAGMENT_SHARE_THREE);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,7 +89,7 @@ public class SpeakingShare3Activity extends BaseActivity implements View.OnClick
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.ll_speaking_stastis: // **** 点击" 高频统计" 启动 Activity-统计，
+            case R.id.ll_speaking_stastis:
                 Intent it_statis = new Intent(this, SpeakingStatisActivity.class);
                 startActivity(it_statis);
                 overridePendingTransition(0, 0);
@@ -123,7 +131,7 @@ public class SpeakingShare3Activity extends BaseActivity implements View.OnClick
                 transactionPart2.show(fragmentparttwo);
                 transactionPart2.commit();
                 break;
-            case R.id.button_share3_next: // *** 点击"下一步"按钮,启动下一个"分享"界面
+            case R.id.button_share3_next:
                 if (fragmentparttwo == null) {
                     fragmentparttwo = new FragmentPartTwo(); // 先判断有无part2,如果没有，则初始化一个，如果有，则直接比较
                     FragmentTransaction transactionPart = fragmentManager.beginTransaction();
@@ -138,7 +146,7 @@ public class SpeakingShare3Activity extends BaseActivity implements View.OnClick
 
                 if (subidList.size() == 0 && subid2 == null) {
                     ToastUtil.showMessage(SpeakingShare3Activity.this, "请选择要分享的题目,亲");
-                    return;                         //这个return太妙
+                    return;
                 } else if (subidList.size() == 0 && subid2 != null) {
                     subidList.add(subid2);
                 } else if (subidList.size() != 0 && subid2 == null) {

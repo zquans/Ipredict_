@@ -7,18 +7,16 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
+import com.lzy.okgo.OkGo;
+import com.lzy.okgo.callback.StringCallback;
+import com.lzy.okgo.model.HttpParams;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.woyuce.activity.BaseActivity;
-import com.woyuce.activity.AppContext;
 import com.woyuce.activity.Bean.Speaking.SpeakingContent;
 import com.woyuce.activity.R;
 import com.woyuce.activity.Utils.LogUtil;
+import com.woyuce.activity.common.Constants;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -29,12 +27,11 @@ import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import cn.sharesdk.framework.ShareSDK;
 import cn.sharesdk.onekeyshare.OnekeyShare;
+import okhttp3.Call;
 import uk.co.senab.photoview.PhotoView;
 
 /**
@@ -46,8 +43,7 @@ public class SpeakingContentActivity extends BaseActivity implements View.OnClic
     private Button btnBack, btnVote, btnShare;
     private PhotoView imgSubContent;
 
-    private String local_url = "http://iphone.ipredicting.com/kysubContent.aspx";
-    private String localsubCategoryid, localsubid; // 从上一级不同Activity中柱状图Item被选中后传递过来的不同本地参数
+    private String localsubCategoryid, localsubid;
     private String localImg, localsubID, localsubName;
 
     private List<SpeakingContent> subContentList = new ArrayList<>();
@@ -55,7 +51,7 @@ public class SpeakingContentActivity extends BaseActivity implements View.OnClic
     @Override
     protected void onStop() {
         super.onStop();
-        AppContext.getHttpQueue().cancelAll("subcontent");
+        OkGo.getInstance().cancelTag(Constants.ACTIVITY_SPEAKING_CONTENT);
     }
 
     @Override
@@ -71,7 +67,6 @@ public class SpeakingContentActivity extends BaseActivity implements View.OnClic
         Intent it_subContent = getIntent();
         localsubCategoryid = it_subContent.getStringExtra("localsubCategoryid");
         localsubid = it_subContent.getStringExtra("localsubid");
-        LogUtil.e("ID", "ID = " + localsubCategoryid + "，id = " + localsubid);
 
         imgSubContent = (PhotoView) findViewById(R.id.img_subcontent);
         txtTitle = (TextView) findViewById(R.id.txt_subcontent_title);
@@ -85,59 +80,47 @@ public class SpeakingContentActivity extends BaseActivity implements View.OnClic
     }
 
     private void getJson() {
-        StringRequest strinRequest = new StringRequest(Request.Method.POST, local_url, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                JSONObject jsonObject;
-                try {
-                    jsonObject = new JSONObject(response);
-                    SpeakingContent subContent;
-                    int result = jsonObject.getInt("code");
-                    if (result == 0) {
-                        JSONArray data = jsonObject.getJSONArray("data");
-                        jsonObject = data.getJSONObject(0);
-                        subContent = new SpeakingContent();
-                        subContent.subanswer = jsonObject.getString("subanswer");
-                        subContent.subid = jsonObject.getString("subid");
-                        subContent.subimg = jsonObject.getString("subimg");
-                        subContent.subname = jsonObject.getString("subname");
-                        subContent.timestamp = jsonObject.getString("timestamp");
-                        subContentList.add(subContent);
-                        // localAnswer = subContent.subanswer;
-                        localImg = subContent.subimg;
-                        localsubID = subContent.subid; // 取出后给下一级 "投票" 使用
-                        localsubName = subContent.subname; // 取出后给下一级 "投票" 使用
-                        getImageView(); // 设置图片
-                        txtTitle.setText(subContent.subname); // 显示Title
-//						imgPreloading.setVisibility(View.GONE);
-                        imgSubContent.setVisibility(View.VISIBLE);
-                    } else {
-                        LogUtil.e("code!=0 Data-BACK", "读取页面失败： " + jsonObject.getString("message"));
+        HttpParams params = new HttpParams();
+        if (localsubCategoryid != null) {
+            params.put("subCategoryid", localsubCategoryid);
+        } else {
+            params.put("subid", localsubid);
+        }
+        OkGo.post(Constants.URL_POST_SPEAKING_CONTENT).tag(Constants.ACTIVITY_SPEAKING_CONTENT).params(params)
+                .execute(new StringCallback() {
+                    @Override
+                    public void onSuccess(String s, Call call, okhttp3.Response response) {
+                        doSuccess(s);
                     }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                // Log.e("DATA-BACK", "JSON接口返回的信息： " + response);
+                });
+    }
+
+    private void doSuccess(String response) {
+        JSONObject jsonObject;
+        try {
+            jsonObject = new JSONObject(response);
+            SpeakingContent subContent;
+            int result = jsonObject.getInt("code");
+            if (result == 0) {
+                JSONArray data = jsonObject.getJSONArray("data");
+                jsonObject = data.getJSONObject(0);
+                subContent = new SpeakingContent();
+                subContent.subanswer = jsonObject.getString("subanswer");
+                subContent.subid = jsonObject.getString("subid");
+                subContent.subimg = jsonObject.getString("subimg");
+                subContent.subname = jsonObject.getString("subname");
+                subContent.timestamp = jsonObject.getString("timestamp");
+                subContentList.add(subContent);
+                localImg = subContent.subimg;
+                localsubID = subContent.subid; // 取出后给下一级 "投票" 使用
+                localsubName = subContent.subname; // 取出后给下一级 "投票" 使用
+                getImageView(); // 设置图片
+                txtTitle.setText(subContent.subname); // 显示Title
+                imgSubContent.setVisibility(View.VISIBLE);
             }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                LogUtil.e("Wrong_BACK", "联接错误原因： " + error.getMessage());
-            }
-        }) {
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                Map<String, String> hashMap = new HashMap<String, String>();
-                if (localsubCategoryid != null) {
-                    hashMap.put("subCategoryid", localsubCategoryid);
-                } else {
-                    hashMap.put("subid", localsubid);
-                }
-                return hashMap;
-            }
-        };
-        strinRequest.setTag("subcontent");
-        AppContext.getHttpQueue().add(strinRequest);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     private void getImageView() {

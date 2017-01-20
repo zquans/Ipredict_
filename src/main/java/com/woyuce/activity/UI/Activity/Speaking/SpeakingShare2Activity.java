@@ -10,9 +10,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.woyuce.activity.BaseActivity;
-import com.woyuce.activity.UI.Activity.MainActivity;
 import com.woyuce.activity.R;
-import com.woyuce.activity.Utils.LogUtil;
+import com.woyuce.activity.UI.Activity.MainActivity;
 
 /**
  * Created by Administrator on 2016/9/22.
@@ -25,7 +24,7 @@ public class SpeakingShare2Activity extends BaseActivity implements View.OnClick
     private TextView txtExamRoom, txtExamTime;
     private EditText edtMessage;
 
-    private String localRoom, localTime, localRoomID; // 上一级传来的数据,其中id和time要传到下一级
+    private String localRoom, localTime, localRoomID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,8 +63,7 @@ public class SpeakingShare2Activity extends BaseActivity implements View.OnClick
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.ll_speaking_stastis: // **** 点击" 高频统计" 启动 Activity-统计，
-                // 但界面看起来无跳转变化
+            case R.id.ll_speaking_stastis:
                 Intent it_statis = new Intent(this, SpeakingStatisActivity.class);
                 startActivity(it_statis);
                 overridePendingTransition(0, 0);
@@ -77,14 +75,13 @@ public class SpeakingShare2Activity extends BaseActivity implements View.OnClick
                 finish();
                 overridePendingTransition(0, 0);
                 break;
-            case R.id.button_share2_next: // **** 点击"下一步"按钮， 进入下一个"分享"界面
+            case R.id.button_share2_next:
                 String localMessage = edtMessage.getText().toString();
                 Intent it_share3 = new Intent(this, SpeakingShare3Activity.class);
                 it_share3.putExtra("localMessage", localMessage);
                 it_share3.putExtra("localTime", localTime);
                 it_share3.putExtra("localRoomID", localRoomID);
                 it_share3.putExtra("localRoom", localRoom);
-                LogUtil.e("aLL info = " + localRoomID + " , " + localMessage + " ," + localTime);
                 startActivity(it_share3);
                 overridePendingTransition(0, 0);
                 break;

@@ -9,14 +9,13 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.toolbox.StringRequest;
-import com.woyuce.activity.BaseActivity;
+import com.lzy.okgo.OkGo;
+import com.lzy.okgo.callback.StringCallback;
 import com.woyuce.activity.Adapter.Speaking.SpeakingAdapter;
-import com.woyuce.activity.AppContext;
+import com.woyuce.activity.BaseActivity;
 import com.woyuce.activity.Bean.Speaking.SpeakingBean;
 import com.woyuce.activity.R;
+import com.woyuce.activity.common.Constants;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -24,6 +23,8 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import okhttp3.Call;
 
 /**
  * Created by Administrator on 2016/9/22.
@@ -36,14 +37,13 @@ public class SpeakingActivity extends BaseActivity implements View.OnClickListen
     private Button btnShare;
     private ListView mListView;
 
-    private String URL = "http://iphone.ipredicting.com/getvoteMge.aspx";
     private List<SpeakingBean> speakingList = new ArrayList<>();
     private SpeakingAdapter adapter;
 
     @Override
     protected void onStop() {
         super.onStop();
-        AppContext.getHttpQueue().cancelAll("speaking");
+        OkGo.getInstance().cancelTag(Constants.ACTIVITY_SPEAKING);
     }
 
     @Override
@@ -76,35 +76,38 @@ public class SpeakingActivity extends BaseActivity implements View.OnClickListen
     }
 
     private void getJson() {
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, URL, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                JSONObject jsonObject;
-                SpeakingBean speaking;
-                try {
-                    jsonObject = new JSONObject(response);
-                    int result = jsonObject.getInt("code");
-                    if (result == 0) {
-                        JSONArray data = jsonObject.getJSONArray("data");
-                        for (int i = 0; i < data.length(); i++) {
-                            jsonObject = data.getJSONObject(i);
-                            speaking = new SpeakingBean();
-                            speaking.uname = jsonObject.getString("uname");
-                            speaking.message = jsonObject.getString("message");
-                            speaking.examroom = jsonObject.getString("examroom");
-                            speaking.vtime = jsonObject.getString("vtime");
-                            speakingList.add(speaking);
-                        }
-                        adapter = new SpeakingAdapter(SpeakingActivity.this, speakingList);
-                        mListView.setAdapter(adapter);
+        OkGo.post(Constants.URL_POST_SPEAKING).tag(Constants.ACTIVITY_SPEAKING)
+                .execute(new StringCallback() {
+                    @Override
+                    public void onSuccess(String s, Call call, okhttp3.Response response) {
+                        doSuccess(s);
                     }
-                } catch (JSONException e) {
-                    e.printStackTrace();
+                });
+    }
+
+    private void doSuccess(String response) {
+        JSONObject jsonObject;
+        SpeakingBean speaking;
+        try {
+            jsonObject = new JSONObject(response);
+            int result = jsonObject.getInt("code");
+            if (result == 0) {
+                JSONArray data = jsonObject.getJSONArray("data");
+                for (int i = 0; i < data.length(); i++) {
+                    jsonObject = data.getJSONObject(i);
+                    speaking = new SpeakingBean();
+                    speaking.uname = jsonObject.getString("uname");
+                    speaking.message = jsonObject.getString("message");
+                    speaking.examroom = jsonObject.getString("examroom");
+                    speaking.vtime = jsonObject.getString("vtime");
+                    speakingList.add(speaking);
                 }
+                adapter = new SpeakingAdapter(SpeakingActivity.this, speakingList);
+                mListView.setAdapter(adapter);
             }
-        }, null);
-        stringRequest.setTag("speaking");
-        AppContext.getHttpQueue().add(stringRequest);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

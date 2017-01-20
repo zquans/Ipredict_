@@ -12,20 +12,16 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
+import com.lzy.okgo.OkGo;
+import com.lzy.okgo.callback.StringCallback;
+import com.lzy.okgo.model.HttpParams;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.woyuce.activity.Adapter.Speaking.SpeakingMoreAdapter;
-import com.woyuce.activity.AppContext;
 import com.woyuce.activity.BaseActivity;
 import com.woyuce.activity.Bean.Speaking.SpeakingMore;
 import com.woyuce.activity.R;
 import com.woyuce.activity.UI.Activity.MainActivity;
-import com.woyuce.activity.Utils.LogUtil;
 import com.woyuce.activity.common.Constants;
 
 import org.json.JSONArray;
@@ -33,9 +29,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+
+import okhttp3.Call;
 
 /**
  * Created by Administrator on 2016/9/22.
@@ -51,14 +47,13 @@ public class SpeakingMoreActivity extends BaseActivity implements AdapterView.On
     private Button btnPart1, btnPart2;
     private ImageView mGuidemap;
 
-    private String URL = "http://iphone.ipredicting.com/kysubCategoryApi.aspx";
     private int localPartid = 1;
     private List<SpeakingMore> categoryList = new ArrayList<>();
 
     @Override
     protected void onStop() {
         super.onStop();
-        AppContext.getHttpQueue().cancelAll("category");
+        OkGo.getInstance().cancelTag(Constants.ACTIVITY_SPEAKING_MORE);
     }
 
     @Override
@@ -102,48 +97,39 @@ public class SpeakingMoreActivity extends BaseActivity implements AdapterView.On
     }
 
     public void getJson() {
-        StringRequest strinRequest = new StringRequest(Request.Method.POST, URL, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                JSONObject jsonObject;
-                SpeakingMore category;
-                try {
-                    jsonObject = new JSONObject(response);
-                    int result = jsonObject.getInt("code");
-                    if (result == 0) {
-                        JSONArray data = jsonObject.getJSONArray("data");
-                        for (int i = 0; i < data.length(); i++) {
-                            jsonObject = data.getJSONObject(i);
-                            category = new SpeakingMore();
-                            category.subCategoryid = jsonObject.getString("subCategoryid");
-                            category.subCategoryname = jsonObject.getString("subCategoryname");
-                            category.fontColor = jsonObject.getString("fontColor");
-                            categoryList.add(category);
-                        }
-                    } else {
-                        LogUtil.e("code!=0 Data-BACK", "读取页面失败： " + jsonObject.getString("message"));
+        HttpParams params = new HttpParams();
+        params.put("partid", localPartid + "");
+        OkGo.post(Constants.URL_POST_SPEAKIGN_MORE).tag(Constants.ACTIVITY_SPEAKING_MORE).params(params)
+                .execute(new StringCallback() {
+                    @Override
+                    public void onSuccess(String s, Call call, okhttp3.Response response) {
+                        doSuccess(s);
                     }
-                    SpeakingMoreAdapter adapter = new SpeakingMoreAdapter(SpeakingMoreActivity.this, categoryList);
-                    gridView.setAdapter(adapter);
-                } catch (JSONException e) {
-                    e.printStackTrace();
+                });
+    }
+
+    private void doSuccess(String response) {
+        JSONObject jsonObject;
+        SpeakingMore category;
+        try {
+            jsonObject = new JSONObject(response);
+            int result = jsonObject.getInt("code");
+            if (result == 0) {
+                JSONArray data = jsonObject.getJSONArray("data");
+                for (int i = 0; i < data.length(); i++) {
+                    jsonObject = data.getJSONObject(i);
+                    category = new SpeakingMore();
+                    category.subCategoryid = jsonObject.getString("subCategoryid");
+                    category.subCategoryname = jsonObject.getString("subCategoryname");
+                    category.fontColor = jsonObject.getString("fontColor");
+                    categoryList.add(category);
                 }
             }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                LogUtil.e("Wrong_BACK", "联接错误原因： " + error.getMessage());
-            }
-        }) {
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                Map<String, String> hashMap = new HashMap<String, String>();
-                hashMap.put("partid", localPartid + "");
-                return hashMap;
-            }
-        };
-        strinRequest.setTag("category");
-        AppContext.getHttpQueue().add(strinRequest);
+            SpeakingMoreAdapter adapter = new SpeakingMoreAdapter(SpeakingMoreActivity.this, categoryList);
+            gridView.setAdapter(adapter);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

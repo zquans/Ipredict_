@@ -9,6 +9,9 @@ public class Constants {
     public static final int CODE_WRITE_EXTERNAL_STORAGE = 0x0002;
     public static final int CODE_READ_EXTERNAL_STORAGE = 0x0003;
 
+    //Activity.startForResult
+    public static final int CODE_START_ACTIVITY_FOR_RESULT = 1;
+
     //四张重点图
     public static final String URL_GUIDE_IMG_NET = "http://www.iyuce.com/res/images/assault.jpg";
     public static final String URL_GUIDE_IMG_FREE = "http://www.iyuce.com/res/images/tl.jpg";
@@ -25,13 +28,38 @@ public class Constants {
     //网络班跳转商城获取商品信息
     public static final String URL_GetGoods = "http://api.iyuce.com/v1/store/getactivegoods";
 
+    //口语
+    public static final String ACTIVITY_SPEAKING = "speaking";
+    public static final String ACTIVITY_SPEAKING_STATIS = "speakingstatis";
+    public static final String ACTIVITY_SPEAKING_SEARCH = "speakingsearch";
+    public static final String ACTIVITY_SPEAKING_MORE = "speakingmore";
+    public static final String ACTIVITY_SPEAKING_CONTENT = "speakingcontent";
+    public static final String ACTIVITY_SPEAKING_VOTE = "speakingvote";
+    public static final String ACTIVITY_SPEAKING_SHARE_CHOOSE = "speakingsharechoose";
+    public static final String ACTIVITY_SPEAKING_SHARE_ONE = "speakingshareone";
+    public static final String FRAGMENT_SHARE_THREE = "speakingsharethree";
+    public static final String ACTIVITY_SPEAKING_SHARE_FOUR = "speakingsharefour";
+    public static final String URL_POST_SPEAKING = "http://iphone.ipredicting.com/getvoteMge.aspx";
+    public static final String URL_POST_SPEAKING_STATIS_CITY = "http://iphone.ipredicting.com/kyCityApi.aspx";
+    public static final String URL_POST_SPEAKING_STATIS_VOTE = "http://iphone.ipredicting.com/kysubOrder.aspx";
+    public static final String URL_POST_SPEAKING_SEARCH = "http://iphone.ipredicting.com/kysubSearch.aspx";
+    public static final String URL_POST_SPEAKIGN_MORE = "http://iphone.ipredicting.com/kysubCategoryApi.aspx";
+    public static final String URL_POST_SPEAKING_CONTENT = "http://iphone.ipredicting.com/kysubContent.aspx";
+    public static final String URL_POST_SPEAKING_CHOOSE_AREA = "http://iphone.ipredicting.com/kyAreaApi.aspx";
+    public static final String URL_POST_SPEAKING_CHOOSE_CITY = "http://iphone.ipredicting.com/kyCityApi.aspx";
+    public static final String URL_POST_SPEAKING_CHOOSE_ROOM = "http://iphone.ipredicting.com/kyRoomApi.aspx";
+    public static final String URL_POST_SPEAKING_VOTE_VOTE = "http://iphone.ipredicting.com/kysubVote.aspx";
+    public static final String URL_GET_SPEAKING_SHARE_ONE = "http://iphone.ipredicting.com/ksexamtime.aspx";
+    public static final String URL_POST_SPEAKING_SHARE_THREE_FRAGMENT = "http://iphone.ipredicting.com/kysubNshare.aspx";
+    public static final String URL_POST_SPEAKING_SHARE_FOUR = "http://iphone.ipredicting.com/kysubshare.aspx";
+
     //免费范围
-    public static final String ACTIVITY_RANGE = "range";
-    public static final String ACTIVITY_BOOK = "book";
-    public static final String ACTIVITY_LESSON = "lesson";
-    public static final String ACTIVITY_PAGE = "page";
-    public static final String ACTIVITY_CONTENT = "content";
-    public static final String FRAGMENT_CONTENT = "answersheet";
+    public static final String ACTIVITY_RANGE = "freerange";
+    public static final String ACTIVITY_BOOK = "freebook";
+    public static final String ACTIVITY_LESSON = "freelesson";
+    public static final String ACTIVITY_PAGE = "freepage";
+    public static final String ACTIVITY_CONTENT = "freecontent";
+    public static final String FRAGMENT_CONTENT = "freeanswersheet";
     public static final String URL_POST_FREE_RANGE = "http://api.iyuce.com/v1/exam/free";
     public static final String URL_POST_FREE_LESSON = "http://api.iyuce.com/v1/exam/freeexamtype";
     public static final String URL_POST_FREE_BOOK = "http://api.iyuce.com/v1/exam/freeexamunits";
@@ -44,8 +72,8 @@ public class Constants {
     public static final String URL_POST_FREE_ANSWER_TAGCANT = "http://api.iyuce.com/v1/exam/cancelexams";
 
     //网络班
-    public static final String ACTIVITY_NET = "wangluoban";
-    public static final String ACTIVITY_NET_LESSON = "wangluobanlesson";
+    public static final String ACTIVITY_NET = "netclass";
+    public static final String ACTIVITY_NET_LESSON = "netclasslesson";
     public static final String URL_POST_NET_TIME = "http://api.iyuce.com/v1/exam/notifydropdownlist";
     public static final String URL_POST_NET_NOTICE = "http://api.iyuce.com/v1/exam/notifycontent";
     public static final String URL_POST_NET_WEB_COURSE = "http://api.iyuce.com/v1/exam/webcoursegroup";
@@ -54,6 +82,7 @@ public class Constants {
     public static final String URL_POST_NET_LESSON_CheckCode = "http://api.iyuce.com/v1/exam/activecodeforwlb";
 
     //公益课堂音频
+    public static final String ACTIVITY_AUDIO_LESSON = "audiolesson";
     public static final String URL_GET_AUDIO_TYPE = "http://api.iyuce.com/v1/exam/audiotypes";
     public static final String URL_POST_AUDIO_LIST = "http://api.iyuce.com/v1/exam/audios";
 
@@ -67,5 +96,4 @@ public class Constants {
     public static final String URL_POST_WRITTING_SUBCATEGORY = "http://iphone.ipredicting.com/xzsubCategory.aspx";
     public static final String URL_POST_WRITTING_TOTAL = "http://iphone.ipredicting.com/xzCategoryApi.aspx";
     public static final String URL_POST_WRITTING_CONTENT = "http://iphone.ipredicting.com/xzsubContent.aspx";
-
 }
