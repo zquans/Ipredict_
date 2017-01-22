@@ -4,6 +4,7 @@ import android.app.Application;
 import android.app.Notification;
 import android.content.Context;
 import android.content.Intent;
+import android.text.TextUtils;
 import android.view.Display;
 import android.view.WindowManager;
 
@@ -129,12 +130,17 @@ public class AppContext extends Application {
                 for (Map.Entry<String, String> entry : msg.extra.entrySet()) {
                     String key = entry.getKey();
                     String value = entry.getValue();
-                    valuelist.add(value);
+                    if (TextUtils.equals(key, "sender")) {
+                        valuelist.add(0, value);
+                    }
+                    if (TextUtils.equals(key, "userid")) {
+                        valuelist.add(1, value);
+                    }
                 }
                 LogUtil.i("valuelist = " + valuelist);
                 LogUtil.i("valuelist = " + valuelist.get(0) + "|||" + valuelist.get(1));
-                if (!valuelist.get(1).equals(DEVICE_TOKEN)) {
-                    if (valuelist.get(0).equals(PreferenceUtil.getSharePre(context).getString("userId", ""))) {
+                if (!valuelist.get(0).equals(DEVICE_TOKEN)) {
+                    if (valuelist.get(1).equals(PreferenceUtil.getSharePre(context).getString("userId", ""))) {
                         Intent startLogin = new Intent(context, LoginActivity.class);
                         startLogin.putExtra("local_push_code", valuelist.get(0));
                         startLogin.putExtra("local_push_message", msg.custom);
