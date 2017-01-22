@@ -10,6 +10,7 @@ public class Constants {
     public static final int CODE_START_ACTIVITY_FOR_RESULT = 1;
 
     //Common
+    public static final String URL_GET_UPDATE = "http://www.iyuce.com/Scripts/andoird.json";
     public static final String URL_MONEY_INFO = "http://api.iyuce.com/v1/store/getusermoney?userid=";
     public static final String ACTIVITY_SUGGESTION = "Suggestion";
     public static final String URL_POST_SUGGESTION = "http://api.iyuce.com/v1/service/feedback";
@@ -121,6 +122,7 @@ public class Constants {
     public static final String ACTIVITY_STORE_ADDRESS = "StoreAddress";
     public static final String ACTIVITY_STORE_ADD_ADDRESS = "StoreAddAddress";
     public static final String ACTIVITY_STORE_ORDER = "StoreOrder";
+    public static final String ACTIVITY_STORE_WXPAY_ENTRY = "StoreOrderWxPay";
     public static final String ACTIVITY_STORE_ORDER_LIST = "StoreOrderList";
     public static final String ACTIVITY_STORE_COMMENT = "StoreComment";
     public static final String FRAGMENT_STORE_GOODS_ONE = "StoreGoodsOne";
@@ -137,6 +139,7 @@ public class Constants {
     public static final String URL_POST_STORE_ORDER_TO_ALI_PAY = "http://api.iyuce.com/v1/store/paywithcash?paytype=alipay&id=";
     public static final String URL_POST_STORE_ORDER_TO_WXPAY_PAY = "http://api.iyuce.com/v1/store/paywithcash?paytype=wxapp&id=";
     public static final String URL_POST_STORE_ORDER_TO_ALI_VALID = "http://api.iyuce.com/v1/store/validpaybyapp?paytype=alipay";
+    public static final String URL_POST_STORE_ORDER_TO_WEXIN_VALID = "http://api.iyuce.com/v1/store/validpaybyapp?paytype=wxapp";
     public static final String URL_GET_STORE_HOME = "http://api.iyuce.com/v1/store/homegoodslist";
     public static final String URL_GET_STORE_GOODS_THREE_COMMENT = "http://api.iyuce.com/v1/store/goodscommentsbygoodsid";
     public static final String URL_GET_STORE_GOODS_THREE_ShowOrder = "http://api.iyuce.com/v1/store/showordersbygoodsid";

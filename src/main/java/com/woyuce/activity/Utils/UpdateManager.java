@@ -17,11 +17,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ProgressBar;
 
-import com.android.volley.Request.Method;
-import com.android.volley.Response.Listener;
-import com.android.volley.toolbox.StringRequest;
-import com.woyuce.activity.AppContext;
+import com.lzy.okgo.OkGo;
+import com.lzy.okgo.callback.StringCallback;
 import com.woyuce.activity.R;
+import com.woyuce.activity.common.Constants;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -32,17 +31,17 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import okhttp3.Call;
+import okhttp3.Response;
+
 /**
  * @author LeBang
- * @Description:APP检测自动升级
- * @date 2016-9-30
  */
 public class UpdateManager {
 
     private ProgressBar pb;
     private Dialog mDownLoadDialog;
 
-    private final String URL_SERVE = "http://www.iyuce.com/Scripts/andoird.json";
     private static final int DOWNLOADING = 1;
     private static final int DOWNLOAD_FINISH = 0;
 
@@ -60,35 +59,6 @@ public class UpdateManager {
     }
 
     @SuppressLint("HandlerLeak")
-    private Handler mGetVersionHandler = new Handler() {
-        public void handleMessage(Message msg) {
-            try {
-                String jsonString = (String) msg.obj;
-                String parseString = new String(jsonString.getBytes("ISO-8859-1"), "utf-8");
-                JSONObject jsonObject;
-                jsonObject = new JSONObject(parseString);
-                int result = jsonObject.getInt("code");
-                if (result == 0) {
-                    JSONArray data = jsonObject.getJSONArray("data");
-                    jsonObject = data.getJSONObject(0);
-                    mVersion = jsonObject.getString("version");
-                    mVersionURL = jsonObject.getString("apkurl");
-                    mMessage = jsonObject.getString("detail");
-//					Log.e("mVersionURL", "VersionURL = " + mVersionURL);
-                }
-//				Log.e("version", "远程version = " + mVersion);
-                if (isUpdate()) {
-                    showNoticeDialog();
-                } else {
-//					Toast.makeText(mcontext, "don't need update", Toast.LENGTH_SHORT).show();
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-    };
-
-    @SuppressLint("HandlerLeak")
     private Handler mUpdateProgressHandler = new Handler() {
         public void handleMessage(Message msg) {
             switch (msg.what) {
@@ -104,16 +74,35 @@ public class UpdateManager {
     };
 
     public void checkUpdate() {
-        StringRequest request = new StringRequest(Method.GET, URL_SERVE, new Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                Message msg = Message.obtain();
-                msg.obj = response;
-                mGetVersionHandler.sendMessage(msg);
+        OkGo.get(Constants.URL_GET_UPDATE)
+                .execute(new StringCallback() {
+                    @Override
+                    public void onSuccess(String s, Call call, Response response) {
+                        doCheckSuccess(s);
+                    }
+                });
+    }
+
+    private void doCheckSuccess(String s) {
+        try {
+            JSONObject jsonObject;
+            jsonObject = new JSONObject(s);
+            int result = jsonObject.getInt("code");
+            if (result == 0) {
+                JSONArray data = jsonObject.getJSONArray("data");
+                jsonObject = data.getJSONObject(0);
+                mVersion = jsonObject.getString("version");
+                mVersionURL = jsonObject.getString("apkurl");
+                mMessage = jsonObject.getString("detail");
+//					Log.e("mVersionURL", "VersionURL = " + mVersionURL);
             }
-        }, null);
-        request.setTag("updatemanager");
-        AppContext.getHttpQueue().add(request);
+//				Log.e("version", "远程version = " + mVersion);
+            if (isUpdate()) {
+                showNoticeDialog();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public boolean isUpdate() {   /*boolean比较本地版本是否需要更新*/
@@ -130,11 +119,7 @@ public class UpdateManager {
         } catch (NameNotFoundException e) {
             e.printStackTrace();
         }
-        if (serverVersion > Float.parseFloat(localVersion)) {
-            return true;
-        } else {
-            return false;
-        }
+        return serverVersion > Float.parseFloat(localVersion);
     }
 
     @SuppressLint("InlinedApi")

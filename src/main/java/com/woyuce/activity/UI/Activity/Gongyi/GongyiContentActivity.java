@@ -8,16 +8,12 @@ import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
-import com.woyuce.activity.AppContext;
 import com.woyuce.activity.BaseActivity;
 import com.woyuce.activity.R;
 import com.woyuce.activity.Utils.LogUtil;
 
 import java.io.IOException;
 
-/**
- * Created by Administrator on 2016/9/21.
- */
 public class GongyiContentActivity extends BaseActivity implements View.OnClickListener, SeekBar.OnSeekBarChangeListener,
         MediaPlayer.OnCompletionListener, MediaPlayer.OnPreparedListener, MediaPlayer.OnErrorListener, MediaPlayer.OnBufferingUpdateListener {
 
@@ -34,7 +30,6 @@ public class GongyiContentActivity extends BaseActivity implements View.OnClickL
     protected void onDestroy() {
         super.onDestroy();
         mp.release();
-        AppContext.getHttpQueue().cancelAll("post");
     }
 
     @Override

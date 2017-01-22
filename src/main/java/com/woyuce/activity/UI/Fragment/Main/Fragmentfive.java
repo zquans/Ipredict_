@@ -13,13 +13,9 @@ import android.webkit.CookieManager;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.toolbox.StringRequest;
 import com.lzy.okgo.OkGo;
 import com.lzy.okgo.callback.StringCallback;
 import com.lzy.okgo.model.HttpParams;
-import com.woyuce.activity.AppContext;
 import com.woyuce.activity.Bean.Speaking.SpeakingRoom;
 import com.woyuce.activity.R;
 import com.woyuce.activity.UI.Activity.Common.AboutUsActivity;
@@ -43,6 +39,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import okhttp3.Call;
+import okhttp3.Response;
 
 public class Fragmentfive extends Fragment implements View.OnClickListener {
 
@@ -204,23 +201,21 @@ public class Fragmentfive extends Fragment implements View.OnClickListener {
      * 获取金币
      */
     private void getMoney() {
-        StringRequest moneyRequest = new StringRequest(Request.Method.GET,
-                Constants.URL_MONEY_INFO + PreferenceUtil.getSharePre(getActivity()).getString("userId", ""), new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                try {
-                    JSONObject obj;
-                    obj = new JSONObject(response);
-                    if (obj.getString("code").equals("0")) {
-                        txtMoney.setText(obj.getString("data"));
+        OkGo.get(Constants.URL_MONEY_INFO + PreferenceUtil.getSharePre(getActivity()).getString("userId", ""))
+                .execute(new StringCallback() {
+                    @Override
+                    public void onSuccess(String s, Call call, Response response) {
+                        try {
+                            JSONObject obj;
+                            obj = new JSONObject(s);
+                            if (obj.getString("code").equals("0")) {
+                                txtMoney.setText(obj.getString("data"));
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
                     }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-        }, null);
-        moneyRequest.setTag("fragmentfive");
-        AppContext.getHttpQueue().add(moneyRequest);
+                });
     }
 
     @Override

@@ -8,30 +8,27 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.DefaultRetryPolicy;
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
+import com.lzy.okgo.OkGo;
+import com.lzy.okgo.callback.StringCallback;
+import com.lzy.okgo.model.HttpParams;
 import com.tencent.mm.sdk.constants.ConstantsAPI;
 import com.tencent.mm.sdk.modelbase.BaseReq;
 import com.tencent.mm.sdk.modelbase.BaseResp;
 import com.tencent.mm.sdk.openapi.IWXAPI;
 import com.tencent.mm.sdk.openapi.IWXAPIEventHandler;
 import com.tencent.mm.sdk.openapi.WXAPIFactory;
-import com.woyuce.activity.UI.Activity.MainActivity;
-import com.woyuce.activity.AppContext;
 import com.woyuce.activity.R;
+import com.woyuce.activity.UI.Activity.MainActivity;
 import com.woyuce.activity.Utils.LogUtil;
 import com.woyuce.activity.Utils.PreferenceUtil;
 import com.woyuce.activity.Utils.ToastUtil;
+import com.woyuce.activity.common.Constants;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.HashMap;
-import java.util.Map;
+import okhttp3.Call;
+import okhttp3.Response;
 
 public class WXPayEntryActivity extends Activity implements IWXAPIEventHandler {
 
@@ -60,7 +57,7 @@ public class WXPayEntryActivity extends Activity implements IWXAPIEventHandler {
     @Override
     protected void onStop() {
         super.onStop();
-        AppContext.getHttpQueue().cancelAll("validWxPayRequest");
+        OkGo.getInstance().cancelTag(Constants.ACTIVITY_STORE_WXPAY_ENTRY);
     }
 
     @Override
@@ -78,8 +75,6 @@ public class WXPayEntryActivity extends Activity implements IWXAPIEventHandler {
 
     /**
      * 微信支付回调
-     *
-     * @param resp
      */
     @Override
     public void onResp(BaseResp resp) {
@@ -90,90 +85,79 @@ public class WXPayEntryActivity extends Activity implements IWXAPIEventHandler {
         LogUtil.d("ping = " + "{\"out_trade_no\":\"" + for_wx_validate + "\"}");
     }
 
-    private String URL_TO_VALID = "http://api.iyuce.com/v1/store/validpaybyapp?paytype=wxapp";
-
     /**
      * 校验微信支付回调结果
      */
     private void validRequest(final BaseResp resp, final String pay_result) {
-        StringRequest validRequest = new StringRequest(Request.Method.POST, URL_TO_VALID, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String s) {
-                LogUtil.i("valid wxpay = " + s);
-                try {
-                    JSONObject obj;
-                    obj = new JSONObject(s);
-                    if (obj.getString("code").equals("0")) {
-                        ToastUtil.showMessage(WXPayEntryActivity.this, "message" + obj.getString("message"));
-                        if (resp.getType() == ConstantsAPI.COMMAND_PAY_BY_WX) {
-                            if (resp.errCode == 0) {
-                                mTxt.setText("支付成功");//************************************
-                                //支付成功
-                                mBtn.setOnClickListener(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-                                        //删除该数据表
-                                        deleteSql();
-                                        PreferenceUtil.removestoretbisexist(WXPayEntryActivity.this);
-                                        //跳转到商城首页,或其他页
-                                        startActivity(new Intent(WXPayEntryActivity.this, MainActivity.class));
-                                        WXPayEntryActivity.this.finish();
-                                    }
-                                });
+        OkGo.getInstance().setRetryCount(0);
+        HttpParams params = new HttpParams();
+        params.put("", pay_result);
+        OkGo.post(Constants.URL_POST_STORE_ORDER_TO_WXPAY_PAY).tag(Constants.ACTIVITY_STORE_WXPAY_ENTRY).params(params)
+                .execute(new StringCallback() {
+                    @Override
+                    public void onSuccess(String s, Call call, Response response) {
+                        doSuccess(s, resp);
+                    }
+                });
+    }
+
+    private void doSuccess(String s, BaseResp resp) {
+        try {
+            JSONObject obj;
+            obj = new JSONObject(s);
+            if (obj.getString("code").equals("0")) {
+                ToastUtil.showMessage(WXPayEntryActivity.this, "message" + obj.getString("message"));
+                if (resp.getType() == ConstantsAPI.COMMAND_PAY_BY_WX) {
+                    if (resp.errCode == 0) {
+                        mTxt.setText("支付成功");//************************************
+                        //支付成功
+                        mBtn.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                //删除该数据表
+                                deleteSql();
+                                PreferenceUtil.removestoretbisexist(WXPayEntryActivity.this);
+                                //跳转到商城首页,或其他页
+                                startActivity(new Intent(WXPayEntryActivity.this, MainActivity.class));
+                                WXPayEntryActivity.this.finish();
                             }
-                            if (resp.errCode == -1) {
-                                mTxt.setText("支付失败");//************************************
-                                //支付失败
-                                mBtn.setOnClickListener(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-                                        WXPayEntryActivity.this.finish();
-                                    }
-                                });
-                            }
-                            if (resp.errCode == -2) {
-                                mTxt.setText("支付取消");//************************************
-                                //支付取消
-                                mBtn.setOnClickListener(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-                                        WXPayEntryActivity.this.finish();
-                                    }
-                                });
-                            }
-                        }
-                    } else {
-                        //客户端不确定，后台反馈直接不成功
-                        mTxt.setText("支付失败");
+                        });
+                    }
+                    if (resp.errCode == -1) {
+                        mTxt.setText("支付失败");//************************************
+                        //支付失败
                         mBtn.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
                                 WXPayEntryActivity.this.finish();
                             }
                         });
-                        LogUtil.i("code !=0" + obj.getString("message"));
                     }
-                } catch (JSONException e) {
-                    e.printStackTrace();
+                    if (resp.errCode == -2) {
+                        mTxt.setText("支付取消");//************************************
+                        //支付取消
+                        mBtn.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                WXPayEntryActivity.this.finish();
+                            }
+                        });
+                    }
                 }
+            } else {
+                //客户端不确定，后台反馈直接不成功
+                mTxt.setText("支付失败");
+                mBtn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        WXPayEntryActivity.this.finish();
+                    }
+                });
+                LogUtil.i("code !=0" + obj.getString("message"));
             }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError volleyError) {
-                LogUtil.e("volleyError = " + volleyError.getMessage());
-            }
-        }) {
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                HashMap<String, String> map = new HashMap<>();
-                map.put("", pay_result);
-                LogUtil.i("pay_result = " + pay_result);
-                return map;
-            }
-        };
-        validRequest.setTag("validWxPayRequest");
-        validRequest.setRetryPolicy(new DefaultRetryPolicy(1000, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-        AppContext.getHttpQueue().add(validRequest);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     /**

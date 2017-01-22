@@ -7,8 +7,6 @@ import android.content.Intent;
 import android.view.Display;
 import android.view.WindowManager;
 
-import com.android.volley.RequestQueue;
-import com.android.volley.toolbox.Volley;
 import com.lzy.okgo.OkGo;
 import com.lzy.okgo.cache.CacheEntity;
 import com.lzy.okgo.cache.CacheMode;
@@ -39,14 +37,12 @@ import java.util.logging.Level;
  */
 public class AppContext extends Application {
     //    private static final String TAG = AppContext.class.getSimpleName();
-//    private static final String APP_CACAHE_DIRNAME = "/webcache";
+    //    private static final String APP_CACAHE_DIRNAME = "/webcache";
     private static String DEVICE_TOKEN;
 
     //singleton
     private static AppContext appContext = null;
     private Display display;
-
-    private static RequestQueue mQueue;
 
     @Override
     public void onCreate() {
@@ -71,7 +67,7 @@ public class AppContext extends Application {
 
                     // 打开该调试开关,打印级别INFO,并不是异常,是为了显眼,不需要就不要加入该行
                     //TODO 最后的true表示是否打印okgo的内部异常，一般打开方便调试错误,发布前要关闭日志
-                    .debug("OkGo", Level.INFO, true)
+                    .debug("linGo", Level.WARNING, true)
 
                     //如果使用默认的 60秒,以下三行也不需要传
                     .setConnectTimeout(OkGo.DEFAULT_MILLISECONDS)  //全局的连接超时时间
@@ -116,7 +112,6 @@ public class AppContext extends Application {
         }
 
         appContext = this;
-        mQueue = Volley.newRequestQueue(getApplicationContext());
         init();
 
         PushAgent mPushAgent = PushAgent.getInstance(this);
@@ -211,10 +206,6 @@ public class AppContext extends Application {
 
     public static AppContext getInstance() {
         return appContext;
-    }
-
-    public static RequestQueue getHttpQueue() {
-        return mQueue;
     }
 
     /**
