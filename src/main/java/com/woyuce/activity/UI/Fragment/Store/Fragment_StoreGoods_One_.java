@@ -9,17 +9,16 @@ import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.TextView;
 
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.toolbox.StringRequest;
+import com.lzy.okgo.OkGo;
+import com.lzy.okgo.callback.StringCallback;
 import com.woyuce.activity.Adapter.Store.StoreSpcAdapter_;
-import com.woyuce.activity.AppContext;
-import com.woyuce.activity.Bean.Store.StoreGoods;
 import com.woyuce.activity.BaseFragment;
+import com.woyuce.activity.Bean.Store.StoreGoods;
 import com.woyuce.activity.R;
 import com.woyuce.activity.Utils.GlideImageLoader;
 import com.woyuce.activity.Utils.LogUtil;
 import com.woyuce.activity.Utils.ToastUtil;
+import com.woyuce.activity.common.Constants;
 import com.youth.banner.Banner;
 import com.youth.banner.BannerConfig;
 import com.youth.banner.Transformer;
@@ -30,6 +29,8 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
+import okhttp3.Call;
+
 /**
  * 两部分，一：将传递到的数据直接放上视图，二：请求规格获取数据
  */
@@ -39,7 +40,7 @@ public class Fragment_StoreGoods_One_ extends BaseFragment implements AdapterVie
     private TextView mTxtGoodsTitle, mTxtGoodsPrice, mTxtTotalSale, mTxtGoodComment, mTxtShowOrder, mTxtPresentPoint;
     private TextView mTxtSpcOne, mTxtSpcTwo, mTxtSpcThree;
 
-    private String local_skuid, local_goodsid, URL;
+    private String local_skuid, local_goodsid, local_url;
     private String return_local_goodsid, return_local_goods_sku_id, return_local_specname, return_local_price;
 
     public String returenGoodsId() {
@@ -59,9 +60,14 @@ public class Fragment_StoreGoods_One_ extends BaseFragment implements AdapterVie
     }
 
     @Override
+    public void onDestroy() {
+        super.onDestroy();
+        OkGo.getInstance().cancelTag(Constants.FRAGMENT_STORE_GOODS_ONE);
+    }
+
+    @Override
     public void onStop() {
         super.onStop();
-        AppContext.getHttpQueue().cancelAll("goodsSpeRequest");
         mBanner.stopAutoPlay();
     }
 
@@ -81,7 +87,7 @@ public class Fragment_StoreGoods_One_ extends BaseFragment implements AdapterVie
     private void initView(View view) {
         local_goodsid = getArguments().getString("goods_id");
         local_skuid = getArguments().getString("goods_sku_id");
-        URL = "http://api.iyuce.com/v1/store/goodsdetail?goodsid=" + local_goodsid;
+        local_url = "http://api.iyuce.com/v1/store/goodsdetail?goodsid=" + local_goodsid;
 
         mBanner = (Banner) view.findViewById(R.id.banner_fragment_store_goods);
         mTxtGoodsTitle = (TextView) view.findViewById(R.id.txt_activity_storegoods_goodstitle);
@@ -104,7 +110,7 @@ public class Fragment_StoreGoods_One_ extends BaseFragment implements AdapterVie
         //做第一部分，设置View上的数据
         setView();
         //做第二部分，请求规格参数
-        requestGoodsSpe(URL + "&skuid=" + local_skuid, false);
+        requestGoodsSpe(local_url + "&skuid=" + local_skuid, false);
     }
 
     /**
@@ -147,127 +153,130 @@ public class Fragment_StoreGoods_One_ extends BaseFragment implements AdapterVie
     private ArrayList<String> mSelectSpcList = new ArrayList<>();
 
     private void requestGoodsSpe(String url, final boolean need_notify) {
-        StringRequest goodsSpeRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String s) {
-                try {
-                    JSONObject obj, obj_one, obj_two, obj_three;
-                    JSONArray arr_seleted_specs, arr_all_spec_id, arr_all_spec, arr_one, arr_two, arr_three;
-                    obj = new JSONObject(s);
-                    if (obj.getString("code").equals("0")) {
-                        //拆解JSON对象之一，对象
-                        obj = obj.getJSONObject("goods_sku");
-                        return_local_goodsid = obj.getString("goods_id");
-                        return_local_goods_sku_id = obj.getString("id");
-                        return_local_specname = obj.getString("spec_texts");
-                        return_local_price = obj.getString("sales_price");
-                        mTxtPresentPoint.setText("赠送金币" + obj.getString("present_trade_point"));
-                        mTxtGoodsTitle.setText(return_local_specname);
-                        mTxtGoodsPrice.setText(return_local_price);
-
-                        //拆解JSON对象之二，数组，选中的规格
-                        if (need_notify) {
-                            arr_seleted_specs = obj.getJSONArray("seleted_specs");
-                            for (int i = 0; i < arr_seleted_specs.length(); i++) {
-                                mSelectSpcList.add(arr_seleted_specs.getJSONObject(i).getString("attr_value_id"));
-                            }
-                            LogUtil.i("mSelectSpcList =" + mSelectSpcList);
-                        }
-
-                        //拆解JSON对象之三，数组，所有的规格ID
-                        arr_all_spec_id = obj.getJSONArray("all_spec_ids");
-                        for (int i = 0; i < arr_all_spec_id.length(); i++) {
-                            mAllSpcId.add(arr_all_spec_id.get(i).toString());
-                        }
-
-                        //拆解JSON对象之四，数组，所有的规格。这里需要优化或者封装
-                        arr_all_spec = obj.getJSONArray("all_specs");
-                        if (need_notify == true) {
-                            //如果不是第一次请求，则做数据刷新，先清除数据
-                            mListOne.clear();
-                            mListTwo.clear();
-                            mListThree.clear();
-                        }
-                        if (arr_all_spec.length() == 1) {
-                            obj_one = arr_all_spec.getJSONObject(0);
-                            arr_one = obj_one.getJSONArray("spec_values");
-                            //获取item数据的数组
-                            getDataList(arr_one, mListOne, need_notify);
-                            //设置数组的标题
-                            mTxtSpcOne.setText(obj_one.getString("attr_text"));
-                            mTxtSpcOne.setBackgroundColor(Color.parseColor("#ffffff"));
-                        } else if (arr_all_spec.length() == 2) {
-                            obj_one = arr_all_spec.getJSONObject(0);
-                            obj_two = arr_all_spec.getJSONObject(1);
-                            arr_one = obj_one.getJSONArray("spec_values");
-                            arr_two = obj_two.getJSONArray("spec_values");
-                            //获取item数据的数组
-                            getDataList(arr_one, mListOne, need_notify);
-                            getDataList(arr_two, mListTwo, need_notify);
-                            //设置数组的标题
-                            mTxtSpcOne.setText(obj_one.getString("attr_text"));
-                            mTxtSpcTwo.setText(obj_two.getString("attr_text"));
-                            mTxtSpcOne.setBackgroundColor(Color.parseColor("#ffffff"));
-                            mTxtSpcTwo.setBackgroundColor(Color.parseColor("#ffffff"));
-                        } else if (arr_all_spec.length() == 3) {
-                            obj_one = arr_all_spec.getJSONObject(0);
-                            obj_two = arr_all_spec.getJSONObject(1);
-                            obj_three = arr_all_spec.getJSONObject(2);
-                            arr_one = obj_one.getJSONArray("spec_values");
-                            arr_two = obj_two.getJSONArray("spec_values");
-                            arr_three = obj_three.getJSONArray("spec_values");
-                            //获取item数据的数组
-                            getDataList(arr_one, mListOne, need_notify);
-                            getDataList(arr_two, mListTwo, need_notify);
-                            getDataList(arr_three, mListThree, need_notify);
-                            //设置数组的标题
-                            mTxtSpcOne.setText(obj_one.getString("attr_text"));
-                            mTxtSpcTwo.setText(obj_two.getString("attr_text"));
-                            mTxtSpcThree.setText(obj_three.getString("attr_text"));
-                            mTxtSpcOne.setBackgroundColor(Color.parseColor("#ffffff"));
-                            mTxtSpcTwo.setBackgroundColor(Color.parseColor("#ffffff"));
-                            mTxtSpcThree.setBackgroundColor(Color.parseColor("#ffffff"));
-                        }
-                        //如果不是第一次加载，刷新数据就好
-                        if (need_notify == true) {
-                            mAdapterOne.notifyDataSetChanged();
-                            mAdapterTwo.notifyDataSetChanged();
-                            mAdapterThree.notifyDataSetChanged();
-                        } else {
-                            mAdapterOne = new StoreSpcAdapter_(getActivity(), mListOne, mSelectSpcList);
-                            mGridOne.setAdapter(mAdapterOne);
-                            if (mListOne.size() > 2) {
-                                mGridOne.setNumColumns(2);//设置每行显示的Item数
-                            } else {
-                                mGridOne.setNumColumns(mListOne.size());//设置每行显示的Item数
-                            }
-
-                            mAdapterTwo = new StoreSpcAdapter_(getActivity(), mListTwo, mSelectSpcList);
-                            mGridTwo.setAdapter(mAdapterTwo);
-                            if (mListTwo.size() > 2) {
-                                mGridTwo.setNumColumns(2);//设置每行显示的Item数
-                            } else {
-                                mGridTwo.setNumColumns(mListTwo.size());//设置每行显示的Item数
-                            }
-
-                            mAdapterThree = new StoreSpcAdapter_(getActivity(), mListThree, mSelectSpcList);
-                            mGridThree.setAdapter(mAdapterThree);
-                            if (mListThree.size() > 2) {
-                                mGridThree.setNumColumns(2);//设置每行显示的Item数
-                            } else {
-                                mGridThree.setNumColumns(mListThree.size());//设置每行显示的Item数
-                            }
-                        }
-                    } else {
-                        ToastUtil.showMessage(getActivity(), obj.getString("message"));
+        OkGo.get(url).tag(Constants.FRAGMENT_STORE_GOODS_ONE)
+                .execute(new StringCallback() {
+                    @Override
+                    public void onSuccess(String s, Call call, okhttp3.Response response) {
+                        doSuccess(s, need_notify);
                     }
-                } catch (JSONException e) {
-                    e.printStackTrace();
+                });
+    }
+
+    private void doSuccess(String s, boolean need_notify) {
+        try {
+            JSONObject obj, obj_one, obj_two, obj_three;
+            JSONArray arr_seleted_specs, arr_all_spec_id, arr_all_spec, arr_one, arr_two, arr_three;
+            obj = new JSONObject(s);
+            if (obj.getString("code").equals("0")) {
+                //拆解JSON对象之一，对象
+                obj = obj.getJSONObject("goods_sku");
+                return_local_goodsid = obj.getString("goods_id");
+                return_local_goods_sku_id = obj.getString("id");
+                return_local_specname = obj.getString("spec_texts");
+                return_local_price = obj.getString("sales_price");
+                mTxtPresentPoint.setText("赠送金币" + obj.getString("present_trade_point"));
+                mTxtGoodsTitle.setText(return_local_specname);
+                mTxtGoodsPrice.setText(return_local_price);
+
+                //拆解JSON对象之二，数组，选中的规格
+                if (need_notify) {
+                    arr_seleted_specs = obj.getJSONArray("seleted_specs");
+                    for (int i = 0; i < arr_seleted_specs.length(); i++) {
+                        mSelectSpcList.add(arr_seleted_specs.getJSONObject(i).getString("attr_value_id"));
+                    }
+                    LogUtil.i("mSelectSpcList =" + mSelectSpcList);
                 }
+
+                //拆解JSON对象之三，数组，所有的规格ID
+                arr_all_spec_id = obj.getJSONArray("all_spec_ids");
+                for (int i = 0; i < arr_all_spec_id.length(); i++) {
+                    mAllSpcId.add(arr_all_spec_id.get(i).toString());
+                }
+
+                //拆解JSON对象之四，数组，所有的规格。这里需要优化或者封装
+                arr_all_spec = obj.getJSONArray("all_specs");
+                if (need_notify == true) {
+                    //如果不是第一次请求，则做数据刷新，先清除数据
+                    mListOne.clear();
+                    mListTwo.clear();
+                    mListThree.clear();
+                }
+                if (arr_all_spec.length() == 1) {
+                    obj_one = arr_all_spec.getJSONObject(0);
+                    arr_one = obj_one.getJSONArray("spec_values");
+                    //获取item数据的数组
+                    getDataList(arr_one, mListOne, need_notify);
+                    //设置数组的标题
+                    mTxtSpcOne.setText(obj_one.getString("attr_text"));
+                    mTxtSpcOne.setBackgroundColor(Color.parseColor("#ffffff"));
+                } else if (arr_all_spec.length() == 2) {
+                    obj_one = arr_all_spec.getJSONObject(0);
+                    obj_two = arr_all_spec.getJSONObject(1);
+                    arr_one = obj_one.getJSONArray("spec_values");
+                    arr_two = obj_two.getJSONArray("spec_values");
+                    //获取item数据的数组
+                    getDataList(arr_one, mListOne, need_notify);
+                    getDataList(arr_two, mListTwo, need_notify);
+                    //设置数组的标题
+                    mTxtSpcOne.setText(obj_one.getString("attr_text"));
+                    mTxtSpcTwo.setText(obj_two.getString("attr_text"));
+                    mTxtSpcOne.setBackgroundColor(Color.parseColor("#ffffff"));
+                    mTxtSpcTwo.setBackgroundColor(Color.parseColor("#ffffff"));
+                } else if (arr_all_spec.length() == 3) {
+                    obj_one = arr_all_spec.getJSONObject(0);
+                    obj_two = arr_all_spec.getJSONObject(1);
+                    obj_three = arr_all_spec.getJSONObject(2);
+                    arr_one = obj_one.getJSONArray("spec_values");
+                    arr_two = obj_two.getJSONArray("spec_values");
+                    arr_three = obj_three.getJSONArray("spec_values");
+                    //获取item数据的数组
+                    getDataList(arr_one, mListOne, need_notify);
+                    getDataList(arr_two, mListTwo, need_notify);
+                    getDataList(arr_three, mListThree, need_notify);
+                    //设置数组的标题
+                    mTxtSpcOne.setText(obj_one.getString("attr_text"));
+                    mTxtSpcTwo.setText(obj_two.getString("attr_text"));
+                    mTxtSpcThree.setText(obj_three.getString("attr_text"));
+                    mTxtSpcOne.setBackgroundColor(Color.parseColor("#ffffff"));
+                    mTxtSpcTwo.setBackgroundColor(Color.parseColor("#ffffff"));
+                    mTxtSpcThree.setBackgroundColor(Color.parseColor("#ffffff"));
+                }
+                //如果不是第一次加载，刷新数据就好
+                if (need_notify == true) {
+                    mAdapterOne.notifyDataSetChanged();
+                    mAdapterTwo.notifyDataSetChanged();
+                    mAdapterThree.notifyDataSetChanged();
+                } else {
+                    mAdapterOne = new StoreSpcAdapter_(getActivity(), mListOne, mSelectSpcList);
+                    mGridOne.setAdapter(mAdapterOne);
+                    if (mListOne.size() > 2) {
+                        mGridOne.setNumColumns(2);//设置每行显示的Item数
+                    } else {
+                        mGridOne.setNumColumns(mListOne.size());//设置每行显示的Item数
+                    }
+
+                    mAdapterTwo = new StoreSpcAdapter_(getActivity(), mListTwo, mSelectSpcList);
+                    mGridTwo.setAdapter(mAdapterTwo);
+                    if (mListTwo.size() > 2) {
+                        mGridTwo.setNumColumns(2);//设置每行显示的Item数
+                    } else {
+                        mGridTwo.setNumColumns(mListTwo.size());//设置每行显示的Item数
+                    }
+
+                    mAdapterThree = new StoreSpcAdapter_(getActivity(), mListThree, mSelectSpcList);
+                    mGridThree.setAdapter(mAdapterThree);
+                    if (mListThree.size() > 2) {
+                        mGridThree.setNumColumns(2);//设置每行显示的Item数
+                    } else {
+                        mGridThree.setNumColumns(mListThree.size());//设置每行显示的Item数
+                    }
+                }
+            } else {
+                ToastUtil.showMessage(getActivity(), obj.getString("message"));
             }
-        }, null);
-        goodsSpeRequest.setTag("goodsSpeRequest");
-        AppContext.getHttpQueue().add(goodsSpeRequest);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -279,7 +288,6 @@ public class Fragment_StoreGoods_One_ extends BaseFragment implements AdapterVie
             storeGoods = new StoreGoods();
             storeGoods.setAttr_id(arr.getJSONObject(i).getString("attr_id"));
             storeGoods.setAttr_text(arr.getJSONObject(i).getString("attr_text"));
-
             if (need_notify == true) {
                 //两个选中项
                 if ((!mAllSpcId.contains("," + storeGoods.getAttr_id() + "," + mSelectSpcList.get(0) + ","))
@@ -298,7 +306,6 @@ public class Fragment_StoreGoods_One_ extends BaseFragment implements AdapterVie
                 }
                 LogUtil.e(mAllSpcId + "," + arr.getJSONObject(i).getString("attr_id"));
             }
-
 //            if (!mAllSpcId.contains("," + storeGoods.getAttr_id() + ",")) {
 //                storeGoods.setAttr_clickable("false");
 //            } else {
@@ -314,7 +321,6 @@ public class Fragment_StoreGoods_One_ extends BaseFragment implements AdapterVie
      * @param parent
      * @param view
      */
-
     private void resetItemView(AdapterView<?> parent, View view, ArrayList<StoreGoods> list) {
         for (int i = 0; i < list.size(); i++) {
             parent.getChildAt(i).findViewById(R.id.txt_storegoods_spc).setBackgroundColor(Color.parseColor("#f0f2f5"));
@@ -327,20 +333,20 @@ public class Fragment_StoreGoods_One_ extends BaseFragment implements AdapterVie
         switch (parent.getId()) {
             case R.id.gridview_fragment_store_one:
                 resetItemView(parent, view, mListOne);
-                requestGoodsSpe(URL + "&skuid=&selected_specs=" + mListOne.get(position).getAttr_id(), true);
+                requestGoodsSpe(local_url + "&skuid=&selected_specs=" + mListOne.get(position).getAttr_id(), true);
                 mSelectSpcList.clear();
                 mAllSpcId.clear();
                 break;
             case R.id.gridview_fragment_store_two:
                 resetItemView(parent, view, mListTwo);
-                requestGoodsSpe(URL + "&skuid=&selected_specs="
+                requestGoodsSpe(local_url + "&skuid=&selected_specs="
                         + mListTwo.get(position).getAttr_id() + "," + mSelectSpcList.get(0), true);
                 mSelectSpcList.clear();
                 mAllSpcId.clear();
                 break;
             case R.id.gridview_fragment_store_three:
                 resetItemView(parent, view, mListThree);
-                requestGoodsSpe(URL + "&skuid=&selected_specs="
+                requestGoodsSpe(local_url + "&skuid=&selected_specs="
                         + mListThree.get(position).getAttr_id(), true);
                 mSelectSpcList.clear();
                 mAllSpcId.clear();

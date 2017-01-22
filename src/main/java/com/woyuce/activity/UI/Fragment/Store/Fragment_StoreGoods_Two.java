@@ -12,7 +12,6 @@ import android.webkit.WebViewClient;
 
 import com.woyuce.activity.BaseFragment;
 import com.woyuce.activity.R;
-import com.woyuce.activity.Utils.LogUtil;
 
 public class Fragment_StoreGoods_Two extends BaseFragment {
 
@@ -24,7 +23,6 @@ public class Fragment_StoreGoods_Two extends BaseFragment {
     }
 
     private void initView(View view) {
-        LogUtil.i("mImgList = " + getArguments().getString("mImgList"));
         WebView web = (WebView) view.findViewById(R.id.web_test);
 
         web.getSettings().setJavaScriptEnabled(true);
@@ -63,6 +61,6 @@ public class Fragment_StoreGoods_Two extends BaseFragment {
                 super.onPageStarted(view, url, favicon);
             }
         });
-        web.loadUrl(getArguments().getString("mImgList").toString().trim());
+        web.loadUrl(getArguments().getString("mImgList").trim());
     }
 }

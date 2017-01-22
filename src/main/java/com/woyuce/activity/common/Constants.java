@@ -1,34 +1,32 @@
 package com.woyuce.activity.common;
 
-/**
- * Created by Administrator on 2016/10/7.
- */
 public class Constants {
 
     public static final int CODE_CAMERE = 0x0001;
     public static final int CODE_WRITE_EXTERNAL_STORAGE = 0x0002;
     public static final int CODE_READ_EXTERNAL_STORAGE = 0x0003;
 
-
     //Activity.startForResult
     public static final int CODE_START_ACTIVITY_FOR_RESULT = 1;
 
     //Common
     public static final String URL_MONEY_INFO = "http://api.iyuce.com/v1/store/getusermoney?userid=";
+    public static final String ACTIVITY_SUGGESTION = "Suggestion";
+    public static final String URL_POST_SUGGESTION = "http://api.iyuce.com/v1/service/feedback";
+    public static final String URL_POST_TAB_FIVE_MY_ROOM = "http://iphone.ipredicting.com/kymyroom.aspx";
+    public static final String URL_POST_TAB_FIVE_MY_SUBJECT = "http://iphone.ipredicting.com/kymyshanesub.aspx";
+    public static final String URL_GetGoods = "http://api.iyuce.com/v1/store/getactivegoods";       //网络班跳转商城获取商品信息
+    public static final String URL_POST_SET_EXAM_TIME = "http://api.iyuce.com/v1/exam/setexamtime";    //倒计时提醒板
 
+    //WebView访问的URL汇总
+    public static final String URL_TAB_BBS = "http://bbs.iyuce.com/bar/bbspullrefresh";
+    public static final String URL_WEB_ZHIBO = "https://iyuce.ke.qq.com/";
 
-    //四张重点图
+    //四张重点导航图
     public static final String URL_GUIDE_IMG_NET = "http://www.iyuce.com/res/images/assault.jpg";
     public static final String URL_GUIDE_IMG_FREE = "http://www.iyuce.com/res/images/tl.jpg";
     public static final String URL_GUIDE_IMG_SPEAKING = "http://www.iyuce.com/res/images/ky.jpg";
     public static final String URL_GUIDE_IMG_WRITTING = "http://www.iyuce.com/res/images/xz.jpg";
-
-    //WebView访问的URL汇总
-    public static final String URL_WEB_ZHIBO = "https://iyuce.ke.qq.com/";
-    public static final String URL_WEB_LUBO = "http://store.iyuce.com/";
-
-    //网络班跳转商城获取商品信息
-    public static final String URL_GetGoods = "http://api.iyuce.com/v1/store/getactivegoods";
 
     //登录
     public static final String ACTIVITY_LOGIN = "Login";
@@ -125,6 +123,8 @@ public class Constants {
     public static final String ACTIVITY_STORE_ORDER = "StoreOrder";
     public static final String ACTIVITY_STORE_ORDER_LIST = "StoreOrderList";
     public static final String ACTIVITY_STORE_COMMENT = "StoreComment";
+    public static final String FRAGMENT_STORE_GOODS_ONE = "StoreGoodsOne";
+    public static final String FRAGMENT_STORE_GOODS_THREE = "StoreGoodsThree";
     public static final String URL_GET_STORE_GOODS = "http://api.iyuce.com/v1/store/goods";
     public static final String URL_GET_STORE_PAY = "http://api.iyuce.com/v1/store/getdefaultaddr";
     public static final String URL_GET_STORE_ADDRESS = "http://api.iyuce.com/v1/store/findbyuser";
@@ -137,4 +137,7 @@ public class Constants {
     public static final String URL_POST_STORE_ORDER_TO_ALI_PAY = "http://api.iyuce.com/v1/store/paywithcash?paytype=alipay&id=";
     public static final String URL_POST_STORE_ORDER_TO_WXPAY_PAY = "http://api.iyuce.com/v1/store/paywithcash?paytype=wxapp&id=";
     public static final String URL_POST_STORE_ORDER_TO_ALI_VALID = "http://api.iyuce.com/v1/store/validpaybyapp?paytype=alipay";
+    public static final String URL_GET_STORE_HOME = "http://api.iyuce.com/v1/store/homegoodslist";
+    public static final String URL_GET_STORE_GOODS_THREE_COMMENT = "http://api.iyuce.com/v1/store/goodscommentsbygoodsid";
+    public static final String URL_GET_STORE_GOODS_THREE_ShowOrder = "http://api.iyuce.com/v1/store/showordersbygoodsid";
 }

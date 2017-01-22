@@ -14,8 +14,8 @@ import android.webkit.WebViewClient;
 import android.widget.Button;
 import android.widget.ImageView;
 
-import com.woyuce.activity.UI.Activity.Common.WebActivity;
 import com.woyuce.activity.R;
+import com.woyuce.activity.UI.Activity.Common.WebActivity;
 import com.woyuce.activity.Utils.Interface.JsInterface;
 import com.woyuce.activity.Utils.PreferenceUtil;
 

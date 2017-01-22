@@ -8,16 +8,14 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.toolbox.StringRequest;
+import com.lzy.okgo.OkGo;
+import com.lzy.okgo.callback.StringCallback;
 import com.woyuce.activity.Adapter.Store.StoreGoodsCommentAdapter;
 import com.woyuce.activity.Adapter.Store.StoreShowOrderAdapter;
-import com.woyuce.activity.AppContext;
-import com.woyuce.activity.Bean.Store.StoreGoods;
 import com.woyuce.activity.BaseFragment;
+import com.woyuce.activity.Bean.Store.StoreGoods;
 import com.woyuce.activity.R;
-import com.woyuce.activity.Utils.LogUtil;
+import com.woyuce.activity.common.Constants;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -25,6 +23,8 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import okhttp3.Call;
 
 public class Fragment_StoreGoods_Three extends BaseFragment implements View.OnClickListener {
 
@@ -34,14 +34,10 @@ public class Fragment_StoreGoods_Three extends BaseFragment implements View.OnCl
     private List<StoreGoods> mDataList = new ArrayList<>();
     private StoreGoodsCommentAdapter mAdapter;
 
-    //请求数据
-    private String URL = "http://api.iyuce.com/v1/store/goodscommentsbygoodsid";
-    private String URL_ShowOrder = "http://api.iyuce.com/v1/store/showordersbygoodsid";
-
     @Override
-    public void onStop() {
-        super.onStop();
-        AppContext.getHttpQueue().cancelAll("goodsCommentRequest");
+    public void onDestroy() {
+        super.onDestroy();
+        OkGo.getInstance().cancelTag(Constants.FRAGMENT_STORE_GOODS_THREE);
     }
 
     @Override
@@ -77,40 +73,41 @@ public class Fragment_StoreGoods_Three extends BaseFragment implements View.OnCl
     }
 
     private void requestData() {
-        StringRequest goodsCommentRequest = new StringRequest(Request.Method.GET,
-                URL + "?goodsid=" + getArguments().getString("goods_id") + "&pageindex=" + "1" + "&pagesize=" + "30",
-                new Response.Listener<String>() {
+        String url = Constants.URL_GET_STORE_GOODS_THREE_COMMENT + "?goodsid=" + getArguments().getString("goods_id") + "&pageindex=" + "1" + "&pagesize=" + "30";
+        OkGo.get(url).tag(Constants.FRAGMENT_STORE_GOODS_THREE)
+                .execute(new StringCallback() {
                     @Override
-                    public void onResponse(String s) {
-                        LogUtil.i(s.toString());
-                        try {
-                            JSONObject obj;
-                            JSONArray arr;
-                            obj = new JSONObject(s);
-                            if (obj.getString("code").equals("0")) {
-                                obj = obj.getJSONObject("goods_comment");
-                                arr = obj.getJSONArray("goods_comments");
-                                StoreGoods storegoods;
-                                for (int i = 0; i < arr.length(); i++) {
-                                    storegoods = new StoreGoods();
-                                    obj = arr.getJSONObject(i);
-                                    storegoods.setComment_text(obj.getString("comment_text"));
-                                    storegoods.setCreate_at(obj.getString("create_at"));
-                                    storegoods.setCreate_by_name(obj.getString("create_by_name"));
-                                    storegoods.setSatisfaction(obj.getString("satisfaction"));
-                                    mDataList.add(storegoods);
-                                }
-                                mAdapter = new StoreGoodsCommentAdapter(getActivity(), mDataList);
-                                mListView.setAdapter(mAdapter);
-                            } else {
-                            }
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
+                    public void onSuccess(String s, Call call, okhttp3.Response response) {
+                        doCommentListSuccess(s);
                     }
-                }, null);
-        goodsCommentRequest.setTag("goodsCommentRequest");
-        AppContext.getHttpQueue().add(goodsCommentRequest);
+                });
+    }
+
+    private void doCommentListSuccess(String s) {
+        try {
+            JSONObject obj;
+            JSONArray arr;
+            obj = new JSONObject(s);
+            if (obj.getString("code").equals("0")) {
+                obj = obj.getJSONObject("goods_comment");
+                arr = obj.getJSONArray("goods_comments");
+                StoreGoods storegoods;
+                for (int i = 0; i < arr.length(); i++) {
+                    storegoods = new StoreGoods();
+                    obj = arr.getJSONObject(i);
+                    storegoods.setComment_text(obj.getString("comment_text"));
+                    storegoods.setCreate_at(obj.getString("create_at"));
+                    storegoods.setCreate_by_name(obj.getString("create_by_name"));
+                    storegoods.setSatisfaction(obj.getString("satisfaction"));
+                    mDataList.add(storegoods);
+                }
+                mAdapter = new StoreGoodsCommentAdapter(getActivity(), mDataList);
+                mListView.setAdapter(mAdapter);
+            } else {
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     private StoreShowOrderAdapter mShowOrderAdapter;
@@ -125,42 +122,43 @@ public class Fragment_StoreGoods_Three extends BaseFragment implements View.OnCl
             mListView.setAdapter(mShowOrderAdapter);
             return;
         }
-        URL_ShowOrder = URL_ShowOrder + "?goodsid=" + getArguments().getString("goods_id");
+        String url = Constants.URL_GET_STORE_GOODS_THREE_ShowOrder + "?goodsid=" + getArguments().getString("goods_id");
 //                + "&pageIndex={pageIndex}&pageSize={pageSize}";
-        StringRequest goodsCommentRequest = new StringRequest(Request.Method.GET, URL_ShowOrder,
-                new Response.Listener<String>() {
+
+        OkGo.get(url).tag(Constants.FRAGMENT_SHARE_THREE)
+                .execute(new StringCallback() {
                     @Override
-                    public void onResponse(String s) {
-                        LogUtil.i(s.toString());
-                        try {
-                            JSONObject obj;
-                            JSONArray arr;
-                            obj = new JSONObject(s);
-                            if (obj.getString("code").equals("0")) {
-                                obj = obj.getJSONObject("goods_show_order");
-                                arr = obj.getJSONArray("goods_show_orders");
-                                StoreGoods storegoods;
-                                for (int i = 0; i < arr.length(); i++) {
-                                    storegoods = new StoreGoods();
-                                    obj = arr.getJSONObject(i);
-                                    storegoods.setComment_text(obj.getString("comment_text"));
-                                    storegoods.setCreate_by_name(obj.getString("create_by_name"));
-                                    storegoods.setShow_at(obj.getString("show_at"));
-                                    storegoods.setImg_url(obj.getString("img_url"));
-                                    mShowOrderList.add(storegoods);
-                                }
-                                mShowOrderAdapter = new StoreShowOrderAdapter(getActivity(), mShowOrderList);
-                                mListView.setAdapter(mShowOrderAdapter);
-                            } else {
-                            }
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
+                    public void onSuccess(String s, Call call, okhttp3.Response response) {
+                        doShowOrderSuccess(s);
                     }
-                }, null);
-        //TODO 这个Tag应该要设置成和Activity一样的
-        goodsCommentRequest.setTag("goodsCommentRequest");
-        AppContext.getHttpQueue().add(goodsCommentRequest);
+                });
+    }
+
+    private void doShowOrderSuccess(String s) {
+        try {
+            JSONObject obj;
+            JSONArray arr;
+            obj = new JSONObject(s);
+            if (obj.getString("code").equals("0")) {
+                obj = obj.getJSONObject("goods_show_order");
+                arr = obj.getJSONArray("goods_show_orders");
+                StoreGoods storegoods;
+                for (int i = 0; i < arr.length(); i++) {
+                    storegoods = new StoreGoods();
+                    obj = arr.getJSONObject(i);
+                    storegoods.setComment_text(obj.getString("comment_text"));
+                    storegoods.setCreate_by_name(obj.getString("create_by_name"));
+                    storegoods.setShow_at(obj.getString("show_at"));
+                    storegoods.setImg_url(obj.getString("img_url"));
+                    mShowOrderList.add(storegoods);
+                }
+                mShowOrderAdapter = new StoreShowOrderAdapter(getActivity(), mShowOrderList);
+                mListView.setAdapter(mShowOrderAdapter);
+            } else {
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     private List<StoreGoods> mFilterList = new ArrayList<>();

@@ -138,7 +138,6 @@ public class WebNoCookieActivity extends BaseActivity implements View.OnClickLis
                 view.loadUrl("file:///android_asset/index.html");
             }
 
-            //TODO 淘宝打开页面崩溃可能是由于此处原因
 //            @Override
 //            public boolean shouldOverrideUrlLoading(WebView view, String url) {
 //                if (url.startsWith("http:") || url.startsWith("https:")) {

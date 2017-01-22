@@ -14,24 +14,23 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.toolbox.StringRequest;
 import com.lzy.okgo.OkGo;
+import com.lzy.okgo.callback.StringCallback;
+import com.lzy.okgo.model.HttpHeaders;
+import com.lzy.okgo.model.HttpParams;
+import com.woyuce.activity.R;
+import com.woyuce.activity.UI.Activity.Common.WebActivity;
 import com.woyuce.activity.UI.Activity.Free.FreeRangeActivity;
+import com.woyuce.activity.UI.Activity.Free.Net.NetClassActivity;
 import com.woyuce.activity.UI.Activity.Gongyi.GongyiActivity;
 import com.woyuce.activity.UI.Activity.Login.LoginActivity;
-import com.woyuce.activity.UI.Activity.Free.Net.NetClassActivity;
 import com.woyuce.activity.UI.Activity.Speaking.SpeakingActivity;
-import com.woyuce.activity.UI.Activity.Common.WebActivity;
 import com.woyuce.activity.UI.Activity.Writting.WitActivity;
-import com.woyuce.activity.AppContext;
-import com.woyuce.activity.R;
 import com.woyuce.activity.Utils.LogUtil;
 import com.woyuce.activity.Utils.PreferenceUtil;
 import com.woyuce.activity.Utils.StringUtils;
 import com.woyuce.activity.Utils.ToastUtil;
+import com.woyuce.activity.common.Constants;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -40,8 +39,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+
+import okhttp3.Call;
 
 public class Fragmentone extends Fragment implements View.OnClickListener {
 
@@ -51,8 +50,6 @@ public class Fragmentone extends Fragment implements View.OnClickListener {
     private FrameLayout mFrame;
     private TextView mTxtTimer, mTxtTimerTitle;
     private String localTimer, localtoken, localuserid;
-
-    private String URL = "http://api.iyuce.com/v1/exam/setexamtime";
 
     @Override
     public void onStart() {
@@ -98,7 +95,6 @@ public class Fragmentone extends Fragment implements View.OnClickListener {
         localtoken = PreferenceUtil.getSharePre(getActivity()).getString("localtoken", "");
         localuserid = PreferenceUtil.getSharePre(getActivity()).getString("userId", "");
         localTimer = PreferenceUtil.getSharePre(getActivity()).getString("mtimer", "");
-//		LogUtil.e("what? = " + localTimer);
         if (localTimer.equals("") || localTimer.equals(null)) {
             mTxtTimer.setText("设置考试时间");
         } else {
@@ -138,41 +134,34 @@ public class Fragmentone extends Fragment implements View.OnClickListener {
      *
      * @param mTime
      */
-    private void getJson(final String mTime) {
-        StringRequest strinRequest = new StringRequest(Request.Method.POST, URL, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                JSONObject obj;
-                try {
-                    obj = new JSONObject(response);
-                    String code = obj.getString("code");
-                    if (code.equals("0")) {
-                        LogUtil.e("settime,success");
-                    } else {
-                        LogUtil.e("settime,false");
+    private void doRequest(final String mTime) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.put("Authorization", "Bearer " + localtoken);
+        HttpParams params = new HttpParams();
+        params.put("user_id", localuserid);
+        params.put("exam_time", mTime);
+        OkGo.post(Constants.URL_POST_SET_EXAM_TIME).headers(headers).params(params)
+                .execute(new StringCallback() {
+                    @Override
+                    public void onSuccess(String s, Call call, okhttp3.Response response) {
+                        doSuccess(s);
                     }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-        }, null) {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
-                headers.put("Authorization", "Bearer " + localtoken);
-                return headers;
-            }
+                });
+    }
 
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                HashMap<String, String> map = new HashMap<String, String>();
-                map.put("user_id", localuserid);
-                map.put("exam_time", mTime);
-                return map;
+    private void doSuccess(String response) {
+        JSONObject obj;
+        try {
+            obj = new JSONObject(response);
+            String code = obj.getString("code");
+            if (code.equals("0")) {
+                LogUtil.e("settime,success");
+            } else {
+                LogUtil.e("settime,false");
             }
-        };
-        strinRequest.setTag("post");
-        AppContext.getHttpQueue().add(strinRequest);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -237,7 +226,7 @@ public class Fragmentone extends Fragment implements View.OnClickListener {
                 // 如果已设置过，则保存
                 PreferenceUtil.save(getActivity(), "mtimer", mTime);
                 //将mTime上传后台
-                getJson(mTime);
+                doRequest(mTime);
                 dealTimePicker(mTime, mSimpleDate);
             }
         };

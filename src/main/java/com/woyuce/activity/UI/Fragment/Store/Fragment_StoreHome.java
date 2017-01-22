@@ -13,23 +13,20 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
 import com.jcodecraeer.xrecyclerview.XRecyclerView;
-import com.woyuce.activity.UI.Activity.Common.CustomServiceActivity;
-import com.woyuce.activity.UI.Activity.Store.StoreCarActivity;
-import com.woyuce.activity.UI.Activity.Store.StoreGoodsActivity;
+import com.lzy.okgo.OkGo;
+import com.lzy.okgo.callback.StringCallback;
 import com.woyuce.activity.Adapter.Store.StoreHomeAdapter;
-import com.woyuce.activity.AppContext;
 import com.woyuce.activity.Bean.Store.StoreBean;
 import com.woyuce.activity.Bean.Store.StoreGoods;
 import com.woyuce.activity.R;
+import com.woyuce.activity.UI.Activity.Common.CustomServiceActivity;
+import com.woyuce.activity.UI.Activity.Store.StoreCarActivity;
+import com.woyuce.activity.UI.Activity.Store.StoreGoodsActivity;
 import com.woyuce.activity.Utils.GlideImageLoader;
-import com.woyuce.activity.Utils.LogUtil;
 import com.woyuce.activity.Utils.PreferenceUtil;
 import com.woyuce.activity.Utils.ToastUtil;
+import com.woyuce.activity.common.Constants;
 import com.youth.banner.Banner;
 import com.youth.banner.BannerConfig;
 import com.youth.banner.Transformer;
@@ -42,6 +39,8 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
+import okhttp3.Call;
+
 public class Fragment_StoreHome extends Fragment implements View.OnClickListener {
 
     private Button mBtnToCustom, mBtnToStoreCar;
@@ -51,8 +50,6 @@ public class Fragment_StoreHome extends Fragment implements View.OnClickListener
     private RecyclerView.Adapter mAdapter;
     private List<StoreBean> mImgData = new ArrayList<>();
     private List<StoreBean> mList = new ArrayList<>();
-
-    private String URL = "http://api.iyuce.com/v1/store/homegoodslist";
 
     private static final int FLAG_VIEWFLIPPER = 1;
     private static final int FLAG_RECYCLERVIEW = 2;
@@ -155,83 +152,80 @@ public class Fragment_StoreHome extends Fragment implements View.OnClickListener
     }
 
     private void requestData() {
-        StringRequest goodsrequest = new StringRequest(Request.Method.GET, URL, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String s) {
-                try {
-                    JSONObject obj, obj_menu;
-                    //轮播图数据
-                    JSONArray arr_menu, arr_menu_result;
-                    //首页商品数据
-                    JSONArray arr_data;
-                    obj = new JSONObject(s);
-                    arr_menu = obj.getJSONArray("menudata");
-                    arr_data = obj.getJSONArray("data");
-                    StoreBean storeBean;
-                    //轮播图Bean
-                    for (int i = 0; i < arr_menu.length(); i++) {
-                        storeBean = new StoreBean();
-                        obj = arr_menu.getJSONObject(i);
-                        obj_menu = obj.getJSONObject("menu");
-                        storeBean.setIcon_mobile_url(obj_menu.getString("icon_mobile_url"));
-                        arr_menu_result = obj.getJSONArray("goods_result");
-                        if (arr_menu_result.length() > 0) {
-                            obj = arr_menu_result.getJSONObject(0);
-                            storeBean.setGoods_id(obj.getString("goods_id"));
-                            storeBean.setGoods_sku_id(obj.getString("goods_sku_id"));
-                            storeBean.setGoods_title(obj.getString("goods_title"));
-                            storeBean.setSales_price(obj.getString("sales_price"));
-                        }
-                        mImgData.add(storeBean);
+        OkGo.get(Constants.URL_GET_STORE_HOME)
+                .execute(new StringCallback() {
+                    @Override
+                    public void onSuccess(String s, Call call, okhttp3.Response response) {
+                        doSuccess(s);
                     }
-                    Message msg1 = new Message();
-                    msg1.what = FLAG_VIEWFLIPPER;
-                    msg1.obj = mImgData;
-                    mHandler.sendMessage(msg1);
-                    // 首页商品数据Bean
-                    StoreBean store;
-                    JSONArray arr_goods_result;
-                    JSONObject obj_goods;
-                    for (int i = 0; i < arr_data.length(); i++) {
-                        store = new StoreBean();
-                        obj = arr_data.getJSONObject(i);
-                        //"goods_result"
-                        arr_goods_result = obj.getJSONArray("goods_result");
-                        ArrayList<StoreGoods> goodsList = new ArrayList<>();
-                        StoreGoods goods;
-                        for (int j = 0; j < arr_goods_result.length(); j++) {
-                            goods = new StoreGoods();
-                            obj_goods = arr_goods_result.getJSONObject(j);
-                            goods.setGoods_title(obj_goods.getString("goods_title"));
-                            goods.setSales_price(obj_goods.getString("sales_price"));
-                            goods.setThumb_img(obj_goods.getString("original_img"));
-                            goods.setGoods_id(obj_goods.getString("goods_id"));
-                            goods.setGoods_sku_id(obj_goods.getString("goods_sku_id"));
-                            goodsList.add(goods);
-                        }
-                        store.setGoods_result(goodsList);
-                        // "menu"
-                        obj = obj.getJSONObject("menu");
-                        store.setTitle(obj.getString("title"));
-                        mList.add(store);
-                    }
-                    Message msg2 = new Message();
-                    msg2.what = FLAG_RECYCLERVIEW;
-                    msg2.obj = mList;
-                    mHandler.sendMessage(msg2);
+                });
+    }
 
-                } catch (JSONException e) {
-                    e.printStackTrace();
+    private void doSuccess(String s) {
+        try {
+            JSONObject obj, obj_menu;
+            //轮播图数据
+            JSONArray arr_menu, arr_menu_result;
+            //首页商品数据
+            JSONArray arr_data;
+            obj = new JSONObject(s);
+            arr_menu = obj.getJSONArray("menudata");
+            arr_data = obj.getJSONArray("data");
+            StoreBean storeBean;
+            //轮播图Bean
+            for (int i = 0; i < arr_menu.length(); i++) {
+                storeBean = new StoreBean();
+                obj = arr_menu.getJSONObject(i);
+                obj_menu = obj.getJSONObject("menu");
+                storeBean.setIcon_mobile_url(obj_menu.getString("icon_mobile_url"));
+                arr_menu_result = obj.getJSONArray("goods_result");
+                if (arr_menu_result.length() > 0) {
+                    obj = arr_menu_result.getJSONObject(0);
+                    storeBean.setGoods_id(obj.getString("goods_id"));
+                    storeBean.setGoods_sku_id(obj.getString("goods_sku_id"));
+                    storeBean.setGoods_title(obj.getString("goods_title"));
+                    storeBean.setSales_price(obj.getString("sales_price"));
                 }
+                mImgData.add(storeBean);
             }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError volleyError) {
-                LogUtil.i("volleyError = " + volleyError.toString());
+            Message msg1 = new Message();
+            msg1.what = FLAG_VIEWFLIPPER;
+            msg1.obj = mImgData;
+            mHandler.sendMessage(msg1);
+            // 首页商品数据Bean
+            StoreBean store;
+            JSONArray arr_goods_result;
+            JSONObject obj_goods;
+            for (int i = 0; i < arr_data.length(); i++) {
+                store = new StoreBean();
+                obj = arr_data.getJSONObject(i);
+                //"goods_result"
+                arr_goods_result = obj.getJSONArray("goods_result");
+                ArrayList<StoreGoods> goodsList = new ArrayList<>();
+                StoreGoods goods;
+                for (int j = 0; j < arr_goods_result.length(); j++) {
+                    goods = new StoreGoods();
+                    obj_goods = arr_goods_result.getJSONObject(j);
+                    goods.setGoods_title(obj_goods.getString("goods_title"));
+                    goods.setSales_price(obj_goods.getString("sales_price"));
+                    goods.setThumb_img(obj_goods.getString("original_img"));
+                    goods.setGoods_id(obj_goods.getString("goods_id"));
+                    goods.setGoods_sku_id(obj_goods.getString("goods_sku_id"));
+                    goodsList.add(goods);
+                }
+                store.setGoods_result(goodsList);
+                // "menu"
+                obj = obj.getJSONObject("menu");
+                store.setTitle(obj.getString("title"));
+                mList.add(store);
             }
-        });
-        goodsrequest.setTag("goodsrequest");
-        AppContext.getHttpQueue().add(goodsrequest);
+            Message msg2 = new Message();
+            msg2.what = FLAG_RECYCLERVIEW;
+            msg2.obj = mList;
+            mHandler.sendMessage(msg2);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
