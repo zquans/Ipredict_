@@ -31,11 +31,11 @@ import com.umeng.message.PushAgent;
 import com.umeng.message.UTrack;
 import com.umeng.message.common.inter.ITagManager;
 import com.umeng.message.tag.TagManager;
-import com.woyuce.activity.BaseActivity;
-import com.woyuce.activity.UI.Activity.MainActivity;
-import com.woyuce.activity.UI.Activity.Common.WebActivity;
 import com.woyuce.activity.AppContext;
+import com.woyuce.activity.BaseActivity;
 import com.woyuce.activity.R;
+import com.woyuce.activity.UI.Activity.Common.WebActivity;
+import com.woyuce.activity.UI.Activity.MainActivity;
 import com.woyuce.activity.Utils.ActivityManager;
 import com.woyuce.activity.Utils.LogUtil;
 import com.woyuce.activity.Utils.PreferenceUtil;
@@ -727,27 +727,28 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
             mplatform = ShareSDK.getPlatform(this, Wechat.NAME);
         } else {
             mplatform = ShareSDK.getPlatform(this, QQ.NAME);
-            String accessToken = mplatform.getDb().getToken(); // 获取授权token
-            String openId = mplatform.getDb().getUserId(); // 获取用户在此平台的ID
-            String nickname = mplatform.getDb().getUserName(); // 获取用户昵称
-            LogUtil.i("nickname = " + nickname + "openId = " + openId + ",accessToken" + accessToken);
         }
+        LogUtil.i("mplatform.isAuthValid() = " + mplatform.isAuthValid());
         mplatform.setPlatformActionListener(new PlatformActionListener() {
             @Override
             public void onComplete(Platform platform, int i, HashMap<String, Object> hashMap) {
-                LogUtil.i("qqLogin onComplete" + hashMap.toString());
+                LogUtil.i("platform onComplete" + hashMap.toString());
+                String accessToken = platform.getDb().getToken(); // 获取授权token
+                String openId = platform.getDb().getUserId(); // 获取用户在此平台的ID
+                String nickname = platform.getDb().getUserName(); // 获取用户昵称
+                LogUtil.i("nickname = " + nickname + "openId = " + openId + ",accessToken" + accessToken);
             }
 
             @Override
             public void onError(Platform platform, int i, Throwable throwable) {
-                LogUtil.i("qqLogin onError");
+                LogUtil.i("platform onError");
             }
 
             @Override
             public void onCancel(Platform platform, int i) {
-                LogUtil.i("qqLogin onCancel");
+                LogUtil.i("platform onCancel");
             }
         });
-        mplatform.authorize();
+        mplatform.showUser(null);
     }
 }
