@@ -27,6 +27,9 @@ import com.android.volley.Response;
 import com.android.volley.Response.ErrorListener;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
+import com.tencent.mm.sdk.modelmsg.SendAuth;
+import com.tencent.mm.sdk.openapi.IWXAPI;
+import com.tencent.mm.sdk.openapi.WXAPIFactory;
 import com.umeng.message.PushAgent;
 import com.umeng.message.UTrack;
 import com.umeng.message.common.inter.ITagManager;
@@ -95,6 +98,10 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
     //选择登录方式
     private boolean login_with_mobile = false;
 
+    //微信API
+    private IWXAPI api;
+    private String APP_ID = "wxee1be723a57f9d21";
+
     //保存倒计时计数
     private int time_count;
     //创建一个Handler去处理倒计时事件
@@ -145,6 +152,9 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
         //推送初始化
         mPushAgent = PushAgent.getInstance(this);
         mPushAgent.onAppStart();
+
+        api = WXAPIFactory.createWXAPI(this, APP_ID, true);
+        api.registerApp(APP_ID);
     }
 
     @Override
@@ -711,7 +721,8 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
     }
 
     public void wechatLogin(View view) {
-        doShareLogin("wechat");
+//        doShareLogin("wechat");
+        doWexinOrginLogin();
     }
 
     public void qqLogin(View view) {
@@ -728,6 +739,7 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
         } else {
             mplatform = ShareSDK.getPlatform(this, QQ.NAME);
         }
+//        mplatform.removeAccount(true);
         LogUtil.i("mplatform.isAuthValid() = " + mplatform.isAuthValid());
         mplatform.setPlatformActionListener(new PlatformActionListener() {
             @Override
@@ -749,6 +761,16 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
                 LogUtil.i("platform onCancel");
             }
         });
+//        mplatform.authorize();
         mplatform.showUser(null);
+    }
+
+    //微信原生调用
+    private void doWexinOrginLogin() {
+        SendAuth.Req req = new SendAuth.Req();
+        req.scope = "snsapi_userinfo";
+        req.state = "wechat_sdk_demo_test";
+        boolean isPass = api.sendReq(req);
+        LogUtil.i("doWexinOrginLogin isPass = " + isPass);
     }
 }

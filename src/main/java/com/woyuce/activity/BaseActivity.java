@@ -4,8 +4,6 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.pm.PackageManager;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -15,6 +13,7 @@ import android.view.MotionEvent;
 import com.umeng.analytics.MobclickAgent;
 import com.woyuce.activity.Utils.ActivityManager;
 import com.woyuce.activity.Utils.LogUtil;
+import com.woyuce.activity.Utils.NetUtil;
 import com.woyuce.activity.Utils.ToastUtil;
 import com.woyuce.activity.common.Constants;
 
@@ -50,12 +49,14 @@ public class BaseActivity extends Activity {
 //            getWindow().setStatusBarColor(Color.TRANSPARENT);
 //        }
         //二、判断是否WIFI环境
-        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
-        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo(); // getActiveNetworkInfo获取当前可用网络
-        if (networkInfo == null || !networkInfo.isAvailable()) {
-            ToastUtil.showMessage(this, "网络链接不可用，请检查网络");
+        //网络已连接
+        if (NetUtil.isConnected(this)) {
+            //但不是WIFI
+//            if (!NetUtil.isWifi(this)) {
+//                ToastUtil.showMessage(this, "当前不在WIFI环境，下载将消耗较多流量");
+//            }
         } else {
-            // toast("链接成功");
+            ToastUtil.showMessage(this, "网络链接不可用，请检查网络");
         }
         //三、将Activity装入管理栈中，以便管理
         ActivityManager.getAppManager().addActivity(this);
