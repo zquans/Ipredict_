@@ -1,6 +1,5 @@
 package com.woyuce.activity.UI.Activity.Store;
 
-import android.content.ContentValues;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
@@ -19,16 +18,18 @@ import android.widget.TextView;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.toolbox.StringRequest;
+import com.woyuce.activity.AppContext;
+import com.woyuce.activity.R;
 import com.woyuce.activity.UI.Activity.Common.CustomServiceActivity;
 import com.woyuce.activity.UI.Activity.MainActivity;
-import com.woyuce.activity.AppContext;
 import com.woyuce.activity.UI.Fragment.Store.Fragment_StoreGoods_One_;
 import com.woyuce.activity.UI.Fragment.Store.Fragment_StoreGoods_Three;
 import com.woyuce.activity.UI.Fragment.Store.Fragment_StoreGoods_Two;
-import com.woyuce.activity.R;
+import com.woyuce.activity.Utils.DbUtil;
 import com.woyuce.activity.Utils.LogUtil;
 import com.woyuce.activity.Utils.PreferenceUtil;
 import com.woyuce.activity.Utils.ToastUtil;
+import com.woyuce.activity.common.Constants;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -208,24 +209,34 @@ public class StoreGoodsActivity extends FragmentActivity implements View.OnClick
     /**
      * 开数据库建一张表
      */
-    private void saveStoreInfo(String id, String goodsid, String goodsskuid, String name, String specname, String num, String price) {
-        SQLiteDatabase mDatabase = openOrCreateDatabase("aipu.db", MODE_PRIVATE, null);
-        mDatabase.execSQL(
-                "create table if not exists storetb(_id integer primary key autoincrement," +
-                        "id text not null,goodsskuid text not null,name text not null," +
-                        "specname text not null,num text not null,price text not null)");
-        ContentValues mValues = new ContentValues();
-        mValues.put("id", id);
-        mValues.put("goodsskuid", goodsskuid);
-        mValues.put("name", name);
-        mValues.put("specname", specname);
-        mValues.put("num", num);
-        mValues.put("price", price);
-        mDatabase.insert("storetb", null, mValues);
-        mValues.clear();
+    private void saveIntoDatabase(String goodsid, String goodsskuid, String name, String specname, String price) {
+        SQLiteDatabase mDatabase = DbUtil.getHelper(this, Constants.DATABASE_IYUCE).getWritableDatabase();
+        mDatabase.execSQL("create table if not exists "
+                + Constants.TABLE_CART + "("
+                + Constants.COLUMN_GOODS_SPEC_ID + " integer primary key ,"
+                + Constants.COLUMN_GOODS_ID + " text,"
+                + Constants.COLUMN_NAME + " text,"
+                + Constants.COLUMN_SPEC_NAME + " text,"
+                + Constants.COLUMN_COUNT + " integer,"
+                + Constants.COLUMN_PRICE + " text)");
+
+        //String sql_replace = "REPLACE INTO cart_table(Goods_spec_id,Goods_id,Name,Spec_name,Price,Count) VALUES(1,\"47\",\"454aaa\",\"specnameeeee\",\"num111\",ifnull((select Count from cart_table where Goods_spec_id= 1 ),0)+1)\n";
+        String sql_replace = "REPLACE INTO " + Constants.TABLE_CART + "("
+                + Constants.COLUMN_GOODS_SPEC_ID + ","
+                + Constants.COLUMN_GOODS_ID + ","
+                + Constants.COLUMN_NAME + ","
+                + Constants.COLUMN_SPEC_NAME + ","
+                + Constants.COLUMN_PRICE + ","
+                + Constants.COLUMN_COUNT + ") VALUES("
+                + goodsskuid + ",\""
+                + goodsid + "\",\""
+                + name + "\",\""
+                + specname + "\",\""
+                + price + "\",ifnull(("
+                + "select " + Constants.COLUMN_COUNT + " from " + Constants.TABLE_CART
+                + " where " + Constants.COLUMN_GOODS_SPEC_ID + "= " + goodsskuid + " ),0)+1)\n";
+        mDatabase.execSQL(sql_replace);
         mDatabase.close();
-        //权宜之计，做个标识给FavoriteActivity用
-        PreferenceUtil.save(this, "storetb_is_exist", "yes");
     }
 
     public void back(View view) {
@@ -250,30 +261,29 @@ public class StoreGoodsActivity extends FragmentActivity implements View.OnClick
             return;
         }
         //这些参数是传递给底部操作栏的，跟购物车相关
-        String local_id = PreferenceUtil.getSharePre(this).getString("userId", "");
-        String local_goodsid = mFrgOne.returenGoodsId();
         String local_goods_sku_id = mFrgOne.returenGoodsSkuId();
+        String local_goodsid = mFrgOne.returenGoodsId();
         String local_name = local_goods_title;
         String local_specname = mFrgOne.returenGoodsSpecName();
         String local_price = mFrgOne.returenGoodsPrice();
-        String local_num = "1";
         switch (v.getId()) {
             case R.id.btn_activity_storegoods_buynow:
-                //保存进数据库
-                saveStoreInfo(local_id, local_goodsid, local_goods_sku_id, local_name, local_specname, local_num, local_price);
+                saveIntoDatabase(local_goodsid, local_goods_sku_id, local_name, local_specname, local_price);
                 startActivity(new Intent(this, StoreCarActivity.class));
                 break;
             case R.id.btn_activity_storegoods_putincar:
-                //保存进数据库
-                saveStoreInfo(local_id, local_goodsid, local_goods_sku_id, local_name, local_specname, local_num, local_price);
+                saveIntoDatabase(local_goodsid, local_goods_sku_id, local_name, local_specname, local_price);
                 ToastUtil.showMessage(this, "您的商品放入购物车啦!");
                 break;
             case R.id.btn_activity_storegoods_tocar:
-                if (!PreferenceUtil.getSharePre(this).getString("storetb_is_exist", "no").equals("yes")) {
-                    ToastUtil.showMessage(this, "您的购物车空空哒，快去添加商品吧！");
-                    return;
+                SQLiteDatabase mDatabase = DbUtil.getHelper(this, Constants.DATABASE_IYUCE).getWritableDatabase();
+                String isExist = DbUtil.queryToString(mDatabase, Constants.TABLE_CART, Constants.COLUMN_GOODS_SPEC_ID, null, null);
+                mDatabase.close();
+                if (!isExist.equals(Constants.NONE)) {
+                    startActivity(new Intent(this, StoreCarActivity.class));
+                    break;
                 }
-                startActivity(new Intent(this, StoreCarActivity.class));
+                ToastUtil.showMessage(this, "您的购物车空空哒，快去添加商品吧！");
                 break;
             case R.id.txt_store_to_custom:
                 startActivity(new Intent(this, CustomServiceActivity.class));

@@ -24,14 +24,16 @@ import com.android.volley.toolbox.StringRequest;
 import com.tencent.mm.sdk.modelpay.PayReq;
 import com.tencent.mm.sdk.openapi.IWXAPI;
 import com.tencent.mm.sdk.openapi.WXAPIFactory;
-import com.woyuce.activity.BaseActivity;
-import com.woyuce.activity.UI.Activity.MainActivity;
 import com.woyuce.activity.AppContext;
+import com.woyuce.activity.BaseActivity;
 import com.woyuce.activity.Bean.Store.StorePayResult;
 import com.woyuce.activity.R;
+import com.woyuce.activity.UI.Activity.MainActivity;
+import com.woyuce.activity.Utils.DbUtil;
 import com.woyuce.activity.Utils.LogUtil;
 import com.woyuce.activity.Utils.PreferenceUtil;
 import com.woyuce.activity.Utils.ToastUtil;
+import com.woyuce.activity.common.Constants;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -388,13 +390,13 @@ public class StoreOrderActivity extends BaseActivity implements View.OnClickList
      * 删除数据库中的这张表
      */
     private void deleteSql() {
-        //删除数据库中该表
-        if (PreferenceUtil.getSharePre(this).getString("storetb_is_exist", "").equals("yes")) {
-            PreferenceUtil.removestoretbisexist(StoreOrderActivity.this);
-            SQLiteDatabase mDatabase = openOrCreateDatabase("aipu.db", MODE_PRIVATE, null);
-            mDatabase.execSQL("drop table storetb");
-            mDatabase.close();
+        //TODO 其实应该只删除相关商品的字段
+        SQLiteDatabase mDatabase = DbUtil.getHelper(this, Constants.DATABASE_IYUCE).getWritableDatabase();
+        String isExist = DbUtil.queryToString(mDatabase, Constants.TABLE_CART, Constants.COLUMN_GOODS_SPEC_ID, null, null);
+        if (isExist.equals(Constants.NONE)) {
+            mDatabase.execSQL("DROP TABLE IF EXISTS " + Constants.TABLE_CART);
         }
+        mDatabase.close();
     }
 
     /**
