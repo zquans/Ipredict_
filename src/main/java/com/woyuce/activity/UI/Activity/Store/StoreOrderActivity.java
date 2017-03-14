@@ -42,7 +42,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Created by Administrator on 2016/11/21.
+ * Created by Administrator on 2016/11/21
  */
 public class StoreOrderActivity extends BaseActivity implements View.OnClickListener {
 
@@ -390,12 +390,8 @@ public class StoreOrderActivity extends BaseActivity implements View.OnClickList
      * 删除数据库中的这张表
      */
     private void deleteSql() {
-        //TODO 其实应该只删除相关商品的字段
         SQLiteDatabase mDatabase = DbUtil.getHelper(this, Constants.DATABASE_IYUCE).getWritableDatabase();
-        String isExist = DbUtil.queryToString(mDatabase, Constants.TABLE_CART, Constants.COLUMN_GOODS_SPEC_ID, null, null);
-        if (isExist.equals(Constants.NONE)) {
-            mDatabase.execSQL("DROP TABLE IF EXISTS " + Constants.TABLE_CART);
-        }
+        mDatabase.execSQL("DROP TABLE IF EXISTS " + Constants.TABLE_CART);
         mDatabase.close();
     }
 

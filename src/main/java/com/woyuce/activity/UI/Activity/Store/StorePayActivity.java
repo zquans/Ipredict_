@@ -18,12 +18,12 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
-import com.woyuce.activity.BaseActivity;
-import com.woyuce.activity.UI.Activity.Login.LoginActivity;
 import com.woyuce.activity.Adapter.Store.StorePayAdapter;
 import com.woyuce.activity.AppContext;
+import com.woyuce.activity.BaseActivity;
 import com.woyuce.activity.Bean.Store.StoreMenu;
 import com.woyuce.activity.R;
+import com.woyuce.activity.UI.Activity.Login.LoginActivity;
 import com.woyuce.activity.Utils.LogUtil;
 import com.woyuce.activity.Utils.MathUtil;
 import com.woyuce.activity.Utils.PreferenceUtil;
@@ -36,7 +36,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 
 /**
- * Created by Administrator on 2016/11/7.
+ * Created by Administrator on 2016/11/7
  */
 
 public class StorePayActivity extends BaseActivity implements View.OnClickListener {
@@ -47,13 +47,9 @@ public class StorePayActivity extends BaseActivity implements View.OnClickListen
 
     private ListView mListView;
     private StorePayAdapter mAdapter;
-    private ArrayList<StoreMenu> mList = new ArrayList<>();
+    private ArrayList<StoreMenu> mStoreList = new ArrayList<>();
 
     //有关商品的列表
-    ArrayList<String> mGoodsSkuIdList = new ArrayList<>();
-    ArrayList<String> mNameList = new ArrayList<>();
-    ArrayList<String> mPriceList = new ArrayList<>();
-    ArrayList<String> mNumList = new ArrayList<>();
     ArrayList<String> mSpecNameList = new ArrayList<>();
     private Integer total_count;
     private Double total_price;
@@ -61,6 +57,7 @@ public class StorePayActivity extends BaseActivity implements View.OnClickListen
 
     //获取默认收货地址
     private String URL = "http://api.iyuce.com/v1/store/getdefaultaddr";
+    private String local_skuids = "";
 
     public void back(View view) {
         finish();
@@ -83,13 +80,14 @@ public class StorePayActivity extends BaseActivity implements View.OnClickListen
     private void initView() {
         //获取到传递来的数据
         Intent intent = getIntent();
-        mGoodsSkuIdList = intent.getStringArrayListExtra("mGoodsSkuIdList");
-        mNameList = intent.getStringArrayListExtra("mNameList");
-        mSpecNameList = intent.getStringArrayListExtra("mSpecNameList");
-        mPriceList = intent.getStringArrayListExtra("mPriceList");
-        mNumList = intent.getStringArrayListExtra("mNumList");
+        mStoreList = (ArrayList<StoreMenu>) intent.getSerializableExtra("mStoreList");
         total_count = intent.getIntExtra("total_count", -1);
         total_price = intent.getDoubleExtra("total_price", 0.00);
+
+        for (int i = 0; i < mStoreList.size(); i++) {
+            local_skuids = local_skuids + mStoreList.get(i).getGoodsskuid() + "|" + mStoreList.get(i).getNum() + ",";
+            mSpecNameList.add(mStoreList.get(i).getName() + "_(" + mStoreList.get(i).getSpecname() + ") \r\rX\r" + mStoreList.get(i).getNum() + "件");
+        }
 
         mReLayoutAddress = (RelativeLayout) findViewById(R.id.relative_activity_storepay);
         mReLayoutAddress.setOnClickListener(this);
@@ -103,24 +101,8 @@ public class StorePayActivity extends BaseActivity implements View.OnClickListen
         mTxtPrice.setText(total_price + "元");
         mTxtCount.setText(total_count + "件");
 
-        StoreMenu storeMenu;
-        for (int i = 0; i < mGoodsSkuIdList.size(); i++) {
-            storeMenu = new StoreMenu();
-            if (mNumList.get(i).equals("0")) {
-                //跳过该次轮询，同时移除商品名称数组中对应位置的商品名称
-                mSpecNameList.remove(i);
-                continue;
-            }
-            storeMenu.setNum(mNumList.get(i));
-            storeMenu.setGoodsskuid(mGoodsSkuIdList.get(i));
-            storeMenu.setName(mNameList.get(i));
-            storeMenu.setSpecname(mSpecNameList.get(i));
-            storeMenu.setPrice(mPriceList.get(i));
-            mList.add(storeMenu);
-        }
-
         mListView = (ListView) findViewById(R.id.listview_actvity_storepay);
-        mAdapter = new StorePayAdapter(this, mList);
+        mAdapter = new StorePayAdapter(this, mStoreList);
         mListView.setAdapter(mAdapter);
         setListViewHeightBasedOnChildren(mListView);
 
@@ -132,8 +114,6 @@ public class StorePayActivity extends BaseActivity implements View.OnClickListen
 
     /**
      * 帮助类:动态设置ListView的高度
-     *
-     * @param listView
      */
     public static void setListViewHeightBasedOnChildren(ListView listView) {
         if (listView == null) return;
@@ -255,7 +235,6 @@ public class StorePayActivity extends BaseActivity implements View.OnClickListen
             ToastUtil.showMessage(this, "快去添加商品吧");
             return;
         }
-
         if (TextUtils.isEmpty(PreferenceUtil.getSharePre(this).getString("userId", null))) {
             new AlertDialog.Builder(this)
                     .setTitle("您还没有登陆哦")
@@ -269,11 +248,6 @@ public class StorePayActivity extends BaseActivity implements View.OnClickListen
                     .setNegativeButton("取消", null)
                     .show();
             return;
-        }
-        String local_skuids = "";
-        for (int i = 0; i < mList.size(); i++) {
-            local_skuids = local_skuids + mList.get(i).getGoodsskuid()
-                    + "|" + mList.get(i).getNum() + ",";
         }
         Intent intent = new Intent(this, StoreOrderActivity.class);
         intent.putExtra("total_price", total_price.toString());

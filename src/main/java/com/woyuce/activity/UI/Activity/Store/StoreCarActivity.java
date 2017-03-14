@@ -37,7 +37,7 @@ public class StoreCarActivity extends BaseActivity implements StoreCarAdapter.On
     private TextView mTxtTotalNum, mTxtTotalPrice, mTxtFinalPrice;
 
     private ListView mListView;
-    private ArrayList<StoreMenu> mList = new ArrayList<>();
+    private ArrayList<StoreMenu> mStoreList = new ArrayList<>();
     private StoreCarAdapter mAdapter;
     private Integer total_count = 0;
     private Double total_price = 0.00;
@@ -69,7 +69,7 @@ public class StoreCarActivity extends BaseActivity implements StoreCarAdapter.On
         mTxtTotalPrice = (TextView) findViewById(R.id.txt_storecar_total_price);
         mTxtFinalPrice = (TextView) findViewById(R.id.txt_storecar_final_price);
 
-        mAdapter = new StoreCarAdapter(this, mList);
+        mAdapter = new StoreCarAdapter(this, mStoreList);
         mAdapter.setOnMyClickListener(this);
         mListView.setAdapter(mAdapter);
 
@@ -84,12 +84,12 @@ public class StoreCarActivity extends BaseActivity implements StoreCarAdapter.On
      */
     private void initData() {
         SQLiteDatabase mDatabase = DbUtil.getHelper(this, Constants.DATABASE_IYUCE).getWritableDatabase();
-        String isNone = DbUtil.queryToString(mDatabase, Constants.TABLE_SQLITE_MASTER, Constants.NAME, Constants.TABLE_NAME, Constants.TABLE_CART);
-        if (isNone.equals(Constants.NONE)) {
-            mDatabase.close();
-            ToastUtil.showMessage(this, "购物车空空如也");
-            return;
-        }
+//        String isNone = DbUtil.queryToExist(mDatabase, Constants.TABLE_SQLITE_MASTER, Constants.NAME, Constants.TABLE_NAME, Constants.TABLE_CART);
+//        if (isNone.equals(Constants.NONE)) {
+//            mDatabase.close();
+//            ToastUtil.showMessage(this, "购物车空空如也");
+//            return;
+//        }
         //查出所有属性
         Cursor mCursor = mDatabase.query(Constants.TABLE_CART, null, null, null, null, null, null);
         if (mCursor != null) {
@@ -106,7 +106,7 @@ public class StoreCarActivity extends BaseActivity implements StoreCarAdapter.On
                 storemenu.setSpecname(mCursor.getString(mCursor.getColumnIndex(Constants.COLUMN_SPEC_NAME)));
                 storemenu.setPrice(mCursor.getString(mCursor.getColumnIndex(Constants.COLUMN_PRICE)));
                 storemenu.setNum(mCursor.getString(mCursor.getColumnIndex(Constants.COLUMN_COUNT)));
-                mList.add(storemenu);
+                mStoreList.add(storemenu);
             }
             mCursor.close();
         }
@@ -114,8 +114,8 @@ public class StoreCarActivity extends BaseActivity implements StoreCarAdapter.On
     }
 
     private void requestRecentInfo() {
-        for (int i = 0; i < mList.size(); i++) {
-            URL = URL + mList.get(i).getGoodsskuid() + ",";
+        for (int i = 0; i < mStoreList.size(); i++) {
+            URL = URL + mStoreList.get(i).getGoodsskuid() + ",";
         }
         progressdialogshow(this);
         StringRequest requestRecentGoods = new StringRequest(Request.Method.GET, URL, new Response.Listener<String>() {
@@ -130,9 +130,9 @@ public class StoreCarActivity extends BaseActivity implements StoreCarAdapter.On
                         LogUtil.i("arr = " + arr);
                         for (int i = 0; i < arr.length(); i++) {
                             obj = arr.getJSONObject(i);
-                            for (int j = 0; j < mList.size(); j++) {
-                                if (obj.getString("Id").equals(mList.get(j).getGoodsskuid())) {
-                                    mList.get(j).setPrice(obj.getString("SalesPrice"));
+                            for (int j = 0; j < mStoreList.size(); j++) {
+                                if (obj.getString("Id").equals(mStoreList.get(j).getGoodsskuid())) {
+                                    mStoreList.get(j).setPrice(obj.getString("SalesPrice"));
                                     break;
                                 }
                             }
@@ -154,11 +154,11 @@ public class StoreCarActivity extends BaseActivity implements StoreCarAdapter.On
      * 初始化总价
      */
     private void initTotalPrice() {
-        for (int i = 0; i < mList.size(); i++) {
+        for (int i = 0; i < mStoreList.size(); i++) {
             Double mtotal_price = MathUtil.mul(
-                    Double.parseDouble(mList.get(i).getNum()), Double.parseDouble(mList.get(i).getPrice()));
+                    Double.parseDouble(mStoreList.get(i).getNum()), Double.parseDouble(mStoreList.get(i).getPrice()));
             total_price = MathUtil.add(total_price, mtotal_price);
-            int mtota_count = Integer.parseInt(mList.get(i).getNum());
+            int mtota_count = Integer.parseInt(mStoreList.get(i).getNum());
             total_count = total_count + mtota_count;
         }
     }
@@ -169,25 +169,37 @@ public class StoreCarActivity extends BaseActivity implements StoreCarAdapter.On
         //增加数据库中的数据
         int count = Integer.parseInt(txtCount.getText().toString());
         count = count + 1;
-        String where_goodsskuid = mList.get(pos).getGoodsskuid();
+        String where_goodsskuid = mStoreList.get(pos).getGoodsskuid();
         changeData(count, where_goodsskuid);
         txtCount.setText(count + "");
-        countPrice("add", mList.get(pos).getPrice());
+        countPrice("add", mStoreList.get(pos).getPrice());
     }
 
     @Override
     public void OnMyMinusClick(View view, int pos) {
         //减少商品的时候需要考虑商品减少到0的情况
         TextView txtCount = (TextView) getViewByPosition(pos, mListView);
-        String where_goodsskuid = mList.get(pos).getGoodsskuid();
+        String where_goodsskuid = mStoreList.get(pos).getGoodsskuid();
         int count = Integer.parseInt(txtCount.getText().toString());
         count = count - 1;
         if (count <= 0) {
+            //商品数量减到0时的处理，刷新Adapter，重新计算总价及总数
             count = 0;
+            changeData(count, where_goodsskuid);
+            mStoreList.clear();
+            initData();
+            mAdapter.notifyDataSetChanged();
+            total_count = 0;
+            total_price = 0.0;
+            initTotalPrice();
+            mTxtTotalNum.setText(total_count + "件");
+            mTxtTotalPrice.setText(total_price + "元");
+            mTxtFinalPrice.setText(total_price + "元");
+            return;
         }
         changeData(count, where_goodsskuid);
         txtCount.setText(count + "");
-        countPrice("minus", mList.get(pos).getPrice());
+        countPrice("minus", mStoreList.get(pos).getPrice());
     }
 
     /**
@@ -237,19 +249,9 @@ public class StoreCarActivity extends BaseActivity implements StoreCarAdapter.On
     /**
      * Button事件，去结账付款
      */
-    //TODO 改为传递一个对象数组
     public void toPay(View view) {
         Intent intent = new Intent(this, StorePayActivity.class);
-        ArrayList<String> mGoodsSkuIdList = new ArrayList<>();
-        ArrayList<String> mSpecNameList = new ArrayList<>();
-        ArrayList<String> mNameList = new ArrayList<>();
-        ArrayList<String> mPriceList = new ArrayList<>();
-        ArrayList<String> mNumList = new ArrayList<>();
-        intent.putStringArrayListExtra("mGoodsSkuIdList", mGoodsSkuIdList);
-        intent.putStringArrayListExtra("mNameList", mNameList);
-        intent.putStringArrayListExtra("mSpecNameList", mSpecNameList);
-        intent.putStringArrayListExtra("mPriceList", mPriceList);
-        intent.putStringArrayListExtra("mNumList", mNumList);
+        intent.putExtra("mStoreList", mStoreList);
         intent.putExtra("total_price", total_price);
         intent.putExtra("total_count", total_count);
         startActivity(intent);

@@ -180,6 +180,16 @@
             </LinearLayout>
 
             <TextView
+                android:id="@+id/txt_registerinfo_checkemail_hint"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="92dp"
+                android:text="邮箱可用"
+                android:textColor="#aaa"
+                android:textSize="12sp"
+                android:visibility="gone" />
+
+            <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"

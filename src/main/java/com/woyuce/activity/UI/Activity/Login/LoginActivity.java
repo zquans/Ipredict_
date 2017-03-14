@@ -137,10 +137,17 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
         setContentView(R.layout.activity_login);
 
         initView();
-        localtoken = PreferenceUtil.getSharePre(LoginActivity.this).getString("localtoken", "");
 
-        getBaseToken();
+        long expires_time = PreferenceUtil.getSharePre(LoginActivity.this).getLong("expires_time", 0);
+        long current_time = System.currentTimeMillis();
+        LogUtil.e("expires_time = " + expires_time + "||| current_time = " + current_time);
+        if (current_time > expires_time) {
+            getBaseToken();
+        } else {
+            localtoken = PreferenceUtil.getSharePre(LoginActivity.this).getString("localtoken", "");
+        }
         LogUtil.e("localtoken = " + localtoken);
+
 
         //判断是否有权限
         if (hasPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE)) {
@@ -336,9 +343,14 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
                     public void onResponse(String response) {
                         try {
                             JSONObject obj = new JSONObject(response);
-                            String localtoken = obj.getString("access_token");
+                            localtoken = obj.getString("access_token");
+                            String expires_in = obj.getString("expires_in");
+                            long current_time = System.currentTimeMillis();
+                            long expires_time = current_time + Long.parseLong(expires_in) * 1000;
                             PreferenceUtil.save(LoginActivity.this, "localtoken", localtoken);
-                            LogUtil.e("localtoken1 = " + localtoken);
+                            PreferenceUtil.save(LoginActivity.this, "expires_time", expires_time);
+                            //存一个时间
+                            LogUtil.e("current_time = " + current_time + "|||" + expires_time + "|||localtoken1 = " + localtoken + "||| expires_in = " + expires_in);
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }

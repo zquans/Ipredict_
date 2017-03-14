@@ -131,6 +131,7 @@
                     android:layout_toLeftOf="@+id/btn_actvity_storepay_add"
                     android:background="#ffffff"
                     android:enabled="false"
+                    android:focusable="false"
                     android:gravity="center"
                     android:inputType="number" />
 

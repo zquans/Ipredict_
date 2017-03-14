@@ -1,9 +1,11 @@
 package com.woyuce.activity.Bean.Store;
 
+import java.io.Serializable;
+
 /**
- * Created by Administrator on 2016/11/2.
+ * Created by Administrator on 2016/11/2
  */
-public class StoreMenu {
+public class StoreMenu implements Serializable {
 
     private String _id;
     private String name;

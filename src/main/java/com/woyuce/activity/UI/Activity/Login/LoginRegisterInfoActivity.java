@@ -19,8 +19,8 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
-import com.woyuce.activity.BaseActivity;
 import com.woyuce.activity.AppContext;
+import com.woyuce.activity.BaseActivity;
 import com.woyuce.activity.R;
 import com.woyuce.activity.Utils.LogUtil;
 import com.woyuce.activity.Utils.PreferenceUtil;
@@ -33,12 +33,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Created by Administrator on 2016/9/22.
+ * Created by Administrator on 2016/9/22
  */
 public class LoginRegisterInfoActivity extends BaseActivity implements View.OnClickListener {
 
     private EditText edtNickname, edtPassword, edtRepassword, edtUsername, edtEmailOrPhone, edtTime, edtCity, edtInvitenum;
-    private TextView txtback, txtPhoneOrEmail;
+    private TextView txtback, txtPhoneOrEmail, txtEmailCheckHint;
     private Button btnfinish, btnCheckUsername, btnCheckEmail;
 
     private String localtoken, localPhoneOrEmail, email_or_phone, localtimer;
@@ -75,6 +75,7 @@ public class LoginRegisterInfoActivity extends BaseActivity implements View.OnCl
 
         txtback = (TextView) findViewById(R.id.txt_registerinfo_back);
         txtPhoneOrEmail = (TextView) findViewById(R.id.txt_registerinfo_email_or_phone);
+        txtEmailCheckHint = (TextView) findViewById(R.id.txt_registerinfo_checkemail_hint);
         edtNickname = (EditText) findViewById(R.id.edt_registerinfo_nickname);
         edtPassword = (EditText) findViewById(R.id.edt_registerinfo_password);
         edtRepassword = (EditText) findViewById(R.id.edt_registerinfo_repassword);
@@ -187,6 +188,7 @@ public class LoginRegisterInfoActivity extends BaseActivity implements View.OnCl
                     map.put("mobile", edtEmailOrPhone.getText().toString().trim());
                     map.put("email", localPhoneOrEmail);
                 }
+                //TODO 以下参数还是要的
                 map.put("username", edtUsername.getText().toString().trim());
                 map.put("nickname", edtNickname.getText().toString().trim());
                 map.put("password", edtPassword.getText().toString().trim());
@@ -219,16 +221,17 @@ public class LoginRegisterInfoActivity extends BaseActivity implements View.OnCl
         StringRequest VaildRequest = new StringRequest(Request.Method.POST, URL_VAILD, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
-                LogUtil.e("response2 = " + response);
                 JSONObject obj;
                 try {
                     obj = new JSONObject(response);
                     int result = obj.getInt("data");
                     if (result == 0) {
-                        ToastUtil.showMessage(LoginRegisterInfoActivity.this, obj.getString("message"));
+//                        ToastUtil.showMessage(LoginRegisterInfoActivity.this, obj.getString("message"));
                     } else {
-                        ToastUtil.showMessage(LoginRegisterInfoActivity.this, obj.getString("message"));
+//                        ToastUtil.showMessage(LoginRegisterInfoActivity.this, obj.getString("message"));
                     }
+                    txtEmailCheckHint.setVisibility(View.VISIBLE);
+                    txtEmailCheckHint.setText(obj.getString("message"));
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }

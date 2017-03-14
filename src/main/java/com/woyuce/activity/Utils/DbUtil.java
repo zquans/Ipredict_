@@ -42,4 +42,16 @@ public class DbUtil {
         }
         return target;
     }
+
+    public static String queryToExist(SQLiteDatabase database, String table, String column, String condition, String condition_value) {
+        String target = "none";
+        Cursor cursor = database.query(table, new String[]{column}, condition + " =? ", new String[]{condition_value}, null, null, null);
+        //开启事务批量操作
+        if (cursor != null) {
+            while (cursor.moveToNext()) {
+                return cursor.getString(0);
+            }
+        }
+        return target;
+    }
 }

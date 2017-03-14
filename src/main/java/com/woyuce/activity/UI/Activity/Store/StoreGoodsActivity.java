@@ -277,9 +277,9 @@ public class StoreGoodsActivity extends FragmentActivity implements View.OnClick
                 break;
             case R.id.btn_activity_storegoods_tocar:
                 SQLiteDatabase mDatabase = DbUtil.getHelper(this, Constants.DATABASE_IYUCE).getWritableDatabase();
-                String isExist = DbUtil.queryToString(mDatabase, Constants.TABLE_CART, Constants.COLUMN_GOODS_SPEC_ID, null, null);
+                String isNone = DbUtil.queryToExist(mDatabase, Constants.TABLE_SQLITE_MASTER, Constants.NAME, Constants.TABLE_NAME, Constants.TABLE_CART);
                 mDatabase.close();
-                if (!isExist.equals(Constants.NONE)) {
+                if (!isNone.equals(Constants.NONE)) {
                     startActivity(new Intent(this, StoreCarActivity.class));
                     break;
                 }
