@@ -27,7 +27,6 @@ import com.android.volley.Response;
 import com.android.volley.Response.ErrorListener;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
-import com.tencent.mm.sdk.modelmsg.SendAuth;
 import com.tencent.mm.sdk.openapi.IWXAPI;
 import com.tencent.mm.sdk.openapi.WXAPIFactory;
 import com.umeng.message.PushAgent;
@@ -113,6 +112,24 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
                 btnGetCode.setText("发送验证码");
                 time_count = 61;
                 btnGetCode.setClickable(true);
+            }
+        }
+    };
+
+    //第三方登录
+    private static final int MSG_AUTH_CANCEL = 1;
+    private static final int MSG_AUTH_ERROR = 2;
+    private static final int MSG_AUTH_COMPLETE = 3;
+    private Handler mThirdLoginHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            ToastUtil.showMessage(LoginActivity.this, msg.what + "--------");
+            switch (msg.what) {
+                case MSG_AUTH_COMPLETE:
+                    //将获取到的信息传给后台
+                    giveLoginMsgToBack("qq", (Platform) msg.obj);
+                    break;
             }
         }
     };
@@ -733,8 +750,7 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
     }
 
     public void wechatLogin(View view) {
-//        doShareLogin("wechat");
-        doWexinOrginLogin();
+        doShareLogin("wechat");
     }
 
     public void qqLogin(View view) {
@@ -751,38 +767,192 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
         } else {
             mplatform = ShareSDK.getPlatform(this, QQ.NAME);
         }
-//        mplatform.removeAccount(true);
-        LogUtil.i("mplatform.isAuthValid() = " + mplatform.isAuthValid());
+        boolean isAuth = mplatform.isAuthValid();
+        LogUtil.i("mplatform.isAuthValid() = " + isAuth);
+        if (isAuth) {
+//            String accessToken = mplatform.getDb().getToken(); // 获取授权token
+//            String unionid = mplatform.getDb().get("unionid");//获取UNION ID
+//            String openId = mplatform.getDb().getUserId(); // 获取用户在此平台的ID
+//            String nickname = mplatform.getDb().getUserName(); // 获取用户昵称
+//            long expiresIn = mplatform.getDb().getExpiresIn(); // 获取授权过期时间
+            //将获取到的信息传给后台
+            giveLoginMsgToBack(arg, mplatform);
+            return;
+        }
         mplatform.setPlatformActionListener(new PlatformActionListener() {
             @Override
             public void onComplete(Platform platform, int i, HashMap<String, Object> hashMap) {
-                LogUtil.i("platform onComplete" + hashMap.toString());
-                String accessToken = platform.getDb().getToken(); // 获取授权token
-                String openId = platform.getDb().getUserId(); // 获取用户在此平台的ID
-                String nickname = platform.getDb().getUserName(); // 获取用户昵称
-                LogUtil.i("nickname = " + nickname + "openId = " + openId + ",accessToken" + accessToken);
+                Message msg = new Message();
+                msg.what = MSG_AUTH_COMPLETE;
+                msg.obj = platform;
+                mThirdLoginHandler.sendMessage(msg);
             }
 
             @Override
             public void onError(Platform platform, int i, Throwable throwable) {
-                LogUtil.i("platform onError");
+                Message msg = new Message();
+                msg.what = MSG_AUTH_ERROR;
+                msg.obj = "onError";
+                mThirdLoginHandler.sendMessage(msg);
             }
 
             @Override
             public void onCancel(Platform platform, int i) {
-                LogUtil.i("platform onCancel");
+                Message msg = new Message();
+                msg.what = MSG_AUTH_CANCEL;
+                msg.obj = "onCancel";
+                mThirdLoginHandler.sendMessage(msg);
             }
         });
-//        mplatform.authorize();
-        mplatform.showUser(null);
+//        mplatform.SSOSetting(true);
+//        mplatform.showUser(null);
+        mplatform.authorize();
     }
 
-    //微信原生调用
-    private void doWexinOrginLogin() {
-        SendAuth.Req req = new SendAuth.Req();
-        req.scope = "snsapi_userinfo";
-        req.state = "wechat_sdk_demo_test";
-        boolean isPass = api.sendReq(req);
-        LogUtil.i("doWexinOrginLogin isPass = " + isPass);
+    /**
+     * 第三方登录给后台发用户信息
+     */
+//    private void giveLoginMsgToBack(final String type, final String openId, final String unionId, final String accessToken, final Long expiresin) {
+    private void giveLoginMsgToBack(final String type, final Platform platform) {
+        StringRequest login_third_request = new StringRequest(Method.POST, Constants.URL_Login_To_Third,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String s) {
+                        LogUtil.i("giveLoginMsgToBack = " + s);
+                        try {
+                            JSONObject obj = new JSONObject(s);
+                            ToastUtil.showMessage(LoginActivity.this, "giveLoginMsgToBack = " + s);
+                            if (obj.getString("code").equals("0")) {
+                                if (obj.getString("firstlogintothird").equals("1")) {
+                                    //TODO 第一次第三方登陆，让他选择绑定还是注册新用户
+//                                    toBindUser(type, openId, unionId, accessToken, expiresin);
+//                                    toBindUser(type, platform);
+                                    toBindUser(platform);
+                                } else {
+                                    obj = new JSONObject(obj.getString("data"));
+                                    ToastUtil.showMessage(LoginActivity.this, "obj user id = " + obj.getString("userid") + "\nusername = " + obj.getString("username"));
+                                    PreferenceUtil.save(LoginActivity.this, "userId", obj.getString("userid"));
+                                    PreferenceUtil.save(LoginActivity.this, "mUserName", obj.getString("username"));
+                                    PreferenceUtil.save(LoginActivity.this, "Permission", obj.getString("permission"));
+                                    PreferenceUtil.save(LoginActivity.this, "money", obj.getString("tradepoints"));
+                                    PreferenceUtil.save(LoginActivity.this, "update", obj.getString("login_time"));
+                                    PreferenceUtil.save(LoginActivity.this, "mtimer", obj.getString("exam_time"));
+                                    startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                                    LoginActivity.this.finish();
+                                }
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }, new ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError volleyError) {
+                ToastUtil.showMessage(LoginActivity.this, "giveLoginMsgToBack volleyError= " + volleyError.getMessage());
+            }
+        }) {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> headers = new HashMap<>();
+                localtoken = PreferenceUtil.getSharePre(LoginActivity.this).getString("localtoken", "");
+                headers.put("Authorization", "Bearer " + localtoken);
+                return headers;
+            }
+
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                HashMap<String, String> map = new HashMap<>();
+                map.put("accounttypekey", platform.getDb().getPlatformNname());
+                map.put("openid", platform.getDb().getUserId());
+                map.put("unionid", platform.getDb().get("unionid"));
+                map.put("accesstoken", platform.getDb().getToken());
+                map.put("expiresin", platform.getDb().getExpiresIn() + "");
+                map.put("deviceid", AppContext.getDeviceToken());
+                return map;
+            }
+        };
+        AppContext.getHttpQueue().add(login_third_request);
+    }
+
+    /**
+     * 跳转绑定第三方用户
+     */
+//    private void toBindUser(final String type, final String openId, final String unionId, final String accessToken, final Long expiresin) {
+//    private void toBindUser(final String type, final Platform platform) {
+    private void toBindUser(final Platform platform) {
+        new AlertDialog.Builder(LoginActivity.this)
+                .setTitle("首次授权登陆")
+                .setMessage("您首次授权登陆我预测，请先选择绑定已有账号、注册新账号，或者跳过")
+                .setPositiveButton("绑定已有账号", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Intent intent = new Intent(LoginActivity.this, LoginBindNew.class);
+                        intent.putExtra("type", platform.getDb().getPlatformNname());
+                        intent.putExtra("openId", platform.getDb().getUserId());
+                        intent.putExtra("unionid", platform.getDb().get("unionid"));
+                        intent.putExtra("accessToken", platform.getDb().getToken());
+                        intent.putExtra("expiresin", platform.getDb().getExpiresIn() + "");
+                        LoginActivity.this.startActivity(intent);
+                    }
+                })
+                .setNegativeButton("注册新账号", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        //TODO 跳转注册界面
+                    }
+                })
+                .setNeutralButton("直接登录", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+//                        jumpThird(type, platform);
+                        jumpThird(platform);
+                    }
+                })
+                .show();
+    }
+
+    /**
+     * 请求跳过第三方注册直接登录
+     */
+//    private void jumpThird(final String type, final Platform platform) {
+    private void jumpThird(final Platform platform) {
+        StringRequest jumpRequest = new StringRequest(Method.POST, Constants.URL_Login_To_Jump, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String s) {
+                ToastUtil.showMessage(LoginActivity.this, "jumpThird = " + s);
+                //TODO 取出默认给的账户JSON,保存到本地
+//                PreferenceUtil.save(LoginActivity.this, "userId", obj.getString("userid"));
+//                PreferenceUtil.save(LoginActivity.this, "mUserName", obj.getString("username"));
+//                PreferenceUtil.save(LoginActivity.this, "Permission", obj.getString("permission"));
+//                PreferenceUtil.save(LoginActivity.this, "money", obj.getString("tradepoints"));
+//                PreferenceUtil.save(LoginActivity.this, "update", obj.getString("login_time"));
+//                PreferenceUtil.save(LoginActivity.this, "mtimer", obj.getString("exam_time"));
+            }
+        }, null) {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> headers = new HashMap<>();
+                localtoken = PreferenceUtil.getSharePre(LoginActivity.this).getString("localtoken", "");
+                headers.put("Authorization", "Bearer " + localtoken);
+                return headers;
+            }
+
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                HashMap<String, String> map = new HashMap<>();
+                map.put("accounttypekey", platform.getDb().getPlatformNname());
+                map.put("openid", platform.getDb().getUserId());
+                map.put("unionid", platform.getDb().get("unionid"));
+                map.put("accesstoken", platform.getDb().getToken());
+                map.put("expiresin", platform.getDb().getExpiresIn() + "");
+                map.put("nickname", platform.getDb().getUserName());
+                map.put("gender", platform.getDb().getUserGender());
+                map.put("useravatarurl", platform.getDb().getUserIcon());
+                map.put("deviceid", AppContext.getDeviceToken());
+                return map;
+            }
+        };
+        jumpRequest.setTag("jumpThird");
+        AppContext.getHttpQueue().add(jumpRequest);
     }
 }

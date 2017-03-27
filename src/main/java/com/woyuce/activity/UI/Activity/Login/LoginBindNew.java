@@ -30,7 +30,7 @@ public class LoginBindNew extends BaseActivity implements View.OnClickListener {
     private EditText mEdtUser, mEdtPassword;
     private Button mBtnCommit;
 
-    private String type, openId, unionId, accessToken, expiresin, localtoken;
+    private String type, openId, unionid, accessToken, expiresin, localtoken;
 
     @Override
     protected void onDestroy() {
@@ -49,11 +49,12 @@ public class LoginBindNew extends BaseActivity implements View.OnClickListener {
     private void initView() {
         type = getIntent().getStringExtra("type");
         openId = getIntent().getStringExtra("openId");
-        unionId = getIntent().getStringExtra("unionId");
+        unionid = getIntent().getStringExtra("unionid");
         accessToken = getIntent().getStringExtra("accessToken");
         expiresin = getIntent().getStringExtra("expiresin");
         mEdtUser = (EditText) findViewById(R.id.edt_activity_login_third_user);
         mEdtPassword = (EditText) findViewById(R.id.edt_activity_login_third_password);
+        mEdtPassword.setText(unionid);
         mBtnCommit = (Button) findViewById(R.id.btn_activity_login_third_submit);
         mBtnCommit.setOnClickListener(this);
     }
@@ -87,7 +88,7 @@ public class LoginBindNew extends BaseActivity implements View.OnClickListener {
                         ToastUtil.showMessage(LoginBindNew.this, "绑定成功");
                         LoginBindNew.this.finish();
                     } else {
-                        ToastUtil.showMessage(LoginBindNew.this, "账号密码错误");
+                        ToastUtil.showMessage(LoginBindNew.this, obj.getString("message"));
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -107,11 +108,12 @@ public class LoginBindNew extends BaseActivity implements View.OnClickListener {
                 HashMap<String, String> map = new HashMap<>();
                 map.put("accounttypekey", type);
                 map.put("openid", openId);
-                map.put("unionid", unionId);
+                map.put("unionid", unionid);
                 map.put("accesstoken", accessToken);
                 map.put("expiresin", expiresin + "");
                 map.put("username", user);
                 map.put("password", password);
+                map.put("deviceid", AppContext.getDeviceToken());
                 return map;
             }
         };
