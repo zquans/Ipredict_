@@ -26,6 +26,11 @@ public class Constants {
     public static final String COLUMN_PRICE = "Price";
     public static final String NONE = "none";
 
+    //第三方登录URL
+    public static final String URL_Login_To_Third = "http://api.iyuce.com/v1/account/logintothird";
+    public static final String URL_Login_To_Bind = "http://api.iyuce.com/v1/account/bindingsysuser";
+    public static final String URL_Login_To_Jump = "http://api.iyuce.com/v1/account/jumpthirdregister";
+
     //URL
     public static final String URL_API_REQUESTTOKEN = "http://api.iyuce.com/api/token";
 

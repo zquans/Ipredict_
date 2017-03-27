@@ -12,8 +12,8 @@ import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.toolbox.StringRequest;
-import com.woyuce.activity.BaseActivity;
 import com.woyuce.activity.AppContext;
+import com.woyuce.activity.BaseActivity;
 import com.woyuce.activity.R;
 import com.woyuce.activity.Utils.LogUtil;
 import com.woyuce.activity.Utils.PreferenceUtil;
@@ -77,6 +77,7 @@ public class SuggestionActivity extends BaseActivity implements View.OnClickList
             public void onResponse(String response) {
                 LogUtil.e("suggest activty is here" + getNowDate());
                 ToastUtil.showMessage(SuggestionActivity.this, "亲，提交成功啦，感谢您的宝贵意见");
+                SuggestionActivity.this.finish();
             }
         }, null) {
             @Override
@@ -106,12 +107,7 @@ public class SuggestionActivity extends BaseActivity implements View.OnClickList
                             public void onClick(DialogInterface dialog, int which) {
                                 getJson();
                             }
-                        }).setPositiveButton("再想想", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        SuggestionActivity.this.finish();
-                    }
-                }).show();
+                        }).setPositiveButton("再想想", null).show();
                 break;
         }
     }

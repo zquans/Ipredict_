@@ -4,6 +4,7 @@ import android.app.Application;
 import android.app.Notification;
 import android.content.Context;
 import android.content.Intent;
+import android.text.TextUtils;
 import android.view.Display;
 import android.view.WindowManager;
 
@@ -24,7 +25,6 @@ import com.woyuce.activity.Utils.LogUtil;
 import com.woyuce.activity.Utils.PreferenceUtil;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Map;
 
 /**
@@ -62,22 +62,26 @@ public class AppContext extends Application {
                 //自定义参数
                 LogUtil.i("linx", "dealWithCustomMessage----msg:" + msg.custom);
                 LogUtil.i("linx", "dealWithCustomMessage----extra:" + msg.extra);
-                ArrayList<String> valuelist = new ArrayList<>();
+                String sender = "";
+                String userid = "";
                 for (Map.Entry<String, String> entry : msg.extra.entrySet()) {
                     String key = entry.getKey();
                     String value = entry.getValue();
-                    valuelist.add(value);
-                }
-                LogUtil.i("valuelist = " + valuelist);
-                LogUtil.i("valuelist = " + valuelist.get(0) + "|||" + valuelist.get(1));
-                if (!valuelist.get(1).equals(DEVICE_TOKEN)) {
-                    if (valuelist.get(0).equals(PreferenceUtil.getSharePre(context).getString("userId", ""))) {
-                        Intent startLogin = new Intent(context, LoginActivity.class);
-                        startLogin.putExtra("local_push_code", valuelist.get(0));
-                        startLogin.putExtra("local_push_message", msg.custom);
-                        startLogin.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                        context.startActivity(startLogin);
+                    if (TextUtils.equals(key, "sender")) {
+                        sender = value;
                     }
+                    if (TextUtils.equals(key, "userid")) {
+                        userid = value;
+                    }
+                }
+                LogUtil.i("sender = " + sender + "|||userid = " + userid);
+                if (!sender.equals(DEVICE_TOKEN) &&
+                        userid.equals(PreferenceUtil.getSharePre(context).getString("userId", ""))) {
+                    Intent startLogin = new Intent(context, LoginActivity.class);
+                    startLogin.putExtra("local_push_code", sender);
+                    startLogin.putExtra("local_push_message", msg.custom);
+                    startLogin.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    context.startActivity(startLogin);
                 }
 //                boolean isClickOrDismissed = true;
 //                if (isClickOrDismissed) {

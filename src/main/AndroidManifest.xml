@@ -56,6 +56,10 @@
             android:launchMode="singleTop"
             android:screenOrientation="portrait" />
         <activity
+            android:name=".UI.Activity.Login.LoginBindNew"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" />
+        <activity
             android:name=".UI.Activity.MainActivity"
             android:launchMode="singleTask"
             android:windowSoftInputMode="adjustPan" />
@@ -314,13 +318,18 @@
             </intent-filter>
         </activity>
         <!-- 微信分享回调 -->
+        <!--<activity-->
+        <!--android:name="cn.sharesdk.onekeyshare.WXEntryActivity"-->
+        <!--android:configChanges="keyboardHidden|orientation|screenSize"-->
+        <!--android:exported="true"-->
+        <!--android:screenOrientation="portrait"-->
+        <!--android:theme="@android:style/Theme.Translucent.NoTitleBar" />-->
         <activity
-            android:name=".wxapi.WXEntryActivity"
+            android:name="cn.sharesdk.onekeyshare.WXEntryActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:exported="true"
             android:screenOrientation="portrait"
             android:theme="@android:style/Theme.Translucent.NoTitleBar" />
-
         <!-- 友盟参数 -->
         <meta-data
             android:name="UMENG_APPKEY"
