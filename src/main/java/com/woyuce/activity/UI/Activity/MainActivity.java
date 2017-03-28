@@ -46,7 +46,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener, O
                 .setPositiveButton("确定", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        PreferenceUtil.removelocaltoken(MainActivity.this);
+//                        PreferenceUtil.removelocaltoken(MainActivity.this);
                         CookieManager.getInstance().removeAllCookie();
                         MainActivity.this.finish();
                     }

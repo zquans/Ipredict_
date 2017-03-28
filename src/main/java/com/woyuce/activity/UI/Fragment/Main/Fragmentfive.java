@@ -18,16 +18,16 @@ import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.toolbox.StringRequest;
-import com.woyuce.activity.UI.Activity.Common.AboutUsActivity;
-import com.woyuce.activity.UI.Activity.Common.CustomServiceActivity;
-import com.woyuce.activity.UI.Activity.Login.LoginActivity;
-import com.woyuce.activity.UI.Activity.Store.StoreCarActivity;
-import com.woyuce.activity.UI.Activity.Store.StoreOrderListActivity;
-import com.woyuce.activity.UI.Activity.Common.SuggestionActivity;
-import com.woyuce.activity.UI.Activity.Common.WebActivity;
 import com.woyuce.activity.AppContext;
 import com.woyuce.activity.Bean.Speaking.SpeakingRoom;
 import com.woyuce.activity.R;
+import com.woyuce.activity.UI.Activity.Common.AboutUsActivity;
+import com.woyuce.activity.UI.Activity.Common.CustomServiceActivity;
+import com.woyuce.activity.UI.Activity.Common.SuggestionActivity;
+import com.woyuce.activity.UI.Activity.Common.WebActivity;
+import com.woyuce.activity.UI.Activity.Login.LoginActivity;
+import com.woyuce.activity.UI.Activity.Store.StoreCarActivity;
+import com.woyuce.activity.UI.Activity.Store.StoreOrderListActivity;
 import com.woyuce.activity.Utils.LogUtil;
 import com.woyuce.activity.Utils.PreferenceUtil;
 import com.woyuce.activity.Utils.ToastUtil;
@@ -308,14 +308,9 @@ public class Fragmentfive extends Fragment implements View.OnClickListener {
                     public void onClick(DialogInterface dialog, int which) {
                         CookieManager.getInstance().removeAllCookie();
                         LogUtil.e("CookieManager = " + CookieManager.getInstance().getCookie("iyuce.com") + "");
-                        //删除数据库中该表
-//                        PreferenceUtil.removestoretbisexist(getActivity());
-//                        SQLiteDatabase mDatabase = getActivity().openOrCreateDatabase("aipu.db", Context.MODE_PRIVATE,null);
-//                        mDatabase.execSQL("drop table storetb");
-//                        mDatabase.close();
                         //启动Login页
                         startActivity(new Intent(getActivity(), LoginActivity.class));
-//                        PreferenceUtil.removeall(getActivity()); // 只留下了版本号
+                        PreferenceUtil.removeall(getActivity()); // 只留下了版本号和localtoken
                         getActivity().finish();
                     }
                 }).setNegativeButton("取消", null)

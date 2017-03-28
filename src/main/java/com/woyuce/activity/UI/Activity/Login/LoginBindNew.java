@@ -1,6 +1,8 @@
 package com.woyuce.activity.UI.Activity.Login;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -12,6 +14,7 @@ import com.android.volley.toolbox.StringRequest;
 import com.woyuce.activity.AppContext;
 import com.woyuce.activity.BaseActivity;
 import com.woyuce.activity.R;
+import com.woyuce.activity.UI.Activity.MainActivity;
 import com.woyuce.activity.Utils.PreferenceUtil;
 import com.woyuce.activity.Utils.ToastUtil;
 import com.woyuce.activity.common.Constants;
@@ -31,6 +34,14 @@ public class LoginBindNew extends BaseActivity implements View.OnClickListener {
     private Button mBtnCommit;
 
     private String type, openId, unionid, accessToken, expiresin, localtoken;
+
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        startActivity(new Intent(LoginBindNew.this, LoginActivity.class));
+        finish();
+    }
 
     @Override
     protected void onDestroy() {
@@ -54,11 +65,9 @@ public class LoginBindNew extends BaseActivity implements View.OnClickListener {
         expiresin = getIntent().getStringExtra("expiresin");
         mEdtUser = (EditText) findViewById(R.id.edt_activity_login_third_user);
         mEdtPassword = (EditText) findViewById(R.id.edt_activity_login_third_password);
-        mEdtPassword.setText(unionid);
         mBtnCommit = (Button) findViewById(R.id.btn_activity_login_third_submit);
         mBtnCommit.setOnClickListener(this);
     }
-
 
     @Override
     public void onClick(View v) {
@@ -81,11 +90,18 @@ public class LoginBindNew extends BaseActivity implements View.OnClickListener {
         StringRequest bindRequest = new StringRequest(Request.Method.POST, Constants.URL_Login_To_Bind, new Response.Listener<String>() {
             @Override
             public void onResponse(String s) {
-                ToastUtil.showMessage(LoginBindNew.this, "s = " + s);
                 try {
                     JSONObject obj = new JSONObject(s);
                     if (obj.getString("code").equals("0")) {
                         ToastUtil.showMessage(LoginBindNew.this, "绑定成功");
+                        obj = new JSONObject(obj.getString("data"));
+                        PreferenceUtil.save(LoginBindNew.this, "userId", obj.getString("userid"));
+                        PreferenceUtil.save(LoginBindNew.this, "mUserName", obj.getString("username"));
+                        PreferenceUtil.save(LoginBindNew.this, "Permission", obj.getString("permission"));
+                        PreferenceUtil.save(LoginBindNew.this, "money", obj.getString("tradepoints"));
+                        PreferenceUtil.save(LoginBindNew.this, "update", obj.getString("login_time"));
+                        PreferenceUtil.save(LoginBindNew.this, "mtimer", obj.getString("exam_time"));
+                        startActivity(new Intent(LoginBindNew.this, MainActivity.class));
                         LoginBindNew.this.finish();
                     } else {
                         ToastUtil.showMessage(LoginBindNew.this, obj.getString("message"));
@@ -109,6 +125,7 @@ public class LoginBindNew extends BaseActivity implements View.OnClickListener {
                 map.put("accounttypekey", type);
                 map.put("openid", openId);
                 map.put("unionid", unionid);
+                map.put("unionid", TextUtils.isEmpty(unionid) ? openId : unionid);
                 map.put("accesstoken", accessToken);
                 map.put("expiresin", expiresin + "");
                 map.put("username", user);

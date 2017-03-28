@@ -3,20 +3,21 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@mipmap/background_main"
+    android:gravity="center"
     android:orientation="vertical">
 
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:layout_marginTop="80.0dp"
+        android:layout_marginTop="48dp"
         android:src="@mipmap/logo" />
 
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:layout_marginTop="48dp"
+        android:layout_marginTop="32dp"
         android:background="#00000000"
         android:focusable="true"
         android:gravity="center_horizontal"
@@ -229,7 +230,7 @@
             android:id="@+id/btn_login"
             android:layout_width="240dp"
             android:layout_height="48dp"
-            android:layout_marginTop="36dp"
+            android:layout_marginTop="24dp"
             android:background="@drawable/buttonstyle_orange"
             android:gravity="center"
             android:text="用户登录"
@@ -279,47 +280,28 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
+            android:layout_height="match_parent"
+            android:layout_marginTop="16dp"
+            android:gravity="center"
             android:orientation="horizontal">
 
-            <Button
-                android:id="@+id/btn_QQ"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:background="@drawable/buttonstyle_gray"
-                android:gravity="center"
-                android:onClick="qqLogin"
-                android:text="QQ"
-                android:textColor="#ffffff"
-                android:textSize="16dp" />
-
-            <Button
+            <ImageButton
                 android:id="@+id/btn_weichat"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_marginLeft="16dp"
-                android:layout_weight="1"
-                android:background="@drawable/buttonstyle_gray"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@mipmap/icon_wechat"
                 android:gravity="center"
-                android:onClick="wechatLogin"
-                android:text="微信"
-                android:textColor="#ffffff"
-                android:textSize="16dp" />
+                android:onClick="wechatLogin" />
 
-            <Button
-                android:id="@+id/btn_SinaWeibo"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
+            <ImageButton
+                android:id="@+id/btn_QQ"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_marginLeft="16dp"
-                android:layout_weight="1"
-                android:background="@drawable/buttonstyle_gray"
+                android:background="@mipmap/icon_qq"
                 android:gravity="center"
-                android:onClick="sinaLogin"
-                android:text="微博"
-                android:textColor="#ffffff"
-                android:textSize="16dp" />
+                android:onClick="qqLogin" />
+
         </LinearLayout>
 
     </LinearLayout>

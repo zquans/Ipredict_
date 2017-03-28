@@ -30,6 +30,9 @@ public class Constants {
     public static final String URL_Login_To_Third = "http://api.iyuce.com/v1/account/logintothird";
     public static final String URL_Login_To_Bind = "http://api.iyuce.com/v1/account/bindingsysuser";
     public static final String URL_Login_To_Jump = "http://api.iyuce.com/v1/account/jumpthirdregister";
+    public static final String URL_Login_VAILD = "http://api.iyuce.com/v1/account/valid";//验证用户名、邮箱等有限性
+    public static final String URL_Login_Register = "http://api.iyuce.com/v1/account/register"; //提交注册
+    public static final String URL_Login_Third_Register = "http://api.iyuce.com/v1/account/thirdregister"; //提交注册
 
     //URL
     public static final String URL_API_REQUESTTOKEN = "http://api.iyuce.com/api/token";

@@ -53,7 +53,8 @@
         android:layout_marginTop="16dp"
         android:drawableLeft="@mipmap/icon_key"
         android:drawablePadding="4dp"
-        android:hint="请输入密码" />
+        android:hint="请输入密码"
+        android:inputType="textPassword" />
 
     <Button
         android:id="@+id/btn_activity_login_third_submit"

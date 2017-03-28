@@ -1,0 +1,294 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/txt_registerinfo_back"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/title_bar_height"
+        android:background="#f7a900"
+        android:drawableLeft="@mipmap/arrow_white_back"
+        android:gravity="center"
+        android:text="注册信息"
+        android:textColor="#ffffff"
+        android:textSize="18sp"
+        android:textStyle="bold" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:paddingLeft="8dp"
+                android:paddingRight="8dp">
+
+                <TextView
+                    android:layout_width="72dp"
+                    android:layout_height="match_parent"
+                    android:gravity="center_vertical"
+                    android:text="账号" />
+
+                <EditText
+                    android:id="@+id/edt_registerinfo_username"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="8dp"
+                    android:layout_weight="1"
+                    android:gravity="center_vertical"
+                    android:hint="请输入账号"
+                    android:imeOptions="actionDone"
+                    android:maxLength="15"
+                    android:singleLine="true" />
+
+                <Button
+                    android:id="@+id/btn_registerinfo_checkusername"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="2dp"
+                    android:background="#f7a900"
+                    android:text="是否可用"
+                    android:textColor="#fff" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:paddingLeft="8dp"
+                android:paddingRight="8dp">
+
+                <TextView
+                    android:layout_width="72dp"
+                    android:layout_height="match_parent"
+                    android:gravity="center_vertical"
+                    android:text="密码" />
+
+                <EditText
+                    android:id="@+id/edt_registerinfo_password"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="8dp"
+                    android:layout_weight="1"
+                    android:gravity="center_vertical"
+                    android:hint="请设置密码"
+                    android:imeOptions="actionDone"
+                    android:inputType="textPassword"
+                    android:singleLine="true" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:paddingLeft="8dp"
+                android:paddingRight="8dp">
+
+                <TextView
+                    android:layout_width="72dp"
+                    android:layout_height="match_parent"
+                    android:gravity="center_vertical"
+                    android:text="确认密码" />
+
+                <EditText
+                    android:id="@+id/edt_registerinfo_repassword"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="8dp"
+                    android:layout_weight="1"
+                    android:gravity="center_vertical"
+                    android:hint="请再次输入密码"
+                    android:imeOptions="actionDone"
+                    android:inputType="textPassword"
+                    android:singleLine="true" />
+            </LinearLayout>
+
+
+            <TextView
+                android:id="@+id/txt_registerinfo_checkemail_hint"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="92dp"
+                android:text="邮箱可用"
+                android:textColor="#aaa"
+                android:textSize="12sp"
+                android:visibility="gone" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:paddingLeft="8dp"
+                android:text="联系方式:"
+                android:textColor="#444"
+                android:textStyle="italic" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="0.5dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginTop="4dp"
+                android:background="#ccc" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:paddingLeft="8dp"
+                android:paddingRight="8dp">
+
+                <TextView
+                    android:layout_width="72dp"
+                    android:layout_height="match_parent"
+                    android:gravity="center_vertical"
+                    android:text="姓名" />
+
+                <EditText
+                    android:id="@+id/edt_registerinfo_name"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="8dp"
+                    android:layout_weight="1"
+                    android:gravity="center_vertical"
+                    android:hint="请输入您的姓名"
+                    android:imeOptions="actionDone"
+                    android:singleLine="true" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:paddingLeft="8dp"
+                android:paddingRight="8dp">
+
+                <TextView
+                    android:layout_width="72dp"
+                    android:layout_height="match_parent"
+                    android:gravity="center_vertical"
+                    android:text="邮箱地址" />
+
+                <EditText
+                    android:id="@+id/edt_registerinfo_email"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="8dp"
+                    android:layout_weight="1"
+                    android:gravity="center_vertical"
+                    android:hint="请输入您的邮箱地址"
+                    android:imeOptions="actionDone"
+                    android:singleLine="true" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:paddingLeft="8dp"
+                android:paddingRight="8dp">
+
+                <TextView
+                    android:layout_width="72dp"
+                    android:layout_height="match_parent"
+                    android:gravity="center_vertical"
+                    android:text="手机号" />
+
+                <EditText
+                    android:id="@+id/edt_registerinfo_phone"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="8dp"
+                    android:layout_weight="1"
+                    android:editable="false"
+                    android:gravity="center_vertical"
+                    android:hint="请输入您的手机号"
+                    android:imeOptions="actionDone"
+                    android:inputType="number"
+                    android:maxLength="11"
+                    android:singleLine="true" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:paddingLeft="8dp"
+                android:paddingRight="8dp">
+
+                <TextView
+                    android:layout_width="72dp"
+                    android:layout_height="match_parent"
+                    android:gravity="center_vertical"
+                    android:text="邀请码" />
+
+                <EditText
+                    android:id="@+id/edt_registerinfo_invitednum"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="8dp"
+                    android:layout_weight="1"
+                    android:gravity="center_vertical"
+                    android:hint="邀请码（选填）"
+                    android:imeOptions="actionDone"
+                    android:maxLength="6"
+                    android:singleLine="true" />
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/btn_registerinfo_tonext"
+                android:layout_width="240dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="24dp"
+                android:background="#f55054"
+                android:padding="16dp"
+                android:text="确认提交"
+                android:textColor="#fff" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:layout_marginTop="8dp"
+                android:padding="4dp"
+                android:text="@string/registerPromp1" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:padding="4dp"
+                android:text="1.用户名为2-20个字符,仅限字母、数字、汉字及下划线" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:padding="4dp"
+                android:text="2.密码为4-15位字母与数字,不能有特殊符号" />
+        </LinearLayout>
+    </ScrollView>
+
+</LinearLayout>
