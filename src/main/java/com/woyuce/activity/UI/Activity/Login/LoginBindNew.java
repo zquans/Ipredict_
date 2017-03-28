@@ -6,6 +6,7 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
@@ -31,15 +32,14 @@ import java.util.Map;
 public class LoginBindNew extends BaseActivity implements View.OnClickListener {
 
     private EditText mEdtUser, mEdtPassword;
+    private ImageButton mImgBtnClose;
     private Button mBtnCommit;
 
     private String type, openId, unionid, accessToken, expiresin, localtoken;
 
-
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        startActivity(new Intent(LoginBindNew.this, LoginActivity.class));
         finish();
     }
 
@@ -65,8 +65,10 @@ public class LoginBindNew extends BaseActivity implements View.OnClickListener {
         expiresin = getIntent().getStringExtra("expiresin");
         mEdtUser = (EditText) findViewById(R.id.edt_activity_login_third_user);
         mEdtPassword = (EditText) findViewById(R.id.edt_activity_login_third_password);
+        mImgBtnClose = (ImageButton) findViewById(R.id.imgbtn_activity_loginforget_close);
         mBtnCommit = (Button) findViewById(R.id.btn_activity_login_third_submit);
         mBtnCommit.setOnClickListener(this);
+        mImgBtnClose.setOnClickListener(this);
     }
 
     @Override
@@ -82,6 +84,9 @@ public class LoginBindNew extends BaseActivity implements View.OnClickListener {
                     return;
                 }
                 requestBind(mEdtUser.getText().toString(), mEdtPassword.getText().toString());
+                break;
+            case R.id.imgbtn_activity_loginforget_close:
+                finish();
                 break;
         }
     }

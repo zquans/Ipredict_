@@ -7,8 +7,6 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.view.GestureDetector;
-import android.view.MotionEvent;
 
 import com.umeng.analytics.MobclickAgent;
 import com.woyuce.activity.Utils.ActivityManager;
@@ -22,7 +20,7 @@ import com.woyuce.activity.common.Constants;
  */
 public class BaseActivity extends Activity {
 
-    private GestureDetector mGestureDetector;
+//    private GestureDetector mGestureDetector;
 
     @Override
     protected void onResume() {
@@ -62,44 +60,44 @@ public class BaseActivity extends Activity {
         ActivityManager.getAppManager().addActivity(this);
 
         //四、手势监听，做左侧右滑退出
-        mGestureDetector = new GestureDetector(this, new GestureDetector.OnGestureListener() {
-            @Override
-            public boolean onDown(MotionEvent e) {
-                LogUtil.i("onDown ");
-                return false;
-            }
-
-            @Override
-            public void onShowPress(MotionEvent e) {
-                LogUtil.i("onShowPress ");
-            }
-
-            @Override
-            public boolean onSingleTapUp(MotionEvent e) {
-                LogUtil.i("onSingleTapUp ");
-                return false;
-            }
-
-            @Override
-            public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
-//                LogUtil.i("onScroll distanceX = " + distanceX);
-                return false;
-            }
-
-            @Override
-            public void onLongPress(MotionEvent e) {
-                LogUtil.i("onLongPress ");
-            }
-
-            @Override
-            public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-//                LogUtil.i("onFling  velocityX  = " + velocityX);
-                if (velocityX > 200) {
-//                    BaseActivity.this.finish();
-                }
-                return true;
-            }
-        });
+//        mGestureDetector = new GestureDetector(this, new GestureDetector.OnGestureListener() {
+//            @Override
+//            public boolean onDown(MotionEvent e) {
+//                LogUtil.i("onDown ");
+//                return false;
+//            }
+//
+//            @Override
+//            public void onShowPress(MotionEvent e) {
+//                LogUtil.i("onShowPress ");
+//            }
+//
+//            @Override
+//            public boolean onSingleTapUp(MotionEvent e) {
+//                LogUtil.i("onSingleTapUp ");
+//                return false;
+//            }
+//
+//            @Override
+//            public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+////                LogUtil.i("onScroll distanceX = " + distanceX);
+//                return false;
+//            }
+//
+//            @Override
+//            public void onLongPress(MotionEvent e) {
+//                LogUtil.i("onLongPress ");
+//            }
+//
+//            @Override
+//            public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+////                LogUtil.i("onFling  velocityX  = " + velocityX);
+//                if (velocityX > 200) {
+////                    BaseActivity.this.finish();
+//                }
+//                return true;
+//            }
+//        });
         LogUtil.i(this.getClass().getSimpleName());
     }
 
@@ -109,10 +107,10 @@ public class BaseActivity extends Activity {
      * @param event
      * @return
      */
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        return mGestureDetector.onTouchEvent(event);
-    }
+//    @Override
+//    public boolean onTouchEvent(MotionEvent event) {
+//        return mGestureDetector.onTouchEvent(event);
+//    }
 
     /**
      * 判断是否拥有权限
@@ -190,6 +188,8 @@ public class BaseActivity extends Activity {
     }
 
     public void progressdialogcancel() {
-        mProgressdialog.cancel();
+        if (mProgressdialog != null) {
+            mProgressdialog.cancel();
+        }
     }
 }

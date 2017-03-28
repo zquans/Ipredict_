@@ -28,6 +28,7 @@ import com.woyuce.activity.UI.Activity.Common.WebActivity;
 import com.woyuce.activity.UI.Activity.Login.LoginActivity;
 import com.woyuce.activity.UI.Activity.Store.StoreCarActivity;
 import com.woyuce.activity.UI.Activity.Store.StoreOrderListActivity;
+import com.woyuce.activity.Utils.ActivityManager;
 import com.woyuce.activity.Utils.LogUtil;
 import com.woyuce.activity.Utils.PreferenceUtil;
 import com.woyuce.activity.Utils.ToastUtil;
@@ -309,6 +310,7 @@ public class Fragmentfive extends Fragment implements View.OnClickListener {
                         CookieManager.getInstance().removeAllCookie();
                         LogUtil.e("CookieManager = " + CookieManager.getInstance().getCookie("iyuce.com") + "");
                         //启动Login页
+                        ActivityManager.getAppManager().finishAllActivity();
                         startActivity(new Intent(getActivity(), LoginActivity.class));
                         PreferenceUtil.removeall(getActivity()); // 只留下了版本号和localtoken
                         getActivity().finish();

@@ -15,16 +15,15 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.woyuce.activity.R;
 import com.woyuce.activity.UI.Fragment.Main.Fragment3;
 import com.woyuce.activity.UI.Fragment.Main.FragmentTwo;
-import com.woyuce.activity.UI.Fragment.Store.Fragment_StoreHome;
 import com.woyuce.activity.UI.Fragment.Main.Fragmentfive;
 import com.woyuce.activity.UI.Fragment.Main.Fragmentone;
 import com.woyuce.activity.UI.Fragment.Main.Fragmentthree;
-import com.woyuce.activity.R;
-import com.woyuce.activity.Utils.ActivityManager;
-import com.woyuce.activity.Utils.PreferenceUtil;
+import com.woyuce.activity.UI.Fragment.Store.Fragment_StoreHome;
 import com.woyuce.activity.UI.View.NoScrollViewPager;
+import com.woyuce.activity.Utils.ActivityManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,6 +47,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener, O
                     public void onClick(DialogInterface dialog, int which) {
 //                        PreferenceUtil.removelocaltoken(MainActivity.this);
                         CookieManager.getInstance().removeAllCookie();
+                        ActivityManager.getAppManager().finishAllActivity();
                         MainActivity.this.finish();
                     }
                 }).setNegativeButton("返回", null).show();

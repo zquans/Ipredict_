@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <include layout="@layout/header_title_bar" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:id="@+id/img_link"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="96dp"
+            android:background="@mipmap/img_link" />
+
+        <ImageView
+            android:id="@+id/img_link_type"
+            android:layout_width="96dp"
+            android:layout_height="96dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginTop="48dp"
+            android:layout_toLeftOf="@+id/img_link"
+            android:background="@mipmap/icon_wechat" />
+
+        <ImageView
+            android:id="@+id/img_link_logo"
+            android:layout_width="72dp"
+            android:layout_height="72dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginTop="60dp"
+            android:layout_toRightOf="@+id/img_link"
+            android:background="@mipmap/icon_logo" />
+
+        <TextView
+            android:id="@+id/txt_login_third_link_platform"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/img_link_type"
+            android:gravity="center"
+            android:text="@string/login_third_type"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/txt_login_third_link_quick_login"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/txt_login_third_link_platform"
+            android:background="#f1f1f1"
+            android:padding="16dp"
+            android:text="还没有我预测账户?" />
+
+        <Button
+            android:id="@+id/btn_login_third_link_quick_register"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/txt_login_third_link_quick_login"
+            android:background="#f7a900"
+            android:text="快速注册"
+            android:textColor="#ffffff"
+            android:textSize="18sp" />
+
+        <TextView
+            android:id="@+id/txt_login_third_link_to_link"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/btn_login_third_link_quick_register"
+            android:background="#f1f1f1"
+            android:padding="16dp"
+            android:text="已有预测账号?" />
+
+        <Button
+            android:id="@+id/btn_login_third_link_to_link"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/txt_login_third_link_to_link"
+            android:layout_marginBottom="16dp"
+            android:background="#ebe3e3"
+            android:text="立即关联"
+            android:textColor="#888"
+            android:textSize="18sp" />
+
+        <TextView
+            android:id="@+id/txt_login_third_link_login_at_once"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/btn_login_third_link_to_link"
+            android:layout_marginLeft="16dp"
+            android:background="#f1f1f1"
+            android:text="不想注册?直接" />
+
+
+        <TextView
+            android:id="@+id/txt_login_third_link_login_right_now"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/btn_login_third_link_to_link"
+            android:layout_toRightOf="@+id/txt_login_third_link_login_at_once"
+            android:background="#f1f1f1"
+            android:text=" 跳过 "
+            android:textColor="#000" />
+
+        <View
+            android:layout_width="wrap_content"
+            android:layout_height="0.5dp"
+            android:layout_alignLeft="@+id/txt_login_third_link_login_right_now"
+            android:layout_alignRight="@+id/txt_login_third_link_login_right_now"
+            android:layout_below="@+id/txt_login_third_link_login_right_now"
+            android:layout_marginTop="2dp"
+            android:background="#000000" />
+    </RelativeLayout>
+</LinearLayout>

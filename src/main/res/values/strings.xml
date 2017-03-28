@@ -34,5 +34,6 @@
     <string name="share_exam">分享考题</string>
     <string name="search_prompt">大家都在搜索</string>
     <string name="pay_hint">1.通过支付宝支付，将会支付到iyuce@qq.com账号上；\n2.通过微信支付，将会支付到"厦门爱优普教育咨询有限公司"\n3.金币足以抵扣现金，需支付0元人民币，可直接点"确定"支付"</string>
+    <string name="login_third_type">亲，您首次使用%s登陆</string>
 
 </resources>

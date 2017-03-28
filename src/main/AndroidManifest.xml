@@ -55,15 +55,9 @@
             android:name=".UI.Activity.Login.LoginRegisterInfoActivity"
             android:launchMode="singleTop"
             android:screenOrientation="portrait" />
-        <activity
-            android:name=".UI.Activity.Login.LoginBindNew"
-            android:launchMode="singleTop"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".UI.Activity.Login.LoginRegisterThirdActivity"
-            android:launchMode="singleTop"
-            android:screenOrientation="portrait" />
-
+        <activity android:name=".UI.Activity.Login.LoginThirdChoiceActivity" />
+        <activity android:name=".UI.Activity.Login.LoginBindNew" />
+        <activity android:name=".UI.Activity.Login.LoginRegisterThirdActivity" />
         <activity
             android:name=".UI.Activity.MainActivity"
             android:launchMode="singleTask"
