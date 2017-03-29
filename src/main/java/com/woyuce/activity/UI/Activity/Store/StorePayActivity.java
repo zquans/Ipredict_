@@ -28,6 +28,7 @@ import com.woyuce.activity.Utils.LogUtil;
 import com.woyuce.activity.Utils.MathUtil;
 import com.woyuce.activity.Utils.PreferenceUtil;
 import com.woyuce.activity.Utils.ToastUtil;
+import com.woyuce.activity.common.Constants;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -82,8 +83,8 @@ public class StorePayActivity extends BaseActivity implements View.OnClickListen
         //获取到传递来的数据
         Intent intent = getIntent();
         mStoreList = (ArrayList<StoreMenu>) intent.getSerializableExtra("mStoreList");
-        total_count = intent.getIntExtra("total_count", -1);
-        total_price = intent.getDoubleExtra("total_price", 0.00);
+        total_count = intent.getIntExtra("total_count", 10000);
+        total_price = intent.getDoubleExtra("total_price", 1000000.00);
 
         for (int i = 0; i < mStoreList.size(); i++) {
             local_skuids = local_skuids + mStoreList.get(i).getGoodsskuid() + "|" + mStoreList.get(i).getNum() + ",";
@@ -272,7 +273,7 @@ public class StorePayActivity extends BaseActivity implements View.OnClickListen
             return;
         }
         switch (requestCode) {
-            case REQUEST_CODE_FOR_ADDRESS:
+            case Constants.REQUEST_CODE_FOR_ADDRESS:
                 mTxtAddressOne.setText(data.getStringExtra("default_address_name") + "\r\r" + data.getStringExtra("default_address_mobile"));
                 mTxtAddressTwo.setText(data.getStringExtra("default_address_q_q") + "\r\r" + data.getStringExtra("default_address_email"));
                 mTxtAddressTwo.setGravity(Gravity.CENTER_VERTICAL);
@@ -281,14 +282,11 @@ public class StorePayActivity extends BaseActivity implements View.OnClickListen
         }
     }
 
-    /*startActivityForResult的请求码*/
-    private static final int REQUEST_CODE_FOR_ADDRESS = 0x001;
-
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.relative_activity_storepay:
-                startActivityForResult(new Intent(this, StoreAddressActivity.class), REQUEST_CODE_FOR_ADDRESS);
+                startActivityForResult(new Intent(this, StoreAddressActivity.class), Constants.REQUEST_CODE_FOR_ADDRESS);
                 break;
         }
     }

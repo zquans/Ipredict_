@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
@@ -29,10 +30,12 @@ import com.woyuce.activity.UI.Activity.Login.LoginActivity;
 import com.woyuce.activity.UI.Activity.Store.StoreCarActivity;
 import com.woyuce.activity.UI.Activity.Store.StoreOrderListActivity;
 import com.woyuce.activity.Utils.ActivityManager;
+import com.woyuce.activity.Utils.DbUtil;
 import com.woyuce.activity.Utils.LogUtil;
 import com.woyuce.activity.Utils.PreferenceUtil;
 import com.woyuce.activity.Utils.ToastUtil;
 import com.woyuce.activity.Utils.UpdateManager;
+import com.woyuce.activity.common.Constants;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -280,11 +283,14 @@ public class Fragmentfive extends Fragment implements View.OnClickListener {
                 ToastUtil.showMessage(getActivity(), "清除缓存成功");
                 break;
             case R.id.txt_to_store:
-                if (!PreferenceUtil.getSharePre(getActivity()).getString("storetb_is_exist", "no").equals("yes")) {
-                    ToastUtil.showMessage(getActivity(), "您的购物车空空哒，快去添加商品吧！");
-                    return;
+                SQLiteDatabase mDatabase = DbUtil.getHelper(getActivity(), Constants.DATABASE_IYUCE).getWritableDatabase();
+                String isNone = DbUtil.queryToExist(mDatabase, Constants.TABLE_SQLITE_MASTER, Constants.NAME, Constants.TABLE_NAME, Constants.TABLE_CART);
+                mDatabase.close();
+                if (!isNone.equals(Constants.NONE)) {
+                    startActivity(new Intent(getActivity(), StoreCarActivity.class));
+                    break;
                 }
-                startActivity(new Intent(getActivity(), StoreCarActivity.class));
+                ToastUtil.showMessage(getActivity(), "您的购物车空空哒，快去添加商品吧！");
                 break;
             case R.id.txt_to_service:
                 startActivity(new Intent(getActivity(), CustomServiceActivity.class));

@@ -9,6 +9,8 @@ public class Constants {
     public static final int CODE_WRITE_EXTERNAL_STORAGE = 0x0002;
     public static final int CODE_READ_EXTERNAL_STORAGE = 0x0003;
 
+    public static final int REQUEST_CODE_FOR_ADDRESS = 0x0001;
+
     //数据库相关
     public static final String DATABASE_AIPU = "aipu.db";
     public static final String TABLE_STORE = "storetb";

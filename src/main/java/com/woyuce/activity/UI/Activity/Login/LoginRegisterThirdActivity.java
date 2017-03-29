@@ -200,7 +200,7 @@ public class LoginRegisterThirdActivity extends BaseActivity implements View.OnC
                     obj = new JSONObject(response);
                     // 成功则Toast，并返回Login界面
                     if (obj.getString("code").equals("0")) {
-                        obj = new JSONObject(obj.getString("data"));
+                        obj = obj.getJSONObject("data");
                         PreferenceUtil.save(LoginRegisterThirdActivity.this, "userId", obj.getString("userid"));
                         PreferenceUtil.save(LoginRegisterThirdActivity.this, "mUserName", obj.getString("username"));
                         PreferenceUtil.save(LoginRegisterThirdActivity.this, "Permission", obj.getString("permission"));

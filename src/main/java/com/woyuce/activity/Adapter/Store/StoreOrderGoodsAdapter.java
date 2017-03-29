@@ -13,10 +13,10 @@ import android.widget.TextView;
 
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
-import com.woyuce.activity.UI.Activity.Store.StoreCommentActivity;
-import com.woyuce.activity.UI.Activity.Store.StoreGoodsActivity;
 import com.woyuce.activity.Bean.Store.StoreGoods;
 import com.woyuce.activity.R;
+import com.woyuce.activity.UI.Activity.Store.StoreCommentActivity;
+import com.woyuce.activity.UI.Activity.Store.StoreGoodsActivity;
 import com.woyuce.activity.Utils.LogUtil;
 
 import java.util.List;
@@ -69,6 +69,8 @@ public class StoreOrderGoodsAdapter extends RecyclerView.Adapter<StoreOrderGoods
         holder.mTxtGoodsNum.setText("x\r" + mList.get(position).getQuantity());
         if (!isPay) {
             holder.mTxtToComment.setVisibility(View.GONE);
+        } else {
+            holder.mTxtToComment.setVisibility(View.VISIBLE);
         }
         if (mList.get(position).getIs_comment().equals("true")) {
             holder.mTxtToComment.setText("已评论");

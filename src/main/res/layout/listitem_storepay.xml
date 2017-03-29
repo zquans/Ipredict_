@@ -30,6 +30,7 @@
         android:layout_below="@+id/txt_listitem_storepay_spec"
         android:layout_marginTop="4dp"
         android:text="规格"
+        android:textColor="#f00"
         android:textSize="12sp" />
 
     <TextView

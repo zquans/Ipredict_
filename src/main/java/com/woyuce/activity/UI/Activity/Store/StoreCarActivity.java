@@ -84,12 +84,6 @@ public class StoreCarActivity extends BaseActivity implements StoreCarAdapter.On
      */
     private void initData() {
         SQLiteDatabase mDatabase = DbUtil.getHelper(this, Constants.DATABASE_IYUCE).getWritableDatabase();
-//        String isNone = DbUtil.queryToExist(mDatabase, Constants.TABLE_SQLITE_MASTER, Constants.NAME, Constants.TABLE_NAME, Constants.TABLE_CART);
-//        if (isNone.equals(Constants.NONE)) {
-//            mDatabase.close();
-//            ToastUtil.showMessage(this, "购物车空空如也");
-//            return;
-//        }
         //查出所有属性
         Cursor mCursor = mDatabase.query(Constants.TABLE_CART, null, null, null, null, null, null);
         if (mCursor != null) {
@@ -171,6 +165,8 @@ public class StoreCarActivity extends BaseActivity implements StoreCarAdapter.On
         count = count + 1;
         String where_goodsskuid = mStoreList.get(pos).getGoodsskuid();
         changeData(count, where_goodsskuid);
+        mStoreList.clear();
+        initData();
         txtCount.setText(count + "");
         countPrice("add", mStoreList.get(pos).getPrice());
     }
@@ -199,6 +195,8 @@ public class StoreCarActivity extends BaseActivity implements StoreCarAdapter.On
         }
         changeData(count, where_goodsskuid);
         txtCount.setText(count + "");
+        mStoreList.clear();
+        initData();
         countPrice("minus", mStoreList.get(pos).getPrice());
     }
 
@@ -252,6 +250,8 @@ public class StoreCarActivity extends BaseActivity implements StoreCarAdapter.On
     public void toPay(View view) {
         Intent intent = new Intent(this, StorePayActivity.class);
         intent.putExtra("mStoreList", mStoreList);
+
+        LogUtil.e("mStoreList = " + mStoreList.toString());
         intent.putExtra("total_price", total_price);
         intent.putExtra("total_count", total_count);
         startActivity(intent);

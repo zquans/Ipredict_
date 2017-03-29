@@ -80,6 +80,7 @@
                             android:background="#cccccc"
                             android:divider="#ffffff"
                             android:dividerHeight="0.5dp"
+                            android:scrollbars="none"
                             android:visibility="gone" />
                     </LinearLayout>
 
@@ -88,7 +89,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_gravity="bottom"
-                        android:orientation="horizontal"></LinearLayout>
+                        android:orientation="horizontal" />
                 </LinearLayout>
 
                 <Button

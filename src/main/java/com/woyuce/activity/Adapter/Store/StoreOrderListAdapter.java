@@ -12,9 +12,9 @@ import android.widget.TextView;
 
 import com.nineoldandroids.view.ViewHelper;
 import com.nineoldandroids.view.ViewPropertyAnimator;
-import com.woyuce.activity.UI.Activity.Store.StoreOrderActivity;
 import com.woyuce.activity.Bean.Store.StoreOrder;
 import com.woyuce.activity.R;
+import com.woyuce.activity.UI.Activity.Store.StoreOrderActivity;
 
 import java.util.List;
 
