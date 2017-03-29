@@ -2,7 +2,7 @@ package com.woyuce.activity.Adapter.Writting;
 
 import java.util.List;
 
-import com.woyuce.activity.Bean.Writting.WitCategory;
+import com.woyuce.activity.Model.Writting.WitCategory;
 import com.woyuce.activity.R;
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -43,7 +43,7 @@ public class WitspnAdapter extends BaseAdapter {
 		ViewHolder viewholder;
 		if(convertView == null){
 			viewholder = new ViewHolder();
-			convertView = mInflater.inflate(R.layout.gvitem_witspinner, null);
+			convertView = mInflater.inflate(R.layout.gvitem_writting_spinner, null);
 			viewholder.categoryname = (TextView) convertView.findViewById(R.id.txt_item_witspinner);
 			convertView.setTag(viewholder);
 		}else{

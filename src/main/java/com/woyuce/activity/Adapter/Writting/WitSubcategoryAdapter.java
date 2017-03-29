@@ -2,7 +2,7 @@ package com.woyuce.activity.Adapter.Writting;
 
 import java.util.List;
 
-import com.woyuce.activity.Bean.Writting.WitSubcategory;
+import com.woyuce.activity.Model.Writting.WitSubcategory;
 import com.woyuce.activity.R;
 
 import android.content.Context;
@@ -43,7 +43,7 @@ public class WitSubcategoryAdapter extends BaseAdapter{
 		ViewHolder viewholder;
 		if(convertView == null){
 			viewholder = new ViewHolder();
-			convertView = mInflater.inflate(R.layout.gvitem_witsubcategory , null);
+			convertView = mInflater.inflate(R.layout.gvitem_writting_category, null);
 			viewholder.txtSubcategory = (TextView) convertView.findViewById(R.id.txt_witsubcategory);
 			convertView.setTag(viewholder);
 		}else{

@@ -2,7 +2,7 @@ package com.woyuce.activity.Adapter.Speaking;
 
 import java.util.List;
 
-import com.woyuce.activity.Bean.Speaking.SpeakingSearch;
+import com.woyuce.activity.Model.Speaking.SpeakingSearch;
 import com.woyuce.activity.R;
 
 import android.content.Context;
@@ -42,7 +42,7 @@ public class SpeakingSearchAdapter extends BaseAdapter{
 		ViewHolder viewHolder = null;
 		if(convertView == null){
 			viewHolder = new ViewHolder();
-			convertView = mInflater.inflate(R.layout.listitem_speakingsearch, null);
+			convertView = mInflater.inflate(R.layout.listitem_speaking_search, null);
 			viewHolder.txtSearch = (TextView) convertView.findViewById(R.id.text_item_search);
 			convertView.setTag(viewHolder);
 		}else{

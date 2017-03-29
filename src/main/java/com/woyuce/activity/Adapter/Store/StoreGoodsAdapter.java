@@ -13,9 +13,9 @@ import android.widget.TextView;
 
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
-import com.woyuce.activity.UI.Activity.Store.StoreGoodsActivity;
-import com.woyuce.activity.UI.Activity.Common.WebNoCookieActivity;
-import com.woyuce.activity.Bean.Store.StoreGoods;
+import com.woyuce.activity.Controller.Store.StoreGoodsActivity;
+import com.woyuce.activity.Controller.WebNoCookieActivity;
+import com.woyuce.activity.Model.Store.StoreGoods;
 import com.woyuce.activity.R;
 
 import java.util.List;

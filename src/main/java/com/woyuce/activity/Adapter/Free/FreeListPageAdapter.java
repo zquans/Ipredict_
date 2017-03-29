@@ -44,7 +44,7 @@ public class FreeListPageAdapter extends BaseAdapter {
 		ViewHolder viewHolder = null;
 		if (convertView == null) {
 			viewHolder = new ViewHolder();
-			convertView = mInflater.inflate(R.layout.listitem_freelistpage, null);
+			convertView = mInflater.inflate(R.layout.listitem_free_list_page, null);
 			viewHolder.txtpage = (TextView) convertView.findViewById(R.id.txt_listpage);
 			convertView.setTag(viewHolder);
 		} else {

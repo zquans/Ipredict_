@@ -12,7 +12,7 @@ import android.widget.TextView;
 
 import com.nineoldandroids.view.ViewHelper;
 import com.nineoldandroids.view.ViewPropertyAnimator;
-import com.woyuce.activity.Bean.Speaking.SpeakingVoteCount;
+import com.woyuce.activity.Model.Speaking.SpeakingVoteCount;
 import com.woyuce.activity.R;
 
 import java.util.List;
@@ -48,7 +48,7 @@ public class SpeakingVoteCountAdapter extends BaseAdapter {
         ViewHolder viewHolder;
         if (convertView == null) {
             viewHolder = new ViewHolder();
-            convertView = mInflater.inflate(R.layout.listitem_speakingstatis, null);
+            convertView = mInflater.inflate(R.layout.listitem_speaking_statis, null);
             viewHolder.itemView = (LinearLayout) convertView.findViewById(R.id.ll_speaking_statis_itemview);
             viewHolder.voteView = convertView.findViewById(R.id.view_vote);
             viewHolder.txtExamTitle = (TextView) convertView.findViewById(R.id.txt_item_examTitle);

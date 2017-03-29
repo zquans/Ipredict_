@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.os.IBinder;
 
 import com.woyuce.activity.Utils.LogUtil;
-import com.woyuce.activity.Utils.ToastUtil;
 import com.woyuce.activity.Utils.UpdateManager;
 
 /**

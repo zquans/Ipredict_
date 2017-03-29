@@ -13,7 +13,7 @@ import android.widget.TextView;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.display.RoundedBitmapDisplayer;
-import com.woyuce.activity.Bean.Weibo.WeiboBean;
+import com.woyuce.activity.Model.Weibo.WeiboBean;
 import com.woyuce.activity.R;
 
 import java.util.List;
@@ -53,7 +53,7 @@ public class WeiboRecommandAdapter extends BaseAdapter {
         ViewHolder viewHolder;
         if (convertView == null) {
             viewHolder = new ViewHolder();
-            convertView = mInflater.inflate(R.layout.gvitem_weiborecommand, null);
+            convertView = mInflater.inflate(R.layout.gvitem_weibo_recommand, null);
             viewHolder.imgPath = (ImageView) convertView.findViewById(R.id.img_item_weibo);
             viewHolder.txtBody = (TextView) convertView.findViewById(R.id.body_item_weibo);
             viewHolder.txtReplyCount = (TextView) convertView.findViewById(R.id.reply_item_weibo);

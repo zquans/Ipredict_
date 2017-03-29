@@ -7,7 +7,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
-import com.woyuce.activity.Bean.Speaking.SpeakingRoom;
+import com.woyuce.activity.Model.Speaking.SpeakingRoom;
 import com.woyuce.activity.R;
 
 import java.util.List;

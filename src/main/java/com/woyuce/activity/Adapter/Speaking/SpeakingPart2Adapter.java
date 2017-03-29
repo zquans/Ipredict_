@@ -8,7 +8,7 @@ import android.widget.BaseAdapter;
 import android.widget.CheckBox;
 import android.widget.TextView;
 
-import com.woyuce.activity.Bean.Speaking.SpeakingPart;
+import com.woyuce.activity.Model.Speaking.SpeakingPart;
 import com.woyuce.activity.R;
 
 import java.util.HashMap;
@@ -53,7 +53,7 @@ public class SpeakingPart2Adapter extends BaseAdapter {
         ViewHolder viewHolder = null;
         if (convertView == null) {
             viewHolder = new ViewHolder();
-            convertView = mInflater.inflate(R.layout.listitem_speakingpart, null);
+            convertView = mInflater.inflate(R.layout.listitem_speaking_part, null);
             viewHolder.txtsubname = (TextView) convertView.findViewById(R.id.text_item_part);
             viewHolder.ckBox = (CheckBox) convertView.findViewById(R.id.ckbox_item_part);
             convertView.setTag(viewHolder);

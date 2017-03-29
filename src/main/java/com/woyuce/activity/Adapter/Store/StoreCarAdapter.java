@@ -8,7 +8,7 @@ import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.woyuce.activity.Bean.Store.StoreMenu;
+import com.woyuce.activity.Model.Store.StoreMenu;
 import com.woyuce.activity.R;
 
 import java.util.List;
@@ -61,7 +61,7 @@ public class StoreCarAdapter extends BaseAdapter {
         final ViewHolder viewHolder;
         if (convertView == null) {
             viewHolder = new ViewHolder();
-            convertView = mLayoutInflater.inflate(R.layout.listitem_storecar, null);
+            convertView = mLayoutInflater.inflate(R.layout.listitem_store_cart, null);
             viewHolder.mTxtName = (TextView) convertView.findViewById(R.id.txt_listitem_storecar_name);
             viewHolder.mTxtSpecName = (TextView) convertView.findViewById(R.id.txt_listitem_storecar_specname);
             viewHolder.mTxtPrice = (TextView) convertView.findViewById(R.id.txt_listitem_storecar_price);

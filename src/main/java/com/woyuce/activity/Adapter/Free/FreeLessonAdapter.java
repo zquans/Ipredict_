@@ -5,7 +5,7 @@ import java.util.List;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.display.RoundedBitmapDisplayer;
-import com.woyuce.activity.Bean.Free.FreeLesson;
+import com.woyuce.activity.Model.Free.FreeLesson;
 import com.woyuce.activity.R;
 
 import android.annotation.SuppressLint;
@@ -48,7 +48,7 @@ public class FreeLessonAdapter extends BaseAdapter {
 		ViewHolder viewHolder = null;
 		if (convertView == null) {
 			viewHolder = new ViewHolder();
-			convertView = mInflater.inflate(R.layout.gvitem_freelesson, null);
+			convertView = mInflater.inflate(R.layout.gvitem_free_lesson, null);
 			viewHolder.imgPath = (ImageView) convertView.findViewById(R.id.img_item_lesson);
 			convertView.setTag(viewHolder);
 		} else {

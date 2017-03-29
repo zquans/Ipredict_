@@ -11,7 +11,7 @@ import android.widget.TextView;
 
 import com.nineoldandroids.view.ViewHelper;
 import com.nineoldandroids.view.ViewPropertyAnimator;
-import com.woyuce.activity.Bean.Store.StoreBean;
+import com.woyuce.activity.Model.Store.StoreBean;
 import com.woyuce.activity.R;
 
 import java.util.List;

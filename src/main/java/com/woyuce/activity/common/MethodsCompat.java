@@ -1,4 +1,4 @@
-package com.woyuce.activity.common;
+package com.woyuce.activity.Common;
 
 import android.annotation.TargetApi;
 import android.app.Activity;

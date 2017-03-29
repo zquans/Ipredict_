@@ -2,7 +2,7 @@ package com.woyuce.activity.Adapter.Speaking;
 
 import java.util.List;
 
-import com.woyuce.activity.Bean.Speaking.SpeakingCity;
+import com.woyuce.activity.Model.Speaking.SpeakingCity;
 import com.woyuce.activity.R;
 
 import android.content.Context;

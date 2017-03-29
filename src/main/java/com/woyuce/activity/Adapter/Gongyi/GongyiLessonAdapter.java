@@ -12,8 +12,8 @@ import android.widget.TextView;
 
 import com.nineoldandroids.view.ViewHelper;
 import com.nineoldandroids.view.ViewPropertyAnimator;
-import com.woyuce.activity.UI.Activity.Gongyi.GongyiContentActivity;
-import com.woyuce.activity.Bean.Gongyi.GongyiAudio;
+import com.woyuce.activity.Controller.OpenClass.OpenContentActivity;
+import com.woyuce.activity.Model.Gongyi.GongyiAudio;
 import com.woyuce.activity.R;
 
 import java.util.List;
@@ -33,7 +33,7 @@ public class GongyiLessonAdapter extends RecyclerView.Adapter<GongyiLessonAdapte
     @Override
     public GongyiLessonAdapter.MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         MyViewHolder viewholder = new MyViewHolder(
-                mLayoutInflater.inflate(R.layout.listitem_gongyilesson, parent, false));
+                mLayoutInflater.inflate(R.layout.listitem_open_class_lesson, parent, false));
         return viewholder;
     }
 
@@ -49,7 +49,7 @@ public class GongyiLessonAdapter extends RecyclerView.Adapter<GongyiLessonAdapte
             @Override
             public void onClick(View v) {
                 GongyiAudio audio = mList.get(position);
-                Intent intent = new Intent(mContext, GongyiContentActivity.class);
+                Intent intent = new Intent(mContext, OpenContentActivity.class);
                 intent.putExtra("url", audio.getUrl());
                 intent.putExtra("title", audio.getTitle());
                 mContext.startActivity(intent);

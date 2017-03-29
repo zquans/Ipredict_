@@ -7,7 +7,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
-import com.woyuce.activity.Bean.Store.StoreMenu;
+import com.woyuce.activity.Model.Store.StoreMenu;
 import com.woyuce.activity.R;
 import com.woyuce.activity.Utils.MathUtil;
 
@@ -46,7 +46,7 @@ public class StorePayAdapter extends BaseAdapter {
         ViewHolder viewHolder;
         if (convertView == null) {
             viewHolder = new ViewHolder();
-            convertView = mInflate.inflate(R.layout.listitem_storepay, null);
+            convertView = mInflate.inflate(R.layout.listitem_store_pay, null);
             viewHolder.mTxtName = (TextView) convertView.findViewById(R.id.txt_listitem_storepay_name);
             viewHolder.mTxtSpec = (TextView) convertView.findViewById(R.id.txt_listitem_storepay_spec);
             viewHolder.mTxtNum = (TextView) convertView.findViewById(R.id.txt_listitem_storepay_num);

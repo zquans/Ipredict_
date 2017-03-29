@@ -2,7 +2,7 @@ package com.woyuce.activity.Adapter.Free;
 
 import java.util.List;
 
-import com.woyuce.activity.Bean.Free.FreeRange;
+import com.woyuce.activity.Model.Free.FreeRange;
 import com.woyuce.activity.R;
 
 import android.content.Context;
@@ -42,7 +42,7 @@ public class FreeRangeAdapter extends BaseAdapter {
 		ViewHolder viewHolder = null;
 		if (convertView == null) {
 			viewHolder = new ViewHolder();
-			convertView = mInflater.inflate(R.layout.listitem_freerange, null);
+			convertView = mInflater.inflate(R.layout.listitem_free_range, null);
 			viewHolder.txt_name = (TextView) convertView.findViewById(R.id.text_item_rang);
 			convertView.setTag(viewHolder);
 		} else {

@@ -14,8 +14,8 @@ import android.widget.TextView;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.display.RoundedBitmapDisplayer;
-import com.woyuce.activity.UI.Activity.Store.ShowImgActivity;
-import com.woyuce.activity.Bean.Store.StoreGoods;
+import com.woyuce.activity.Controller.Store.ShowImageActivity;
+import com.woyuce.activity.Model.Store.StoreGoods;
 import com.woyuce.activity.R;
 
 import java.util.ArrayList;
@@ -64,7 +64,7 @@ public class StoreShowOrderAdapter extends BaseAdapter {
         ViewHolder viewHolder;
         if (convertView == null) {
             viewHolder = new ViewHolder();
-            convertView = mInflater.inflate(R.layout.listitem_storeshoworder, null);
+            convertView = mInflater.inflate(R.layout.listitem_store_show_order, null);
             viewHolder.mTxtName = (TextView) convertView.findViewById(R.id.txt_goodscomment_username);
             viewHolder.mTxtComment = (TextView) convertView.findViewById(R.id.txt_goodscomment_comment);
             viewHolder.mTxtTime = (TextView) convertView.findViewById(R.id.txt_goodscomment_time);
@@ -83,7 +83,7 @@ public class StoreShowOrderAdapter extends BaseAdapter {
         viewHolder.mImg.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(mContext, ShowImgActivity.class);
+                Intent intent = new Intent(mContext, ShowImageActivity.class);
                 intent.putExtra("img_url", mList.get(position).getImg_url());
                 mContext.startActivity(intent);
             }

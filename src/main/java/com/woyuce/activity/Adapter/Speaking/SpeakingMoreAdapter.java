@@ -11,7 +11,7 @@ import android.widget.TextView;
 
 import com.nineoldandroids.view.ViewHelper;
 import com.nineoldandroids.view.ViewPropertyAnimator;
-import com.woyuce.activity.Bean.Speaking.SpeakingMore;
+import com.woyuce.activity.Model.Speaking.SpeakingMore;
 import com.woyuce.activity.R;
 
 import java.util.List;
@@ -46,7 +46,7 @@ public class SpeakingMoreAdapter extends BaseAdapter {
         ViewHolder viewHolder;
         if (convertView == null) {
             viewHolder = new ViewHolder();
-            convertView = mInflater.inflate(R.layout.gvitem_speakingmore, null);
+            convertView = mInflater.inflate(R.layout.gvitem_speaking_more, null);
             viewHolder.txtCategory = (TextView) convertView.findViewById(R.id.txt_category);
             convertView.setTag(viewHolder);
         } else {

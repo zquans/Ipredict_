@@ -13,10 +13,10 @@ import android.widget.TextView;
 
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
-import com.woyuce.activity.Bean.Store.StoreGoods;
+import com.woyuce.activity.Model.Store.StoreGoods;
 import com.woyuce.activity.R;
-import com.woyuce.activity.UI.Activity.Store.StoreCommentActivity;
-import com.woyuce.activity.UI.Activity.Store.StoreGoodsActivity;
+import com.woyuce.activity.Controller.Store.StoreCommentActivity;
+import com.woyuce.activity.Controller.Store.StoreGoodsActivity;
 import com.woyuce.activity.Utils.LogUtil;
 
 import java.util.List;
@@ -46,7 +46,7 @@ public class StoreOrderGoodsAdapter extends RecyclerView.Adapter<StoreOrderGoods
     @Override
     public MViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         MViewHolder viewholder = new MViewHolder(
-                mLayoutInflater.inflate(R.layout.recycleritem_ordergoods, parent, false));
+                mLayoutInflater.inflate(R.layout.recycleritem_order_goods, parent, false));
         return viewholder;
     }
 

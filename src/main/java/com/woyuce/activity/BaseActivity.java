@@ -13,7 +13,7 @@ import com.woyuce.activity.Utils.ActivityManager;
 import com.woyuce.activity.Utils.LogUtil;
 import com.woyuce.activity.Utils.NetUtil;
 import com.woyuce.activity.Utils.ToastUtil;
-import com.woyuce.activity.common.Constants;
+import com.woyuce.activity.Common.Constants;
 
 /**
  * Created by Administrator on 2016/9/20.

@@ -12,7 +12,7 @@ import android.widget.TextView;
 
 import com.nineoldandroids.view.ViewHelper;
 import com.nineoldandroids.view.ViewPropertyAnimator;
-import com.woyuce.activity.Bean.Speaking.SpeakingBean;
+import com.woyuce.activity.Model.Speaking.SpeakingBean;
 import com.woyuce.activity.R;
 
 import java.util.List;

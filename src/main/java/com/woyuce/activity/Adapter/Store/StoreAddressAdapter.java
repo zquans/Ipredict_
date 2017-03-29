@@ -7,7 +7,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
-import com.woyuce.activity.Bean.Store.StoreAddress;
+import com.woyuce.activity.Model.Store.StoreAddress;
 import com.woyuce.activity.R;
 
 import java.util.ArrayList;
@@ -46,7 +46,7 @@ public class StoreAddressAdapter extends BaseAdapter {
         ViewHolder viewHolder;
         if (convertView == null) {
             viewHolder = new ViewHolder();
-            convertView = mInflate.inflate(R.layout.listitem_storeaddress, null);
+            convertView = mInflate.inflate(R.layout.listitem_store_address, null);
             viewHolder.mTxtName = (TextView) convertView.findViewById(R.id.txt_listitem_storeaddress_name);
             viewHolder.mTxtMobile = (TextView) convertView.findViewById(R.id.txt_listitem_storeaddress_mobile);
             viewHolder.mTxtQQ = (TextView) convertView.findViewById(R.id.txt_listitem_storeaddress_qq);

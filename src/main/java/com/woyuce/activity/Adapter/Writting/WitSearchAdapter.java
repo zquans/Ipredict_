@@ -2,7 +2,7 @@ package com.woyuce.activity.Adapter.Writting;
 
 import java.util.List;
 
-import com.woyuce.activity.Bean.Writting.WitSearch;
+import com.woyuce.activity.Model.Writting.WitSearch;
 import com.woyuce.activity.R;
 
 import android.content.Context;
@@ -42,7 +42,7 @@ public class WitSearchAdapter extends BaseAdapter{
 		ViewHolder viewHolder = null;
 		if(convertView == null){
 			viewHolder = new ViewHolder();
-			convertView = mInflater.inflate(R.layout.listitem_witsearch, null);
+			convertView = mInflater.inflate(R.layout.listitem_writting_search, null);
 			viewHolder.txtWitSearch = (TextView) convertView.findViewById(R.id.text_item_witsearch);
 			convertView.setTag(viewHolder);
 		}else{

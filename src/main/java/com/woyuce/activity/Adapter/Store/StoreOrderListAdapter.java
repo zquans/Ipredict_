@@ -12,9 +12,9 @@ import android.widget.TextView;
 
 import com.nineoldandroids.view.ViewHelper;
 import com.nineoldandroids.view.ViewPropertyAnimator;
-import com.woyuce.activity.Bean.Store.StoreOrder;
+import com.woyuce.activity.Model.Store.StoreOrder;
 import com.woyuce.activity.R;
-import com.woyuce.activity.UI.Activity.Store.StoreOrderActivity;
+import com.woyuce.activity.Controller.Store.StoreOrderActivity;
 
 import java.util.List;
 
@@ -36,7 +36,7 @@ public class StoreOrderListAdapter extends RecyclerView.Adapter<StoreOrderListAd
     @Override
     public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         MyViewHolder viewholder = new MyViewHolder(
-                mLayoutInflater.inflate(R.layout.recycleritem_storeorderlist, parent, false));
+                mLayoutInflater.inflate(R.layout.recycleritem_store_order_list, parent, false));
         return viewholder;
     }
 

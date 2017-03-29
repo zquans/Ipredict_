@@ -57,7 +57,7 @@
 //        ViewHolder viewHolder ;
 //        if (convertView == null) {
 //            viewHolder = new ViewHolder();
-//            convertView = mInflater.inflate(R.layout.gvitem_weibophotowawll, null);
+//            convertView = mInflater.inflate(R.layout.gvitem_weibo_photo_wall, null);
 //            viewHolder.mImg = (ImageView) convertView.findViewById(R.id.img_item_weibophotowall);
 //            convertView.setTag(viewHolder);
 //        } else {

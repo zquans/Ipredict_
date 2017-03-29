@@ -9,7 +9,7 @@
         android:id="@+id/txt_item_vote_area"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:drawableRight="@mipmap/icon_morespinner_black"
+        android:drawableRight="@mipmap/icon_more_spinner_black"
         android:text="aaaaaaaaaaaaaaaaaaa"
         android:gravity="center_vertical"
         android:textColor="#000000"

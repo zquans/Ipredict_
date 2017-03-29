@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.nineoldandroids.view.ViewHelper;
 import com.nineoldandroids.view.ViewPropertyAnimator;
-import com.woyuce.activity.Bean.Free.FreeSection;
+import com.woyuce.activity.Model.Free.FreeSection;
 import com.woyuce.activity.R;
 
 import android.content.Context;
@@ -46,7 +46,7 @@ public class FreeSectionAdapter extends BaseAdapter{
 		ViewHolder viewHolder = null;
 		if(convertView == null){
 			viewHolder = new ViewHolder();
-			convertView = mInflater.inflate(R.layout.gvitem_freesection, null);
+			convertView = mInflater.inflate(R.layout.gvitem_free_section, null);
 			viewHolder.txtsection = (TextView) convertView.findViewById(R.id.txt_section);
 			convertView.setTag(viewHolder);
 		}else{

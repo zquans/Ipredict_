@@ -11,7 +11,7 @@ import android.widget.ImageView;
 
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
-import com.woyuce.activity.Bean.Free.FreeBook;
+import com.woyuce.activity.Model.Free.FreeBook;
 import com.woyuce.activity.R;
 
 import java.util.List;
@@ -47,7 +47,7 @@ public class FreeBookAdapter extends BaseAdapter {
         ViewHolder viewHolder = null;
         if (convertView == null) {
             viewHolder = new ViewHolder();
-            convertView = mInflater.inflate(R.layout.gvitem_freebook, null);
+            convertView = mInflater.inflate(R.layout.gvitem_free_book, null);
             viewHolder.imgbook = (ImageView) convertView.findViewById(R.id.img_item_book);
             convertView.setTag(viewHolder);
         } else {

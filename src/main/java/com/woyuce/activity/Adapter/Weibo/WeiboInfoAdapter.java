@@ -8,7 +8,7 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.woyuce.activity.Bean.Weibo.WeiboBean;
+import com.woyuce.activity.Model.Weibo.WeiboBean;
 import com.woyuce.activity.R;
 
 import java.util.List;
@@ -49,7 +49,7 @@ public class WeiboInfoAdapter extends BaseAdapter {
         ViewHolder viewHolder;
         if (convertView == null) {
             viewHolder = new ViewHolder();
-            convertView = mInflater.inflate(R.layout.listitem_weiboinfo, null);
+            convertView = mInflater.inflate(R.layout.listitem_weibo_info, null);
             viewHolder.imgPath = (ImageView) convertView.findViewById(R.id.img_item_weibo);
             viewHolder.txtBody = (TextView) convertView.findViewById(R.id.body_item_weibo);
             viewHolder.txtTime = (TextView) convertView.findViewById(R.id.time_item_weibo);

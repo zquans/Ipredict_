@@ -8,7 +8,7 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.woyuce.activity.Bean.Writting.WitCategory;
+import com.woyuce.activity.Model.Writting.WitCategory;
 import com.woyuce.activity.R;
 
 import java.util.List;
@@ -43,7 +43,7 @@ public class WittingAdapter extends BaseAdapter {
         ViewHolder viewholder;
         if (convertView == null) {
             viewholder = new ViewHolder();
-            convertView = mInflater.inflate(R.layout.gvitem_witting, null);
+            convertView = mInflater.inflate(R.layout.gvitem_writting, null);
             viewholder.categoryname = (TextView) convertView.findViewById(R.id.txt_item_witcategoryname);
             viewholder.img = (ImageView) convertView.findViewById(R.id.img_writting);
             convertView.setTag(viewholder);

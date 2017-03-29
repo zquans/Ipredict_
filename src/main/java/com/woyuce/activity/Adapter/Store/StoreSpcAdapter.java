@@ -8,7 +8,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
-import com.woyuce.activity.Bean.Store.StoreGoods;
+import com.woyuce.activity.Model.Store.StoreGoods;
 import com.woyuce.activity.R;
 
 import java.util.ArrayList;
@@ -55,7 +55,7 @@ public class StoreSpcAdapter extends BaseAdapter {
         ViewHolder viewHolder;
         if (convertView == null) {
             viewHolder = new ViewHolder();
-            convertView = mInflater.inflate(R.layout.listitem_storegoodsspc, null);
+            convertView = mInflater.inflate(R.layout.listitem_store_goods_spec, null);
             viewHolder.txtGoal = (TextView) convertView.findViewById(R.id.txt_storegoods_spc);
             convertView.setTag(viewHolder);
         } else {

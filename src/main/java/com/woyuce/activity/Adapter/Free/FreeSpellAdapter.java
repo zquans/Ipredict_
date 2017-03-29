@@ -3,7 +3,7 @@ package com.woyuce.activity.Adapter.Free;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.woyuce.activity.Bean.Free.FreeSpellBean;
+import com.woyuce.activity.Model.Free.FreeSpellBean;
 import com.woyuce.activity.R;
 
 import android.content.Context;
@@ -52,7 +52,7 @@ public class FreeSpellAdapter extends BaseAdapter {
 		final Viewhold viewhold;
 		if (convertView == null) {
 			viewhold = new Viewhold();
-			convertView = mLayoutnflate.inflate(R.layout.listitem_freecheckspell, null);
+			convertView = mLayoutnflate.inflate(R.layout.listitem_free_check_spell, null);
 			viewhold.mTxtnum = (TextView) convertView.findViewById(R.id.txt_checkspell_num);
 			viewhold.mAnswer = (TextView) convertView.findViewById(R.id.txt_checkspell_answer);
 			viewhold.mSpell = (TextView) convertView.findViewById(R.id.txt_checkspell_showspell);

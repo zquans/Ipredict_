@@ -11,7 +11,7 @@ import android.widget.TextView;
 
 import com.nineoldandroids.view.ViewHelper;
 import com.nineoldandroids.view.ViewPropertyAnimator;
-import com.woyuce.activity.Bean.Free.FreePage;
+import com.woyuce.activity.Model.Free.FreePage;
 import com.woyuce.activity.R;
 
 import java.util.List;
@@ -47,7 +47,7 @@ public class FreePageAdapter extends BaseAdapter {
         ViewHolder viewHolder = null;
         if (convertView == null) {
             viewHolder = new ViewHolder();
-            convertView = mInflater.inflate(R.layout.gvitem_freepage, null);
+            convertView = mInflater.inflate(R.layout.gvitem_free_page, null);
             viewHolder.txtpage = (TextView) convertView.findViewById(R.id.txt_pageno);
             convertView.setTag(viewHolder);
         } else {

@@ -8,7 +8,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
-import com.woyuce.activity.Bean.Store.StoreGoods;
+import com.woyuce.activity.Model.Store.StoreGoods;
 import com.woyuce.activity.R;
 
 import java.util.List;
@@ -44,7 +44,7 @@ public class StoreGoodsCommentAdapter extends BaseAdapter {
         ViewHolder viewHolder = null;
         if (convertView == null) {
             viewHolder = new ViewHolder();
-            convertView = mInflater.inflate(R.layout.listitem_storegoodscomment, null);
+            convertView = mInflater.inflate(R.layout.listitem_store_goods_comment, null);
             viewHolder.mTxtName = (TextView) convertView.findViewById(R.id.txt_goodscomment_username);
             viewHolder.mTxtComment = (TextView) convertView.findViewById(R.id.txt_goodscomment_comment);
             viewHolder.mTxtTime = (TextView) convertView.findViewById(R.id.txt_goodscomment_time);

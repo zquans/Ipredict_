@@ -46,7 +46,7 @@ public class WeiboInfoImgAdapter extends BaseAdapter {
         ViewHolder viewHolder = null;
         if (convertView == null) {
             viewHolder = new ViewHolder();
-            convertView = mInflater.inflate(R.layout.gvitem_weiboinfoimg, null);
+            convertView = mInflater.inflate(R.layout.gvitem_weibo_info_img, null);
             viewHolder.img = (ImageView) convertView.findViewById(R.id.img_item_weiboinfo);
             convertView.setTag(viewHolder);
         } else {
