@@ -5,6 +5,7 @@
     <color name="colorAccent">#FF4081</color>
     <color name="colorTheme">#cccccc</color>
     <color name="colorTabTheme">#f7941d</color>
+    <color name="colorTransparent">#00000000</color>
 
     <color name="gray_3">#333333</color>
     <color name="gray_6">#666666</color>

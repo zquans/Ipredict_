@@ -206,7 +206,6 @@ public class LoginRegisterInfoActivity extends BaseActivity implements View.OnCl
                 LogUtil.e("mobile = " + localPhoneOrEmail + "," + edtUsername.getText().toString().trim() + ","
                         + edtNickname.getText().toString().trim() + "," + edtPassword.getText().toString().trim() + ","
                         + edtEmailOrPhone.getText().toString().trim());
-
                 return map;
             }
         };

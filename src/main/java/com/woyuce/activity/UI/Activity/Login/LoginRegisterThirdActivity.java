@@ -2,13 +2,16 @@ package com.woyuce.activity.UI.Activity.Login;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
 import com.android.volley.AuthFailureError;
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -28,12 +31,19 @@ import java.util.Map;
 
 public class LoginRegisterThirdActivity extends BaseActivity implements View.OnClickListener {
 
-    private TextView mTxtBack;
+    private TextView mTxtBack, mTxtCheckEmail, mTxtCheckPhone;
     private EditText mEdtPassword, mEdtRepassword, mEdtUsername, mEdtName, mEdtEmail, mEdtPhone;
     private Button mBtnCheckUserName, mBtnCommit;
 
     private String localtoken, type, openId, unionid, accessToken, expiresin, userIcon, userGender, userName, deviceid;
     private static final String Tag_Volley = "LoginRegisterThird";
+
+    private boolean bValidEmail = false;
+    private boolean bValidPhone = false;
+    private boolean bValidName = false;
+    private static final String VALIDATE_USERNAME = "username";
+    private static final String VALIDATE_PHONE = "mobile";
+    private static final String VALIDATE_EMAIL = "email";
 
     @Override
     public void onBackPressed() {
@@ -73,6 +83,8 @@ public class LoginRegisterThirdActivity extends BaseActivity implements View.OnC
         mEdtName = (EditText) findViewById(R.id.edt_registerinfo_name);
         mEdtEmail = (EditText) findViewById(R.id.edt_registerinfo_email);
         mEdtPhone = (EditText) findViewById(R.id.edt_registerinfo_phone);
+        mTxtCheckEmail = (TextView) findViewById(R.id.txt_registerinfo_email);
+        mTxtCheckPhone = (TextView) findViewById(R.id.txt_registerinfo_phone);
         mBtnCheckUserName = (Button) findViewById(R.id.btn_registerinfo_checkusername);
         mBtnCommit = (Button) findViewById(R.id.btn_registerinfo_tonext);
 
@@ -80,6 +92,102 @@ public class LoginRegisterThirdActivity extends BaseActivity implements View.OnC
         mTxtBack.setOnClickListener(this);
         mBtnCheckUserName.setOnClickListener(this);
         mBtnCommit.setOnClickListener(this);
+        mEdtEmail.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                mTxtCheckEmail.setVisibility(View.VISIBLE);
+                if (!s.toString().contains("@") || !s.toString().contains(".")) {
+                    mTxtCheckEmail.setText("请输入正确的邮箱地址");
+                    return;
+                }
+                RequestVaildUser(VALIDATE_EMAIL, mEdtEmail.getText().toString().trim());
+            }
+        });
+        mEdtPhone.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                mTxtCheckPhone.setVisibility(View.VISIBLE);
+                if (s.length() < 11) {
+                    mTxtCheckPhone.setText("请输入正确的电话号码");
+                    return;
+                }
+                RequestVaildUser(VALIDATE_PHONE, mEdtPhone.getText().toString().trim());
+            }
+        });
+    }
+
+    /**
+     * 检查用户名是否可用
+     */
+    private void RequestVaildUser(final String key, final String value) {
+        StringRequest requestThird = new StringRequest(Request.Method.POST, Constants.URL_Login_VAILD, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String s) {
+                try {
+                    JSONObject obj;
+                    obj = new JSONObject(s);
+                    switch (key) {
+                        case VALIDATE_USERNAME:
+                            if (obj.getString("code").equals("0")) {
+                                bValidName = true;
+                            }
+                            ToastUtil.showMessage(LoginRegisterThirdActivity.this, obj.getString("message"));
+                            break;
+                        case VALIDATE_EMAIL:
+                            if (obj.getString("code").equals("0")) {
+                                bValidEmail = true;
+                            }
+                            mTxtCheckEmail.setText(obj.getString("message"));
+                            break;
+                        case VALIDATE_PHONE:
+                            if (obj.getString("code").equals("0") && obj.getString("data").equals("1")) {
+                                bValidPhone = true;
+                            }
+                            mTxtCheckPhone.setText(obj.getString("message"));
+                            break;
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }, null) {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> headers = new HashMap<>();
+                localtoken = PreferenceUtil.getSharePre(LoginRegisterThirdActivity.this).getString("localtoken", "");
+                headers.put("Authorization", "Bearer " + localtoken);
+                return headers;
+            }
+
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                HashMap<String, String> map = new HashMap<>();
+                map.put("key", key);
+                map.put("value", value);
+                return map;
+            }
+        };
+        requestThird.setTag(Tag_Volley);
+        AppContext.getHttpQueue().add(requestThird);
     }
 
     private void RequestToCommit() {
@@ -92,6 +200,14 @@ public class LoginRegisterThirdActivity extends BaseActivity implements View.OnC
                     obj = new JSONObject(response);
                     // 成功则Toast，并返回Login界面
                     if (obj.getString("code").equals("0")) {
+                        obj = new JSONObject(obj.getString("data"));
+                        PreferenceUtil.save(LoginRegisterThirdActivity.this, "userId", obj.getString("userid"));
+                        PreferenceUtil.save(LoginRegisterThirdActivity.this, "mUserName", obj.getString("username"));
+                        PreferenceUtil.save(LoginRegisterThirdActivity.this, "Permission", obj.getString("permission"));
+                        PreferenceUtil.save(LoginRegisterThirdActivity.this, "money", obj.getString("tradepoints"));
+                        PreferenceUtil.save(LoginRegisterThirdActivity.this, "update", obj.getString("login_time"));
+                        PreferenceUtil.save(LoginRegisterThirdActivity.this, "mtimer", obj.getString("exam_time"));
+
                         ToastUtil.showMessage(LoginRegisterThirdActivity.this, "恭喜您,注册成功!");
                         Intent intent = new Intent(LoginRegisterThirdActivity.this, LoginActivity.class);
                         intent.putExtra("username_register", mEdtUsername.getText().toString());
@@ -141,51 +257,8 @@ public class LoginRegisterThirdActivity extends BaseActivity implements View.OnC
             }
         };
         stringRequest.setTag(Tag_Volley);
+        stringRequest.setRetryPolicy(new DefaultRetryPolicy(1000, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         AppContext.getHttpQueue().add(stringRequest);
-    }
-
-    /**
-     * 检查用户名是否可用
-     */
-    private void RequestVaildUser(final String username) {
-        progressdialogshow(this);
-        StringRequest requestThird = new StringRequest(Request.Method.POST, Constants.URL_Login_VAILD, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String s) {
-                progressdialogcancel();
-                try {
-                    JSONObject obj;
-                    obj = new JSONObject(s);
-                    ToastUtil.showMessage(LoginRegisterThirdActivity.this, obj.getString("message"));
-//                    mBtnCheckUserName.setText(obj.getString("message"));
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError volleyError) {
-                progressdialogcancel();
-            }
-        }) {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<>();
-                localtoken = PreferenceUtil.getSharePre(LoginRegisterThirdActivity.this).getString("localtoken", "");
-                headers.put("Authorization", "Bearer " + localtoken);
-                return headers;
-            }
-
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                HashMap<String, String> map = new HashMap<>();
-                map.put("key", "username");
-                map.put("value", username);
-                return map;
-            }
-        };
-        requestThird.setTag(Tag_Volley);
-        AppContext.getHttpQueue().add(requestThird);
     }
 
     @Override
@@ -201,7 +274,7 @@ public class LoginRegisterThirdActivity extends BaseActivity implements View.OnC
                     ToastUtil.showMessage(this, "请输入用户名");
                     return;
                 }
-                RequestVaildUser(localusername);
+                RequestVaildUser(VALIDATE_USERNAME, localusername);
                 break;
             case R.id.btn_registerinfo_tonext:
                 // 判断是否填入内容
@@ -219,6 +292,19 @@ public class LoginRegisterThirdActivity extends BaseActivity implements View.OnC
                     ToastUtil.showMessage(LoginRegisterThirdActivity.this, "您设置的密码不一致");
                     return;
                 }
+                if (!bValidName) {
+                    ToastUtil.showMessage(LoginRegisterThirdActivity.this, "请检查您的用户名");
+                    return;
+                }
+                if (!bValidPhone) {
+                    ToastUtil.showMessage(LoginRegisterThirdActivity.this, "请检查您的电话号码");
+                    return;
+                }
+                if (!bValidEmail) {
+                    ToastUtil.showMessage(LoginRegisterThirdActivity.this, "请检查您的邮箱");
+                    return;
+                }
+
                 // 注册
                 RequestToCommit();
                 break;

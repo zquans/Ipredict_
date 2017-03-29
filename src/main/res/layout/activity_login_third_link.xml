@@ -20,12 +20,12 @@
 
         <ImageView
             android:id="@+id/img_link_type"
-            android:layout_width="96dp"
-            android:layout_height="96dp"
-            android:layout_marginRight="8dp"
-            android:layout_marginTop="48dp"
+            android:layout_width="72dp"
+            android:layout_height="72dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginTop="60dp"
             android:layout_toLeftOf="@+id/img_link"
-            android:background="@mipmap/icon_wechat" />
+            android:background="@mipmap/icon_qq" />
 
         <ImageView
             android:id="@+id/img_link_logo"
@@ -41,6 +41,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/img_link_type"
+            android:layout_marginTop="16dp"
             android:gravity="center"
             android:text="@string/login_third_type"
             android:textSize="18sp"

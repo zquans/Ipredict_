@@ -107,7 +107,7 @@ public class Fragmentfive extends Fragment implements View.OnClickListener {
 
     // fragment 生命周期，打开时
     private void initEvent() {
-        if (share().getString("username", "").length() == 0) {
+        if (share().getString("userId", "").length() == 0) {
             txtRoom.setText("登录后可见");
             txtSubject.setText("登录后可见");
             txtMoney.setText(share().getString("money", "登录后可见"));

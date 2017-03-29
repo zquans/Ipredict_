@@ -197,6 +197,16 @@
                     android:singleLine="true" />
             </LinearLayout>
 
+            <TextView
+                android:id="@+id/txt_registerinfo_email"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="92dp"
+                android:text="邮箱可用"
+                android:textColor="#aaa"
+                android:textSize="12sp"
+                android:visibility="gone" />
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -217,7 +227,6 @@
                     android:layout_height="match_parent"
                     android:layout_marginLeft="8dp"
                     android:layout_weight="1"
-                    android:editable="false"
                     android:gravity="center_vertical"
                     android:hint="请输入您的手机号"
                     android:imeOptions="actionDone"
@@ -225,6 +234,16 @@
                     android:maxLength="11"
                     android:singleLine="true" />
             </LinearLayout>
+
+            <TextView
+                android:id="@+id/txt_registerinfo_phone"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="92dp"
+                android:text="手机号可用"
+                android:textColor="#aaa"
+                android:textSize="12sp"
+                android:visibility="gone" />
 
             <LinearLayout
                 android:layout_width="match_parent"

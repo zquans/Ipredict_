@@ -11,6 +11,7 @@ import android.widget.TextView;
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.Response;
+import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.woyuce.activity.AppContext;
 import com.woyuce.activity.BaseActivity;
@@ -80,10 +81,11 @@ public class LoginThirdChoiceActivity extends BaseActivity implements View.OnCli
      * 请求跳过第三方注册直接登录
      */
     private void jumpThird() {
+        progressdialogshow(this);
         StringRequest jumpRequest = new StringRequest(Request.Method.POST, Constants.URL_Login_To_Jump, new Response.Listener<String>() {
             @Override
             public void onResponse(String s) {
-                ToastUtil.showMessage(LoginThirdChoiceActivity.this, "jumpThird = " + s);
+                progressdialogcancel();
                 try {
                     JSONObject obj = new JSONObject(s);
                     if (obj.getString("code").equals("0")) {
@@ -104,7 +106,12 @@ public class LoginThirdChoiceActivity extends BaseActivity implements View.OnCli
                     e.printStackTrace();
                 }
             }
-        }, null) {
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError volleyError) {
+                progressdialogcancel();
+            }
+        }) {
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
                 HashMap<String, String> headers = new HashMap<>();
@@ -116,14 +123,14 @@ public class LoginThirdChoiceActivity extends BaseActivity implements View.OnCli
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {
                 HashMap<String, String> map = new HashMap<>();
-                map.put("type", type);
-                map.put("openId", openId);
+                map.put("accounttypekey", type);
+                map.put("openid", openId);
                 map.put("unionid", TextUtils.isEmpty(unionid) ? openId : unionid);
-                map.put("accessToken", accessToken);
+                map.put("accesstoken", accessToken);
                 map.put("expiresin", expiresin);
-                map.put("userName", userName);
-                map.put("userGender", userGender);
-                map.put("userIcon", userIcon);
+                map.put("nickname", userName);
+                map.put("gender", userGender);
+                map.put("useravatarurl", userIcon);
                 map.put("deviceid", deviceid);
                 return map;
             }

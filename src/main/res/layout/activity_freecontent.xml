@@ -36,10 +36,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical|right"
-                android:layout_marginRight="2dp"
-                android:background="@drawable/buttonstyle"
+                android:layout_marginRight="4dp"
                 android:text="查看页码"
-                android:textColor="#ffffff" />
+                android:textColor="#ffffff"
+                android:textSize="@dimen/textsize_18" />
         </FrameLayout>
 
         <LinearLayout

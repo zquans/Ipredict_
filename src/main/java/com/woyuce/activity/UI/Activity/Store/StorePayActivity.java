@@ -58,6 +58,7 @@ public class StorePayActivity extends BaseActivity implements View.OnClickListen
     //获取默认收货地址
     private String URL = "http://api.iyuce.com/v1/store/getdefaultaddr";
     private String local_skuids = "";
+    private boolean bIsAddress = false;
 
     public void back(View view) {
         finish();
@@ -184,6 +185,7 @@ public class StorePayActivity extends BaseActivity implements View.OnClickListen
                         mTxtAddressTwo.setText("去新增地址");
                         mTxtAddressTwo.setGravity(Gravity.CENTER_HORIZONTAL);
                     } else {
+                        bIsAddress = true;
                         obj = arr.getJSONObject(0);
                         mTxtAddressOne.setText(obj.getString("name") + "\r\r" + obj.getString("mobile"));
                         mTxtAddressTwo.setText("QQ:" + obj.getString("q_q") + "\r\r" + "邮箱" + obj.getString("email"));
@@ -233,6 +235,10 @@ public class StorePayActivity extends BaseActivity implements View.OnClickListen
     public void nowPay(View view) {
         if (total_price == 0) {
             ToastUtil.showMessage(this, "快去添加商品吧");
+            return;
+        }
+        if (!bIsAddress) {
+            ToastUtil.showMessage(this, "无效的联系人信息，请检查收货信息是否有误");
             return;
         }
         if (TextUtils.isEmpty(PreferenceUtil.getSharePre(this).getString("userId", null))) {
