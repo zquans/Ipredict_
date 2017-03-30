@@ -40,20 +40,6 @@
     <color name="login_quick_login_text_color">#8f8f8f</color>
     <color name="login_input_dividing_line_bg">#cbcbcb</color>
 
-    <!-- 注册界面 -->
-    <color name="register_agreement_color">#4da0e4</color>
-    <color name="register_phone_button_enable_color">#ffffff</color>
-    <color name="register_phone_button_disable_color">#e3f1fa</color>
-
-    <!-- 协议dialog -->
-    <color name="dialog_title_bg">#00adef</color>
-    <color name="dialog_container_bg">#ffffff</color>
-
-    <!-- 主界面导航 -->
-    <color name="navigation_bg">#f8f8f8</color>
-    <color name="navigation_text_normal_color">#2c2c2c</color>
-    <color name="navigation_text_selected_color">#1cb6f4</color>
-
     <!-- "我的"界面 -->
     <color name="mine_bg">#ffffff</color>
     <color name="mine_bg_selected">#d9d9d9</color>
@@ -89,21 +75,7 @@
     <color name="blue_bg_selected">#0392cd</color>
     <color name="blue_bg_unable">#dedede</color>
 
-    <!--  songyao  -->
-    <color name="message_new_background">#eeeeee</color>
-    <color name="message_new_name_textcolor">#333333</color>
-    <color name="message_new_value_textcolor">#536893</color>
-
     <color name="footer_line">#cccccc</color>
     <color name="footer_text">#666666</color>
 
-    <color name="userinfo_signture_background">#eeeeee</color>
-
-    <!-- 用户信息-->
-    <color name="personal_page_item_background">#ffffff</color>
-    <color name="personal_page_background">#eeeeee</color>
-    <color name="personal_page_systemdynamic_background">#eeeeee</color>
-    <color name="personal_page_dynamic_textcolor_gray">#b0b0b0</color>
-    <color name="personal_page_leadactivity_textcolor">#333333</color>
-    <color name="personal_page_signture_null_textcolor">#f1f1f1</color>
 </resources>

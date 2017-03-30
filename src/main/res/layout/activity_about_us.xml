@@ -30,7 +30,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:gravity="center"
-        android:text="版本号： 3.1.0"
+        android:text="@string/app_version"
         android:textColor="#aaaaaa" />
 
     <View

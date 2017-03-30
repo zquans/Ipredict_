@@ -29,16 +29,14 @@
             android:background="@mipmap/arrow_white_back"
             android:onClick="back" />
 
-        <TextView
-            android:id="@+id/txt_store_to_custom"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
+        <ImageView
+            android:id="@+id/img_store_to_custom"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
             android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
             android:layout_marginRight="8dp"
-            android:gravity="center"
-            android:text="客服"
-            android:textColor="#fff"
-            android:textSize="16sp" />
+            android:background="@mipmap/icon_custom_header" />
 
     </RelativeLayout>
 

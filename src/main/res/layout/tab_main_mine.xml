@@ -35,7 +35,8 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="0.6"
-        android:background="#ffffff">
+        android:background="#ffffff"
+        android:scrollbars="none">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -55,7 +56,8 @@
                     android:id="@+id/txt_tab5_message"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:drawableLeft="@mipmap/my_updateinfo"
+                    android:drawableLeft="@mipmap/my_lesson"
+                    android:gravity="center_vertical"
                     android:text="     查看课表"
                     android:textColor="#a2a2a2"
                     android:textSize="16sp" />
@@ -66,6 +68,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="8dp"
                     android:layout_weight="1"
+                    android:gravity="center_vertical"
                     android:text="登录后可见"
                     android:textColor="#f0742e"
                     android:textSize="16sp" />
@@ -81,7 +84,7 @@
                 android:id="@+id/txt_to_store"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:drawableLeft="@mipmap/my_exam"
+                android:drawableLeft="@mipmap/my_cart"
                 android:gravity="center_vertical"
                 android:padding="8dp"
                 android:text="     购物车"
@@ -98,7 +101,7 @@
                 android:id="@+id/txt_to_orderlist"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:drawableLeft="@mipmap/my_message"
+                android:drawableLeft="@mipmap/my_order"
                 android:gravity="center_vertical"
                 android:padding="8dp"
                 android:text="     我的订单"
@@ -123,6 +126,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:drawableLeft="@mipmap/my_coin"
+                    android:gravity="center_vertical"
                     android:text="     我的金币"
                     android:textColor="#a2a2a2"
                     android:textSize="16sp" />
@@ -133,6 +137,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="8dp"
                     android:layout_weight="1"
+                    android:gravity="center_vertical"
                     android:textColor="#f0742e"
                     android:textSize="16sp" />
             </LinearLayout>
@@ -155,8 +160,8 @@
                     android:id="@+id/txt_tab5_room"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:drawableLeft="@mipmap/my_examroom"
-                    android:gravity="center"
+                    android:drawableLeft="@mipmap/my_room"
+                    android:gravity="center_vertical"
                     android:text="     我的考场"
                     android:textColor="#a2a2a2"
                     android:textSize="16sp" />
@@ -167,6 +172,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="8dp"
                     android:layout_weight="1"
+                    android:gravity="center_vertical"
                     android:textColor="#f0742e"
                     android:textSize="16sp" />
             </LinearLayout>
@@ -188,7 +194,8 @@
                     android:id="@+id/txt_tab5_subject"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:drawableLeft="@mipmap/my_exam"
+                    android:drawableLeft="@mipmap/my_test"
+                    android:gravity="center_vertical"
                     android:text="     我的考题"
                     android:textColor="#a2a2a2"
                     android:textSize="16sp" />
@@ -217,7 +224,7 @@
                 android:id="@+id/txt_to_service"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:drawableLeft="@mipmap/my_examroom"
+                android:drawableLeft="@mipmap/my_custom_service"
                 android:gravity="center_vertical"
                 android:padding="8dp"
                 android:text="     在线客服"
@@ -234,7 +241,7 @@
                 android:id="@+id/txt_to_clearcache"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:drawableLeft="@mipmap/my_message"
+                android:drawableLeft="@mipmap/my_clear"
                 android:gravity="center_vertical"
                 android:padding="8dp"
                 android:text="     清除缓存"
@@ -251,7 +258,7 @@
                 android:id="@+id/txt_to_update"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:drawableLeft="@mipmap/my_updateinfo"
+                android:drawableLeft="@mipmap/my_update"
                 android:gravity="center_vertical"
                 android:padding="8dp"
                 android:text="     版本更新"
@@ -268,7 +275,7 @@
                 android:id="@+id/txt_to_suggestion"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:drawableLeft="@mipmap/my_suggestion"
+                android:drawableLeft="@mipmap/my_suggest"
                 android:gravity="center_vertical"
                 android:padding="8dp"
                 android:text="     意见反馈"
@@ -285,7 +292,7 @@
                 android:id="@+id/txt_to_aboutus"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:drawableLeft="@mipmap/my_about_us"
+                android:drawableLeft="@mipmap/my_about"
                 android:gravity="center_vertical"
                 android:padding="8dp"
                 android:text="     关于我们"
@@ -302,7 +309,7 @@
                 android:id="@+id/txt_to_signout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:drawableLeft="@mipmap/my_suggestion"
+                android:drawableLeft="@mipmap/my_login_out"
                 android:gravity="center_vertical"
                 android:padding="8dp"
                 android:text="     切换账号"

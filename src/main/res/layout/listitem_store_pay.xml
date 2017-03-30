@@ -10,8 +10,10 @@
 
     <TextView
         android:id="@+id/txt_listitem_storepay_name"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginRight="8dp"
+        android:layout_toLeftOf="@+id/txt_listitem_storepay_price"
         android:text="商品名称"
         android:textColor="#000000"
         android:textStyle="bold" />

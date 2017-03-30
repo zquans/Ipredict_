@@ -13,20 +13,20 @@ import android.support.v4.view.ViewPager;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
-import android.widget.TextView;
+import android.widget.ImageView;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.toolbox.StringRequest;
 import com.woyuce.activity.AppContext;
-import com.woyuce.activity.R;
-import com.woyuce.activity.Controller.Mine.CustomServiceActivity;
+import com.woyuce.activity.Common.Constants;
 import com.woyuce.activity.Controller.Main.MainActivity;
+import com.woyuce.activity.Controller.Mine.CustomServiceActivity;
+import com.woyuce.activity.R;
 import com.woyuce.activity.Utils.DbUtil;
 import com.woyuce.activity.Utils.LogUtil;
 import com.woyuce.activity.Utils.PreferenceUtil;
 import com.woyuce.activity.Utils.ToastUtil;
-import com.woyuce.activity.Common.Constants;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -43,7 +43,7 @@ public class StoreGoodsActivity extends FragmentActivity implements View.OnClick
     private ArrayList<Fragment> mFragmentList;
     private ArrayList<String> mTabList = new ArrayList<>();
 
-    private TextView mTxtToCustom;
+    private ImageView mImgToCustom;
     private Button mBtnGoToCar, mBtnPutIntoCar, mBtnBuyNow;
 
     //存放数据
@@ -141,8 +141,8 @@ public class StoreGoodsActivity extends FragmentActivity implements View.OnClick
         mBtnGoToCar = (Button) findViewById(R.id.btn_activity_storegoods_tocar);
         mBtnPutIntoCar = (Button) findViewById(R.id.btn_activity_storegoods_putincar);
         mBtnBuyNow = (Button) findViewById(R.id.btn_activity_storegoods_buynow);
-        mTxtToCustom = (TextView) findViewById(R.id.txt_store_to_custom);
-        mTxtToCustom.setOnClickListener(this);
+        mImgToCustom = (ImageView) findViewById(R.id.img_store_to_custom);
+        mImgToCustom.setOnClickListener(this);
         mBtnGoToCar.setOnClickListener(this);
         mBtnPutIntoCar.setOnClickListener(this);
         mBtnBuyNow.setOnClickListener(this);
@@ -282,7 +282,7 @@ public class StoreGoodsActivity extends FragmentActivity implements View.OnClick
                 }
                 ToastUtil.showMessage(this, "您的购物车空空哒，快去添加商品吧！");
                 break;
-            case R.id.txt_store_to_custom:
+            case R.id.img_store_to_custom:
                 startActivity(new Intent(this, CustomServiceActivity.class));
                 break;
         }

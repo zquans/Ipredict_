@@ -1,6 +1,7 @@
 package com.woyuce.activity.Controller.Store;
 
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -11,22 +12,23 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
+import android.widget.ImageButton;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.jcodecraeer.xrecyclerview.XRecyclerView;
-import com.woyuce.activity.Controller.Mine.CustomServiceActivity;
 import com.woyuce.activity.Adapter.Store.StoreHomeAdapter;
 import com.woyuce.activity.AppContext;
+import com.woyuce.activity.Common.Constants;
+import com.woyuce.activity.Controller.Mine.CustomServiceActivity;
 import com.woyuce.activity.Model.Store.StoreBean;
 import com.woyuce.activity.Model.Store.StoreGoods;
 import com.woyuce.activity.R;
+import com.woyuce.activity.Utils.DbUtil;
 import com.woyuce.activity.Utils.GlideImageLoader;
 import com.woyuce.activity.Utils.LogUtil;
-import com.woyuce.activity.Utils.PreferenceUtil;
 import com.woyuce.activity.Utils.ToastUtil;
 import com.youth.banner.Banner;
 import com.youth.banner.BannerConfig;
@@ -42,7 +44,7 @@ import java.util.List;
 
 public class FragmentStoreHome extends Fragment implements View.OnClickListener {
 
-    private Button mBtnToCustom, mBtnToStoreCar;
+    private ImageButton mBtnToCustom, mBtnToStoreCar;
     private Banner mBanner;
 
     private XRecyclerView mRecycler;
@@ -126,8 +128,8 @@ public class FragmentStoreHome extends Fragment implements View.OnClickListener 
         //给Item中的Image宽高用
         screen_width = getActivity().getWindowManager().getDefaultDisplay().getWidth();
 
-        mBtnToCustom = (Button) view.findViewById(R.id.imgbtn_store_toCustom);
-        mBtnToStoreCar = (Button) view.findViewById(R.id.imgbtn_store_toStoreCar);
+        mBtnToCustom = (ImageButton) view.findViewById(R.id.imgbtn_store_toCustom);
+        mBtnToStoreCar = (ImageButton) view.findViewById(R.id.imgbtn_store_toStoreCar);
         mBtnToCustom.setOnClickListener(this);
         mBtnToStoreCar.setOnClickListener(this);
 
@@ -239,11 +241,14 @@ public class FragmentStoreHome extends Fragment implements View.OnClickListener 
                 startActivity(new Intent(getActivity(), CustomServiceActivity.class));
                 break;
             case R.id.imgbtn_store_toStoreCar:
-                if (!PreferenceUtil.getSharePre(getActivity()).getString("storetb_is_exist", "no").equals("yes")) {
-                    ToastUtil.showMessage(getActivity(), "您的购物车空空哒，快去添加商品吧！");
-                    return;
+                SQLiteDatabase mDatabase = DbUtil.getHelper(getActivity(), Constants.DATABASE_IYUCE).getWritableDatabase();
+                String isNone = DbUtil.queryToExist(mDatabase, Constants.TABLE_SQLITE_MASTER, Constants.NAME, Constants.TABLE_NAME, Constants.TABLE_CART);
+                mDatabase.close();
+                if (!isNone.equals(Constants.NONE)) {
+                    startActivity(new Intent(getActivity(), StoreCartActivity.class));
+                    break;
                 }
-                startActivity(new Intent(getActivity(), StoreCartActivity.class));
+                ToastUtil.showMessage(getActivity(), "您的购物车空空哒，快去添加商品吧！");
                 break;
         }
     }
