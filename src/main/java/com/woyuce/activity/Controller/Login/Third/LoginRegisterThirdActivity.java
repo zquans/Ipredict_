@@ -21,6 +21,7 @@ import com.woyuce.activity.BaseActivity;
 import com.woyuce.activity.Common.Constants;
 import com.woyuce.activity.Controller.Login.LoginActivity;
 import com.woyuce.activity.R;
+import com.woyuce.activity.Utils.LogUtil;
 import com.woyuce.activity.Utils.PreferenceUtil;
 import com.woyuce.activity.Utils.ToastUtil;
 
@@ -195,13 +196,15 @@ public class LoginRegisterThirdActivity extends BaseActivity implements View.OnC
         StringRequest stringRequest = new StringRequest(Request.Method.POST, Constants.URL_Login_Third_Register, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
-                ToastUtil.showMessage(LoginRegisterThirdActivity.this, response);
+//                ToastUtil.showMessage(LoginRegisterThirdActivity.this, response);
+                LogUtil.e("1 = " + response);
                 try {
                     JSONObject obj;
                     obj = new JSONObject(response);
                     // 成功则Toast，并返回Login界面
                     if (obj.getString("code").equals("0")) {
                         obj = obj.getJSONObject("data");
+                        LogUtil.e("2");
                         PreferenceUtil.save(LoginRegisterThirdActivity.this, "userId", obj.getString("userid"));
                         PreferenceUtil.save(LoginRegisterThirdActivity.this, "mUserName", obj.getString("username"));
                         PreferenceUtil.save(LoginRegisterThirdActivity.this, "Permission", obj.getString("permission"));
@@ -209,6 +212,7 @@ public class LoginRegisterThirdActivity extends BaseActivity implements View.OnC
                         PreferenceUtil.save(LoginRegisterThirdActivity.this, "update", obj.getString("login_time"));
                         PreferenceUtil.save(LoginRegisterThirdActivity.this, "mtimer", obj.getString("exam_time"));
 
+                        LogUtil.e("3");
                         ToastUtil.showMessage(LoginRegisterThirdActivity.this, "恭喜您,注册成功!");
                         Intent intent = new Intent(LoginRegisterThirdActivity.this, LoginActivity.class);
                         intent.putExtra("username_register", mEdtUsername.getText().toString());
@@ -216,8 +220,10 @@ public class LoginRegisterThirdActivity extends BaseActivity implements View.OnC
                         startActivity(intent);
                         finish();
                     } else {
+                        LogUtil.e("4");
                         ToastUtil.showMessage(LoginRegisterThirdActivity.this, obj.getString("message"));
                     }
+                    LogUtil.e("5");
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -225,7 +231,8 @@ public class LoginRegisterThirdActivity extends BaseActivity implements View.OnC
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError volleyError) {
-                ToastUtil.showMessage(LoginRegisterThirdActivity.this, volleyError.getMessage());
+                ToastUtil.showMessage(LoginRegisterThirdActivity.this, "网络错误" + volleyError.getMessage());
+                LogUtil.e("error");
             }
         }) {
             @Override
@@ -258,7 +265,7 @@ public class LoginRegisterThirdActivity extends BaseActivity implements View.OnC
             }
         };
         stringRequest.setTag(Tag_Volley);
-        stringRequest.setRetryPolicy(new DefaultRetryPolicy(1000, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+        stringRequest.setRetryPolicy(new DefaultRetryPolicy(1000, 1, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         AppContext.getHttpQueue().add(stringRequest);
     }
 

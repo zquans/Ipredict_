@@ -15,11 +15,11 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.woyuce.activity.AppContext;
 import com.woyuce.activity.BaseActivity;
-import com.woyuce.activity.R;
+import com.woyuce.activity.Common.Constants;
 import com.woyuce.activity.Controller.Main.MainActivity;
+import com.woyuce.activity.R;
 import com.woyuce.activity.Utils.PreferenceUtil;
 import com.woyuce.activity.Utils.ToastUtil;
-import com.woyuce.activity.Common.Constants;
 
 import org.json.JSONException;
 import org.json.JSONObject;
