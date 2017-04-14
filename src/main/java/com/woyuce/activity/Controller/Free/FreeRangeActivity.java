@@ -10,18 +10,14 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request.Method;
-import com.android.volley.Response;
-import com.android.volley.Response.ErrorListener;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
 import com.nostra13.universalimageloader.core.ImageLoader;
-import com.woyuce.activity.BaseActivity;
 import com.woyuce.activity.Adapter.Free.FreeRangeAdapter;
-import com.woyuce.activity.AppContext;
+import com.woyuce.activity.BaseActivity;
+import com.woyuce.activity.Common.Constants;
 import com.woyuce.activity.Model.Free.FreeRange;
 import com.woyuce.activity.R;
+import com.woyuce.activity.Utils.Http.Volley.HttpUtil;
+import com.woyuce.activity.Utils.Http.Volley.RequestInterface;
 import com.woyuce.activity.Utils.LogUtil;
 import com.woyuce.activity.Utils.PreferenceUtil;
 import com.woyuce.activity.Utils.ToastUtil;
@@ -33,7 +29,6 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class FreeRangeActivity extends BaseActivity implements OnItemClickListener, OnClickListener {
 
@@ -42,13 +37,13 @@ public class FreeRangeActivity extends BaseActivity implements OnItemClickListen
     private ListView mListView;
 
     private String localtoken;
-    private String URL = "http://api.iyuce.com/v1/exam/free";
+    //    private String URL = "http://api.iyuce.com/v1/exam/free";
     private List<FreeRange> rangeList = new ArrayList<>();
 
     @Override
     protected void onStop() {
         super.onStop();
-        AppContext.getHttpQueue().cancelAll("range");
+        HttpUtil.removeTag(Constants.ACTIVITY_RANGE);
     }
 
     @Override
@@ -71,6 +66,7 @@ public class FreeRangeActivity extends BaseActivity implements OnItemClickListen
         mBtnClear.setOnClickListener(this);
         mListView.setOnItemClickListener(this);
 
+        localtoken = PreferenceUtil.getSharePre(FreeRangeActivity.this).getString("localtoken", "");
         // 第一次引导的动画
         boolean b = PreferenceUtil.getSharePre(FreeRangeActivity.this).contains("imgclearguide");
         if (b == true) {
@@ -80,28 +76,14 @@ public class FreeRangeActivity extends BaseActivity implements OnItemClickListen
 
     private void requestJson() {
         progressdialogshow(this);
-        StringRequest rangeRequest = new StringRequest(Method.POST, URL, new Response.Listener<String>() {
+        HashMap<String, String> headers = new HashMap<>();
+        headers.put("Authorization", "Bearer " + localtoken);
+        HttpUtil.post(Constants.URL_POST_FREE_RANGE, headers, null, Constants.ACTIVITY_RANGE, new RequestInterface() {
             @Override
-            public void onResponse(String response) {
-                doSuccess(response);
+            public void doSuccess(String result) {
+                onSuccess(result);
             }
-        }, new ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                progressdialogcancel();
-                LogUtil.e("Wrong-BACK", "联接错误原因： " + error.getMessage());
-            }
-        }) {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<>();
-                localtoken = PreferenceUtil.getSharePre(FreeRangeActivity.this).getString("localtoken", "");
-                headers.put("Authorization", "Bearer " + localtoken);
-                return headers;
-            }
-        };
-        rangeRequest.setTag("range");
-        AppContext.getHttpQueue().add(rangeRequest);
+        });
     }
 
     /**
@@ -109,7 +91,7 @@ public class FreeRangeActivity extends BaseActivity implements OnItemClickListen
      *
      * @param response
      */
-    private void doSuccess(String response) {
+    private void onSuccess(String response) {
         JSONObject jsonObject;
         FreeRange range;
         try {

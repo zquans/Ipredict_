@@ -75,10 +75,10 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 
     private String strPassword, strUserName; // 本类中变量，用于下次登录时作自动登录的数据
     private String localtoken;
-    private String LOGIN_URL = "http://api.iyuce.com/v1001/account/login";
-    private String URL_UPLOADTIME = "http://api.iyuce.com/v1/exam/setexamtime";
-    private String URL_SEND_PHONE_MSG = "http://api.iyuce.com/v1/common/sendsmsvericode";
-    private String URL_LOGIN_WITH_MESSAGE = "http://api.iyuce.com/v1/account/smslogin";
+    //    private String LOGIN_URL = "http://api.iyuce.com/v1001/account/login";
+//    private String URL_UPLOADTIME = "http://api.iyuce.com/v1/exam/setexamtime";
+//    private String URL_SEND_PHONE_MSG = "http://api.iyuce.com/v1/common/sendsmsvericode";
+//    private String URL_LOGIN_WITH_MESSAGE = "http://api.iyuce.com/v1/account/smslogin";
 
     // 注册页面跳转过来用
     private String username_register, password_register, timer_register;
@@ -161,7 +161,6 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
             localtoken = PreferenceUtil.getSharePre(LoginActivity.this).getString("localtoken", "");
         }
         LogUtil.e("localtoken = " + localtoken);
-
 
         //判断是否有权限
         if (hasPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE)) {
@@ -311,7 +310,7 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
         HashMap<String, String> params = new HashMap<>();
         params.put("user_id", userid);
         params.put("exam_time", mTime);
-        HttpUtil.post(URL_UPLOADTIME, headers, params, "login", new RequestInterface() {
+        HttpUtil.post(Constants.URL_POST_LOGIN_UPLOADTIME, headers, params, Constants.ACTIVITY_LOGIN, new RequestInterface() {
             @Override
             public void doSuccess(String result) {
                 try {
@@ -397,7 +396,7 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
         params.put("username", strUserName);
         params.put("password", strPassword);
         params.put("deviceid", AppContext.getDeviceToken());
-        HttpUtil.post(LOGIN_URL, headers, params, "login", new RequestInterface() {
+        HttpUtil.post(Constants.URL_POST_LOGIN, headers, params, Constants.ACTIVITY_LOGIN, new RequestInterface() {
             @Override
             public void doSuccess(String result) {
                 onSuccess(result);
@@ -473,7 +472,7 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
         params.put("accountmobile", mobile);
         params.put("smsvalidcode", validatecode);
         params.put("deviceid", AppContext.getDeviceToken());
-        HttpUtil.post(URL_LOGIN_WITH_MESSAGE, headers, params, "login", new RequestInterface() {
+        HttpUtil.post(Constants.URL_POST_LOGIN_WITH_MESSAGE, headers, params, Constants.ACTIVITY_LOGIN, new RequestInterface() {
             @Override
             public void doSuccess(String result) {
                 onSuccess(result);
@@ -491,7 +490,7 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
         HashMap<String, String> params = new HashMap<>();
         params.put("phone", edtMobile.getText().toString().trim());
         params.put("template", "VeriCode");
-        HttpUtil.post(URL_SEND_PHONE_MSG, headers, params, "login", new RequestInterface() {
+        HttpUtil.post(Constants.URL_POST_LOGIN_SEND_PHONE_MSG, headers, params, Constants.ACTIVITY_LOGIN, new RequestInterface() {
             @Override
             public void doSuccess(String result) {
                 JSONObject obj;

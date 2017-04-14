@@ -21,10 +21,11 @@ import com.android.volley.Response.Listener;
 import com.android.volley.toolbox.StringRequest;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
-import com.woyuce.activity.BaseActivity;
 import com.woyuce.activity.Adapter.Writting.WitSubcategoryAdapter;
 import com.woyuce.activity.Adapter.Writting.WitspnAdapter;
 import com.woyuce.activity.AppContext;
+import com.woyuce.activity.BaseActivity;
+import com.woyuce.activity.Common.Constants;
 import com.woyuce.activity.Model.Writting.WitCategory;
 import com.woyuce.activity.Model.Writting.WitSubcategory;
 import com.woyuce.activity.R;
@@ -99,11 +100,10 @@ public class WitSubcategoryActivity extends BaseActivity
         spnCategory.setOnItemSelectedListener(this);
     }
 
-    // ��ʼ���ص��ʶͼ
     private void initGuidemap() {
         DisplayImageOptions options = new DisplayImageOptions.Builder().cacheInMemory(true).cacheOnDisk(true)
                 .bitmapConfig(Bitmap.Config.RGB_565).build();
-        ImageLoader.getInstance().displayImage("http://www.iyuce.com/res/images/xz.jpg", mGuidemap, options);
+        ImageLoader.getInstance().displayImage(Constants.URL_GUIDE_IMG_WRITTING, mGuidemap, options);
     }
 
     private void getSpinnerJson() {

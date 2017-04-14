@@ -11,6 +11,7 @@ import android.widget.TextView;
 import com.woyuce.activity.AppContext;
 import com.woyuce.activity.BaseActivity;
 import com.woyuce.activity.R;
+import com.woyuce.activity.Utils.Http.Volley.HttpUtil;
 import com.woyuce.activity.Utils.LogUtil;
 
 import java.io.IOException;
@@ -34,7 +35,8 @@ public class OpenContentActivity extends BaseActivity implements View.OnClickLis
     protected void onDestroy() {
         super.onDestroy();
         mp.release();
-        AppContext.getHttpQueue().cancelAll("post");
+//        AppContext.getHttpQueue().cancelAll("post");
+        HttpUtil.removeTag("post");
     }
 
     @Override

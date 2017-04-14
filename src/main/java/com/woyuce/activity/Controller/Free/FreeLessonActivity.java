@@ -9,17 +9,14 @@ import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
 import com.nostra13.universalimageloader.core.ImageLoader;
-import com.woyuce.activity.BaseActivity;
 import com.woyuce.activity.Adapter.Free.FreeLessonAdapter;
-import com.woyuce.activity.AppContext;
+import com.woyuce.activity.BaseActivity;
+import com.woyuce.activity.Common.Constants;
 import com.woyuce.activity.Model.Free.FreeLesson;
 import com.woyuce.activity.R;
+import com.woyuce.activity.Utils.Http.Volley.HttpUtil;
+import com.woyuce.activity.Utils.Http.Volley.RequestInterface;
 import com.woyuce.activity.Utils.LogUtil;
 import com.woyuce.activity.Utils.PreferenceUtil;
 import com.woyuce.activity.Utils.ToastUtil;
@@ -31,10 +28,9 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
- * Created by Administrator on 2016/9/21.
+ * Created by Administrator on 2016/9/21
  */
 public class FreeLessonActivity extends BaseActivity implements AdapterView.OnItemClickListener, View.OnClickListener {
 
@@ -43,14 +39,15 @@ public class FreeLessonActivity extends BaseActivity implements AdapterView.OnIt
     private ImageView mBack;
     private GridView mGridView;
 
-    private String URL = "http://api.iyuce.com/v1/exam/freeexamtype";
+    //    private String URL = "http://api.iyuce.com/v1/exam/freeexamtype";
     private String localtoken, localMonthid, localTitle;
     private List<FreeLesson> lessonList = new ArrayList<>();
 
     @Override
     protected void onStop() {
         super.onStop();
-        AppContext.getHttpQueue().cancelAll("lesson");
+        HttpUtil.removeTag(Constants.ACTIVITY_LESSON);
+//        AppContext.getHttpQueue().cancelAll("lesson");
     }
 
     @Override
@@ -66,6 +63,7 @@ public class FreeLessonActivity extends BaseActivity implements AdapterView.OnIt
         Bundle bundle = getIntent().getExtras();
         localMonthid = bundle.getString("localMonthid");
         localTitle = bundle.getString("localTitle");
+        localtoken = PreferenceUtil.getSharePre(FreeLessonActivity.this).getString("localtoken", "");
 
         mTitle = (TextView) findViewById(R.id.txt_lesson_title);
         mBack = (ImageView) findViewById(R.id.arrow_back);
@@ -81,50 +79,27 @@ public class FreeLessonActivity extends BaseActivity implements AdapterView.OnIt
     // 请求接口
     private void getJson() {
         progressdialogshow(this);
-        StringRequest lessonRequest = new StringRequest(Request.Method.POST, URL, new Response.Listener<String>() {
+        HashMap<String, String> headers = new HashMap<>();
+        headers.put("Authorization", "Bearer " + localtoken);
+        HashMap<String, String> params = new HashMap<>();
+        params.put("", localMonthid);
+        HttpUtil.post(Constants.URL_POST_FREE_LESSON, headers, params, Constants.ACTIVITY_LESSON, new RequestInterface() {
             @Override
-            public void onResponse(String response) {
-                doSuccess(response);
+            public void doSuccess(String result) {
+                onSuccess(result);
             }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                LogUtil.e("Wrong-BACK", "连接错误原因： " + error.getMessage() + error);
-                progressdialogcancel();
-            }
-        }) {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<>();
-                localtoken = PreferenceUtil.getSharePre(FreeLessonActivity.this).getString("localtoken", "");
-                headers.put("Authorization", "Bearer " + localtoken);
-                return headers;
-            }
-
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                HashMap<String, String> map = new HashMap<>();
-                map.put("", localMonthid);
-                return map;
-            }
-        };
-        lessonRequest.setTag("lesson");
-        AppContext.getHttpQueue().add(lessonRequest);
+        });
     }
 
     /**
      * 请求成功后执行
-     *
-     * @param response
      */
-    private void doSuccess(String response) {
+    private void onSuccess(String response) {
         JSONObject jsonObject;
         FreeLesson lesson;
         try {
-            LogUtil.i("response = " + response.toString());
             jsonObject = new JSONObject(response);
-            int result = jsonObject.getInt("code");
-            if (result == 0) {
+            if (jsonObject.getInt("code") == 0) {
                 JSONArray data = jsonObject.getJSONArray("data");
                 for (int i = 0; i < data.length(); i++) {
                     jsonObject = data.getJSONObject(i);

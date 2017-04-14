@@ -13,26 +13,21 @@ import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
-import com.woyuce.activity.BaseActivity;
-import com.woyuce.activity.Controller.Store.StoreGoodsActivity;
-import com.woyuce.activity.Controller.WebNoCookieActivity;
 import com.woyuce.activity.Adapter.Free.FreePageAdapter;
 import com.woyuce.activity.Adapter.Free.FreeSectionAdapter;
-import com.woyuce.activity.AppContext;
+import com.woyuce.activity.BaseActivity;
+import com.woyuce.activity.Common.Constants;
+import com.woyuce.activity.Controller.Store.StoreGoodsActivity;
+import com.woyuce.activity.Controller.WebNoCookieActivity;
 import com.woyuce.activity.Model.Free.FreePage;
 import com.woyuce.activity.Model.Free.FreeSection;
 import com.woyuce.activity.R;
-import com.woyuce.activity.Utils.LogUtil;
+import com.woyuce.activity.Utils.Http.Volley.HttpUtil;
+import com.woyuce.activity.Utils.Http.Volley.RequestInterface;
 import com.woyuce.activity.Utils.PreferenceUtil;
 import com.woyuce.activity.Utils.ToastUtil;
-import com.woyuce.activity.Common.Constants;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -41,10 +36,9 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
- * Created by Administrator on 2016/9/21.
+ * Created by Administrator on 2016/9/21
  */
 public class FreePageActivity extends BaseActivity implements View.OnClickListener, AdapterView.OnItemClickListener {
 
@@ -55,10 +49,10 @@ public class FreePageActivity extends BaseActivity implements View.OnClickListen
     private FrameLayout flSection;
 
     // URL地址
-    private String URL_SECTION = "http://api.iyuce.com/v1/exam/section";
-    private String URL_PAGE = "http://api.iyuce.com/v1/exam/subjects";
-    private String URL_CHECKRIGHT = "http://api.iyuce.com/v1/exam/checkuserforwlb";
-    private String URL_CANCELTAG = "http://api.iyuce.com/v1/exam/cancelexams";
+//    private String URL_SECTION = "http://api.iyuce.com/v1/exam/section";
+//    private String URL_PAGE = "http://api.iyuce.com/v1/exam/subjects";
+//    private String URL_CHECKRIGHT = "http://api.iyuce.com/v1/exam/checkuserforwlb";
+//    private String URL_CANCELTAG = "http://api.iyuce.com/v1/exam/cancelexams";
 
     private int mSectionlength;
     // 用于判断状态的boolean值
@@ -81,7 +75,8 @@ public class FreePageActivity extends BaseActivity implements View.OnClickListen
     @Override
     protected void onStop() {
         super.onStop();
-        AppContext.getHttpQueue().cancelAll("page");
+//        AppContext.getHttpQueue().cancelAll("page");
+        HttpUtil.removeTag(Constants.ACTIVITY_PAGE);
     }
 
     @Override
@@ -98,6 +93,7 @@ public class FreePageActivity extends BaseActivity implements View.OnClickListen
         localunit_name = bundle.getString("localunit_name");
         localunit_id = bundle.getString("localunit_id");
         localshow_type_id = bundle.getString("localshow_type_id");
+        localtoken = PreferenceUtil.getSharePre(FreePageActivity.this).getString("localtoken", "");
 
         mTitle = (TextView) findViewById(R.id.txt_page_title);
         mAll = (TextView) findViewById(R.id.txt_page_all);
@@ -131,23 +127,32 @@ public class FreePageActivity extends BaseActivity implements View.OnClickListen
         DisplayImageOptions options = new DisplayImageOptions.Builder().cacheInMemory(true).cacheOnDisk(true)
                 .bitmapConfig(Bitmap.Config.RGB_565).build();
         if (imgurl.equals("wangluoban")) {
-            ImageLoader.getInstance().displayImage("http://www.iyuce.com/res/images/assault.jpg", mGuidemap, options);
+            ImageLoader.getInstance().displayImage(Constants.URL_GUIDE_IMG_NET, mGuidemap, options);
         } else {
-            ImageLoader.getInstance().displayImage("http://www.iyuce.com/res/images/tl.jpg", mGuidemap, options);
+            ImageLoader.getInstance().displayImage(Constants.URL_GUIDE_IMG_FREE, mGuidemap, options);
         }
     }
 
     // 加载章节
     private void getSectionJson() {
-        StringRequest strinRequest = new StringRequest(Request.Method.POST, URL_SECTION, new Response.Listener<String>() {
+        progressdialogshow(this);
+        HashMap<String, String> headers = new HashMap<>();
+        headers.put("Authorization", "Bearer " + localtoken);
+        HashMap<String, String> params = new HashMap<>();
+        params.put("unit_id", localunit_id);
+        if (isPageImportants == IMPORTANT_NULL) {
+            params.put("important", "");
+        } else if (isPageImportants == IMPORTANT_TRUE) {
+            params.put("important", "true");
+        }
+        HttpUtil.post(Constants.URL_POST_FREE_SECTION, headers, params, Constants.ACTIVITY_PAGE, new RequestInterface() {
             @Override
-            public void onResponse(String response) {
-                JSONObject obj;
-                JSONArray arr;
+            public void doSuccess(String result) {
                 try {
-                    obj = new JSONObject(response);
-                    int result = obj.getInt("code");
-                    if (result == 0) {
+                    JSONObject obj;
+                    JSONArray arr;
+                    obj = new JSONObject(result);
+                    if (obj.getInt("code") == 0) {
                         arr = obj.getJSONArray("data");
                         FreeSection section;
                         mSectionlength = arr.length();
@@ -192,45 +197,48 @@ public class FreePageActivity extends BaseActivity implements View.OnClickListen
                     e.printStackTrace();
                 }
             }
-        }, null) {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<>();
-                localtoken = PreferenceUtil.getSharePre(FreePageActivity.this).getString("localtoken", "");
-                headers.put("Authorization", "Bearer " + localtoken);
-                return headers;
-            }
-
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                HashMap<String, String> map = new HashMap<>();
-                map.put("unit_id", localunit_id);
-                if (isPageImportants == IMPORTANT_NULL) {
-                    map.put("important", "");
-                } else if (isPageImportants == IMPORTANT_TRUE) {
-                    map.put("important", "true");
-                }
-                return map;
-            }
-
-        };
-        strinRequest.setTag("page");
-        AppContext.getHttpQueue().add(strinRequest);
+        });
     }
 
     // 加载书页
     private void getPageJson() {
         progressdialogshow(this);
-        StringRequest strinRequest = new StringRequest(Request.Method.POST, URL_PAGE, new Response.Listener<String>() {
+        HashMap<String, String> headers = new HashMap<>();
+        headers.put("Authorization", "Bearer " + localtoken);
+        HashMap<String, String> params = new HashMap<>();
+        params.put("unit_id", localunit_id);
+        params.put("user_id", PreferenceUtil.getSharePre(FreePageActivity.this).getString("userId", ""));
+        // 判断获取到的章节数组是否为空
+        if (localsection_id == null) {
+            params.put("section_id", "");
+        } else {
+            params.put("section_id", localsection_id);
+        }
+
+        // 判断是否查看会做,三种状态的boolean
+        if (isCanDo == CANDO_FALSE) {
+            params.put("is_can_do", "false");
+        } else if (isCanDo == CANDO_NULL) {
+            params.put("is_can_do", "");
+        } else if (isCanDo == CANDO_TRUE) {
+            params.put("is_can_do", "true");
+        }
+
+        // 判断是否查看重点,三种状态的boolean
+        if (isPageImportants == IMPORTANT_NULL) {
+            params.put("important", "");
+        } else if (isPageImportants == IMPORTANT_TRUE) {
+            params.put("important", "true");
+        }
+        HttpUtil.post(Constants.URL_POST_FREE_PAGE, headers, params, Constants.ACTIVITY_PAGE, new RequestInterface() {
             @Override
-            public void onResponse(String response) {
-                JSONObject obj;
-                JSONArray arr;
-                FreePage page;
+            public void doSuccess(String result) {
                 try {
-                    obj = new JSONObject(response);
-                    int result = obj.getInt("code");
-                    if (result == 0) {
+                    JSONObject obj;
+                    JSONArray arr;
+                    FreePage page;
+                    obj = new JSONObject(result);
+                    if (obj.getInt("code") == 0) {
                         arr = obj.getJSONArray("data");
                         for (int i = 0; i < arr.length(); i++) {
                             obj = arr.getJSONObject(i);
@@ -277,7 +285,6 @@ public class FreePageActivity extends BaseActivity implements View.OnClickListen
                             pageEmptyImglist.add(page.sub_img_empty);
                             pageList.add(page);
                         }
-                    } else {
                     }
                     // 第二步，将数据放到适配器中
                     FreePageAdapter adapter = new FreePageAdapter(FreePageActivity.this, pageList);
@@ -287,57 +294,7 @@ public class FreePageActivity extends BaseActivity implements View.OnClickListen
                     e.printStackTrace();
                 }
             }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                progressdialogcancel();
-            }
-        }) {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<>();
-                localtoken = PreferenceUtil.getSharePre(FreePageActivity.this).getString("localtoken", "");
-                headers.put("Authorization", "Bearer " + localtoken);
-                return headers;
-            }
-
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                HashMap<String, String> map = new HashMap<>();
-                map.put("unit_id", localunit_id);
-                map.put("user_id", PreferenceUtil.getSharePre(FreePageActivity.this).getString("userId", ""));
-
-                // 判断获取到的章节数组是否为空
-                if (localsection_id == null) {
-                    map.put("section_id", "");
-                } else {
-                    map.put("section_id", localsection_id);
-                }
-
-                // 判断是否查看会做,三种状态的boolean
-                if (isCanDo == CANDO_FALSE) {
-                    map.put("is_can_do", "false");
-                } else if (isCanDo == CANDO_NULL) {
-                    map.put("is_can_do", "");
-                } else if (isCanDo == CANDO_TRUE) {
-                    map.put("is_can_do", "true");
-                }
-
-                // 判断是否查看重点,三种状态的boolean
-                if (isPageImportants == IMPORTANT_NULL) {
-                    map.put("important", "");
-                } else if (isPageImportants == IMPORTANT_TRUE) {
-                    map.put("important", "true");
-                }
-
-                LogUtil.e("localunit_id" + localunit_id + ",,"
-                        + PreferenceUtil.getSharePre(FreePageActivity.this).getString("userId", "") + ",,");
-                return map;
-            }
-
-        };
-        strinRequest.setTag("page");
-        AppContext.getHttpQueue().add(strinRequest);
+        });
     }
 
     @Override
@@ -496,11 +453,11 @@ public class FreePageActivity extends BaseActivity implements View.OnClickListen
      * 获取商城商品信息
      */
     private void getactivegoods() {
-        StringRequest getGoodsRequest = new StringRequest(Request.Method.GET, Constants.URL_GetGoods, new Response.Listener<String>() {
+        HttpUtil.get(Constants.URL_GetGoods, Constants.ACTIVITY_PAGE, new RequestInterface() {
             @Override
-            public void onResponse(String s) {
+            public void doSuccess(String result) {
                 try {
-                    JSONObject obj = new JSONObject(s);
+                    JSONObject obj = new JSONObject(result);
                     if (obj.getString("code").equals("0")) {
                         obj = obj.getJSONObject("data");
                         Intent intent = new Intent(FreePageActivity.this, StoreGoodsActivity.class);
@@ -515,24 +472,25 @@ public class FreePageActivity extends BaseActivity implements View.OnClickListen
                     e.printStackTrace();
                 }
             }
-        }, null);
-        getGoodsRequest.setTag("page");
-        AppContext.getHttpQueue().add(getGoodsRequest);
+        });
     }
 
     /**
      * 检测有无网络班权限
      */
     private void checkRight(final int flag) {
-        StringRequest strinrequest = new StringRequest(Request.Method.POST, URL_CHECKRIGHT, new Response.Listener<String>() {
+        HashMap<String, String> headers = new HashMap<>();
+        headers.put("Authorization", "Bearer " + localtoken);
+        HashMap<String, String> params = new HashMap<>();
+        params.put("user_id", PreferenceUtil.getSharePre(FreePageActivity.this).getString("userId", ""));
+        params.put("gid", "99");
+        HttpUtil.post(Constants.URL_POST_NET_CHECKRIGHT, headers, params, Constants.ACTIVITY_PAGE, new RequestInterface() {
             @Override
-            public void onResponse(String response) {
-                JSONArray arr;
-                JSONObject obj;
+            public void doSuccess(String result) {
                 try {
-                    obj = new JSONObject(response);
-                    int result = obj.getInt("code");
-                    if (result == 0 && obj.getString("data").equals("1")) {
+                    JSONObject obj;
+                    obj = new JSONObject(result);
+                    if (obj.getInt("code") == 0 && obj.getString("data").equals("1")) {
                         // 取消的标识，则做取消的请求
                         if (flag == CANCEL_TAG) {
                             new AlertDialog.Builder(FreePageActivity.this, AlertDialog.THEME_DEVICE_DEFAULT_LIGHT)
@@ -560,7 +518,6 @@ public class FreePageActivity extends BaseActivity implements View.OnClickListen
 
                             getSectionJson();
                         }
-
                     } else {
                         showBuyAd();
                     }
@@ -568,39 +525,26 @@ public class FreePageActivity extends BaseActivity implements View.OnClickListen
                     e.printStackTrace();
                 }
             }
-        }, null) {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<>();
-                headers.put("Authorization", "Bearer " + localtoken);
-                return headers;
-            }
-
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                HashMap<String, String> map = new HashMap<>();
-                map.put("user_id", PreferenceUtil.getSharePre(FreePageActivity.this).getString("userId", ""));
-                map.put("gid", "99");
-                return map;
-            }
-        };
-        strinrequest.setTag("page");
-        AppContext.getHttpQueue().add(strinrequest);
+        });
     }
 
     /**
      * 取消所有标识
      */
     private void requestCancealtag() {
-        StringRequest requestCanceltag = new StringRequest(Request.Method.POST, URL_CANCELTAG, new Response.Listener<String>() {
+        HashMap<String, String> headers = new HashMap<>();
+        headers.put("Authorization", "Bearer " + localtoken);
+        HashMap<String, String> params = new HashMap<>();
+        params.put("user_id", PreferenceUtil.getSharePre(FreePageActivity.this).getString("userId", ""));
+        params.put("unit_id", "");
+        params.put("section_id", "");
+        HttpUtil.post(Constants.URL_POST_NET_CANCELTAG, headers, params, Constants.ACTIVITY_PAGE, new RequestInterface() {
             @Override
-            public void onResponse(String response) {
-                JSONArray arr;
-                JSONObject obj;
+            public void doSuccess(String result) {
                 try {
-                    obj = new JSONObject(response);
-                    int result = obj.getInt("code");
-                    if (result == 0) {
+                    JSONObject obj;
+                    obj = new JSONObject(result);
+                    if (obj.getInt("code") == 0) {
                         ToastUtil.showMessage(FreePageActivity.this, "取消成功");
                     } else {
                         ToastUtil.showMessage(FreePageActivity.this, "取消失败");
@@ -609,24 +553,6 @@ public class FreePageActivity extends BaseActivity implements View.OnClickListen
                     e.printStackTrace();
                 }
             }
-        }, null) {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<>();
-                headers.put("Authorization", "Bearer " + localtoken);
-                return headers;
-            }
-
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                HashMap<String, String> map = new HashMap<>();
-                map.put("user_id", PreferenceUtil.getSharePre(FreePageActivity.this).getString("userId", ""));
-                map.put("unit_id", "");
-                map.put("section_id", "");
-                return map;
-            }
-        };
-        requestCanceltag.setTag("page");
-        AppContext.getHttpQueue().add(requestCanceltag);
+        });
     }
 }

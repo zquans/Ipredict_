@@ -11,16 +11,14 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.toolbox.StringRequest;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
-import com.woyuce.activity.BaseActivity;
 import com.woyuce.activity.Adapter.Free.FreeListPageAdapter;
-import com.woyuce.activity.AppContext;
+import com.woyuce.activity.BaseActivity;
+import com.woyuce.activity.Common.Constants;
 import com.woyuce.activity.R;
+import com.woyuce.activity.Utils.Http.Volley.HttpUtil;
+import com.woyuce.activity.Utils.Http.Volley.RequestInterface;
 import com.woyuce.activity.Utils.LogUtil;
 import com.woyuce.activity.Utils.PreferenceUtil;
 import com.woyuce.activity.Utils.ToastUtil;
@@ -32,12 +30,11 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import uk.co.senab.photoview.PhotoView;
 
 /**
- * Created by Administrator on 2016/9/21.
+ * Created by Administrator on 2016/9/21
  */
 public class FreeContentActivity extends BaseActivity implements View.OnClickListener, AdapterView.OnItemClickListener, FragmentCheckSpell.IShowButton {
 
@@ -67,12 +64,13 @@ public class FreeContentActivity extends BaseActivity implements View.OnClickLis
     private ImageView mImgGuide;
 
     // 留给Fragment用的答案准备
-    private String URL_TOANSWER = "http://api.iyuce.com/v1/exam/answers";
+//    private String URL_TOANSWER = "http://api.iyuce.com/v1/exam/answers";
 
     @Override
     protected void onDestroy() {
-        AppContext.getHttpQueue().cancelAll("content");
         super.onDestroy();
+//        AppContext.getHttpQueue().cancelAll("content");
+        HttpUtil.removeTag(Constants.ACTIVITY_CONTENT);
     }
 
     @Override
@@ -95,7 +93,6 @@ public class FreeContentActivity extends BaseActivity implements View.OnClickLis
         pageIdlist = intent.getStringArrayListExtra("pageIdlist");
         pageColorlist = intent.getStringArrayListExtra("pageColorlist");
         pageEmptyImglist = intent.getStringArrayListExtra("pageEmptyImglist");
-        LogUtil.e("pageColorlist = " + pageColorlist);
 
         mBack = (ImageView) findViewById(R.id.back);
         mPre = (ImageView) findViewById(R.id.img_pre);
@@ -149,30 +146,27 @@ public class FreeContentActivity extends BaseActivity implements View.OnClickLis
      * 拼写检查,如果答案的长度为0，则不显示Fragment
      */
     private void requestJson() {
-        StringRequest toanswerRequest = new StringRequest(Request.Method.POST, URL_TOANSWER, new Response.Listener<String>() {
+        HashMap<String, String> headers = new HashMap<>();
+        String localtoken = PreferenceUtil.getSharePre(FreeContentActivity.this).getString("localtoken", "");
+        headers.put("Authorization", "Bearer " + localtoken);
+        HashMap<String, String> params = new HashMap<>();
+        params.put("", pageIdlist.get(localposition));
+        HttpUtil.post(Constants.URL_POST_FREE_TOANSWER, headers, params, Constants.ACTIVITY_CONTENT, new RequestInterface() {
             @Override
-            public void onResponse(String response) {
-                LogUtil.e("requestJson() =");
-                JSONObject obj;
-                JSONArray arr;
+            public void doSuccess(String result) {
                 try {
-                    obj = new JSONObject(response);
-                    int result = obj.getInt("code");
-                    if (result == 0) {
+                    JSONObject obj;
+                    JSONArray arr;
+                    obj = new JSONObject(result);
+                    if (obj.getInt("code") == 0) {
                         arr = obj.getJSONArray("data");
                         if (arr.length() == 0) {
                             ToastUtil.showMessage(FreeContentActivity.this, "亲，真遗憾，本页答案还未制作好哦");
                         } else {
-                            // 构造Fragement向下传递
                             getImage(pageEmptyImglist.get(localposition));
+                            // 构造Fragement向下传递
                             FragmentTransaction mTransaction = getFragmentManager().beginTransaction();
-                            String localtoken = PreferenceUtil.getSharePre(FreeContentActivity.this).getString("localtoken",
-                                    "");
-
-//							淘汰该方法(构造函数传值)，换为Bundle传值，Fragment还是空构造
-//							mFragment = new FragmentCheckSpell(pageIdlist.get(localposition), localtoken, pageEmptyImglist.get(localposition),localunit_id,
-//									localsection_id);
-//							add(R.id.frame_activity_content, mFragment).addToBackStack(null).commit();
+                            String localtoken = PreferenceUtil.getSharePre(FreeContentActivity.this).getString("localtoken", "");
                             mFragment = new FragmentCheckSpell();
                             Bundle bundle = new Bundle();
                             bundle.putString("localsubid", pageIdlist.get(localposition));
@@ -186,32 +180,12 @@ public class FreeContentActivity extends BaseActivity implements View.OnClickLis
                             mTransaction.replace(R.id.frame_activity_content, mFragment).commit();
                             mBtnToShowFrame.setVisibility(View.GONE);
                         }
-                    } else {
-                        // 失败的处理
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
             }
-        }, null) {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<>();
-                String localtoken = PreferenceUtil.getSharePre(FreeContentActivity.this).getString("localtoken", "");
-                headers.put("Authorization", "Bearer " + localtoken);
-                return headers;
-            }
-
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                HashMap<String, String> map = new HashMap<String, String>();
-                map.put("", pageIdlist.get(localposition));
-                LogUtil.e(" pageIdlist.get(localposition) = " + pageImglist.get(localposition));
-                return map;
-            }
-        };
-        toanswerRequest.setTag("content");
-        AppContext.getHttpQueue().add(toanswerRequest);
+        });
     }
 
     @Override

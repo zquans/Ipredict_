@@ -38,6 +38,29 @@ public class HttpUtil {
     }
 
     /**
+     * Get请求
+     */
+    public static void get(String url, String tag, final HashMap<String, String> headers, final RequestInterface requestInterface) {
+        if (TextUtils.isEmpty(url)) {
+            return;
+        }
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                requestInterface.doSuccess(response);
+            }
+        }, null) {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                return headers;
+            }
+        };
+        stringRequest.setTag(tag);
+        AppContext.getHttpQueue().add(stringRequest);
+    }
+
+
+    /**
      * Post请求
      */
     public static void post(String url, final HashMap<String, String> headers, final HashMap<String, String> params, String tag, final RequestInterface requestInterface) {

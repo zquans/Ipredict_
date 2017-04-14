@@ -9,20 +9,16 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.toolbox.StringRequest;
 import com.jcodecraeer.xrecyclerview.ProgressStyle;
 import com.jcodecraeer.xrecyclerview.XRecyclerView;
 import com.woyuce.activity.Adapter.Gongyi.GongyiLessonAdapter;
-import com.woyuce.activity.AppContext;
 import com.woyuce.activity.BaseActivity;
+import com.woyuce.activity.Common.Constants;
 import com.woyuce.activity.Model.Gongyi.GongyiAudio;
 import com.woyuce.activity.R;
-import com.woyuce.activity.Utils.LogUtil;
+import com.woyuce.activity.Utils.Http.Volley.HttpUtil;
+import com.woyuce.activity.Utils.Http.Volley.RequestInterface;
 import com.woyuce.activity.Utils.PreferenceUtil;
-import com.woyuce.activity.Common.Constants;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -30,10 +26,9 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
 
 /**
- * Created by Administrator on 2016/9/21.
+ * Created by Administrator on 2016/9/21
  */
 public class OpenLessonActivity extends BaseActivity implements View.OnClickListener, XRecyclerView.LoadingListener {
 
@@ -71,7 +66,8 @@ public class OpenLessonActivity extends BaseActivity implements View.OnClickList
     @Override
     protected void onStop() {
         super.onStop();
-        AppContext.getHttpQueue().cancelAll("audiolesson");
+//        AppContext.getHttpQueue().cancelAll("audiolesson");
+        HttpUtil.removeTag(Constants.ACTIVITY_AUDIO_LESSON);
     }
 
     @Override
@@ -105,15 +101,21 @@ public class OpenLessonActivity extends BaseActivity implements View.OnClickList
     }
 
     private void getListRequest(final int code, String url, final String type_id, final int page_num) {
-        StringRequest audioListRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
+        HashMap<String, String> headers = new HashMap<>();
+        String localtoken = PreferenceUtil.getSharePre(this).getString("localtoken", "");
+        headers.put("Authorization", "Bearer " + localtoken);
+        HashMap<String, String> params = new HashMap<>();
+        params.put("type_id", type_id);
+        params.put("date", "");
+        params.put("page", page_num + "");
+        HttpUtil.post(url, headers, params, Constants.ACTIVITY_AUDIO_LESSON, new RequestInterface() {
             @Override
-            public void onResponse(String response) {
-                LogUtil.e("response audiolist= " + response);
+            public void doSuccess(String result) {
                 try {
                     JSONObject obj;
                     JSONArray arr;
                     GongyiAudio audio;
-                    obj = new JSONObject(response);
+                    obj = new JSONObject(result);
                     if (obj.getInt("code") == 0) {
                         arr = obj.getJSONArray("data");
                         if (isRefresh) {
@@ -142,41 +144,23 @@ public class OpenLessonActivity extends BaseActivity implements View.OnClickList
                     e.printStackTrace();
                 }
             }
-        }, null) {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<>();
-                String localtoken = PreferenceUtil.getSharePre(OpenLessonActivity.this).getString("localtoken", "");
-                headers.put("Authorization", "Bearer " + localtoken);
-                return headers;
-            }
-
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                HashMap<String, String> map = new HashMap<>();
-                map.put("type_id", type_id);
-                map.put("date", "");
-                map.put("page", page_num + "");
-                return map;
-            }
-        };
-        audioListRequest.setTag("audiolesson");
-        AppContext.getHttpQueue().add(audioListRequest);
+        });
     }
 
     /**
      * 获取音频类型
-     *
-     * @param url
      */
     private void getTypeRequest(String url) {
-        StringRequest audioTypeRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
+        HashMap<String, String> headers = new HashMap<>();
+        String localtoken = PreferenceUtil.getSharePre(this).getString("localtoken", "");
+        headers.put("Authorization", "Bearer " + localtoken);
+        HttpUtil.get(url, Constants.ACTIVITY_AUDIO_LESSON, headers, new RequestInterface() {
             @Override
-            public void onResponse(String s) {
+            public void doSuccess(String result) {
                 try {
                     JSONObject obj;
                     JSONArray arr;
-                    obj = new JSONObject(s);
+                    obj = new JSONObject(result);
                     if (obj.getString("code").equals("0")) {
                         arr = obj.getJSONArray("data");
                         GongyiAudio audio;
@@ -197,17 +181,7 @@ public class OpenLessonActivity extends BaseActivity implements View.OnClickList
                     e.printStackTrace();
                 }
             }
-        }, null) {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<>();
-                String localtoken = PreferenceUtil.getSharePre(OpenLessonActivity.this).getString("localtoken", "");
-                headers.put("Authorization", "Bearer " + localtoken);
-                return headers;
-            }
-        };
-        audioTypeRequest.setTag("audiolesson");
-        AppContext.getHttpQueue().add(audioTypeRequest);
+        });
     }
 
     @Override
