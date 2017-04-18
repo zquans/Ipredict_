@@ -9,19 +9,15 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request.Method;
-import com.android.volley.Response.ErrorListener;
-import com.android.volley.Response.Listener;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.woyuce.activity.BaseActivity;
+import com.woyuce.activity.Common.Constants;
 import com.woyuce.activity.Controller.WebActivity;
-import com.woyuce.activity.AppContext;
 import com.woyuce.activity.Model.Writting.WitContent;
 import com.woyuce.activity.R;
+import com.woyuce.activity.Utils.Http.Volley.HttpUtil;
+import com.woyuce.activity.Utils.Http.Volley.RequestInterface;
 import com.woyuce.activity.Utils.LogUtil;
 
 import org.json.JSONArray;
@@ -29,7 +25,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
-import java.util.Map;
 
 import uk.co.senab.photoview.PhotoView;
 
@@ -40,13 +35,14 @@ public class WitContentActivity extends BaseActivity implements OnClickListener 
     private ImageView mImgview;
     private PhotoView photoView;
 
-    private String URL = "http://iphone.ipredicting.com/xzsubContent.aspx";
+    //    private String URL = "http://iphone.ipredicting.com/xzsubContent.aspx";
     private String localsubCategoryid, localname, localsubid, localimgUrl, localanswerUrl;
 
     @Override
     protected void onStop() {
         super.onStop();
-        AppContext.getHttpQueue().cancelAll("witcontent");
+//        AppContext.getHttpQueue().cancelAll("witcontent");
+        HttpUtil.removeTag(Constants.ACTIVITY_WIT_CONTENT);
     }
 
     @Override
@@ -84,15 +80,21 @@ public class WitContentActivity extends BaseActivity implements OnClickListener 
 
     private void getJson() {
         progressdialogshow(WitContentActivity.this);
-        StringRequest strinrequest = new StringRequest(Method.POST, URL, new Listener<String>() {
+        HashMap<String, String> params = new HashMap<>();
+        if (localsubid == null) {
+            params.put("subCategoryid", localsubCategoryid);
+        } else {
+            params.put("subid", localsubid);
+        }
+        HttpUtil.post(Constants.URL_POST_WRITTING_CONTENT, params, Constants.ACTIVITY_WIT_CONTENT, new RequestInterface() {
             @Override
-            public void onResponse(String response) {
-                JSONObject jsonobj;
-                WitContent witcontent;
+            public void doSuccess(String result) {
+                LogUtil.e("getNoticeJson = ");
                 try {
-                    jsonobj = new JSONObject(response);
-                    int result = jsonobj.getInt("code");
-                    if (result == 0) {
+                    JSONObject jsonobj;
+                    WitContent witcontent;
+                    jsonobj = new JSONObject(result);
+                    if (jsonobj.getInt("code") == 0) {
                         JSONArray data = jsonobj.getJSONArray("data");
                         jsonobj = data.getJSONObject(0);
                         witcontent = new WitContent();
@@ -103,34 +105,13 @@ public class WitContentActivity extends BaseActivity implements OnClickListener 
                         localimgUrl = witcontent.subimg; // 拿到了图片地址
                         txtContent.setText(witcontent.subname);
                         progressdialogcancel();
-                    } else {
-                        LogUtil.e("Code Wrong", "请求失败 =" + response);
                     }
                     showImage();
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
             }
-        }, new ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                LogUtil.e("Request Wrong", "请求失败 =" + error);
-                progressdialogcancel();
-            }
-        }) {
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                Map<String, String> hashMap = new HashMap<>();
-                if (localsubid == null) {
-                    hashMap.put("subCategoryid", localsubCategoryid);
-                } else {
-                    hashMap.put("subid", localsubid);
-                }
-                return hashMap;
-            }
-        };
-        strinrequest.setTag("witcontent");
-        AppContext.getHttpQueue().add(strinrequest);
+        });
     }
 
     private void showImage() {

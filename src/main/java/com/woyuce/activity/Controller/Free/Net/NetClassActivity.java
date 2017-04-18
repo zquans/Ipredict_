@@ -11,21 +11,17 @@ import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
+import com.woyuce.activity.Adapter.Free.Net.NetClassCourseAdapter;
 import com.woyuce.activity.BaseActivity;
+import com.woyuce.activity.Common.Constants;
 import com.woyuce.activity.Controller.Store.StoreGoodsActivity;
 import com.woyuce.activity.Controller.WebNoCookieActivity;
-import com.woyuce.activity.Adapter.Free.Net.NetClassCourseAdapter;
-import com.woyuce.activity.AppContext;
 import com.woyuce.activity.Model.Free.Net.NetBean;
 import com.woyuce.activity.R;
+import com.woyuce.activity.Utils.Http.Volley.HttpUtil;
+import com.woyuce.activity.Utils.Http.Volley.RequestInterface;
 import com.woyuce.activity.Utils.LogUtil;
 import com.woyuce.activity.Utils.PreferenceUtil;
-import com.woyuce.activity.Common.Constants;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -34,10 +30,9 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
- * Created by Administrator on 2016/9/21.
+ * Created by Administrator on 2016/9/21
  */
 
 public class NetClassActivity extends BaseActivity
@@ -57,15 +52,16 @@ public class NetClassActivity extends BaseActivity
     private List<String> classidList = new ArrayList<>();
 
     private List<NetBean> wcgList = new ArrayList<>();
-    private static final String URL_TIME = "http://api.iyuce.com/v1/exam/notifydropdownlist";
-    private static final String URL_NOTICE = "http://api.iyuce.com/v1/exam/notifycontent";
-    private static final String URL_WebCourse = "http://api.iyuce.com/v1/exam/webcoursegroup";
+    //    private static final String URL_TIME = "http://api.iyuce.com/v1/exam/notifydropdownlist";
+    //    private static final String URL_NOTICE = "http://api.iyuce.com/v1/exam/notifycontent";
+    //    private static final String URL_WebCourse = "http://api.iyuce.com/v1/exam/webcoursegroup";
     private String localtoken;
 
     @Override
     protected void onStop() {
         super.onStop();
-        AppContext.getHttpQueue().cancelAll("wangluoban");
+//        AppContext.getHttpQueue().cancelAll("wangluoban");
+        HttpUtil.removeTag(Constants.ACTIVITY_NET);
     }
 
     @Override
@@ -95,16 +91,21 @@ public class NetClassActivity extends BaseActivity
         gridview.setOnItemClickListener(this);
     }
 
-    /* 获取notice的数据，初始传值为null */
+    //获取notice的数据，初始传值为null
     private void getNoticeJson() {
-        StringRequest strinRequest = new StringRequest(Request.Method.POST, URL_NOTICE, new Response.Listener<String>() {
+        HashMap<String, String> headers = new HashMap<>();
+        headers.put("Authorization", "Bearer " + localtoken);
+        HashMap<String, String> params = new HashMap<>();
+        params.put("exam_time", localdate);
+        params.put("class_type", localclass);
+        HttpUtil.post(Constants.URL_POST_NET_NOTICE, headers, params, Constants.ACTIVITY_NET, new RequestInterface() {
             @Override
-            public void onResponse(String response) {
+            public void doSuccess(String result) {
                 LogUtil.e("getNoticeJson = ");
-                JSONObject obj;
-                JSONArray arr;
                 try {
-                    obj = new JSONObject(response);
+                    JSONObject obj;
+                    JSONArray arr;
+                    obj = new JSONObject(result);
                     arr = obj.getJSONArray("data");
                     if (arr.length() >= 1) {
                         txtcontent.setText(arr.getString(0));
@@ -115,40 +116,24 @@ public class NetClassActivity extends BaseActivity
                     e.printStackTrace();
                 }
             }
-        }, null) {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<>();
-                headers.put("Authorization", "Bearer " + localtoken);
-                return headers;
-            }
-
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                HashMap<String, String> map = new HashMap<>();
-                map.put("exam_time", localdate);
-                map.put("class_type", localclass);
-                return map;
-            }
-        };
-        strinRequest.setTag("wangluoban");
-        AppContext.getHttpQueue().add(strinRequest);
+        });
     }
 
-    /* 获取spn的数据 */
+    // 获取spn的数据
     private void getSpinnerJson() {
-        StringRequest strinrequest = new StringRequest(Request.Method.POST, URL_TIME, new Response.Listener<String>() {
+        HashMap<String, String> headers = new HashMap<>();
+        headers.put("Authorization", "Bearer " + localtoken);
+        HttpUtil.post(Constants.URL_POST_NET_TIME, headers, null, Constants.ACTIVITY_NET, new RequestInterface() {
             @Override
-            public void onResponse(String response) {
+            public void doSuccess(String result) {
                 LogUtil.e("getSpinnerJson = ");
-                JSONArray arr;
-                JSONArray examtime;
-                JSONObject obj;
-                String examdate;
                 try {
-                    obj = new JSONObject(response);
-                    int result = obj.getInt("code");
-                    if (result == 0) {
+                    JSONArray arr;
+                    JSONArray examtime;
+                    JSONObject obj;
+                    String examdate;
+                    obj = new JSONObject(result);
+                    if (obj.getInt("code") == 0) {
                         obj = obj.getJSONObject("data");
                         arr = obj.getJSONArray("class_type");
                         examtime = obj.getJSONArray("exam_time");
@@ -163,8 +148,6 @@ public class NetClassActivity extends BaseActivity
                             classnameList.add(obj.getString("wcg_name"));
                             classidList.add(obj.getString("wcg_id"));
                         }
-                    } else {
-                        // Log.e("Code Error", "code spnTimewrong" + response);
                     }
                     //数据加载完后放入
                     setSpnDate();
@@ -172,20 +155,7 @@ public class NetClassActivity extends BaseActivity
                     e.printStackTrace();
                 }
             }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-            }
-        }) {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
-                headers.put("Authorization", "Bearer " + localtoken);
-                return headers;
-            }
-        };
-        strinrequest.setTag("wangluoban");
-        AppContext.getHttpQueue().add(strinrequest);
+        });
     }
 
     /**
@@ -208,16 +178,17 @@ public class NetClassActivity extends BaseActivity
      */
     private void getWebCourse() {
         progressdialogshow(this);
-        StringRequest strinrequest = new StringRequest(Request.Method.POST, URL_WebCourse, new Response.Listener<String>() {
+        HashMap<String, String> headers = new HashMap<>();
+        headers.put("Authorization", "Bearer " + localtoken);
+        HttpUtil.post(Constants.URL_POST_NET_WEB_COURSE, headers, null, Constants.ACTIVITY_NET, new RequestInterface() {
             @Override
-            public void onResponse(String response) {
+            public void doSuccess(String result) {
                 LogUtil.e("getWebCourse = ");
-                JSONArray arr;
-                JSONObject obj;
                 try {
-                    obj = new JSONObject(response);
-                    int result = obj.getInt("code");
-                    if (result == 0) {
+                    JSONArray arr;
+                    JSONObject obj;
+                    obj = new JSONObject(result);
+                    if (obj.getInt("code") == 0) {
                         arr = obj.getJSONArray("data");
                         NetBean wcgbean;
                         for (int i = 0; i < arr.length(); i++) {
@@ -230,8 +201,6 @@ public class NetClassActivity extends BaseActivity
                             wcgbean.setImgUrl(obj.getString("img_url"));
                             wcgList.add(wcgbean);
                         }
-                    } else {
-                        // Log.e("Code Error", "code spnTimewrong" + response);
                     }
                     /* gridview设置adapter */
                     webcourseAdapter = new NetClassCourseAdapter(NetClassActivity.this, wcgList);
@@ -241,32 +210,18 @@ public class NetClassActivity extends BaseActivity
                 }
                 progressdialogcancel();
             }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                progressdialogcancel();
-            }
-        }) {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<>();
-                headers.put("Authorization", "Bearer " + localtoken);
-                return headers;
-            }
-        };
-        strinrequest.setTag("wangluoban");
-        AppContext.getHttpQueue().add(strinrequest);
+        });
     }
 
     /**
      * 获取商城商品信息
      */
     private void getactivegoods() {
-        StringRequest getGoodsRequest = new StringRequest(Request.Method.GET, Constants.URL_GetGoods, new Response.Listener<String>() {
+        HttpUtil.get(Constants.URL_GetGoods, Constants.ACTIVITY_NET, new RequestInterface() {
             @Override
-            public void onResponse(String s) {
+            public void doSuccess(String result) {
                 try {
-                    JSONObject obj = new JSONObject(s);
+                    JSONObject obj = new JSONObject(result);
                     if (obj.getString("code").equals("0")) {
                         obj = obj.getJSONObject("data");
                         Intent intent = new Intent(NetClassActivity.this, StoreGoodsActivity.class);
@@ -281,9 +236,7 @@ public class NetClassActivity extends BaseActivity
                     e.printStackTrace();
                 }
             }
-        }, null);
-        getGoodsRequest.setTag("wangluobanlesson");
-        AppContext.getHttpQueue().add(getGoodsRequest);
+        });
     }
 
     @Override

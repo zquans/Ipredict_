@@ -8,13 +8,11 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.toolbox.StringRequest;
-import com.woyuce.activity.AppContext;
 import com.woyuce.activity.BaseActivity;
+import com.woyuce.activity.Common.Constants;
 import com.woyuce.activity.R;
+import com.woyuce.activity.Utils.Http.Volley.HttpUtil;
+import com.woyuce.activity.Utils.Http.Volley.RequestInterface;
 import com.woyuce.activity.Utils.LogUtil;
 import com.woyuce.activity.Utils.PreferenceUtil;
 import com.woyuce.activity.Utils.ToastUtil;
@@ -22,10 +20,9 @@ import com.woyuce.activity.Utils.ToastUtil;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Map;
 
 /**
- * Created by Administrator on 2016/9/23.
+ * Created by Administrator on 2016/9/23
  */
 public class SuggestionActivity extends BaseActivity implements View.OnClickListener {
 
@@ -34,12 +31,13 @@ public class SuggestionActivity extends BaseActivity implements View.OnClickList
     private Button btnSure;
 
     private String mContent;
-    private String URl = "http://api.iyuce.com/v1/service/feedback";
+//    private String URl = "http://api.iyuce.com/v1/service/feedback";
 
     @Override
     protected void onStop() {
         super.onStop();
-        AppContext.getHttpQueue().cancelAll("suggestion");
+//        AppContext.getHttpQueue().cancelAll("suggestion");
+        HttpUtil.removeTag(Constants.ACTIVITY_SUGGESTION);
     }
 
     @Override
@@ -61,8 +59,6 @@ public class SuggestionActivity extends BaseActivity implements View.OnClickList
 
     /**
      * 返回日期字符串
-     *
-     * @return
      */
     public String getNowDate() {
         Date currentTime = new Date();
@@ -72,25 +68,18 @@ public class SuggestionActivity extends BaseActivity implements View.OnClickList
     }
 
     private void getJson() {
-        StringRequest aboutusrequest = new StringRequest(Request.Method.POST, URl, new Response.Listener<String>() {
+        HashMap<String, String> params = new HashMap<>();
+        params.put("user_id", PreferenceUtil.getSharePre(SuggestionActivity.this).getString("userId", ""));
+        params.put("createat", getNowDate());
+        params.put("content", mContent);
+        HttpUtil.post(Constants.URL_POST_SUGGESTION, params, Constants.ACTIVITY_SUGGESTION, new RequestInterface() {
             @Override
-            public void onResponse(String response) {
+            public void doSuccess(String result) {
                 LogUtil.e("suggest activty is here" + getNowDate());
                 ToastUtil.showMessage(SuggestionActivity.this, "亲，提交成功啦，感谢您的宝贵意见");
                 SuggestionActivity.this.finish();
             }
-        }, null) {
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                Map<String, String> hashmap = new HashMap<>();
-                hashmap.put("user_id", PreferenceUtil.getSharePre(SuggestionActivity.this).getString("userId", ""));
-                hashmap.put("createat", getNowDate());
-                hashmap.put("content", mContent);
-                return hashmap;
-            }
-        };
-        aboutusrequest.setTag("suggestion");
-        AppContext.getHttpQueue().add(aboutusrequest);
+        });
     }
 
     @Override

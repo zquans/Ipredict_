@@ -15,21 +15,17 @@ import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request.Method;
-import com.android.volley.Response.Listener;
-import com.android.volley.toolbox.StringRequest;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.woyuce.activity.Adapter.Writting.WitSubcategoryAdapter;
 import com.woyuce.activity.Adapter.Writting.WitspnAdapter;
-import com.woyuce.activity.AppContext;
 import com.woyuce.activity.BaseActivity;
 import com.woyuce.activity.Common.Constants;
 import com.woyuce.activity.Model.Writting.WitCategory;
 import com.woyuce.activity.Model.Writting.WitSubcategory;
 import com.woyuce.activity.R;
-import com.woyuce.activity.Utils.LogUtil;
+import com.woyuce.activity.Utils.Http.Volley.HttpUtil;
+import com.woyuce.activity.Utils.Http.Volley.RequestInterface;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -38,7 +34,6 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class WitSubcategoryActivity extends BaseActivity
         implements OnClickListener, OnItemClickListener, OnItemSelectedListener {
@@ -54,14 +49,15 @@ public class WitSubcategoryActivity extends BaseActivity
     private List<WitCategory> witcategoryList = new ArrayList<>();
     private String localid, localname;
     private String localsubCategoryid;
-    private String URL_CATEGORY = "http://iphone.ipredicting.com/xzsubCategory.aspx";
-    private String URL_TOTAL = "http://iphone.ipredicting.com/xzCategoryApi.aspx";
+    //    private String URL_CATEGORY = "http://iphone.ipredicting.com/xzsubCategory.aspx";
+    //    private String URL_TOTAL = "http://iphone.ipredicting.com/xzCategoryApi.aspx";
     private boolean isfirst = true;
 
     @Override
     protected void onStop() {
         super.onStop();
-        AppContext.getHttpQueue().cancelAll("witsubcategory");
+//        AppContext.getHttpQueue().cancelAll("witsubcategory");
+        HttpUtil.removeTag(Constants.ACTIVITY_WIT_SUBCATEGORY);
     }
 
     @Override
@@ -107,15 +103,14 @@ public class WitSubcategoryActivity extends BaseActivity
     }
 
     private void getSpinnerJson() {
-        StringRequest strinrequest = new StringRequest(Method.POST, URL_TOTAL, new Listener<String>() {
+        HttpUtil.get(Constants.URL_POST_WRITTING_TOTAL, Constants.ACTIVITY_WIT_SUBCATEGORY, new RequestInterface() {
             @Override
-            public void onResponse(String response) {
-                JSONObject jsonobj;
-                WitCategory witcategory;
+            public void doSuccess(String result) {
                 try {
-                    jsonobj = new JSONObject(response);
-                    int result = jsonobj.getInt("code");
-                    if (result == 0) {
+                    JSONObject jsonobj;
+                    WitCategory witcategory;
+                    jsonobj = new JSONObject(result);
+                    if (jsonobj.getInt("code") == 0) {
                         JSONArray data = jsonobj.getJSONArray("data");
                         for (int i = 0; i < data.length(); i++) {
                             jsonobj = data.getJSONObject(i);
@@ -124,29 +119,26 @@ public class WitSubcategoryActivity extends BaseActivity
                             witcategory.id = jsonobj.getString("id");
                             witcategoryList.add(witcategory);
                         }
-                    } else {
-                        LogUtil.e("Code Error", "code spinnerwrong" + response);
                     }
-                    setspnDate(); // ���ݼ�����ɺ��ٷ���
+                    setspnDate();
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
             }
-        }, null);
-        strinrequest.setTag("witsubcategory");
-        AppContext.getHttpQueue().add(strinrequest);
+        });
     }
 
     private void getJson() {
-        StringRequest strinrequest = new StringRequest(Method.POST, URL_CATEGORY, new Listener<String>() {
+        HashMap<String, String> params = new HashMap<>();
+        params.put("categoryid", localid);
+        HttpUtil.post(Constants.URL_POST_WRITTING_SUBCATEGORY, params, Constants.ACTIVITY_WIT_SUBCATEGORY, new RequestInterface() {
             @Override
-            public void onResponse(String response) {
-                JSONObject jsonobj;
-                WitSubcategory witsubcategory;
+            public void doSuccess(String result) {
                 try {
-                    jsonobj = new JSONObject(response);
-                    int result = jsonobj.getInt("code");
-                    if (result == 0) {
+                    JSONObject jsonobj;
+                    WitSubcategory witsubcategory;
+                    jsonobj = new JSONObject(result);
+                    if (jsonobj.getInt("code") == 0) {
                         JSONArray data = jsonobj.getJSONArray("data");
                         for (int i = 0; i < data.length(); i++) {
                             jsonobj = data.getJSONObject(i);
@@ -156,26 +148,14 @@ public class WitSubcategoryActivity extends BaseActivity
                             witsubcategory.subCategoryid = jsonobj.getString("subCategoryid");
                             witsubcategoryList.add(witsubcategory);
                         }
-                    } else {
-                        LogUtil.e("Code Error", "code wrong" + response);
                     }
-                    WitSubcategoryAdapter adapter = new WitSubcategoryAdapter(WitSubcategoryActivity.this,
-                            witsubcategoryList);
+                    WitSubcategoryAdapter adapter = new WitSubcategoryAdapter(WitSubcategoryActivity.this, witsubcategoryList);
                     gridView.setAdapter(adapter);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
             }
-        }, null) {
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                Map<String, String> hashMap = new HashMap<>();
-                hashMap.put("categoryid", localid);
-                return hashMap;
-            }
-        };
-        strinrequest.setTag("witsubcategory");
-        AppContext.getHttpQueue().add(strinrequest);
+        });
     }
 
     @Override
@@ -196,7 +176,7 @@ public class WitSubcategoryActivity extends BaseActivity
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        WitSubcategory witsubcategory = (WitSubcategory) witsubcategoryList.get(position);
+        WitSubcategory witsubcategory = witsubcategoryList.get(position);
         localsubCategoryid = witsubcategory.subCategoryid;
         String localname = witsubcategory.name;
         Intent it_witContent = new Intent(this, WitContentActivity.class);
@@ -207,10 +187,10 @@ public class WitSubcategoryActivity extends BaseActivity
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        if (isfirst == true) {
+        if (isfirst) {
             isfirst = false;
         } else {
-            WitCategory witcategory = (WitCategory) witcategoryList.get(position);
+            WitCategory witcategory = witcategoryList.get(position);
             localid = witcategory.id;
             localname = witcategory.name;
             txtTitle.setText(localname);

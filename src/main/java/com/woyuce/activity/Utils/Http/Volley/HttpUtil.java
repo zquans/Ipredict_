@@ -87,11 +87,26 @@ public class HttpUtil {
         AppContext.getHttpQueue().add(stringRequest);
     }
 
-
-    public static void post(String url, HashMap<String, String> param, String tag, final RequestInterface requestInterface) {
+    /**
+     * Post请求
+     */
+    public static void post(String url, final HashMap<String, String> param, String tag, final RequestInterface requestInterface) {
         if (TextUtils.isEmpty(url)) {
             return;
         }
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                requestInterface.doSuccess(response);
+            }
+        }, null) {
 
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                return param;
+            }
+        };
+        stringRequest.setTag(tag);
+        AppContext.getHttpQueue().add(stringRequest);
     }
 }

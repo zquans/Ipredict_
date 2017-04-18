@@ -9,6 +9,11 @@ public class Constants {
     public static final int CODE_START_ACTIVITY_FOR_RESULT = 1;
     public static final int REQUEST_CODE_FOR_ADDRESS = 0x0001;
 
+    //6.0权限
+    public static final int CODE_CAMERE = 0x0001;
+    public static final int CODE_WRITE_EXTERNAL_STORAGE = 0x0002;
+    public static final int CODE_READ_EXTERNAL_STORAGE = 0x0003;
+
     //数据库相关
     public static final String DATABASE_IYUCE = "IYUCE.db";
     public static final String TABLE_SQLITE_MASTER = "sqlite_master";   //sql系统表
@@ -23,21 +28,7 @@ public class Constants {
     public static final String COLUMN_PRICE = "Price";
     public static final String NONE = "none";
 
-    //第三方登录URL
-    public static final String URL_Login_To_Third = "http://api.iyuce.com/v1/account/logintothird"; //跳转第三方
-    public static final String URL_Login_To_Bind = "http://api.iyuce.com/v1/account/bindingsysuser";//第三方绑定已有账号
-    public static final String URL_Login_To_Jump = "http://api.iyuce.com/v1/account/jumpthirdregister";//第三方直接登录
-    public static final String URL_Login_Third_Register = "http://api.iyuce.com/v1/account/thirdregister"; //第三方提交注册
-    public static final String URL_Login_VAILD = "http://api.iyuce.com/v1/account/valid";       //验证用户名、邮箱等有限性
-    public static final String URL_Login_Register = "http://api.iyuce.com/v1/account/register"; //提交注册
-
-    //-----------------------------------------------------------------------------------------------------------------
-
-    public static final int CODE_CAMERE = 0x0001;
-    public static final int CODE_WRITE_EXTERNAL_STORAGE = 0x0002;
-    public static final int CODE_READ_EXTERNAL_STORAGE = 0x0003;
-
-    //Common
+    //Common 通用
     public static final String URL_GET_UPDATE = "http://www.iyuce.com/Scripts/andoird.json";
     public static final String URL_MONEY_INFO = "http://api.iyuce.com/v1/store/getusermoney?userid=";
     public static final String ACTIVITY_SUGGESTION = "Suggestion";
@@ -46,6 +37,7 @@ public class Constants {
     public static final String URL_POST_TAB_FIVE_MY_SUBJECT = "http://iphone.ipredicting.com/kymyshanesub.aspx";
     public static final String URL_GetGoods = "http://api.iyuce.com/v1/store/getactivegoods";       //网络班跳转商城获取商品信息
     public static final String URL_POST_SET_EXAM_TIME = "http://api.iyuce.com/v1/exam/setexamtime";    //倒计时提醒板
+    public static final String URL_EXAM_ANSWER = "http://sj.iyuce.com";    //考后笔记答案
 
     //WebView访问的URL汇总
     public static final String URL_TAB_BBS = "http://bbs.iyuce.com/bar/bbspullrefresh";
@@ -57,6 +49,14 @@ public class Constants {
     public static final String URL_GUIDE_IMG_FREE = "http://www.iyuce.com/res/images/tl.jpg";
     public static final String URL_GUIDE_IMG_SPEAKING = "http://www.iyuce.com/res/images/ky.jpg";
     public static final String URL_GUIDE_IMG_WRITTING = "http://www.iyuce.com/res/images/xz.jpg";
+
+    //第三方登录URL
+    public static final String URL_Login_To_Third = "http://api.iyuce.com/v1/account/logintothird"; //跳转第三方
+    public static final String URL_Login_To_Bind = "http://api.iyuce.com/v1/account/bindingsysuser";//第三方绑定已有账号
+    public static final String URL_Login_To_Jump = "http://api.iyuce.com/v1/account/jumpthirdregister";//第三方直接登录
+    public static final String URL_Login_Third_Register = "http://api.iyuce.com/v1/account/thirdregister"; //第三方提交注册
+    public static final String URL_Login_VAILD = "http://api.iyuce.com/v1/account/valid";       //验证用户名、邮箱等有限性
+    public static final String URL_Login_Register = "http://api.iyuce.com/v1/account/register"; //提交注册
 
     //登录
     public static final String ACTIVITY_LOGIN = "Login";
