@@ -30,7 +30,7 @@ public class Constants {
 
     //Common 通用
     public static final String URL_GET_UPDATE = "http://www.iyuce.com/Scripts/andoird.json";
-    public static final String URL_MONEY_INFO = "http://api.iyuce.com/v1/store/getusermoney?userid=";
+    public static final String URL_MONEY_INFO = "http://api.iyuce.com/v1/store/getusermoney?userid="; //获取金币
     public static final String ACTIVITY_SUGGESTION = "Suggestion";
     public static final String URL_POST_SUGGESTION = "http://api.iyuce.com/v1/service/feedback";
     public static final String URL_POST_TAB_FIVE_MY_ROOM = "http://iphone.ipredicting.com/kymyroom.aspx";
@@ -50,14 +50,6 @@ public class Constants {
     public static final String URL_GUIDE_IMG_SPEAKING = "http://www.iyuce.com/res/images/ky.jpg";
     public static final String URL_GUIDE_IMG_WRITTING = "http://www.iyuce.com/res/images/xz.jpg";
 
-    //第三方登录URL
-    public static final String URL_Login_To_Third = "http://api.iyuce.com/v1/account/logintothird"; //跳转第三方
-    public static final String URL_Login_To_Bind = "http://api.iyuce.com/v1/account/bindingsysuser";//第三方绑定已有账号
-    public static final String URL_Login_To_Jump = "http://api.iyuce.com/v1/account/jumpthirdregister";//第三方直接登录
-    public static final String URL_Login_Third_Register = "http://api.iyuce.com/v1/account/thirdregister"; //第三方提交注册
-    public static final String URL_Login_VAILD = "http://api.iyuce.com/v1/account/valid";       //验证用户名、邮箱等有限性
-    public static final String URL_Login_Register = "http://api.iyuce.com/v1/account/register"; //提交注册
-
     //登录
     public static final String ACTIVITY_LOGIN = "Login";
     public static final String ACTIVITY_LOGIN_REGISTER = "LoginRegister";
@@ -74,6 +66,14 @@ public class Constants {
     public static final String URL_POST_LOGIN_ACTIVITE_EMAIL = "http://api.iyuce.com/v1/account/active_email";
     public static final String URL_POST_LOGIN_RESET_PASSWORD = "http://api.iyuce.com/v1/account/reset_password";
     public static final String URL_POST_LOGIN_REGISTER = "http://api.iyuce.com/v1/account/register";
+
+    //第三方登录
+    public static final String URL_Login_To_Third = "http://api.iyuce.com/v1/account/logintothird"; //跳转第三方
+    public static final String URL_Login_To_Bind = "http://api.iyuce.com/v1/account/bindingsysuser";//第三方绑定已有账号
+    public static final String URL_Login_To_Jump = "http://api.iyuce.com/v1/account/jumpthirdregister";//第三方直接登录
+    public static final String URL_Login_Third_Register = "http://api.iyuce.com/v1/account/thirdregister"; //第三方提交注册
+    public static final String URL_Login_VAILD = "http://api.iyuce.com/v1/account/valid";       //验证用户名、邮箱等有限性
+    public static final String URL_Login_Register = "http://api.iyuce.com/v1/account/register"; //提交注册
 
     //口语
     public static final String ACTIVITY_SPEAKING = "Speaking";
@@ -146,22 +146,17 @@ public class Constants {
 
     //商城
     public static final String ACTIVITY_STORE_GOODS = "StoreGoods";
-    public static final String ACTIVITY_STORE_CAR = "StoreCar";
+    public static final String ACTIVITY_STORE_CART = "StoreCart";
     public static final String ACTIVITY_STORE_PAY = "StorePay";
     public static final String ACTIVITY_STORE_ADDRESS = "StoreAddress";
     public static final String ACTIVITY_STORE_ADD_ADDRESS = "StoreAddAddress";
     public static final String ACTIVITY_STORE_ORDER = "StoreOrder";
-    public static final String ACTIVITY_STORE_WXPAY_ENTRY = "StoreOrderWxPay";
     public static final String ACTIVITY_STORE_ORDER_LIST = "StoreOrderList";
     public static final String ACTIVITY_STORE_COMMENT = "StoreComment";
-    public static final String FRAGMENT_STORE_GOODS_ONE = "StoreGoodsOne";
-    public static final String FRAGMENT_STORE_GOODS_THREE = "StoreGoodsThree";
     public static final String URL_GET_STORE_GOODS = "http://api.iyuce.com/v1/store/goods";
     public static final String URL_GET_STORE_PAY = "http://api.iyuce.com/v1/store/getdefaultaddr";
     public static final String URL_GET_STORE_ADDRESS = "http://api.iyuce.com/v1/store/findbyuser";
     public static final String URL_POST_STORE_ADD_ADDRESS = "http://api.iyuce.com/v1/store/OperationAddress";
-    public static final String URL_GET_STORE_ORDER_LIST = "http://api.iyuce.com/v1/store/orderlist?pageSize=10&userid=";
-    public static final String URL_GET_STORE_ORDER_LIST_Del = "http://api.iyuce.com/v1/store/orderdelete?userid=";
     public static final String URL_POST_STORE_COMMENT = "http://api.iyuce.com/v1/store/submitcomment";
     public static final String URL_POST_STORE_ORDER_MAKE_ORDER = "http://api.iyuce.com/v1/store/order";
     public static final String URL_POST_STORE_ORDER_TO_PAY = "http://api.iyuce.com/v1/store/pay";
@@ -171,5 +166,7 @@ public class Constants {
     public static final String URL_POST_STORE_ORDER_TO_WEXIN_VALID = "http://api.iyuce.com/v1/store/validpaybyapp?paytype=wxapp";
     public static final String URL_GET_STORE_HOME = "http://api.iyuce.com/v1/store/homegoodslist";
     public static final String URL_GET_STORE_GOODS_THREE_COMMENT = "http://api.iyuce.com/v1/store/goodscommentsbygoodsid";
-    public static final String URL_GET_STORE_GOODS_THREE_ShowOrder = "http://api.iyuce.com/v1/store/showordersbygoodsid";
+    //    public static final String URL_GET_STORE_ORDER_LIST = "http://api.iyuce.com/v1/store/orderlist?pageSize=10&userid=";
+    //    public static final String URL_GET_STORE_ORDER_LIST_Del = "http://api.iyuce.com/v1/store/orderdelete?userid=";
+    //    public static final String URL_GET_STORE_GOODS_THREE_ShowOrder = "http://api.iyuce.com/v1/store/showordersbygoodsid";
 }

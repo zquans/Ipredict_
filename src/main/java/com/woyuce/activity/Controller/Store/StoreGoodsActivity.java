@@ -15,15 +15,13 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.toolbox.StringRequest;
-import com.woyuce.activity.AppContext;
 import com.woyuce.activity.Common.Constants;
 import com.woyuce.activity.Controller.Main.MainActivity;
 import com.woyuce.activity.Controller.Mine.CustomServiceActivity;
 import com.woyuce.activity.R;
 import com.woyuce.activity.Utils.DbUtil;
+import com.woyuce.activity.Utils.Http.Volley.HttpUtil;
+import com.woyuce.activity.Utils.Http.Volley.RequestInterface;
 import com.woyuce.activity.Utils.LogUtil;
 import com.woyuce.activity.Utils.PreferenceUtil;
 import com.woyuce.activity.Utils.ToastUtil;
@@ -126,6 +124,12 @@ public class StoreGoodsActivity extends FragmentActivity implements View.OnClick
     };
 
     @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        HttpUtil.removeTag(Constants.ACTIVITY_STORE_GOODS);
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_store_goods);
@@ -155,20 +159,19 @@ public class StoreGoodsActivity extends FragmentActivity implements View.OnClick
      * 获取的是轮播图、商品详情的数据
      */
     private String total_sales_volume, total_good_volume, total_bad_volume, total_medium_volume, total_show_order_volume;
-    private String URL = "http://api.iyuce.com/v1/store/goods";
+//    private String URL = "http://api.iyuce.com/v1/store/goods";
 
     private void requestData() {
-        StringRequest goodsDetialRequest = new StringRequest(Request.Method.GET,
-                URL + "?goodsid=" + getIntent().getStringExtra("goods_id") + "&skuid="
+        HttpUtil.get(Constants.URL_GET_STORE_GOODS + "?goodsid=" + getIntent().getStringExtra("goods_id") + "&skuid="
                         + getIntent().getStringExtra("goods_sku_id") + "&userid="
                         + PreferenceUtil.getSharePre(this).getString("userId", ""),
-                new Response.Listener<String>() {
+                Constants.ACTIVITY_STORE_GOODS, new RequestInterface() {
                     @Override
-                    public void onResponse(String s) {
+                    public void doSuccess(String result) {
                         try {
                             JSONObject obj;
                             JSONArray arr;
-                            obj = new JSONObject(s);
+                            obj = new JSONObject(result);
                             if (obj.getString("code").equals("0")) {
                                 String store_user_money = obj.getString("user_money");
                                 LogUtil.i("user_money = " + store_user_money);
@@ -198,9 +201,7 @@ public class StoreGoodsActivity extends FragmentActivity implements View.OnClick
                             e.printStackTrace();
                         }
                     }
-                }, null);
-        goodsDetialRequest.setTag("goodsDetialRequest");
-        AppContext.getHttpQueue().add(goodsDetialRequest);
+                });
     }
 
     /**

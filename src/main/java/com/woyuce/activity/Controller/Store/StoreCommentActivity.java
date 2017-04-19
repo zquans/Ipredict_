@@ -9,15 +9,11 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
 import com.woyuce.activity.BaseActivity;
-import com.woyuce.activity.AppContext;
+import com.woyuce.activity.Common.Constants;
 import com.woyuce.activity.R;
-import com.woyuce.activity.Utils.LogUtil;
+import com.woyuce.activity.Utils.Http.Volley.HttpUtil;
+import com.woyuce.activity.Utils.Http.Volley.RequestInterface;
 import com.woyuce.activity.Utils.PreferenceUtil;
 import com.woyuce.activity.Utils.ToastUtil;
 
@@ -25,10 +21,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
-import java.util.Map;
 
 /**
- * Created by Administrator on 2016/12/19.
+ * Created by Administrator on 2016/12/19
  */
 public class StoreCommentActivity extends BaseActivity implements View.OnClickListener {
 
@@ -36,12 +31,18 @@ public class StoreCommentActivity extends BaseActivity implements View.OnClickLi
     private EditText mEdtComment;
     private ImageView mImgGood, mImgMedium, mImgBad;
 
-    private String URL_COMMENT = "http://api.iyuce.com/v1/store/submitcomment";
+//    private String URL_COMMENT = "http://api.iyuce.com/v1/store/submitcomment";
 
     private String local_order_id;
 
     //默认好评
     private String local_comment_star = "Good";
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        HttpUtil.removeTag(Constants.ACTIVITY_STORE_COMMENT);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,19 +69,19 @@ public class StoreCommentActivity extends BaseActivity implements View.OnClickLi
 
     /**
      * 请求提交评论
-     *
-     * @param url
-     * @param userid
-     * @param user_comment
      */
     private void storeCommentRequest(String url, final String userid, final String user_comment, final String local_comment_star) {
-        StringRequest storeCommentRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
+        HashMap<String, String> params = new HashMap<>();
+        params.put("user_id", userid);
+        params.put("item_id", local_order_id);
+        params.put("cmt_text", user_comment);
+        params.put("satisfaction", local_comment_star);
+        HttpUtil.post(url, params, Constants.ACTIVITY_STORE_COMMENT, new RequestInterface() {
             @Override
-            public void onResponse(String s) {
-                LogUtil.i("comment s = " + s);
-                JSONObject obj;
+            public void doSuccess(String result) {
                 try {
-                    obj = new JSONObject(s);
+                    JSONObject obj;
+                    obj = new JSONObject(result);
                     if (obj.getString("code").equals("0")) {
                         ToastUtil.showMessage(StoreCommentActivity.this, obj.getString("message"));
                         new AlertDialog.Builder(StoreCommentActivity.this)
@@ -96,24 +97,7 @@ public class StoreCommentActivity extends BaseActivity implements View.OnClickLi
                     e.printStackTrace();
                 }
             }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError volleyError) {
-                LogUtil.i("volleyError = " + volleyError.getMessage());
-            }
-        }) {
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                HashMap<String, String> map = new HashMap<>();
-                map.put("user_id", userid);
-                map.put("item_id", local_order_id);
-                map.put("cmt_text", user_comment);
-                map.put("satisfaction", local_comment_star);
-                return map;
-            }
-        };
-        storeCommentRequest.setTag("storeCommentRequest");
-        AppContext.getHttpQueue().add(storeCommentRequest);
+        });
     }
 
     public void toSubmit(View view) {
@@ -124,7 +108,7 @@ public class StoreCommentActivity extends BaseActivity implements View.OnClickLi
         //这里拼接URL
         String user_id = PreferenceUtil.getSharePre(this).getString("userId", null);
         String user_comment = mEdtComment.getText().toString();
-        storeCommentRequest(URL_COMMENT, user_id, user_comment, local_comment_star);
+        storeCommentRequest(Constants.URL_POST_STORE_COMMENT, user_id, user_comment, local_comment_star);
     }
 
     public void back(View view) {

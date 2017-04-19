@@ -8,21 +8,18 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.DefaultRetryPolicy;
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
 import com.tencent.mm.sdk.constants.ConstantsAPI;
 import com.tencent.mm.sdk.modelbase.BaseReq;
 import com.tencent.mm.sdk.modelbase.BaseResp;
 import com.tencent.mm.sdk.openapi.IWXAPI;
 import com.tencent.mm.sdk.openapi.IWXAPIEventHandler;
 import com.tencent.mm.sdk.openapi.WXAPIFactory;
+import com.woyuce.activity.Common.Constants;
 import com.woyuce.activity.Controller.Main.MainActivity;
-import com.woyuce.activity.AppContext;
 import com.woyuce.activity.R;
+import com.woyuce.activity.Utils.DbUtil;
+import com.woyuce.activity.Utils.Http.Volley.HttpUtil;
+import com.woyuce.activity.Utils.Http.Volley.RequestInterface;
 import com.woyuce.activity.Utils.LogUtil;
 import com.woyuce.activity.Utils.PreferenceUtil;
 import com.woyuce.activity.Utils.ToastUtil;
@@ -31,7 +28,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
-import java.util.Map;
 
 public class WXPayEntryActivity extends Activity implements IWXAPIEventHandler {
 
@@ -60,7 +56,8 @@ public class WXPayEntryActivity extends Activity implements IWXAPIEventHandler {
     @Override
     protected void onStop() {
         super.onStop();
-        AppContext.getHttpQueue().cancelAll("validWxPayRequest");
+//        AppContext.getHttpQueue().cancelAll("validWxPayRequest");
+        HttpUtil.removeTag(Constants.ACTIVITY_STORE_ORDER);
     }
 
     @Override
@@ -78,8 +75,6 @@ public class WXPayEntryActivity extends Activity implements IWXAPIEventHandler {
 
     /**
      * 微信支付回调
-     *
-     * @param resp
      */
     @Override
     public void onResp(BaseResp resp) {
@@ -90,19 +85,21 @@ public class WXPayEntryActivity extends Activity implements IWXAPIEventHandler {
         LogUtil.d("ping = " + "{\"out_trade_no\":\"" + for_wx_validate + "\"}");
     }
 
-    private String URL_TO_VALID = "http://api.iyuce.com/v1/store/validpaybyapp?paytype=wxapp";
+//    private String URL_TO_VALID = "http://api.iyuce.com/v1/store/validpaybyapp?paytype=wxapp";
 
     /**
      * 校验微信支付回调结果
      */
     private void validRequest(final BaseResp resp, final String pay_result) {
-        StringRequest validRequest = new StringRequest(Request.Method.POST, URL_TO_VALID, new Response.Listener<String>() {
+        HashMap<String, String> params = new HashMap<>();
+        params.put("", pay_result);
+        HttpUtil.post(Constants.URL_POST_STORE_ORDER_TO_WEXIN_VALID, params, Constants.ACTIVITY_STORE_ORDER, new RequestInterface() {
             @Override
-            public void onResponse(String s) {
-                LogUtil.i("valid wxpay = " + s);
+            public void doSuccess(String result) {
+                LogUtil.i("valid wxpay = " + result);
                 try {
                     JSONObject obj;
-                    obj = new JSONObject(s);
+                    obj = new JSONObject(result);
                     if (obj.getString("code").equals("0")) {
                         ToastUtil.showMessage(WXPayEntryActivity.this, "message" + obj.getString("message"));
                         if (resp.getType() == ConstantsAPI.COMMAND_PAY_BY_WX) {
@@ -157,31 +154,15 @@ public class WXPayEntryActivity extends Activity implements IWXAPIEventHandler {
                     e.printStackTrace();
                 }
             }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError volleyError) {
-                LogUtil.e("volleyError = " + volleyError.getMessage());
-            }
-        }) {
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                HashMap<String, String> map = new HashMap<>();
-                map.put("", pay_result);
-                LogUtil.i("pay_result = " + pay_result);
-                return map;
-            }
-        };
-        validRequest.setTag("validWxPayRequest");
-        validRequest.setRetryPolicy(new DefaultRetryPolicy(1000, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-        AppContext.getHttpQueue().add(validRequest);
+        });
     }
 
     /**
      * 删除数据库中的这张表
      */
     private void deleteSql() {
-        SQLiteDatabase mDatabase = openOrCreateDatabase("aipu.db", MODE_PRIVATE, null);
-        mDatabase.execSQL("drop table storetb");
+        SQLiteDatabase mDatabase = DbUtil.getHelper(this, Constants.DATABASE_IYUCE).getWritableDatabase();
+        mDatabase.execSQL("DROP TABLE IF EXISTS " + Constants.TABLE_CART);
         mDatabase.close();
     }
 }

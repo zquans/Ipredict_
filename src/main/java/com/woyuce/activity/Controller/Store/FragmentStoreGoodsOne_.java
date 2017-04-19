@@ -9,15 +9,14 @@ import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.TextView;
 
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.toolbox.StringRequest;
 import com.woyuce.activity.Adapter.Store.StoreSpcAdapter_;
-import com.woyuce.activity.AppContext;
-import com.woyuce.activity.Model.Store.StoreGoods;
 import com.woyuce.activity.BaseFragment;
+import com.woyuce.activity.Common.Constants;
+import com.woyuce.activity.Model.Store.StoreGoods;
 import com.woyuce.activity.R;
 import com.woyuce.activity.Utils.GlideImageLoader;
+import com.woyuce.activity.Utils.Http.Volley.HttpUtil;
+import com.woyuce.activity.Utils.Http.Volley.RequestInterface;
 import com.woyuce.activity.Utils.LogUtil;
 import com.woyuce.activity.Utils.ToastUtil;
 import com.youth.banner.Banner;
@@ -61,7 +60,8 @@ public class FragmentStoreGoodsOne_ extends BaseFragment implements AdapterView.
     @Override
     public void onStop() {
         super.onStop();
-        AppContext.getHttpQueue().cancelAll("goodsSpeRequest");
+//        AppContext.getHttpQueue().cancelAll("goodsSpeRequest");
+        HttpUtil.removeTag(Constants.ACTIVITY_STORE_GOODS);
         mBanner.stopAutoPlay();
     }
 
@@ -147,13 +147,13 @@ public class FragmentStoreGoodsOne_ extends BaseFragment implements AdapterView.
     private ArrayList<String> mSelectSpcList = new ArrayList<>();
 
     private void requestGoodsSpe(String url, final boolean need_notify) {
-        StringRequest goodsSpeRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
+        HttpUtil.get(url, Constants.ACTIVITY_STORE_GOODS, new RequestInterface() {
             @Override
-            public void onResponse(String s) {
+            public void doSuccess(String result) {
                 try {
                     JSONObject obj, obj_one, obj_two, obj_three;
                     JSONArray arr_seleted_specs, arr_all_spec_id, arr_all_spec, arr_one, arr_two, arr_three;
-                    obj = new JSONObject(s);
+                    obj = new JSONObject(result);
                     if (obj.getString("code").equals("0")) {
                         //拆解JSON对象之一，对象
                         obj = obj.getJSONObject("goods_sku");
@@ -182,7 +182,7 @@ public class FragmentStoreGoodsOne_ extends BaseFragment implements AdapterView.
 
                         //拆解JSON对象之四，数组，所有的规格。这里需要优化或者封装
                         arr_all_spec = obj.getJSONArray("all_specs");
-                        if (need_notify == true) {
+                        if (need_notify) {
                             //如果不是第一次请求，则做数据刷新，先清除数据
                             mListOne.clear();
                             mListTwo.clear();
@@ -229,7 +229,7 @@ public class FragmentStoreGoodsOne_ extends BaseFragment implements AdapterView.
                             mTxtSpcThree.setBackgroundColor(Color.parseColor("#ffffff"));
                         }
                         //如果不是第一次加载，刷新数据就好
-                        if (need_notify == true) {
+                        if (need_notify) {
                             mAdapterOne.notifyDataSetChanged();
                             mAdapterTwo.notifyDataSetChanged();
                             mAdapterThree.notifyDataSetChanged();
@@ -265,9 +265,7 @@ public class FragmentStoreGoodsOne_ extends BaseFragment implements AdapterView.
                     e.printStackTrace();
                 }
             }
-        }, null);
-        goodsSpeRequest.setTag("goodsSpeRequest");
-        AppContext.getHttpQueue().add(goodsSpeRequest);
+        });
     }
 
     /**
@@ -310,11 +308,7 @@ public class FragmentStoreGoodsOne_ extends BaseFragment implements AdapterView.
 
     /**
      * 重设选中的Item及全部的Item
-     *
-     * @param parent
-     * @param view
      */
-
     private void resetItemView(AdapterView<?> parent, View view, ArrayList<StoreGoods> list) {
         for (int i = 0; i < list.size(); i++) {
             parent.getChildAt(i).findViewById(R.id.txt_storegoods_spc).setBackgroundColor(Color.parseColor("#f0f2f5"));
