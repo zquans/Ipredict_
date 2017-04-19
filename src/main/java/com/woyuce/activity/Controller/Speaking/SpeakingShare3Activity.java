@@ -10,8 +10,10 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import com.woyuce.activity.BaseActivity;
+import com.woyuce.activity.Common.Constants;
 import com.woyuce.activity.Controller.Main.MainActivity;
 import com.woyuce.activity.R;
+import com.woyuce.activity.Utils.Http.Volley.HttpUtil;
 import com.woyuce.activity.Utils.ToastUtil;
 
 import java.util.ArrayList;
@@ -36,6 +38,12 @@ public class SpeakingShare3Activity extends BaseActivity implements View.OnClick
     private FragmentPartOne fragmentpartone;
     private FragmentPartTwo fragmentparttwo;
     private FragmentManager fragmentManager;
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        HttpUtil.removeTag(Constants.FRAGMENT_SHARE_THREE);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

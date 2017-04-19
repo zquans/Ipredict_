@@ -77,7 +77,7 @@ public class Constants {
 
     //口语
     public static final String ACTIVITY_SPEAKING = "Speaking";
-    public static final String ACTIVITY_SPEAKING_STATIS = "SpeakingStatics";
+    public static final String ACTIVITY_SPEAKING_STATICS = "SpeakingStatics";
     public static final String ACTIVITY_SPEAKING_SEARCH = "SpeakingSearch";
     public static final String ACTIVITY_SPEAKING_MORE = "SpeakingMore";
     public static final String ACTIVITY_SPEAKING_CONTENT = "SpeakingContent";

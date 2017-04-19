@@ -9,14 +9,13 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.toolbox.StringRequest;
-import com.woyuce.activity.BaseActivity;
 import com.woyuce.activity.Adapter.Speaking.SpeakingAdapter;
-import com.woyuce.activity.AppContext;
+import com.woyuce.activity.BaseActivity;
+import com.woyuce.activity.Common.Constants;
 import com.woyuce.activity.Model.Speaking.SpeakingBean;
 import com.woyuce.activity.R;
+import com.woyuce.activity.Utils.Http.Volley.HttpUtil;
+import com.woyuce.activity.Utils.Http.Volley.RequestInterface;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -26,7 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by Administrator on 2016/9/22.
+ * Created by Administrator on 2016/9/22
  */
 public class SpeakingActivity extends BaseActivity implements View.OnClickListener, AdapterView.OnItemClickListener {
 
@@ -36,14 +35,15 @@ public class SpeakingActivity extends BaseActivity implements View.OnClickListen
     private Button btnShare;
     private ListView mListView;
 
-    private String URL = "http://iphone.ipredicting.com/getvoteMge.aspx";
+    //    private String URL = "http://iphone.ipredicting.com/getvoteMge.aspx";
     private List<SpeakingBean> speakingList = new ArrayList<>();
     private SpeakingAdapter adapter;
 
     @Override
     protected void onStop() {
         super.onStop();
-        AppContext.getHttpQueue().cancelAll("speaking");
+//        AppContext.getHttpQueue().cancelAll("speaking");
+        HttpUtil.removeTag(Constants.ACTIVITY_SPEAKING);
     }
 
     @Override
@@ -76,15 +76,14 @@ public class SpeakingActivity extends BaseActivity implements View.OnClickListen
     }
 
     private void getJson() {
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, URL, new Response.Listener<String>() {
+        HttpUtil.get(Constants.URL_POST_SPEAKING, Constants.ACTIVITY_SPEAKING, new RequestInterface() {
             @Override
-            public void onResponse(String response) {
-                JSONObject jsonObject;
-                SpeakingBean speaking;
+            public void doSuccess(String result) {
                 try {
-                    jsonObject = new JSONObject(response);
-                    int result = jsonObject.getInt("code");
-                    if (result == 0) {
+                    JSONObject jsonObject;
+                    SpeakingBean speaking;
+                    jsonObject = new JSONObject(result);
+                    if (jsonObject.getInt("code") == 0) {
                         JSONArray data = jsonObject.getJSONArray("data");
                         for (int i = 0; i < data.length(); i++) {
                             jsonObject = data.getJSONObject(i);
@@ -102,9 +101,7 @@ public class SpeakingActivity extends BaseActivity implements View.OnClickListen
                     e.printStackTrace();
                 }
             }
-        }, null);
-        stringRequest.setTag("speaking");
-        AppContext.getHttpQueue().add(stringRequest);
+        });
     }
 
     @Override

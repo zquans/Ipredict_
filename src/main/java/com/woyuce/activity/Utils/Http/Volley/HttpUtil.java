@@ -100,7 +100,6 @@ public class HttpUtil {
                 requestInterface.doSuccess(response);
             }
         }, null) {
-
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {
                 return param;
