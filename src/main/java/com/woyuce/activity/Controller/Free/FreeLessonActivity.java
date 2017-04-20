@@ -14,10 +14,10 @@ import com.woyuce.activity.Adapter.Free.FreeLessonAdapter;
 import com.woyuce.activity.BaseActivity;
 import com.woyuce.activity.Common.Constants;
 import com.woyuce.activity.Model.Free.FreeLesson;
+import com.woyuce.activity.Model.Free.FreeRange;
 import com.woyuce.activity.R;
 import com.woyuce.activity.Utils.Http.Volley.HttpUtil;
 import com.woyuce.activity.Utils.Http.Volley.RequestInterface;
-import com.woyuce.activity.Utils.LogUtil;
 import com.woyuce.activity.Utils.PreferenceUtil;
 import com.woyuce.activity.Utils.ToastUtil;
 
@@ -38,16 +38,15 @@ public class FreeLessonActivity extends BaseActivity implements AdapterView.OnIt
     private Button mBtnClearcache;
     private ImageView mBack;
     private GridView mGridView;
+    private FreeRange mFreeRange;
 
-    //    private String URL = "http://api.iyuce.com/v1/exam/freeexamtype";
-    private String localtoken, localMonthid, localTitle;
+    private String localtoken;
     private List<FreeLesson> lessonList = new ArrayList<>();
 
     @Override
     protected void onStop() {
         super.onStop();
         HttpUtil.removeTag(Constants.ACTIVITY_LESSON);
-//        AppContext.getHttpQueue().cancelAll("lesson");
     }
 
     @Override
@@ -56,14 +55,12 @@ public class FreeLessonActivity extends BaseActivity implements AdapterView.OnIt
         setContentView(R.layout.activity_free_lesson);
 
         initView();
-        getJson();
+        requestData();
     }
 
     private void initView() {
-        Bundle bundle = getIntent().getExtras();
-        localMonthid = bundle.getString("localMonthid");
-        localTitle = bundle.getString("localTitle");
         localtoken = PreferenceUtil.getSharePre(FreeLessonActivity.this).getString("localtoken", "");
+        mFreeRange = (FreeRange) getIntent().getSerializableExtra("FreeRange");
 
         mTitle = (TextView) findViewById(R.id.txt_lesson_title);
         mBack = (ImageView) findViewById(R.id.arrow_back);
@@ -73,16 +70,16 @@ public class FreeLessonActivity extends BaseActivity implements AdapterView.OnIt
         mBack.setOnClickListener(this);
         mBtnClearcache.setOnClickListener(this);
         mGridView.setOnItemClickListener(this);
-        mTitle.setText(localTitle);
+        mTitle.setText(mFreeRange.getTitle());
     }
 
     // 请求接口
-    private void getJson() {
+    private void requestData() {
         progressdialogshow(this);
         HashMap<String, String> headers = new HashMap<>();
         headers.put("Authorization", "Bearer " + localtoken);
         HashMap<String, String> params = new HashMap<>();
-        params.put("", localMonthid);
+        params.put("", mFreeRange.getId());
         HttpUtil.post(Constants.URL_POST_FREE_LESSON, headers, params, Constants.ACTIVITY_LESSON, new RequestInterface() {
             @Override
             public void doSuccess(String result) {
@@ -95,9 +92,9 @@ public class FreeLessonActivity extends BaseActivity implements AdapterView.OnIt
      * 请求成功后执行
      */
     private void onSuccess(String response) {
-        JSONObject jsonObject;
-        FreeLesson lesson;
         try {
+            JSONObject jsonObject;
+            FreeLesson lesson;
             jsonObject = new JSONObject(response);
             if (jsonObject.getInt("code") == 0) {
                 JSONArray data = jsonObject.getJSONArray("data");
@@ -110,8 +107,6 @@ public class FreeLessonActivity extends BaseActivity implements AdapterView.OnIt
                     lesson.type_id = jsonObject.getString("type_id");
                     lessonList.add(lesson);
                 }
-            } else {
-                LogUtil.e("code!=0 DATA_BACK", "读取页面失败： " + jsonObject.getString("message"));
             }
             // 第二步，将数据放到适配器中
             FreeLessonAdapter adapter = new FreeLessonAdapter(FreeLessonActivity.this, lessonList);
@@ -124,17 +119,9 @@ public class FreeLessonActivity extends BaseActivity implements AdapterView.OnIt
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        FreeLesson lesson = lessonList.get(position);
-        String localPid = lesson.user_power_type_id;
-        String localtitle = lesson.title;
-        String localtypeid = lesson.type_id;
         Intent intent = new Intent(this, FreeBookActivity.class);
-        Bundle bundle = new Bundle();
-        bundle.putString("localMid", localMonthid);
-        bundle.putString("localPid", localPid);
-        bundle.putString("localtitle", localtitle);
-        bundle.putString("localtypeid", localtypeid);
-        intent.putExtras(bundle);
+        intent.putExtra("localMid", mFreeRange.getId());
+        intent.putExtra("FreeLesson", lessonList.get(position));
         startActivity(intent);
     }
 

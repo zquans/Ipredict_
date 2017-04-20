@@ -1,39 +1,41 @@
 package com.woyuce.activity.Model.Free;
 
-public class FreeRange {
+import java.io.Serializable;
 
-	private String id;
-	private String title;
+public class FreeRange implements Serializable {
 
-	public FreeRange() {
-		super();
-	}
+    private String id;
+    private String title;
 
-	public FreeRange(String id, String title) {
-		super();
-		this.id = id;
-		this.title = title;
-	}
+    public FreeRange() {
+        super();
+    }
 
-	public String getId() {
-		return id;
-	}
+    public FreeRange(String id, String title) {
+        super();
+        this.id = id;
+        this.title = title;
+    }
 
-	public void setId(String id) {
-		this.id = id;
-	}
+    public String getId() {
+        return id;
+    }
 
-	public String getTitle() {
-		return title;
-	}
+    public void setId(String id) {
+        this.id = id;
+    }
 
-	public void setTitle(String title) {
-		this.title = title;
-	}
+    public String getTitle() {
+        return title;
+    }
 
-	@Override
-	public String toString() {
-		return "FreeRange [id=" + id + ", title=" + title + "]";
-	}
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    @Override
+    public String toString() {
+        return "FreeRange [id=" + id + ", title=" + title + "]";
+    }
 
 }

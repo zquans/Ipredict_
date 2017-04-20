@@ -54,9 +54,6 @@ public class FragmentCheckSpell extends Fragment implements OnClickListener {
 
     // 获取需要的subid
     private String localsubid, localtoken, localimgurl, localsectionId, localunitId, localunit_name, localpage_no;
-    //    private String URL_TOANSWER = "http://api.iyuce.com/v1/exam/answers";
-    //    private String URL_TAGCAN = "http://api.iyuce.com/v1/exam/completepractice";
-//    private String URL_TAGCANT = "http://api.iyuce.com/v1/exam/cancelexams";
 
     //记分用
     private String mShowCount;
@@ -78,8 +75,6 @@ public class FragmentCheckSpell extends Fragment implements OnClickListener {
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         mShowbutton = (IShowButton) activity;
-        // 初始化MOB
-//		ShareSDK.initSDK(getActivity());
     }
 
     @Override
@@ -190,14 +185,14 @@ public class FragmentCheckSpell extends Fragment implements OnClickListener {
                 spellbeanList.clear();
                 break;
             case R.id.btn_checkspell_finish:
-                if (FLAG == false) {
+                if (!FLAG) {
                     FLAG = true;
                     // 判断得分
                     ArrayList<FreeSpellBean> spellList = mAdapters.returnSpellList();
                     int mCount = 0;
                     for (int i = 0; i < answerList.size(); i++) {
-                        if (spellList.get(i).spell.toLowerCase().trim().toString()
-                                .equals(answerList.get(i).toLowerCase().trim().toString())) {
+                        if (spellList.get(i).spell.toLowerCase().trim()
+                                .equals(answerList.get(i).toLowerCase().trim())) {
                             mCount = mCount + 10;
                         }
                     }

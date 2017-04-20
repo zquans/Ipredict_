@@ -16,6 +16,7 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import com.woyuce.activity.Adapter.Free.FreeListPageAdapter;
 import com.woyuce.activity.BaseActivity;
 import com.woyuce.activity.Common.Constants;
+import com.woyuce.activity.Model.Free.FreePage;
 import com.woyuce.activity.R;
 import com.woyuce.activity.Utils.Http.Volley.HttpUtil;
 import com.woyuce.activity.Utils.Http.Volley.RequestInterface;
@@ -53,23 +54,14 @@ public class FreeContentActivity extends BaseActivity implements View.OnClickLis
 
     private int localposition;
     private String localunit_id, localsection_id, localunit_name;
-    private List<String> pagenNolist = new ArrayList<>();
-    private List<String> pageStatelist = new ArrayList<>();
-    private List<String> pageImglist = new ArrayList<>();
-    private List<String> pageIdlist = new ArrayList<>();
-    private List<String> pageColorlist = new ArrayList<>();
-    private List<String> pageEmptyImglist = new ArrayList<>();
+    private List<FreePage> pageList = new ArrayList<>();
 
     //第一次引导用的动画
     private ImageView mImgGuide;
 
-    // 留给Fragment用的答案准备
-//    private String URL_TOANSWER = "http://api.iyuce.com/v1/exam/answers";
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
-//        AppContext.getHttpQueue().cancelAll("content");
         HttpUtil.removeTag(Constants.ACTIVITY_CONTENT);
     }
 
@@ -87,12 +79,7 @@ public class FreeContentActivity extends BaseActivity implements View.OnClickLis
         localposition = Integer.parseInt(intent.getStringExtra("localposition"));
         localunit_id = intent.getStringExtra("localunit_id");
         localsection_id = intent.getStringExtra("localsection_id");
-        pagenNolist = intent.getStringArrayListExtra("pagenNolist");
-        pageStatelist = intent.getStringArrayListExtra("pageStatelist");
-        pageImglist = intent.getStringArrayListExtra("pageImglist");
-        pageIdlist = intent.getStringArrayListExtra("pageIdlist");
-        pageColorlist = intent.getStringArrayListExtra("pageColorlist");
-        pageEmptyImglist = intent.getStringArrayListExtra("pageEmptyImglist");
+        pageList = (List<FreePage>) intent.getSerializableExtra("pageList");
 
         mBack = (ImageView) findViewById(R.id.back);
         mPre = (ImageView) findViewById(R.id.img_pre);
@@ -121,18 +108,16 @@ public class FreeContentActivity extends BaseActivity implements View.OnClickLis
         }
 
         setPageno(localposition);
-        getImage(pageImglist.get(localposition));
+        getImage(pageList.get(localposition).sub_img);
     }
 
     // 设置页码
     private void setPageno(int localposition) {
-        mTitle.setText("第" + (pagenNolist.get(localposition)) + "页");
+        mTitle.setText("第" + (pageList.get(localposition).sub_name) + "页");
     }
 
     /**
      * 并加载图片内容
-     *
-     * @param imgurl
      */
     private void getImage(String imgurl) {
         DisplayImageOptions options = new DisplayImageOptions.Builder()
@@ -150,7 +135,7 @@ public class FreeContentActivity extends BaseActivity implements View.OnClickLis
         String localtoken = PreferenceUtil.getSharePre(FreeContentActivity.this).getString("localtoken", "");
         headers.put("Authorization", "Bearer " + localtoken);
         HashMap<String, String> params = new HashMap<>();
-        params.put("", pageIdlist.get(localposition));
+        params.put("", pageList.get(localposition).sub_id);
         HttpUtil.post(Constants.URL_POST_FREE_TOANSWER, headers, params, Constants.ACTIVITY_CONTENT, new RequestInterface() {
             @Override
             public void doSuccess(String result) {
@@ -163,19 +148,19 @@ public class FreeContentActivity extends BaseActivity implements View.OnClickLis
                         if (arr.length() == 0) {
                             ToastUtil.showMessage(FreeContentActivity.this, "亲，真遗憾，本页答案还未制作好哦");
                         } else {
-                            getImage(pageEmptyImglist.get(localposition));
+                            getImage(pageList.get(localposition).sub_img_empty);
                             // 构造Fragement向下传递
                             FragmentTransaction mTransaction = getFragmentManager().beginTransaction();
                             String localtoken = PreferenceUtil.getSharePre(FreeContentActivity.this).getString("localtoken", "");
                             mFragment = new FragmentCheckSpell();
                             Bundle bundle = new Bundle();
-                            bundle.putString("localsubid", pageIdlist.get(localposition));
+                            bundle.putString("localsubid", pageList.get(localposition).sub_id);
                             bundle.putString("localtoken", localtoken);
-                            bundle.putString("localimgurl", pageEmptyImglist.get(localposition));
+                            bundle.putString("localimgurl", pageList.get(localposition).sub_img_empty);
                             bundle.putString("localsectionId", localunit_id);
                             bundle.putString("localunitId", localsection_id);
                             bundle.putString("localunit_name", localunit_name);
-                            bundle.putString("localpageno", pagenNolist.get(localposition));
+                            bundle.putString("localpageno", pageList.get(localposition).sub_name);
                             mFragment.setArguments(bundle);
                             mTransaction.replace(R.id.frame_activity_content, mFragment).commit();
                             mBtnToShowFrame.setVisibility(View.GONE);
@@ -201,19 +186,18 @@ public class FreeContentActivity extends BaseActivity implements View.OnClickLis
                 break;
             case R.id.btn_content_showframe:
                 // 判断是否有挖空的图片，如果没有，就不加载，有则加载
-                LogUtil.e("挖空" + pageEmptyImglist.get(localposition));
-                if (pageEmptyImglist.get(localposition).equals("")) {
+                LogUtil.e("挖空" + pageList.get(localposition).sub_img_empty);
+                if (pageList.get(localposition).sub_img_empty.equals("")) {
                     ToastUtil.showMessage(FreeContentActivity.this, "本页没有拼写检查");
                     break;
                 }
                 requestJson();
-                // getImage(pageEmptyImglist.get(localposition));
                 break;
             case R.id.txt_content_bookmenu:
-                madapter = new FreeListPageAdapter(FreeContentActivity.this, pagenNolist, pageColorlist);
+                madapter = new FreeListPageAdapter(FreeContentActivity.this, pageList);
                 mListview.setAdapter(madapter);
 
-                if (isShowList == false) {
+                if (!isShowList) {
                     mListview.setVisibility(View.VISIBLE);
                     isShowList = true;
                     break;
@@ -234,15 +218,15 @@ public class FreeContentActivity extends BaseActivity implements View.OnClickLis
                     mTransaction.remove(mFragment).commit();
                 }
                 localposition = localposition - 1;
-                if (pageStatelist.get(localposition).equals("0")) {
+                if (pageList.get(localposition).sub_state.equals("0")) {
                     ToastUtil.showMessage(FreeContentActivity.this, "该页已命中删除");
                     break;
                 }
-                getImage(pageImglist.get(localposition));
+                getImage(pageList.get(localposition).sub_img);
                 setPageno(localposition);
                 break;
             case R.id.img_next:
-                if (localposition == pagenNolist.size() - 1) {
+                if (localposition == pageList.size() - 1) {
                     ToastUtil.showMessage(FreeContentActivity.this, "已经是最后一页啦，亲");
                     break;
                 }
@@ -254,25 +238,27 @@ public class FreeContentActivity extends BaseActivity implements View.OnClickLis
                 }
 
                 localposition = localposition + 1;
-                if (pageStatelist.get(localposition).equals("0")) {
+                if (pageList.get(localposition).sub_state.equals("0")) {
                     ToastUtil.showMessage(FreeContentActivity.this, "该页已命中删除");
                     break;
                 }
-                getImage(pageImglist.get(localposition));
+                getImage(pageList.get(localposition).sub_img);
                 setPageno(localposition);
                 break;
         }
     }
 
-    // 右侧页码栏
+    /**
+     * 右侧页码栏
+     */
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        if (pageStatelist.get(position).equals("0") || pageColorlist.get(position).equals("#cccccc")) {
-            ToastUtil.showMessage(FreeContentActivity.this, "第" + pagenNolist.get(position) + "页已命中删除");
+        if (pageList.get(position).sub_state.equals("0") || pageList.get(position).sub_color.equals("#cccccc")) {
+            ToastUtil.showMessage(FreeContentActivity.this, "第" + pageList.get(position).sub_name + "页已命中删除");
             return;
         }
         localposition = position;
-        getImage(pageImglist.get(localposition));
+        getImage(pageList.get(localposition).sub_img);
         setPageno(localposition);
 
         LogUtil.e("mFragment = " + mFragment);
@@ -288,7 +274,7 @@ public class FreeContentActivity extends BaseActivity implements View.OnClickLis
         LogUtil.e("showButton() = ");
         mBtnToShowFrame.setVisibility(View.VISIBLE);
         // 取消答题卡时，显示回原图
-        getImage(pageImglist.get(localposition));
+        getImage(pageList.get(localposition).sub_img);
     }
 
     @Override

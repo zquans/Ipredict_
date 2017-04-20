@@ -21,6 +21,7 @@ import com.woyuce.activity.BaseActivity;
 import com.woyuce.activity.Common.Constants;
 import com.woyuce.activity.Controller.Store.StoreGoodsActivity;
 import com.woyuce.activity.Controller.WebNoCookieActivity;
+import com.woyuce.activity.Model.Free.FreeBook;
 import com.woyuce.activity.Model.Free.FreePage;
 import com.woyuce.activity.Model.Free.FreeSection;
 import com.woyuce.activity.R;
@@ -33,6 +34,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -48,34 +50,21 @@ public class FreePageActivity extends BaseActivity implements View.OnClickListen
     private GridView mGridViewPage, mGridViewSection;
     private FrameLayout flSection;
 
-    // URL地址
-//    private String URL_SECTION = "http://api.iyuce.com/v1/exam/section";
-//    private String URL_PAGE = "http://api.iyuce.com/v1/exam/subjects";
-//    private String URL_CHECKRIGHT = "http://api.iyuce.com/v1/exam/checkuserforwlb";
-//    private String URL_CANCELTAG = "http://api.iyuce.com/v1/exam/cancelexams";
-
     private int mSectionlength;
-    // 用于判断状态的boolean值
+    // 用于判断状态的boolean值(以下常量应该考虑枚举，然而枚举性能不佳)
     private int isPageImportants, isSectionImportants, isCanDo;
     private static final int IMPORTANT_NULL = 0, IMPORTANT_TRUE = 1, IMPORTANT_FALSE = 2;
     private static final int CANDO_NULL = 0, CANDO_TRUE = 1, CANDO_FALSE = 2, CANCEL_TAG = -1;
 
-    private String localtoken, localunit_name, localunit_id, localshow_type_id, localsection_id, localsection_color,
-            localsection_state;
+    private String localtoken, localsection_id, localsection_color, localsection_state;
+    private FreeBook mFreeBook;
 
     private List<FreePage> pageList = new ArrayList<>();
     private List<FreeSection> sectionList = new ArrayList<>();
-    private List<String> pagenNolist = new ArrayList<>();
-    private List<String> pageStatelist = new ArrayList<>();
-    private List<String> pageImglist = new ArrayList<>();
-    private List<String> pageIdlist = new ArrayList<>();
-    private List<String> pageColorlist = new ArrayList<>();
-    private List<String> pageEmptyImglist = new ArrayList<>();
 
     @Override
     protected void onStop() {
         super.onStop();
-//        AppContext.getHttpQueue().cancelAll("page");
         HttpUtil.removeTag(Constants.ACTIVITY_PAGE);
     }
 
@@ -85,15 +74,12 @@ public class FreePageActivity extends BaseActivity implements View.OnClickListen
         setContentView(R.layout.activity_free_page);
 
         initView();
-        getSectionJson();
+        requestSectionJson();
     }
 
     private void initView() {
-        Bundle bundle = getIntent().getExtras();
-        localunit_name = bundle.getString("localunit_name");
-        localunit_id = bundle.getString("localunit_id");
-        localshow_type_id = bundle.getString("localshow_type_id");
         localtoken = PreferenceUtil.getSharePre(FreePageActivity.this).getString("localtoken", "");
+        mFreeBook = (FreeBook) getIntent().getSerializableExtra("FreeBook");
 
         mTitle = (TextView) findViewById(R.id.txt_page_title);
         mAll = (TextView) findViewById(R.id.txt_page_all);
@@ -116,8 +102,8 @@ public class FreePageActivity extends BaseActivity implements View.OnClickListen
         mGridViewPage.setOnItemClickListener(this);
         mGridViewSection.setOnItemClickListener(this);
 
-        mTitle.setText(localunit_name);
-        initGuidemap(localshow_type_id);
+        mTitle.setText(mFreeBook.unit_name);
+        initGuidemap(mFreeBook.show_type_id);
     }
 
     /**
@@ -134,12 +120,12 @@ public class FreePageActivity extends BaseActivity implements View.OnClickListen
     }
 
     // 加载章节
-    private void getSectionJson() {
+    private void requestSectionJson() {
         progressdialogshow(this);
         HashMap<String, String> headers = new HashMap<>();
         headers.put("Authorization", "Bearer " + localtoken);
         HashMap<String, String> params = new HashMap<>();
-        params.put("unit_id", localunit_id);
+        params.put("unit_id", mFreeBook.unit_id);
         if (isPageImportants == IMPORTANT_NULL) {
             params.put("important", "");
         } else if (isPageImportants == IMPORTANT_TRUE) {
@@ -186,9 +172,7 @@ public class FreePageActivity extends BaseActivity implements View.OnClickListen
                                 isPageImportants = IMPORTANT_NULL;
                             }
                         }
-                        getPageJson();
-                    } else {
-                        // LogUtil.e("读取章节失败");
+                        requestPageJson();
                     }
                     FreeSectionAdapter adapter = new FreeSectionAdapter(FreePageActivity.this, sectionList);
                     mGridViewSection.setAdapter(adapter);
@@ -201,12 +185,12 @@ public class FreePageActivity extends BaseActivity implements View.OnClickListen
     }
 
     // 加载书页
-    private void getPageJson() {
+    private void requestPageJson() {
         progressdialogshow(this);
         HashMap<String, String> headers = new HashMap<>();
         headers.put("Authorization", "Bearer " + localtoken);
         HashMap<String, String> params = new HashMap<>();
-        params.put("unit_id", localunit_id);
+        params.put("unit_id", mFreeBook.unit_id);
         params.put("user_id", PreferenceUtil.getSharePre(FreePageActivity.this).getString("userId", ""));
         // 判断获取到的章节数组是否为空
         if (localsection_id == null) {
@@ -272,17 +256,6 @@ public class FreePageActivity extends BaseActivity implements View.OnClickListen
                                     continue;
                                 }
                             }
-                            String pageno = page.sub_name;
-                            String pageid = page.sub_id;
-                            String pagecolor = page.sub_color;
-                            String pageimg = page.sub_img;
-                            String pagestate = page.sub_state;
-                            pagenNolist.add(pageno);
-                            pageStatelist.add(pagestate);
-                            pageImglist.add(pageimg);
-                            pageIdlist.add(pageid);
-                            pageColorlist.add(pagecolor);
-                            pageEmptyImglist.add(page.sub_img_empty);
                             pageList.add(page);
                         }
                     }
@@ -317,10 +290,6 @@ public class FreePageActivity extends BaseActivity implements View.OnClickListen
                 mAnimator4.setDuration(500).start();
 
                 checkRight(CANDO_FALSE);
-                // if (!localshow_type_id.equals("wangluoban")) {
-                // showBuyAd();
-                // break;
-                // }
                 break;
             case R.id.txt_page_imptnothold:
                 // 只看已会重点
@@ -328,10 +297,6 @@ public class FreePageActivity extends BaseActivity implements View.OnClickListen
                 mAnimator0.setDuration(500).start();
 
                 checkRight(CANDO_TRUE);
-                // if (!localshow_type_id.equals("wangluoban")) {
-                // showBuyAd();
-                // break;
-                // }
                 break;
             case R.id.txt_page_important:
                 // 只看重点
@@ -343,14 +308,7 @@ public class FreePageActivity extends BaseActivity implements View.OnClickListen
                 isCanDo = CANDO_NULL;
                 sectionList.clear();
                 pageList.clear();
-                pagenNolist.clear();
-                pageStatelist.clear();
-                pageImglist.clear();
-                pageIdlist.clear();
-                pageColorlist.clear();
-                pageEmptyImglist.clear();
-
-                getSectionJson();
+                requestSectionJson();
                 break;
             case R.id.txt_page_all:
                 // 查看全部
@@ -362,14 +320,7 @@ public class FreePageActivity extends BaseActivity implements View.OnClickListen
                 isCanDo = CANDO_NULL;
                 sectionList.clear();
                 pageList.clear();
-                pagenNolist.clear();
-                pageStatelist.clear();
-                pageImglist.clear();
-                pageIdlist.clear();
-                pageColorlist.clear();
-                pageEmptyImglist.clear();
-
-                getSectionJson();
+                requestSectionJson();
                 break;
         }
     }
@@ -394,14 +345,7 @@ public class FreePageActivity extends BaseActivity implements View.OnClickListen
                     return;
                 }
                 pageList.clear();
-                pagenNolist.clear();
-                pageStatelist.clear();
-                pageImglist.clear();
-                pageIdlist.clear();
-                pageColorlist.clear();
-                pageEmptyImglist.clear();
-
-                getPageJson();
+                requestPageJson();
                 break;
             case R.id.gridview_page:
                 FreePage page = pageList.get(position);
@@ -411,16 +355,12 @@ public class FreePageActivity extends BaseActivity implements View.OnClickListen
                     return;
                 }
                 Intent intent = new Intent(this, FreeContentActivity.class);
-                intent.putStringArrayListExtra("pagenNolist", (ArrayList<String>) pagenNolist);
-                intent.putStringArrayListExtra("pageStatelist", (ArrayList<String>) pageStatelist);
-                intent.putStringArrayListExtra("pageImglist", (ArrayList<String>) pageImglist);
-                intent.putStringArrayListExtra("pageIdlist", (ArrayList<String>) pageIdlist);
-                intent.putStringArrayListExtra("pageColorlist", (ArrayList<String>) pageColorlist);
-                intent.putStringArrayListExtra("pageEmptyImglist", (ArrayList<String>) pageEmptyImglist);
                 intent.putExtra("localposition", position + "");
-                intent.putExtra("localunit_id", localunit_id);
                 intent.putExtra("localsection_id", localsection_id);
-                intent.putExtra("localunit_name", localunit_name);
+                intent.putExtra("pageList", (Serializable) pageList);
+                intent.putExtra("sectionList", (Serializable) sectionList);
+                intent.putExtra("localunit_id", mFreeBook.unit_id);
+                intent.putExtra("localunit_name", mFreeBook.unit_name);
                 startActivity(intent);
                 break;
         }
@@ -509,14 +449,7 @@ public class FreePageActivity extends BaseActivity implements View.OnClickListen
                             isPageImportants = IMPORTANT_TRUE;
                             sectionList.clear();
                             pageList.clear();
-                            pagenNolist.clear();
-                            pageStatelist.clear();
-                            pageImglist.clear();
-                            pageIdlist.clear();
-                            pageColorlist.clear();
-                            pageEmptyImglist.clear();
-
-                            getSectionJson();
+                            requestSectionJson();
                         }
                     } else {
                         showBuyAd();

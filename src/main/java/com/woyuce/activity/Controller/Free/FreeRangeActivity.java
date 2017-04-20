@@ -18,7 +18,6 @@ import com.woyuce.activity.Model.Free.FreeRange;
 import com.woyuce.activity.R;
 import com.woyuce.activity.Utils.Http.Volley.HttpUtil;
 import com.woyuce.activity.Utils.Http.Volley.RequestInterface;
-import com.woyuce.activity.Utils.LogUtil;
 import com.woyuce.activity.Utils.PreferenceUtil;
 import com.woyuce.activity.Utils.ToastUtil;
 
@@ -37,7 +36,6 @@ public class FreeRangeActivity extends BaseActivity implements OnItemClickListen
     private ListView mListView;
 
     private String localtoken;
-    //    private String URL = "http://api.iyuce.com/v1/exam/free";
     private List<FreeRange> rangeList = new ArrayList<>();
 
     @Override
@@ -52,7 +50,7 @@ public class FreeRangeActivity extends BaseActivity implements OnItemClickListen
         setContentView(R.layout.activity_free_range);
 
         initView();
-        requestJson();
+        requestData();
     }
 
     private void initView() {
@@ -69,12 +67,12 @@ public class FreeRangeActivity extends BaseActivity implements OnItemClickListen
         localtoken = PreferenceUtil.getSharePre(FreeRangeActivity.this).getString("localtoken", "");
         // 第一次引导的动画
         boolean b = PreferenceUtil.getSharePre(FreeRangeActivity.this).contains("imgclearguide");
-        if (b == true) {
+        if (b) {
             mGuide.setVisibility(View.GONE);
         }
     }
 
-    private void requestJson() {
+    private void requestData() {
         progressdialogshow(this);
         HashMap<String, String> headers = new HashMap<>();
         headers.put("Authorization", "Bearer " + localtoken);
@@ -88,13 +86,11 @@ public class FreeRangeActivity extends BaseActivity implements OnItemClickListen
 
     /**
      * 请求成功后调用
-     *
-     * @param response
      */
     private void onSuccess(String response) {
-        JSONObject jsonObject;
-        FreeRange range;
         try {
+            JSONObject jsonObject;
+            FreeRange range;
             jsonObject = new JSONObject(response);
             int result = jsonObject.getInt("code");
             if (result == 0) {
@@ -106,8 +102,6 @@ public class FreeRangeActivity extends BaseActivity implements OnItemClickListen
                     range.setTitle(jsonObject.getString("title"));
                     rangeList.add(range);
                 }
-            } else {
-                LogUtil.e("code!=0 --DATA-BACK", "读取页面失败： " + jsonObject.getString("message"));
             }
             // 第二步，将数据放到适配器中
             FreeRangeAdapter adapter = new FreeRangeAdapter(FreeRangeActivity.this, rangeList);
@@ -120,14 +114,8 @@ public class FreeRangeActivity extends BaseActivity implements OnItemClickListen
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        FreeRange range = rangeList.get(position);
-        String localMonthid = range.getId();
-        String localTitle = range.getTitle();
         Intent intent = new Intent(this, FreeLessonActivity.class);
-        Bundle bundle = new Bundle();
-        bundle.putString("localTitle", localTitle);
-        bundle.putString("localMonthid", localMonthid);
-        intent.putExtras(bundle);
+        intent.putExtra("FreeRange", rangeList.get(position));
         startActivity(intent);
     }
 

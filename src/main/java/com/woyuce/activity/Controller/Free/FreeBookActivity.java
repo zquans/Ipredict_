@@ -14,10 +14,10 @@ import com.woyuce.activity.Adapter.Free.FreeBookAdapter;
 import com.woyuce.activity.BaseActivity;
 import com.woyuce.activity.Common.Constants;
 import com.woyuce.activity.Model.Free.FreeBook;
+import com.woyuce.activity.Model.Free.FreeLesson;
 import com.woyuce.activity.R;
 import com.woyuce.activity.Utils.Http.Volley.HttpUtil;
 import com.woyuce.activity.Utils.Http.Volley.RequestInterface;
-import com.woyuce.activity.Utils.LogUtil;
 import com.woyuce.activity.Utils.PreferenceUtil;
 import com.woyuce.activity.Utils.ToastUtil;
 
@@ -39,15 +39,14 @@ public class FreeBookActivity extends BaseActivity implements AdapterView.OnItem
     private ImageView mBack;
     private GridView mGridView;
 
-    //    private String URL = "http://api.iyuce.com/v1/exam/freeexamunits";
-    private String localtoken, localtitle, localMid, localPid, localtypeid;
+    private FreeLesson mFreeLesson;
+    private String localtoken, localMid;
     private List<FreeBook> bookList = new ArrayList<>();
 
     @Override
     protected void onStop() {
         super.onStop();
         HttpUtil.removeTag(Constants.ACTIVITY_BOOK);
-//        AppContext.getHttpQueue().cancelAll("book");
     }
 
     @Override
@@ -56,16 +55,13 @@ public class FreeBookActivity extends BaseActivity implements AdapterView.OnItem
         setContentView(R.layout.activity_free_book);
 
         initView();
-        getJson();
+        requestData();
     }
 
     private void initView() {
-        Bundle bundle = getIntent().getExtras();
-        localtitle = bundle.getString("localtitle");
-        localMid = bundle.getString("localMid");
-        localPid = bundle.getString("localPid");
-        localtypeid = bundle.getString("localtypeid");
         localtoken = PreferenceUtil.getSharePre(FreeBookActivity.this).getString("localtoken", "");
+        localMid = getIntent().getStringExtra("localMid");
+        mFreeLesson = (FreeLesson) getIntent().getSerializableExtra("FreeLesson");
 
         mTitle = (TextView) findViewById(R.id.txt_book_typeName);
         mBack = (ImageView) findViewById(R.id.arrow_back);
@@ -76,17 +72,17 @@ public class FreeBookActivity extends BaseActivity implements AdapterView.OnItem
         mBtnClearcache.setOnClickListener(this);
         mGridView.setOnItemClickListener(this);
 
-        mTitle.setText(localtitle);
+        mTitle.setText(mFreeLesson.title);
     }
 
-    private void getJson() {
+    private void requestData() {
         progressdialogshow(this);
         HashMap<String, String> headers = new HashMap<>();
         headers.put("Authorization", "Bearer " + localtoken);
         HashMap<String, String> params = new HashMap<>();
         params.put("month_id", localMid);
-        params.put("user_power_type_id", localPid);
-        params.put("type_id", localtypeid);
+        params.put("user_power_type_id", mFreeLesson.user_power_type_id);
+        params.put("type_id", mFreeLesson.type_id);
         HttpUtil.post(Constants.URL_POST_FREE_BOOK, headers, params, Constants.ACTIVITY_BOOK, new RequestInterface() {
             @Override
             public void doSuccess(String result) {
@@ -111,8 +107,6 @@ public class FreeBookActivity extends BaseActivity implements AdapterView.OnItem
                     book.img_path = jsonObject.getString("img_path");
                     bookList.add(book);
                 }
-            } else {
-                LogUtil.e("code!=0 Data-BACK", "读取页面失败： " + jsonObject.getString("message"));
             }
             // 第二步，将数据放到适配器中
             FreeBookAdapter adapter = new FreeBookAdapter(FreeBookActivity.this, bookList);
@@ -125,16 +119,8 @@ public class FreeBookActivity extends BaseActivity implements AdapterView.OnItem
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        FreeBook book = bookList.get(position);
-        String localunit_name = book.unit_name;
-        String localunit_id = book.unit_id;
-        String localshow_type_id = book.show_type_id;
         Intent intent = new Intent(this, FreePageActivity.class);
-        Bundle bundle = new Bundle();
-        bundle.putString("localunit_name", localunit_name);
-        bundle.putString("localunit_id", localunit_id);
-        bundle.putString("localshow_type_id", localshow_type_id);
-        intent.putExtras(bundle);
+        intent.putExtra("FreeBook", bookList.get(position));
         startActivity(intent);
     }
 
