@@ -20,11 +20,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
 import com.umeng.message.PushAgent;
 import com.umeng.message.UTrack;
 import com.umeng.message.common.inter.ITagManager;
@@ -49,7 +44,6 @@ import org.json.JSONObject;
 
 import java.net.URLEncoder;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -188,7 +182,8 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
     @Override
     protected void onStop() {
         super.onStop();
-        AppContext.getHttpQueue().cancelAll("login");
+//        AppContext.getHttpQueue().cancelAll("login");
+        HttpUtil.removeTag(Constants.ACTIVITY_LOGIN);
     }
 
     /**
@@ -286,7 +281,7 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
         //别名和分组(别名应该用user_id)
         String alias = userid;
         String aliasType = "user_id";
-        //TODO 如果设备ID为null，return
+        // 如果设备ID为null，return
         LogUtil.i("device_token = " + alias);
         mPushAgent.addAlias(alias, aliasType, new UTrack.ICallBack() {
             @Override
@@ -332,57 +327,39 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
      * 获取基本请求token
      */
     public void getBaseToken() {
-        StringRequest tokenrequest = new StringRequest(Request.Method.POST, Constants.URL_API_REQUESTTOKEN,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        try {
-                            JSONObject obj = new JSONObject(response);
-                            localtoken = obj.getString("access_token");
-                            String expires_in = obj.getString("expires_in");
-                            long current_time = System.currentTimeMillis();
-                            long expires_time = current_time + Long.parseLong(expires_in) * 1000;
-                            PreferenceUtil.save(LoginActivity.this, "localtoken", localtoken);
-                            PreferenceUtil.save(LoginActivity.this, "expires_time", expires_time);
-                            //存一个时间
-                            LogUtil.e("current_time = " + current_time + "|||" + expires_time + "|||localtoken1 = " + localtoken + "||| expires_in = " + expires_in);
-                            LogUtil.e("token ==== " + PreferenceUtil.getSharePre(LoginActivity.this).getString("localtoken", ""));
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }, new Response.ErrorListener() {
+        String base64EncodedString = null;
+        try {
+            String encodedConsumerKey = URLEncoder.encode("defA8Dq2ambB", "UTF-8");
+            String encodedConsumerSecret = URLEncoder.encode("WM7Ei5mzrrHl42HHXuGkNR0bVJexq4P", "UTF-8");
+            String authString = encodedConsumerKey + ":" + encodedConsumerSecret;
+            base64EncodedString = Base64.encodeToString(authString.getBytes("UTF-8"), Base64.NO_WRAP);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        HashMap<String, String> headers = new HashMap<>();
+        headers.put("Authorization", "Basic " + base64EncodedString);
+        HashMap<String, String> params = new HashMap<>();
+        params.put("grant_type", "client_credentials");
+        params.put("scope", "");
+        HttpUtil.post(Constants.URL_API_REQUESTTOKEN, headers, params, Constants.ACTIVITY_LOGIN, new RequestInterface() {
             @Override
-            public void onErrorResponse(VolleyError error) {
-                getBaseToken();
-            }
-        }) {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                String base64EncodedString = null;
+            public void doSuccess(String result) {
                 try {
-                    String encodedConsumerKey = URLEncoder.encode("defA8Dq2ambB", "UTF-8");
-                    String encodedConsumerSecret = URLEncoder.encode("WM7Ei5mzrrHl42HHXuGkNR0bVJexq4P", "UTF-8");
-                    String authString = encodedConsumerKey + ":" + encodedConsumerSecret;
-                    base64EncodedString = Base64.encodeToString(authString.getBytes("UTF-8"), Base64.NO_WRAP);
-                } catch (Exception e) {
+                    JSONObject obj = new JSONObject(result);
+                    localtoken = obj.getString("access_token");
+                    String expires_in = obj.getString("expires_in");
+                    long current_time = System.currentTimeMillis();
+                    long expires_time = current_time + Long.parseLong(expires_in) * 1000;
+                    PreferenceUtil.save(LoginActivity.this, "localtoken", localtoken);
+                    PreferenceUtil.save(LoginActivity.this, "expires_time", expires_time);
+                    //存一个时间
+                    LogUtil.e("current_time = " + current_time + "|||" + expires_time + "|||localtoken1 = " + localtoken + "||| expires_in = " + expires_in);
+                    LogUtil.e("token ==== " + PreferenceUtil.getSharePre(LoginActivity.this).getString("localtoken", ""));
+                } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                HashMap<String, String> headers = new HashMap<>();
-                headers.put("Authorization", "Basic " + base64EncodedString);
-                return headers;
             }
-
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<>();
-                headers.put("grant_type", "client_credentials");
-                headers.put("scope", "");
-                return headers;
-            }
-        };
-        tokenrequest.setTag("login");
-        AppContext.getHttpQueue().add(tokenrequest);
+        });
     }
 
     /**
@@ -406,12 +383,10 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 
     /**
      * 处理成功获取的JSON
-     *
-     * @param response
      */
     private void onSuccess(String response) {
-        JSONObject jsonObject;
         try {
+            JSONObject jsonObject;
             jsonObject = new JSONObject(response);
             int result = jsonObject.getInt("code");
             if (result == 0) {
@@ -493,8 +468,8 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
         HttpUtil.post(Constants.URL_POST_LOGIN_SEND_PHONE_MSG, headers, params, Constants.ACTIVITY_LOGIN, new RequestInterface() {
             @Override
             public void doSuccess(String result) {
-                JSONObject obj;
                 try {
+                    JSONObject obj;
                     obj = new JSONObject(result);
                     if (obj.getString("code").equals("0")) {
                         //倒计时

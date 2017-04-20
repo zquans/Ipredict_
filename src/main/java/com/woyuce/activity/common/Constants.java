@@ -62,18 +62,18 @@ public class Constants {
     public static final String URL_POST_LOGIN_SEND_EMAIL_MSG = "http://api.iyuce.com/v1/common/sendemailvericode";
     public static final String URL_POST_LOGIN_WITH_MESSAGE = "http://api.iyuce.com/v1/account/smslogin";
     public static final String URL_POST_LOGIN_VERIFY_CODE = "http://api.iyuce.com/v1/common/verifycode";
-    public static final String URL_POST_LOGIN_VAILD = "http://api.iyuce.com/v1/account/valid";
     public static final String URL_POST_LOGIN_ACTIVITE_EMAIL = "http://api.iyuce.com/v1/account/active_email";
     public static final String URL_POST_LOGIN_RESET_PASSWORD = "http://api.iyuce.com/v1/account/reset_password";
-    public static final String URL_POST_LOGIN_REGISTER = "http://api.iyuce.com/v1/account/register";
+    public static final String URL_POST_LOGIN_REGISTER = "http://api.iyuce.com/v1/account/register"; //提交注册
 
     //第三方登录
+    public static final String ACTIVITY_LOGIN_BIND_NEW = "LoginBindNew";
+    public static final String ACTIVITY_LOGIN_REGISTER_THIRD = "LoginRegisterThird";
     public static final String URL_Login_To_Third = "http://api.iyuce.com/v1/account/logintothird"; //跳转第三方
     public static final String URL_Login_To_Bind = "http://api.iyuce.com/v1/account/bindingsysuser";//第三方绑定已有账号
     public static final String URL_Login_To_Jump = "http://api.iyuce.com/v1/account/jumpthirdregister";//第三方直接登录
     public static final String URL_Login_Third_Register = "http://api.iyuce.com/v1/account/thirdregister"; //第三方提交注册
     public static final String URL_Login_VAILD = "http://api.iyuce.com/v1/account/valid";       //验证用户名、邮箱等有限性
-    public static final String URL_Login_Register = "http://api.iyuce.com/v1/account/register"; //提交注册
 
     //口语
     public static final String ACTIVITY_SPEAKING = "Speaking";

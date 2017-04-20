@@ -3,6 +3,7 @@ package com.woyuce.activity.Utils.Http.Volley;
 import android.text.TextUtils;
 
 import com.android.volley.AuthFailureError;
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.toolbox.StringRequest;
@@ -84,6 +85,8 @@ public class HttpUtil {
             }
         };
         stringRequest.setTag(tag);
+        //TODO 默认请求失败后会重复请求,此处设置为不重复请求
+        stringRequest.setRetryPolicy(new DefaultRetryPolicy(1000, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         AppContext.getHttpQueue().add(stringRequest);
     }
 
@@ -106,6 +109,8 @@ public class HttpUtil {
             }
         };
         stringRequest.setTag(tag);
+        //TODO 默认请求失败后会重复请求,此处设置为不重复请求
+        stringRequest.setRetryPolicy(new DefaultRetryPolicy(1000, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         AppContext.getHttpQueue().add(stringRequest);
     }
 }

@@ -10,17 +10,12 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.DefaultRetryPolicy;
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.woyuce.activity.AppContext;
 import com.woyuce.activity.BaseActivity;
 import com.woyuce.activity.Common.Constants;
 import com.woyuce.activity.Controller.Login.LoginActivity;
 import com.woyuce.activity.R;
+import com.woyuce.activity.Utils.Http.Volley.HttpUtil;
+import com.woyuce.activity.Utils.Http.Volley.RequestInterface;
 import com.woyuce.activity.Utils.LogUtil;
 import com.woyuce.activity.Utils.PreferenceUtil;
 import com.woyuce.activity.Utils.ToastUtil;
@@ -29,7 +24,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
-import java.util.Map;
 
 public class LoginRegisterThirdActivity extends BaseActivity implements View.OnClickListener {
 
@@ -38,7 +32,6 @@ public class LoginRegisterThirdActivity extends BaseActivity implements View.OnC
     private Button mBtnCheckUserName, mBtnCommit;
 
     private String localtoken, type, openId, unionid, accessToken, expiresin, userIcon, userGender, userName, deviceid;
-    private static final String Tag_Volley = "LoginRegisterThird";
 
     private boolean bValidEmail = false;
     private boolean bValidPhone = false;
@@ -57,7 +50,8 @@ public class LoginRegisterThirdActivity extends BaseActivity implements View.OnC
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        AppContext.getHttpQueue().cancelAll(Tag_Volley);
+//        AppContext.getHttpQueue().cancelAll(Constants.ACTIVITY_LOGIN_REGISTER_THIRD);
+        HttpUtil.removeTag(Constants.ACTIVITY_LOGIN_REGISTER_THIRD);
     }
 
     @Override
@@ -69,6 +63,7 @@ public class LoginRegisterThirdActivity extends BaseActivity implements View.OnC
     }
 
     private void initView() {
+        localtoken = PreferenceUtil.getSharePre(LoginRegisterThirdActivity.this).getString("localtoken", "");
         type = getIntent().getStringExtra("type");
         openId = getIntent().getStringExtra("openId");
         unionid = getIntent().getStringExtra("unionid");
@@ -141,12 +136,17 @@ public class LoginRegisterThirdActivity extends BaseActivity implements View.OnC
      * 检查用户名是否可用
      */
     private void RequestVaildUser(final String key, final String value) {
-        StringRequest requestThird = new StringRequest(Request.Method.POST, Constants.URL_Login_VAILD, new Response.Listener<String>() {
+        HashMap<String, String> headers = new HashMap<>();
+        headers.put("Authorization", "Bearer " + localtoken);
+        HashMap<String, String> params = new HashMap<>();
+        params.put("key", key);
+        params.put("value", value);
+        HttpUtil.post(Constants.URL_Login_VAILD, headers, params, Constants.ACTIVITY_LOGIN_REGISTER_THIRD, new RequestInterface() {
             @Override
-            public void onResponse(String s) {
+            public void doSuccess(String result) {
                 try {
                     JSONObject obj;
-                    obj = new JSONObject(s);
+                    obj = new JSONObject(result);
                     switch (key) {
                         case VALIDATE_USERNAME:
                             if (obj.getString("code").equals("0")) {
@@ -171,36 +171,35 @@ public class LoginRegisterThirdActivity extends BaseActivity implements View.OnC
                     e.printStackTrace();
                 }
             }
-        }, null) {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<>();
-                localtoken = PreferenceUtil.getSharePre(LoginRegisterThirdActivity.this).getString("localtoken", "");
-                headers.put("Authorization", "Bearer " + localtoken);
-                return headers;
-            }
-
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                HashMap<String, String> map = new HashMap<>();
-                map.put("key", key);
-                map.put("value", value);
-                return map;
-            }
-        };
-        requestThird.setTag(Tag_Volley);
-        AppContext.getHttpQueue().add(requestThird);
+        });
     }
 
     private void RequestToCommit() {
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, Constants.URL_Login_Third_Register, new Response.Listener<String>() {
+        HashMap<String, String> headers = new HashMap<>();
+        headers.put("Authorization", "Bearer " + localtoken);
+        HashMap<String, String> params = new HashMap<>();
+        params.put("username", mEdtUsername.getText().toString().trim());
+        params.put("nickname", mEdtUsername.getText().toString().trim());
+        params.put("name", mEdtName.getText().toString().trim());
+        params.put("password", mEdtPassword.getText().toString().trim());
+        params.put("mobile", mEdtPhone.getText().toString().trim());
+        params.put("email", mEdtEmail.getText().toString().trim());
+        params.put("accounttypekey", type);
+        params.put("openid", openId);
+        params.put("unionid", TextUtils.isEmpty(unionid) ? openId : unionid);
+        params.put("accesstoken", accessToken);
+        params.put("expirestimeout", expiresin);
+        params.put("useravatarurl", userIcon);
+        params.put("sex", userGender);
+        params.put("deviceid", deviceid);
+        params.put("qq", " ");
+        HttpUtil.post(Constants.URL_Login_Third_Register, headers, params, Constants.ACTIVITY_LOGIN_REGISTER_THIRD, new RequestInterface() {
             @Override
-            public void onResponse(String response) {
-//                ToastUtil.showMessage(LoginRegisterThirdActivity.this, response);
-                LogUtil.e("1 = " + response);
+            public void doSuccess(String result) {
+                LogUtil.e("1 = " + result);
                 try {
                     JSONObject obj;
-                    obj = new JSONObject(response);
+                    obj = new JSONObject(result);
                     // 成功则Toast，并返回Login界面
                     if (obj.getString("code").equals("0")) {
                         obj = obj.getJSONObject("data");
@@ -228,45 +227,7 @@ public class LoginRegisterThirdActivity extends BaseActivity implements View.OnC
                     e.printStackTrace();
                 }
             }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError volleyError) {
-                ToastUtil.showMessage(LoginRegisterThirdActivity.this, "网络错误" + volleyError.getMessage());
-                LogUtil.e("error");
-            }
-        }) {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<>();
-                localtoken = PreferenceUtil.getSharePre(LoginRegisterThirdActivity.this).getString("localtoken", "");
-                headers.put("Authorization", "Bearer " + localtoken);
-                return headers;
-            }
-
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                HashMap<String, String> map = new HashMap<>();
-                map.put("username", mEdtUsername.getText().toString().trim());
-                map.put("nickname", mEdtUsername.getText().toString().trim());
-                map.put("name", mEdtName.getText().toString().trim());
-                map.put("password", mEdtPassword.getText().toString().trim());
-                map.put("mobile", mEdtPhone.getText().toString().trim());
-                map.put("email", mEdtEmail.getText().toString().trim());
-                map.put("accounttypekey", type);
-                map.put("openid", openId);
-                map.put("unionid", TextUtils.isEmpty(unionid) ? openId : unionid);
-                map.put("accesstoken", accessToken);
-                map.put("expirestimeout", expiresin);
-                map.put("useravatarurl", userIcon);
-                map.put("sex", userGender);
-                map.put("deviceid", deviceid);
-                map.put("qq", " ");
-                return map;
-            }
-        };
-        stringRequest.setTag(Tag_Volley);
-        stringRequest.setRetryPolicy(new DefaultRetryPolicy(1000, 1, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-        AppContext.getHttpQueue().add(stringRequest);
+        });
     }
 
     @Override
