@@ -53,8 +53,6 @@ public class StorePayActivity extends BaseActivity implements View.OnClickListen
     private Double total_price;
     private Double local_store_user_money, max_store_user_money;
 
-    //获取默认收货地址
-//    private String URL = "http://api.iyuce.com/v1/store/getdefaultaddr";
     private String local_skuids = "";
     private boolean bIsAddress = false;
 
@@ -73,7 +71,6 @@ public class StorePayActivity extends BaseActivity implements View.OnClickListen
     @Override
     protected void onStop() {
         super.onStop();
-//        AppContext.getHttpQueue().cancelAll("StorePayRequest");
         HttpUtil.removeTag(Constants.ACTIVITY_STORE_PAY);
     }
 

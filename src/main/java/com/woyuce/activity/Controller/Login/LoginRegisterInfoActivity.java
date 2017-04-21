@@ -51,7 +51,6 @@ public class LoginRegisterInfoActivity extends BaseActivity implements View.OnCl
     @Override
     protected void onStop() {
         super.onStop();
-//        AppContext.getHttpQueue().cancelAll("registerinfo");
         HttpUtil.removeTag(Constants.ACTIVITY_LOGIN_REGISTER_INFO);
     }
 

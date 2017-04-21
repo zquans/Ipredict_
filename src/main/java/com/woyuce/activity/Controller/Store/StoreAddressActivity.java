@@ -152,29 +152,24 @@ public class StoreAddressActivity extends BaseActivity implements
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         Intent intent = new Intent(StoreAddressActivity.this, StoreAddAddressActivity.class);
-        intent.putExtra("local_name", mList.get(position).getName());
-        intent.putExtra("local_mobile", mList.get(position).getMobile());
-        intent.putExtra("local_qq", mList.get(position).getQ_q());
-        intent.putExtra("local_email", mList.get(position).getEmail());
-        intent.putExtra("local_id", mList.get(position).getId());
-        intent.putExtra("local_mobile_veri_code_id", mList.get(position).getMobile_veri_code_id());
-        intent.putExtra("local_verified_type", mList.get(position).getVerified_type());
-
+        intent.putExtra("StoreAddress", mList.get(position));
         startActivity(intent);
     }
 
-//    private String URL_OPERA = "http://api.iyuce.com/v1/store/OperationAddress";
-
     @Override
     public boolean onItemLongClick(AdapterView<?> parent, View view, final int position, long id) {
-        new AlertDialog.Builder(this).setTitle("操作提示").setMessage("确认要删除该地址吗？")
+        new AlertDialog.Builder(this)
+                .setTitle("操作提示")
+                .setMessage("确认要删除该地址吗？")
                 .setPositiveButton("确定", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         delAddressRequest(Constants.URL_POST_STORE_ADD_ADDRESS + "?operation=del&id=" + mList.get(position).getId()
                                 + "&userid=" + PreferenceUtil.getSharePre(StoreAddressActivity.this).getString("userId", ""), position);
                     }
-                }).setNegativeButton("取消", null).show();
+                })
+                .setNegativeButton("取消", null)
+                .show();
         return true;
     }
 }

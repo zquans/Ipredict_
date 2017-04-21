@@ -69,7 +69,6 @@ public class StoreOrderListActivity extends BaseActivity implements XRecyclerVie
     protected void onStop() {
         super.onStop();
         HttpUtil.removeTag(Constants.ACTIVITY_STORE_ORDER_LIST);
-//        AppContext.getHttpQueue().cancelAll("StoreOrderList");
         local_page_number = 1;
     }
 

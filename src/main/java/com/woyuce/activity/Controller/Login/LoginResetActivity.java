@@ -35,7 +35,6 @@ public class LoginResetActivity extends BaseActivity implements View.OnClickList
     @Override
     protected void onStop() {
         super.onStop();
-//        AppContext.getHttpQueue().cancelAll("forgetActivityRequest");
         HttpUtil.removeTag(Constants.ACTIVITY_LOGIN_RESET);
     }
 

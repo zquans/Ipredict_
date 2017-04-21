@@ -110,6 +110,9 @@ public class StoreCartActivity extends BaseActivity implements StoreCarAdapter.O
         mDatabase.close();
     }
 
+    /**
+     * 请求当前商品最新信息
+     */
     private void requestRecentInfo() {
         for (int i = 0; i < mStoreList.size(); i++) {
             URL = URL + mStoreList.get(i).getGoodsskuid() + ",";

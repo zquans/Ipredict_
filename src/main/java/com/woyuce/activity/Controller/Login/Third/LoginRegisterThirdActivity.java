@@ -50,7 +50,6 @@ public class LoginRegisterThirdActivity extends BaseActivity implements View.OnC
     @Override
     protected void onDestroy() {
         super.onDestroy();
-//        AppContext.getHttpQueue().cancelAll(Constants.ACTIVITY_LOGIN_REGISTER_THIRD);
         HttpUtil.removeTag(Constants.ACTIVITY_LOGIN_REGISTER_THIRD);
     }
 

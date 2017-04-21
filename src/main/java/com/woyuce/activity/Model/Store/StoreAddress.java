@@ -1,9 +1,11 @@
 package com.woyuce.activity.Model.Store;
 
+import java.io.Serializable;
+
 /**
  * Created by Administrator on 2016/11/17
  */
-public class StoreAddress {
+public class StoreAddress implements Serializable {
 
     //商城收货地址
     private String name;

@@ -75,7 +75,6 @@ public class LoginRegisterActivity extends BaseActivity implements View.OnClickL
     @Override
     protected void onStop() {
         super.onStop();
-//        AppContext.getHttpQueue().cancelAll("register");
         HttpUtil.removeTag(Constants.ACTIVITY_LOGIN_REGISTER);
     }
 

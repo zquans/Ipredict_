@@ -31,8 +31,6 @@ public class StoreCommentActivity extends BaseActivity implements View.OnClickLi
     private EditText mEdtComment;
     private ImageView mImgGood, mImgMedium, mImgBad;
 
-//    private String URL_COMMENT = "http://api.iyuce.com/v1/store/submitcomment";
-
     private String local_order_id;
 
     //默认好评

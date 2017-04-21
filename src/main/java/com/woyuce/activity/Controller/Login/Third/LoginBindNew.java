@@ -43,7 +43,6 @@ public class LoginBindNew extends BaseActivity implements View.OnClickListener {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-//        AppContext.getHttpQueue().cancelAll("bindRequest");
         HttpUtil.removeTag(Constants.ACTIVITY_LOGIN_BIND_NEW);
     }
 

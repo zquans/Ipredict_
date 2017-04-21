@@ -24,7 +24,6 @@
 //import com.woyuce.activity.Controller.Weibo.WeiboInfoActivity;
 //import com.woyuce.activity.Controller.Weibo.WeiboPublishActivity;
 //import com.woyuce.activity.Adapter.Weibo.WeiboRecommandAdapter;
-//import com.woyuce.activity.AppContext;
 //import com.woyuce.activity.Model.Weibo.WeiboBean;
 //import com.woyuce.activity.R;
 //import com.woyuce.activity.Utils.LogUtil;
@@ -153,7 +152,6 @@
 //            }
 //        };
 //        weiboDataRequest.setTag("fragment_weibo");
-//        AppContext.getHttpQueue().add(weiboDataRequest);
 //    }
 //
 //

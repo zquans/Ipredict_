@@ -1,6 +1,5 @@
 package com.woyuce.activity.Controller.Store;
 
-import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
@@ -16,6 +15,7 @@ import android.widget.TextView;
 
 import com.woyuce.activity.BaseActivity;
 import com.woyuce.activity.Common.Constants;
+import com.woyuce.activity.Model.Store.StoreAddress;
 import com.woyuce.activity.R;
 import com.woyuce.activity.Utils.Http.Volley.HttpUtil;
 import com.woyuce.activity.Utils.Http.Volley.RequestInterface;
@@ -40,13 +40,11 @@ public class StoreAddAddressActivity extends BaseActivity implements View.OnClic
     private Button mBtnSendMsg, mBtnValidate;
     private EditText mEdtName, mEdtPhone, mEdtCode, mEdtQQ, mEdtEmail;
 
-    private String local_name, local_mobile, local_qq, local_email, local_id, local_mobile_veri_code_id, local_verified_type;
-    private String local_user_id, LocalMobileVeriCodeId;//LocalMobileVeriCodeId验证短信后返回的标识ID
+    private StoreAddress mStoreAddress;
+    private String localtoken, local_user_id, LocalMobileVeriCodeId;//LocalMobileVeriCodeId验证短信后返回的标识ID
 
-    private String URL = "http://api.iyuce.com/v1/store/OperationAddress";
-    //    private String URL_SEND_PHONE_MSG = "http://api.iyuce.com/v1/common/sendsmsvericode";
-//    private String URL_SEND_EMAIL_MSG = "http://api.iyuce.com/v1/common/sendemailvericode";
-//    private String URL_TO_VALIDATE = "http://api.iyuce.com/v1/common/verifycode";
+    private boolean isValidated = false;
+    private boolean isPhoneNotEmail = true;
 
     private int time_count;
 
@@ -84,14 +82,7 @@ public class StoreAddAddressActivity extends BaseActivity implements View.OnClic
     private void initView() {
         localtoken = PreferenceUtil.getSharePre(this).getString("localtoken", "");
         local_user_id = PreferenceUtil.getSharePre(this).getString("userId", "");
-        Intent intent = getIntent();
-        local_name = intent.getStringExtra("local_name");
-        local_mobile = intent.getStringExtra("local_mobile");
-        local_qq = intent.getStringExtra("local_qq");
-        local_email = intent.getStringExtra("local_email");
-        local_id = intent.getStringExtra("local_id");
-        local_mobile_veri_code_id = intent.getStringExtra("local_mobile_veri_code_id");
-        local_verified_type = intent.getStringExtra("local_verified_type");
+        mStoreAddress = (StoreAddress) getIntent().getSerializableExtra("StoreAddress");
 
         mLinearLayoutChoose = (LinearLayout) findViewById(R.id.ll_activity_storeaddaddress_choose);
         mChooseOne = (TextView) findViewById(R.id.txt_activity_storeaddaddress_choose_one);
@@ -108,16 +99,17 @@ public class StoreAddAddressActivity extends BaseActivity implements View.OnClic
         mEdtQQ = (EditText) findViewById(R.id.edt_activity_storeaddaddress_qq);
         mEdtEmail = (EditText) findViewById(R.id.edt_activity_storeaddaddress_email);
 
-        if (!TextUtils.isEmpty(local_name)) {
-            mEdtName.setText(local_name);
-            mEdtPhone.setText(local_mobile);
-            mEdtQQ.setText(local_qq);
-            mEdtEmail.setText(local_email);
+        //根据不同情况,修改布局
+        if (!TextUtils.isEmpty(mStoreAddress.getName())) {
+            mEdtName.setText(mStoreAddress.getName());
+            mEdtPhone.setText(mStoreAddress.getMobile());
+            mEdtQQ.setText(mStoreAddress.getQ_q());
+            mEdtEmail.setText(mStoreAddress.getEmail());
             mBtnSendMsg.setVisibility(View.GONE);
             mBtnValidate.setVisibility(View.GONE);
             mEdtCode.setVisibility(View.GONE);
             mLinearLayoutChoose.setVisibility(View.GONE);
-            if (local_verified_type.equals("mobile")) {
+            if (mStoreAddress.getVerified_type().equals("mobile")) {
                 //如果之前是通过电话验证的，则修改地址不允许修改电话
                 mEdtPhone.setEnabled(false);
             } else {
@@ -148,10 +140,10 @@ public class StoreAddAddressActivity extends BaseActivity implements View.OnClic
         params.put("qq", mEdtQQ.getText().toString());
         params.put("MobileVeriCodeId", LocalMobileVeriCodeId);
         //修改的时候传id,新增的时候传0或者空
-        if (TextUtils.isEmpty(local_id)) {
+        if (TextUtils.isEmpty(mStoreAddress.getId())) {
             params.put("id", "");
         } else {
-            params.put("id", local_id);
+            params.put("id", mStoreAddress.getId());
         }
         HttpUtil.post(url, params, Constants.ACTIVITY_STORE_ADD_ADDRESS, new RequestInterface() {
             @Override
@@ -181,18 +173,18 @@ public class StoreAddAddressActivity extends BaseActivity implements View.OnClic
 //            return;
 //        }
 //        requestValidate(URL_TO_VALIDATE);
-        if (!TextUtils.isEmpty(getIntent().getStringExtra("local_name"))) {
+        if (!TextUtils.isEmpty(mStoreAddress.getName())) {
             isValidated = true;
         }
         if (!isValidated) {
             ToastUtil.showMessage(this, "请先确认验证码哦，亲");
             return;
         }
-        if (TextUtils.isEmpty(local_id)) {
-            operaAddressRequest(URL + "?operation=save&userid=" + local_user_id);
+        if (TextUtils.isEmpty(mStoreAddress.getId())) {
+            operaAddressRequest(Constants.URL_POST_STORE_ADD_ADDRESS + "?operation=save&userid=" + local_user_id);
         } else {
-            LocalMobileVeriCodeId = local_mobile_veri_code_id;
-            operaAddressRequest(URL + "?operation=save&userid=" + local_user_id);
+            LocalMobileVeriCodeId = mStoreAddress.getMobile_veri_code_id();
+            operaAddressRequest(Constants.URL_POST_STORE_ADD_ADDRESS + "?operation=save&userid=" + local_user_id);
         }
     }
 
@@ -256,10 +248,6 @@ public class StoreAddAddressActivity extends BaseActivity implements View.OnClic
             }
         });
     }
-
-    private String localtoken;
-    private boolean isValidated = false;
-    private boolean isPhoneNotEmail = true;
 
     @Override
     public void onClick(View v) {

@@ -182,7 +182,6 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
     @Override
     protected void onStop() {
         super.onStop();
-//        AppContext.getHttpQueue().cancelAll("login");
         HttpUtil.removeTag(Constants.ACTIVITY_LOGIN);
     }
 
