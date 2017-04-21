@@ -31,12 +31,10 @@ public class SuggestionActivity extends BaseActivity implements View.OnClickList
     private Button btnSure;
 
     private String mContent;
-//    private String URl = "http://api.iyuce.com/v1/service/feedback";
 
     @Override
     protected void onStop() {
         super.onStop();
-//        AppContext.getHttpQueue().cancelAll("suggestion");
         HttpUtil.removeTag(Constants.ACTIVITY_SUGGESTION);
     }
 

@@ -73,10 +73,6 @@ public class StoreGoodsActivity extends FragmentActivity implements View.OnClick
                     //Tab2需要的
                     bundle.putString("mImgList", mImgList);
                     //Tab3需要的
-//                    bundle.putString("goods_id", getIntent().getStringExtra("goods_id"));
-//                    bundle.putString("total_sales_volume", total_sales_volume);
-//                    bundle.putString("total_good_volume", total_good_volume);
-//                    bundle.putString("total_show_order_volume", total_show_order_volume);
                     bundle.putString("total_bad_volume", total_bad_volume);
                     bundle.putString("total_medium_volume", total_medium_volume);
 
@@ -159,7 +155,6 @@ public class StoreGoodsActivity extends FragmentActivity implements View.OnClick
      * 获取的是轮播图、商品详情的数据
      */
     private String total_sales_volume, total_good_volume, total_bad_volume, total_medium_volume, total_show_order_volume;
-//    private String URL = "http://api.iyuce.com/v1/store/goods";
 
     private void requestData() {
         HttpUtil.get(Constants.URL_GET_STORE_GOODS + "?goodsid=" + getIntent().getStringExtra("goods_id") + "&skuid="

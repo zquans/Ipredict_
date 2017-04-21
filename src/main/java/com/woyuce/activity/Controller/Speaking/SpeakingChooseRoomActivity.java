@@ -39,16 +39,12 @@ public class SpeakingChooseRoomActivity extends BaseActivity implements View.OnC
     private List<SpeakingCity> cityList = new ArrayList<>();
     private List<SpeakingRoom> roomList = new ArrayList<>();
 
-    //    private String URL_AREA = "http://iphone.ipredicting.com/kyAreaApi.aspx";
-    //    private String URL_CITY = "http://iphone.ipredicting.com/kyCityApi.aspx";
-    private String URL_ROOM = "http://iphone.ipredicting.com/kyRoomApi.aspx";
     private String localAreaID, localCityID;
     private String localRoomName, localRoomID; // 传递给下一级的数据
 
     @Override
     protected void onStop() {
         super.onStop();
-//        AppContext.getHttpQueue().cancelAll("roomchoose");
         HttpUtil.removeTag(Constants.ACTIVITY_SPEAKING_SHARE_CHOOSE);
     }
 

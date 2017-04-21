@@ -15,7 +15,6 @@ import android.widget.TextView;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.woyuce.activity.Adapter.Speaking.SpeakingMoreAdapter;
-import com.woyuce.activity.AppContext;
 import com.woyuce.activity.BaseActivity;
 import com.woyuce.activity.Common.Constants;
 import com.woyuce.activity.Controller.Main.MainActivity;
@@ -46,14 +45,12 @@ public class SpeakingMoreActivity extends BaseActivity implements AdapterView.On
     private Button btnPart1, btnPart2;
     private ImageView mGuidemap;
 
-    //    private String URL = "http://iphone.ipredicting.com/kysubCategoryApi.aspx";
     private int localPartid = 1;
     private List<SpeakingMore> categoryList = new ArrayList<>();
 
     @Override
     protected void onStop() {
         super.onStop();
-//        AppContext.getHttpQueue().cancelAll("category");
         HttpUtil.removeTag(Constants.ACTIVITY_SPEAKING_MORE);
     }
 
@@ -64,7 +61,7 @@ public class SpeakingMoreActivity extends BaseActivity implements AdapterView.On
 
         initView();
         initGuidemap();
-        getJson();
+        requestJson();
     }
 
     private void initView() {
@@ -97,7 +94,7 @@ public class SpeakingMoreActivity extends BaseActivity implements AdapterView.On
         ImageLoader.getInstance().displayImage(Constants.URL_GUIDE_IMG_SPEAKING, mGuidemap, options);
     }
 
-    public void getJson() {
+    public void requestJson() {
         HashMap<String, String> params = new HashMap<>();
         params.put("partid", localPartid + "");
         HttpUtil.post(Constants.URL_POST_SPEAKIGN_MORE, params, Constants.ACTIVITY_SPEAKING_MORE, new RequestInterface() {
@@ -129,11 +126,9 @@ public class SpeakingMoreActivity extends BaseActivity implements AdapterView.On
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        SpeakingMore category = categoryList.get(position);
-        String localsubCategoryid = category.subCategoryid;
-        Intent it_subContent = new Intent(this, SpeakingContentActivity.class);
-        it_subContent.putExtra("localsubCategoryid", localsubCategoryid);
-        startActivity(it_subContent);
+        Intent intent = new Intent(this, SpeakingContentActivity.class);
+        intent.putExtra("localsubCategoryid", categoryList.get(position).subCategoryid);
+        startActivity(intent);
     }
 
     public void back(View view) {
@@ -145,8 +140,7 @@ public class SpeakingMoreActivity extends BaseActivity implements AdapterView.On
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.ll_speaking_share:
-                Intent it_speaking = new Intent(this, SpeakingActivity.class);
-                startActivity(it_speaking);
+                startActivity(new Intent(this, SpeakingActivity.class));
                 overridePendingTransition(0, 0);
                 break;
             case R.id.img_back:
@@ -159,7 +153,7 @@ public class SpeakingMoreActivity extends BaseActivity implements AdapterView.On
                 btnPart2.setBackgroundResource(com.woyuce.activity.R.drawable.buttonstyle);
                 btnPart2.setTextColor(Color.parseColor("#3399ff"));
                 localPartid = 1;
-                getJson();
+                requestJson();
                 break;
             case R.id.btn_category_part2:
                 categoryList.clear();
@@ -168,7 +162,7 @@ public class SpeakingMoreActivity extends BaseActivity implements AdapterView.On
                 btnPart2.setBackgroundResource(com.woyuce.activity.R.drawable.buttonstyle_blue);
                 btnPart2.setTextColor(Color.parseColor("#ffffff"));
                 localPartid = 2;
-                getJson();
+                requestJson();
                 break;
         }
     }

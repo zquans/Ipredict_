@@ -1,7 +1,7 @@
 package com.woyuce.activity.Model.Speaking;
 
 /**
- * Created by Administrator on 2016/9/22.
+ * Created by Administrator on 2016/9/22
  */
 public class SpeakingContent {
 

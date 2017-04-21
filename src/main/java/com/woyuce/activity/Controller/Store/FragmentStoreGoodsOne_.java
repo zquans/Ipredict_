@@ -60,7 +60,6 @@ public class FragmentStoreGoodsOne_ extends BaseFragment implements AdapterView.
     @Override
     public void onStop() {
         super.onStop();
-//        AppContext.getHttpQueue().cancelAll("goodsSpeRequest");
         HttpUtil.removeTag(Constants.ACTIVITY_STORE_GOODS);
         mBanner.stopAutoPlay();
     }
@@ -278,7 +277,7 @@ public class FragmentStoreGoodsOne_ extends BaseFragment implements AdapterView.
             storeGoods.setAttr_id(arr.getJSONObject(i).getString("attr_id"));
             storeGoods.setAttr_text(arr.getJSONObject(i).getString("attr_text"));
 
-            if (need_notify == true) {
+            if (need_notify) {
                 //两个选中项
                 if ((!mAllSpcId.contains("," + storeGoods.getAttr_id() + "," + mSelectSpcList.get(0) + ","))
                         && (!mAllSpcId.contains("," + mSelectSpcList.get(0) + "," + storeGoods.getAttr_id() + ","))) {
@@ -327,15 +326,13 @@ public class FragmentStoreGoodsOne_ extends BaseFragment implements AdapterView.
                 break;
             case R.id.gridview_fragment_store_two:
                 resetItemView(parent, view, mListTwo);
-                requestGoodsSpe(URL + "&skuid=&selected_specs="
-                        + mListTwo.get(position).getAttr_id() + "," + mSelectSpcList.get(0), true);
+                requestGoodsSpe(URL + "&skuid=&selected_specs=" + mListTwo.get(position).getAttr_id() + "," + mSelectSpcList.get(0), true);
                 mSelectSpcList.clear();
                 mAllSpcId.clear();
                 break;
             case R.id.gridview_fragment_store_three:
                 resetItemView(parent, view, mListThree);
-                requestGoodsSpe(URL + "&skuid=&selected_specs="
-                        + mListThree.get(position).getAttr_id(), true);
+                requestGoodsSpe(URL + "&skuid=&selected_specs=" + mListThree.get(position).getAttr_id(), true);
                 mSelectSpcList.clear();
                 mAllSpcId.clear();
                 break;

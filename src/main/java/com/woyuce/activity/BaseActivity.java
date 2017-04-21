@@ -7,16 +7,17 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.widget.Toast;
 
 import com.umeng.analytics.MobclickAgent;
+import com.woyuce.activity.Common.Constants;
 import com.woyuce.activity.Utils.ActivityManager;
 import com.woyuce.activity.Utils.LogUtil;
 import com.woyuce.activity.Utils.NetUtil;
 import com.woyuce.activity.Utils.ToastUtil;
-import com.woyuce.activity.Common.Constants;
 
 /**
- * Created by Administrator on 2016/9/20.
+ * Created by Administrator on 2016/9/20
  */
 public class BaseActivity extends Activity {
 
@@ -39,6 +40,10 @@ public class BaseActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        //日志输出Activity名称，方便查找
+        LogUtil.i(this.getClass().getSimpleName());
+
         //一、配置沉浸式状态栏
 //        if (Build.VERSION.SDK_INT >= 21) {
 //            View decorView = getWindow().getDecorView();
@@ -98,7 +103,6 @@ public class BaseActivity extends Activity {
 //                return true;
 //            }
 //        });
-        LogUtil.i(this.getClass().getSimpleName());
     }
 
     /**
@@ -114,9 +118,6 @@ public class BaseActivity extends Activity {
 
     /**
      * 判断是否拥有权限
-     *
-     * @param permissions
-     * @return
      */
     public boolean hasPermission(String... permissions) {
         for (String permission : permissions) {
@@ -131,15 +132,11 @@ public class BaseActivity extends Activity {
      */
     protected void requestPermission(int code, String... permissions) {
         ActivityCompat.requestPermissions(this, permissions, code);
-        ToastUtil.showMessage(this, "如果拒绝存储授权,会导致应用无法正常使用", 8000);
+        ToastUtil.showMessage(this, "如果拒绝存储授权,会导致应用无法正常使用", Toast.LENGTH_LONG);
     }
 
     /**
      * 请求权限的回调
-     *
-     * @param requestCode
-     * @param permissions
-     * @param grantResults
      */
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
@@ -151,7 +148,7 @@ public class BaseActivity extends Activity {
                     // 自动检测更新
                     doUpdate();
                 } else {
-                    ToastUtil.showMessage(this, "您拒绝存储授权,会导致应用无法正常使用，可以在系统设置中重新开启权限", 8000);
+                    ToastUtil.showMessage(this, "您拒绝存储授权,会导致应用无法正常使用，可以在系统设置中重新开启权限", Toast.LENGTH_LONG);
                 }
                 break;
             case Constants.CODE_READ_EXTERNAL_STORAGE:
@@ -159,23 +156,14 @@ public class BaseActivity extends Activity {
         }
     }
 
-    //子类重写后实现具体调用相机的业务逻辑
+    /**
+     * 子类重写后实现具体的业务逻辑
+     */
     public void doUpdate() {
     }
 
-    private void show() {
-        mProgressdialog.setTitle("加载中，请稍候");
-        mProgressdialog.setMessage("Loading...");
-        mProgressdialog.setCanceledOnTouchOutside(false);
-//        mProgressdialog.setCancelable(false);
-        mProgressdialog.show();
-    }
-
     /**
-     * 单例模式
-     *
-     * @param context
-     * @return
+     * 默认定义的progressDialog的show方法,给子类用
      */
     public ProgressDialog progressdialogshow(Context context) {
         if (mProgressdialog == null) {
@@ -187,6 +175,20 @@ public class BaseActivity extends Activity {
         return mProgressdialog;
     }
 
+    /**
+     * show方法,给子类用
+     */
+    private void show() {
+        mProgressdialog.setTitle("加载中，请稍候");
+        mProgressdialog.setMessage("Loading...");
+        mProgressdialog.setCanceledOnTouchOutside(false);
+//        mProgressdialog.setCancelable(false);
+        mProgressdialog.show();
+    }
+
+    /**
+     * 默认定义的progressDialog的cancel方法,给子类用
+     */
     public void progressdialogcancel() {
         if (mProgressdialog != null) {
             mProgressdialog.cancel();

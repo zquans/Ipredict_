@@ -34,7 +34,6 @@ public class SpeakingShare4Activity extends BaseActivity implements View.OnClick
     private Button btnBack;
     private LinearLayout llBack;
 
-    //    private String URL_REQUEST = "http://iphone.ipredicting.com/kysubshare.aspx";
     private String localRoomID, localTime, localMessage, localsubname, localRoom;
     private List<String> subidList = new ArrayList<>();
     private List<String> subnameList = new ArrayList<>();
@@ -42,7 +41,6 @@ public class SpeakingShare4Activity extends BaseActivity implements View.OnClick
     @Override
     protected void onStop() {
         super.onStop();
-//        AppContext.getHttpQueue().cancelAll("share4");
         HttpUtil.removeTag(Constants.ACTIVITY_SPEAKING_SHARE_FOUR);
     }
 
@@ -185,44 +183,43 @@ public class SpeakingShare4Activity extends BaseActivity implements View.OnClick
     //多社交平台分享
     private void showShare(String title, String message) {
         try {
-            String pingjie = null;
+            String temp = null;
             switch (subnameList.size()) {
                 case 0:
-                    pingjie = "";
+                    temp = "";
                     break;
                 case 1:
-                    pingjie = subnameList.get(0);
+                    temp = subnameList.get(0);
                     break;
                 case 2:
-                    pingjie = subnameList.get(0) + "," + subnameList.get(1);
+                    temp = subnameList.get(0) + "," + subnameList.get(1);
                     break;
                 case 3:
-                    pingjie = subnameList.get(0) + "," + subnameList.get(1) + "," + subnameList.get(2);
+                    temp = subnameList.get(0) + "," + subnameList.get(1) + "," + subnameList.get(2);
                     break;
             }
             String encode_collage = URLEncoder.encode(localRoom, "utf-8");
-            String encode_title = URLEncoder.encode(subnameList.get(0), "utf-8");
-            String URLcode = encode_title.replace("+", "%20");
+            String URLcode;
+            if (subnameList.size() > 0) {
+                String encode_title = URLEncoder.encode(subnameList.get(0), "utf-8");
+                URLcode = encode_title.replace("+", "%20");
+            } else {
+                URLcode = "";
+            }
             String url = "http://xm.iyuce.com/app/fenxiang.html?viewid=1&collage=" + encode_collage
-                    + "&title=" + URLcode + "&datetime=" + localTime + "&img=&part1=" + pingjie
+                    + "&title=" + URLcode + "&datetime=" + localTime + "&img=&part1=" + temp
                     + "&part2= " + localsubname + "&message=" + localMessage;
             ShareSDK.initSDK(SpeakingShare4Activity.this);
             OnekeyShare oks = new OnekeyShare();
             oks.setTitle(message);
-            // titleUrl是标题的网络链接，仅在人人网和QQ空间使用
             oks.setTitleUrl(url);
-            // text是分享文本，所有平台都需要这个字段
             oks.setText(title);
-            // url仅在微信（包括好友和朋友圈）中使用
             oks.setUrl(url);
             oks.setImageUrl("http://www.iyuce.com/uploadfiles/app/logo.png");
             oks.setComment("答题超赞");
-            // site是分享此内容的网站名称，仅在QQ空间使用
             oks.setSite(getString(R.string.app_name));
-            // siteUrl是分享此内容的网站地址，仅在QQ空间使用
             oks.setSiteUrl(url);
-            // 启动分享GUI
-            oks.show(SpeakingShare4Activity.this);
+            oks.show(this);
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }

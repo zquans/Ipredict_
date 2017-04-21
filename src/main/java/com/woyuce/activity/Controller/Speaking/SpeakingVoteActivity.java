@@ -44,10 +44,6 @@ public class SpeakingVoteActivity extends BaseActivity implements View.OnClickLi
     private Spinner spnArea, spnCity, spnRoom;
 
     private String localsubID, localsubName, localUrl;
-    //    private String URL_AREA = "http://iphone.ipredicting.com/kyAreaApi.aspx";
-//    private String URL_CITY = "http://iphone.ipredicting.com/kyCityApi.aspx";
-//    private String URL_ROOM = "http://iphone.ipredicting.com/kyRoomApi.aspx";
-//    private String URL_VOTE = "http://iphone.ipredicting.com/kysubVote.aspx";
     private String localAreaId, localCityId, localRoomId, localRoomName;
 
     private List<SpeakingArea> areaList = new ArrayList<>();
@@ -57,7 +53,6 @@ public class SpeakingVoteActivity extends BaseActivity implements View.OnClickLi
     @Override
     protected void onStop() {
         super.onStop();
-//        AppContext.getHttpQueue().cancelAll("vote");
         HttpUtil.removeTag(Constants.ACTIVITY_SPEAKING_VOTE);
     }
 

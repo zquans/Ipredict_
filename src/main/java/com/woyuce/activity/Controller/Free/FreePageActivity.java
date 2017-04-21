@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.FrameLayout;
@@ -56,6 +57,7 @@ public class FreePageActivity extends BaseActivity implements View.OnClickListen
     private static final int IMPORTANT_NULL = 0, IMPORTANT_TRUE = 1, IMPORTANT_FALSE = 2;
     private static final int CANDO_NULL = 0, CANDO_TRUE = 1, CANDO_FALSE = 2, CANCEL_TAG = -1;
 
+    private String localunit_name, localunit_id, localshow_type_id;
     private String localtoken, localsection_id, localsection_color, localsection_state;
     private FreeBook mFreeBook;
 
@@ -80,6 +82,9 @@ public class FreePageActivity extends BaseActivity implements View.OnClickListen
     private void initView() {
         localtoken = PreferenceUtil.getSharePre(FreePageActivity.this).getString("localtoken", "");
         mFreeBook = (FreeBook) getIntent().getSerializableExtra("FreeBook");
+        localunit_name = getIntent().getStringExtra("localunit_name");
+        localunit_id = getIntent().getStringExtra("localunit_id");
+        localshow_type_id = getIntent().getStringExtra("localshow_type_id");
 
         mTitle = (TextView) findViewById(R.id.txt_page_title);
         mAll = (TextView) findViewById(R.id.txt_page_all);
@@ -102,8 +107,13 @@ public class FreePageActivity extends BaseActivity implements View.OnClickListen
         mGridViewPage.setOnItemClickListener(this);
         mGridViewSection.setOnItemClickListener(this);
 
-        mTitle.setText(mFreeBook.unit_name);
-        initGuidemap(mFreeBook.show_type_id);
+        if (TextUtils.isEmpty(localunit_name)) {
+            mTitle.setText(mFreeBook.unit_name);
+            initGuidemap(mFreeBook.show_type_id);
+        } else {
+            mTitle.setText(localunit_name);
+            initGuidemap(localshow_type_id);
+        }
     }
 
     /**
@@ -125,7 +135,7 @@ public class FreePageActivity extends BaseActivity implements View.OnClickListen
         HashMap<String, String> headers = new HashMap<>();
         headers.put("Authorization", "Bearer " + localtoken);
         HashMap<String, String> params = new HashMap<>();
-        params.put("unit_id", mFreeBook.unit_id);
+        params.put("unit_id", TextUtils.isEmpty(localunit_id) ? mFreeBook.unit_id : localunit_id);
         if (isPageImportants == IMPORTANT_NULL) {
             params.put("important", "");
         } else if (isPageImportants == IMPORTANT_TRUE) {
@@ -190,7 +200,7 @@ public class FreePageActivity extends BaseActivity implements View.OnClickListen
         HashMap<String, String> headers = new HashMap<>();
         headers.put("Authorization", "Bearer " + localtoken);
         HashMap<String, String> params = new HashMap<>();
-        params.put("unit_id", mFreeBook.unit_id);
+        params.put("unit_id", TextUtils.isEmpty(localunit_id) ? mFreeBook.unit_id : localunit_id);
         params.put("user_id", PreferenceUtil.getSharePre(FreePageActivity.this).getString("userId", ""));
         // 判断获取到的章节数组是否为空
         if (localsection_id == null) {
@@ -359,8 +369,8 @@ public class FreePageActivity extends BaseActivity implements View.OnClickListen
                 intent.putExtra("localsection_id", localsection_id);
                 intent.putExtra("pageList", (Serializable) pageList);
                 intent.putExtra("sectionList", (Serializable) sectionList);
-                intent.putExtra("localunit_id", mFreeBook.unit_id);
-                intent.putExtra("localunit_name", mFreeBook.unit_name);
+                intent.putExtra("localunit_id",TextUtils.isEmpty(localunit_id) ? mFreeBook.unit_id : localunit_id);
+                intent.putExtra("localunit_name",TextUtils.isEmpty(localunit_name) ? mFreeBook.unit_name : localunit_name);
                 startActivity(intent);
                 break;
         }

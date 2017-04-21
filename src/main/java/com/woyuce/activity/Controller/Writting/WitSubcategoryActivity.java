@@ -48,15 +48,11 @@ public class WitSubcategoryActivity extends BaseActivity
     private List<WitSubcategory> witsubcategoryList = new ArrayList<>();
     private List<WitCategory> witcategoryList = new ArrayList<>();
     private String localid, localname;
-    private String localsubCategoryid;
-    //    private String URL_CATEGORY = "http://iphone.ipredicting.com/xzsubCategory.aspx";
-    //    private String URL_TOTAL = "http://iphone.ipredicting.com/xzCategoryApi.aspx";
     private boolean isfirst = true;
 
     @Override
     protected void onStop() {
         super.onStop();
-//        AppContext.getHttpQueue().cancelAll("witsubcategory");
         HttpUtil.removeTag(Constants.ACTIVITY_WIT_SUBCATEGORY);
     }
 
@@ -68,13 +64,12 @@ public class WitSubcategoryActivity extends BaseActivity
         initView();
         initGuidemap();
         getSpinnerJson();
-        getJson();
+        requestListJson();
     }
 
     private void initView() {
-        Intent it_witSubcategory = getIntent();
-        localid = it_witSubcategory.getStringExtra("localid");
-        localname = it_witSubcategory.getStringExtra("localname");
+        localid = getIntent().getStringExtra("localid");
+        localname = getIntent().getStringExtra("localname");
 
         txtTitle = (TextView) findViewById(R.id.txt_witsubcategory_title);
         autoTxt = (AutoCompleteTextView) findViewById(R.id.auto_witsubcategory);
@@ -90,7 +85,7 @@ public class WitSubcategoryActivity extends BaseActivity
         gridView.setOnItemClickListener(this);
     }
 
-    private void setspnDate() {
+    private void seSpinnerData() {
         WitspnAdapter spnadapter = new WitspnAdapter(this, witcategoryList);
         spnCategory.setAdapter(spnadapter);
         spnCategory.setOnItemSelectedListener(this);
@@ -120,7 +115,7 @@ public class WitSubcategoryActivity extends BaseActivity
                             witcategoryList.add(witcategory);
                         }
                     }
-                    setspnDate();
+                    seSpinnerData();
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -128,7 +123,7 @@ public class WitSubcategoryActivity extends BaseActivity
         });
     }
 
-    private void getJson() {
+    private void requestListJson() {
         HashMap<String, String> params = new HashMap<>();
         params.put("categoryid", localid);
         HttpUtil.post(Constants.URL_POST_WRITTING_SUBCATEGORY, params, Constants.ACTIVITY_WIT_SUBCATEGORY, new RequestInterface() {
@@ -165,24 +160,20 @@ public class WitSubcategoryActivity extends BaseActivity
                 finish();
                 break;
             case R.id.btn_witsubcategory_search:
-                String localkey = autoTxt.getText().toString();
-                Intent it_search = new Intent(this, WitSearchActivity.class);
-                it_search.putExtra("localid", localid);
-                it_search.putExtra("localkey", localkey);
-                startActivity(it_search);
+                Intent intent = new Intent(this, WitSearchActivity.class);
+                intent.putExtra("localid", localid);
+                intent.putExtra("localkey", autoTxt.getText().toString());
+                startActivity(intent);
                 break;
         }
     }
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        WitSubcategory witsubcategory = witsubcategoryList.get(position);
-        localsubCategoryid = witsubcategory.subCategoryid;
-        String localname = witsubcategory.name;
-        Intent it_witContent = new Intent(this, WitContentActivity.class);
-        it_witContent.putExtra("localsubCategoryid", localsubCategoryid);
-        it_witContent.putExtra("localname", localname);
-        startActivity(it_witContent);
+        Intent intent = new Intent(this, WitContentActivity.class);
+        intent.putExtra("localsubCategoryid", witsubcategoryList.get(position).subCategoryid);
+        intent.putExtra("localname", witsubcategoryList.get(position).name);
+        startActivity(intent);
     }
 
     @Override
@@ -190,12 +181,11 @@ public class WitSubcategoryActivity extends BaseActivity
         if (isfirst) {
             isfirst = false;
         } else {
-            WitCategory witcategory = witcategoryList.get(position);
-            localid = witcategory.id;
-            localname = witcategory.name;
+            localid = witcategoryList.get(position).id;
+            localname = witcategoryList.get(position).name;
             txtTitle.setText(localname);
             witsubcategoryList.clear();
-            getJson();
+            requestListJson();
         }
     }
 

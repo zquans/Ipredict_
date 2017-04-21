@@ -15,7 +15,7 @@ import com.woyuce.activity.R;
 import com.woyuce.activity.Utils.LogUtil;
 
 /**
- * Created by Administrator on 2016/9/22.
+ * Created by Administrator on 2016/9/22
  */
 public class SpeakingShare2Activity extends BaseActivity implements View.OnClickListener {
 
@@ -37,10 +37,9 @@ public class SpeakingShare2Activity extends BaseActivity implements View.OnClick
     }
 
     private void initView() {
-        Intent it_share2 = getIntent();
-        localRoom = it_share2.getStringExtra("localRoom");
-        localRoomID = it_share2.getStringExtra("localRoomID");
-        localTime = it_share2.getStringExtra("localTime");
+        localRoom = getIntent().getStringExtra("localRoom");
+        localRoomID = getIntent().getStringExtra("localRoomID");
+        localTime = getIntent().getStringExtra("localTime");
 
         mImgBack = (ImageView) findViewById(R.id.img_back);
         txtExamRoom = (TextView) findViewById(R.id.txt_share2_examRoom);
@@ -66,8 +65,7 @@ public class SpeakingShare2Activity extends BaseActivity implements View.OnClick
         switch (v.getId()) {
             case R.id.ll_speaking_stastis: // **** 点击" 高频统计" 启动 Activity-统计，
                 // 但界面看起来无跳转变化
-                Intent it_statis = new Intent(this, SpeakingStatisActivity.class);
-                startActivity(it_statis);
+                startActivity(new Intent(this, SpeakingStatisActivity.class));
                 overridePendingTransition(0, 0);
                 break;
             case R.id.img_back:
@@ -79,13 +77,13 @@ public class SpeakingShare2Activity extends BaseActivity implements View.OnClick
                 break;
             case R.id.button_share2_next: // **** 点击"下一步"按钮， 进入下一个"分享"界面
                 String localMessage = edtMessage.getText().toString();
-                Intent it_share3 = new Intent(this, SpeakingShare3Activity.class);
-                it_share3.putExtra("localMessage", localMessage);
-                it_share3.putExtra("localTime", localTime);
-                it_share3.putExtra("localRoomID", localRoomID);
-                it_share3.putExtra("localRoom", localRoom);
+                Intent intent = new Intent(this, SpeakingShare3Activity.class);
+                intent.putExtra("localMessage", localMessage);
+                intent.putExtra("localTime", localTime);
+                intent.putExtra("localRoomID", localRoomID);
+                intent.putExtra("localRoom", localRoom);
                 LogUtil.e("aLL info = " + localRoomID + " , " + localMessage + " ," + localTime);
-                startActivity(it_share3);
+                startActivity(intent);
                 overridePendingTransition(0, 0);
                 break;
         }

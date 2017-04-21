@@ -1,9 +1,11 @@
 package com.woyuce.activity.Model.Free.Net;
 
+import java.io.Serializable;
+
 /**
- * Created by Administrator on 2016/9/21.
+ * Created by Administrator on 2016/9/21
  */
-public class NetBean {
+public class NetBean implements Serializable {
 
     private String wcg_id;
     private String wcg_powerid;

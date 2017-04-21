@@ -27,7 +27,6 @@ import java.util.List;
 public class FragmentPartOne extends Fragment implements OnItemClickListener {
 
     private ListView listviewPart1;
-    //	private String URL_PART1 = "http://iphone.ipredicting.com/kysubNshare.aspx";
     private List<SpeakingPart> partList = new ArrayList<>();
     private List<String> subidList = new ArrayList<>();
     private List<String> subnameList = new ArrayList<>();
@@ -114,7 +113,7 @@ public class FragmentPartOne extends Fragment implements OnItemClickListener {
                 holder.ckBox.setChecked(true);
             }
             SpeakingPart1Adapter.getIsSelected().put(position, holder.ckBox.isChecked()); // 将CheckBox的Item,和,isChecked记录下来
-            if (holder.ckBox.isChecked() == true) { // ***** 调整选定条目
+            if (holder.ckBox.isChecked()) { // ***** 调整选定条目
                 checkNum++;
                 localsubid = localpart.subid;
                 subidList.add(localsubid);

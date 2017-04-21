@@ -66,7 +66,6 @@ public class OpenLessonActivity extends BaseActivity implements View.OnClickList
     @Override
     protected void onStop() {
         super.onStop();
-//        AppContext.getHttpQueue().cancelAll("audiolesson");
         HttpUtil.removeTag(Constants.ACTIVITY_AUDIO_LESSON);
     }
 

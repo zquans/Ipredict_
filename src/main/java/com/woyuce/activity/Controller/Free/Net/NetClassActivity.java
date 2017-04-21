@@ -52,15 +52,11 @@ public class NetClassActivity extends BaseActivity
     private List<String> classidList = new ArrayList<>();
 
     private List<NetBean> wcgList = new ArrayList<>();
-    //    private static final String URL_TIME = "http://api.iyuce.com/v1/exam/notifydropdownlist";
-    //    private static final String URL_NOTICE = "http://api.iyuce.com/v1/exam/notifycontent";
-    //    private static final String URL_WebCourse = "http://api.iyuce.com/v1/exam/webcoursegroup";
     private String localtoken;
 
     @Override
     protected void onStop() {
         super.onStop();
-//        AppContext.getHttpQueue().cancelAll("wangluoban");
         HttpUtil.removeTag(Constants.ACTIVITY_NET);
     }
 
@@ -202,7 +198,7 @@ public class NetClassActivity extends BaseActivity
                             wcgList.add(wcgbean);
                         }
                     }
-                    /* gridview设置adapter */
+                    // gridview设置adapter
                     webcourseAdapter = new NetClassCourseAdapter(NetClassActivity.this, wcgList);
                     gridview.setAdapter(webcourseAdapter);
                 } catch (JSONException e) {
@@ -279,17 +275,8 @@ public class NetClassActivity extends BaseActivity
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        // 传递相应的localwcg_id
-        String localwcg_id = wcgList.get(position).getWcg_id();
-        String localwcg_pid = wcgList.get(position).getWcg_powerid();
-        String localwcg_mid = wcgList.get(position).getMonthId();
-        String localwcg_name = wcgList.get(position).getWcg_name();
-
         Intent intent = new Intent(NetClassActivity.this, NetClassLessonActivity.class);
-        intent.putExtra("localwcg_id", localwcg_id);
-        intent.putExtra("localwcg_pid", localwcg_pid);
-        intent.putExtra("localwcg_mid", localwcg_mid);
-        intent.putExtra("localwcg_name", localwcg_name);
+        intent.putExtra("NetBean", wcgList.get(position));
         startActivity(intent);
     }
 }

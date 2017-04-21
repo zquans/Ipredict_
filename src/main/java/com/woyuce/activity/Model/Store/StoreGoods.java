@@ -1,7 +1,7 @@
 package com.woyuce.activity.Model.Store;
 
 /**
- * Created by Administrator on 2016/11/2.
+ * Created by Administrator on 2016/11/2
  */
 public class StoreGoods {
 

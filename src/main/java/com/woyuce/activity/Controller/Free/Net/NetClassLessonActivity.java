@@ -23,6 +23,7 @@ import com.woyuce.activity.Controller.Free.FreePageActivity;
 import com.woyuce.activity.Controller.Login.LoginActivity;
 import com.woyuce.activity.Controller.Store.StoreGoodsActivity;
 import com.woyuce.activity.Controller.WebNoCookieActivity;
+import com.woyuce.activity.Model.Free.Net.NetBean;
 import com.woyuce.activity.Model.Free.Net.NetLessonBean;
 import com.woyuce.activity.R;
 import com.woyuce.activity.Utils.Http.Volley.HttpUtil;
@@ -50,19 +51,14 @@ public class NetClassLessonActivity extends BaseActivity implements AdapterView.
     private NetClassLessonAdapter wanglessonAdapter;
     private List<NetLessonBean> wanglessonList = new ArrayList<>();
 
-    //    private static final String URL = "http://api.iyuce.com/v1/exam/examunit";
-    //    private static final String URL_Check = "http://api.iyuce.com/v1/exam/checkuserforwlb";
-    //    private static final String URL_CheckCode = "http://api.iyuce.com/v1/exam/activecodeforwlb";
-
     private int localtry = 0;
     private String localtoken;
-    private String localgid, localpid, localmid, localwcg_name;
+    private NetBean mNetBean;
     private String localCheckCode, localunitid, localunitName;
 
     @Override
     protected void onStop() {
         super.onStop();
-//        AppContext.getHttpQueue().cancelAll("wangluobanlesson");
         HttpUtil.removeTag(Constants.ACTIVITY_NET_LESSON);
     }
 
@@ -78,10 +74,7 @@ public class NetClassLessonActivity extends BaseActivity implements AdapterView.
     private void initView() {
         localtoken = PreferenceUtil.getSharePre(NetClassLessonActivity.this).getString("localtoken", "");
         Intent intent = getIntent();
-        localgid = intent.getStringExtra("localwcg_id");
-        localpid = intent.getStringExtra("localwcg_pid");
-        localmid = intent.getStringExtra("localwcg_mid");
-        localwcg_name = intent.getStringExtra("localwcg_name");
+        mNetBean = (NetBean) intent.getSerializableExtra("NetBean");
 
         mTitle = (TextView) findViewById(R.id.title_activity_wangluobanlesson);
         mGuide = (ImageView) findViewById(R.id.img_wangluobanlesson_guide);
@@ -93,7 +86,7 @@ public class NetClassLessonActivity extends BaseActivity implements AdapterView.
         mGuide.setOnClickListener(this);
         mBtnClearcache.setOnClickListener(this);
         mGridview.setOnItemClickListener(this);
-        mTitle.setText(localwcg_name);
+        mTitle.setText(mNetBean.getWcg_name());
 
         // 第一次引导的动画
         if (PreferenceUtil.getSharePre(NetClassLessonActivity.this).contains("imgclearguide_wangluobanlesson")) {
@@ -108,8 +101,8 @@ public class NetClassLessonActivity extends BaseActivity implements AdapterView.
         HashMap<String, String> headers = new HashMap<>();
         headers.put("Authorization", "Bearer " + localtoken);
         HashMap<String, String> params = new HashMap<>();
-        params.put("mid", localmid);
-        params.put("pid", localpid);
+        params.put("mid", mNetBean.getMonthId());
+        params.put("pid", mNetBean.getWcg_powerid());
         HttpUtil.post(Constants.URL_POST_NET_LESSON, headers, params, Constants.ACTIVITY_NET_LESSON, new RequestInterface() {
             @Override
             public void doSuccess(String result) {
@@ -164,7 +157,7 @@ public class NetClassLessonActivity extends BaseActivity implements AdapterView.
         headers.put("Authorization", "Bearer " + localtoken);
         HashMap<String, String> params = new HashMap<>();
         params.put("user_id", PreferenceUtil.getSharePre(NetClassLessonActivity.this).getString("userId", ""));
-        params.put("gid", localgid);
+        params.put("gid", mNetBean.getWcg_id());
         HttpUtil.post(Constants.URL_POST_NET_LESSON_Check, headers, params, Constants.ACTIVITY_NET_LESSON, new RequestInterface() {
             @Override
             public void doSuccess(String result) {
@@ -176,11 +169,9 @@ public class NetClassLessonActivity extends BaseActivity implements AdapterView.
                         // 判断是否有权限,有则进入下一级
                         if (flag.equals("1")) {
                             Intent intent = new Intent(NetClassLessonActivity.this, FreePageActivity.class);
-                            Bundle bundle = new Bundle();
-                            bundle.putString("localunit_name", localunitName);
-                            bundle.putString("localunit_id", localunitid);
-                            bundle.putString("localshow_type_id", "wangluoban");
-                            intent.putExtras(bundle);
+                            intent.putExtra("localunit_name", localunitName);
+                            intent.putExtra("localunit_id", localunitid);
+                            intent.putExtra("localshow_type_id", "wangluoban");
                             startActivity(intent);
                         } else {
                             // 没有则输入激活码
@@ -288,7 +279,7 @@ public class NetClassLessonActivity extends BaseActivity implements AdapterView.
         headers.put("Authorization", "Bearer " + localtoken);
         HashMap<String, String> params = new HashMap<>();
         params.put("user_id", PreferenceUtil.getSharePre(NetClassLessonActivity.this).getString("userId", ""));
-        params.put("gid", localgid);
+        params.put("gid", mNetBean.getWcg_id());
         params.put("code", localCheckCode);
         HttpUtil.post(Constants.URL_POST_NET_LESSON_CheckCode, headers, params, Constants.ACTIVITY_NET_LESSON, new RequestInterface() {
             @Override
@@ -302,11 +293,9 @@ public class NetClassLessonActivity extends BaseActivity implements AdapterView.
                     } else if (code == 0) {
                         ToastUtil.showMessage(NetClassLessonActivity.this, "恭喜您，验证成功啦!");
                         Intent intent = new Intent(NetClassLessonActivity.this, FreePageActivity.class);
-                        Bundle bundle = new Bundle();
-                        bundle.putString("localunit_name", localunitName);
-                        bundle.putString("localunit_id", localunitid);
-                        bundle.putString("localshow_type_id", "wangluoban");
-                        intent.putExtras(bundle);
+                        intent.putExtra("localunit_name", localunitName);
+                        intent.putExtra("localunit_id", localunitid);
+                        intent.putExtra("localshow_type_id", "wangluoban");
                         startActivity(intent);
                     }
                 } catch (JSONException e) {

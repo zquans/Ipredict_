@@ -42,7 +42,6 @@ public class SpeakingContentActivity extends BaseActivity implements View.OnClic
     private Button btnBack, btnVote, btnShare;
     private PhotoView imgSubContent;
 
-    //    private String local_url = "http://iphone.ipredicting.com/kysubContent.aspx";
     private String localsubCategoryid, localsubid; // 从上一级不同Activity中柱状图Item被选中后传递过来的不同本地参数
     private String localImg, localsubID, localsubName;
 
@@ -51,7 +50,6 @@ public class SpeakingContentActivity extends BaseActivity implements View.OnClic
     @Override
     protected void onStop() {
         super.onStop();
-//        AppContext.getHttpQueue().cancelAll("subcontent");
         HttpUtil.removeTag(Constants.ACTIVITY_SPEAKING_CONTENT);
     }
 

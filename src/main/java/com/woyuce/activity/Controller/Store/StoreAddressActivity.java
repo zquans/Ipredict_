@@ -34,8 +34,6 @@ public class StoreAddressActivity extends BaseActivity implements
     private StoreAddressAdapter mAdapter;
     private ArrayList<StoreAddress> mList = new ArrayList<>();
 
-//    private String URL = "http://api.iyuce.com/v1/store/findbyuser";
-
     public void back(View view) {
         finish();
     }
@@ -161,6 +159,7 @@ public class StoreAddressActivity extends BaseActivity implements
         intent.putExtra("local_id", mList.get(position).getId());
         intent.putExtra("local_mobile_veri_code_id", mList.get(position).getMobile_veri_code_id());
         intent.putExtra("local_verified_type", mList.get(position).getVerified_type());
+
         startActivity(intent);
     }
 

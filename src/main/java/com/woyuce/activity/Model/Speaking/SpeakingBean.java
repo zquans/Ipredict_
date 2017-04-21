@@ -3,7 +3,7 @@ package com.woyuce.activity.Model.Speaking;
 import java.io.Serializable;
 
 /**
- * Created by Administrator on 2016/9/22.
+ * Created by Administrator on 2016/9/22
  */
 public class SpeakingBean implements Serializable{
 

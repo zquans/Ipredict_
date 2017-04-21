@@ -41,13 +41,11 @@ public class SpeakingSearchActivity extends BaseActivity implements AdapterView.
     private TextView txtNull;
 
     private String localsearch;
-    //    private String URL_SEARCH = "http://iphone.ipredicting.com/kysubSearch.aspx";
     private List<SpeakingSearch> searchList = new ArrayList<>();
 
     @Override
     protected void onStop() {
         super.onStop();
-//        AppContext.getHttpQueue().cancelAll("search");
         HttpUtil.removeTag(Constants.ACTIVITY_SPEAKING_SEARCH);
     }
 
@@ -72,8 +70,7 @@ public class SpeakingSearchActivity extends BaseActivity implements AdapterView.
         mTxtToShare.setBackgroundResource(R.drawable.buttonstyle_whitestroke);
 
         //读取数据
-        Intent it_search = getIntent();
-        localsearch = it_search.getStringExtra("localsearch");
+        localsearch = getIntent().getStringExtra("localsearch");
 
         txtNull = (TextView) findViewById(R.id.txt_search_null);
         lvSearch = (ListView) findViewById(R.id.listview_search);
@@ -136,8 +133,7 @@ public class SpeakingSearchActivity extends BaseActivity implements AdapterView.
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.ll_speaking_share:
-                Intent it_speaking = new Intent(this, SpeakingActivity.class);
-                startActivity(it_speaking);
+                startActivity(new Intent(this, SpeakingActivity.class));
                 overridePendingTransition(0, 0);
                 break;
             case R.id.img_back:

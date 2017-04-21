@@ -32,6 +32,11 @@ public class FragmentStoreGoodsThree extends BaseFragment implements View.OnClic
     private List<StoreGoods> mDataList = new ArrayList<>();
     private StoreGoodsCommentAdapter mAdapter;
 
+    private StoreShowOrderAdapter mShowOrderAdapter;
+    private ArrayList<StoreGoods> mShowOrderList = new ArrayList<>();
+    private List<StoreGoods> mFilterList = new ArrayList<>();
+    private boolean isfirst = true;
+
     //请求数据
 //    private String URL = "http://api.iyuce.com/v1/store/goodscommentsbygoodsid";
     private String URL_ShowOrder = "http://api.iyuce.com/v1/store/showordersbygoodsid";
@@ -39,7 +44,6 @@ public class FragmentStoreGoodsThree extends BaseFragment implements View.OnClic
     @Override
     public void onStop() {
         super.onStop();
-//        AppContext.getHttpQueue().cancelAll("goodsCommentRequest");
         HttpUtil.removeTag(Constants.ACTIVITY_STORE_GOODS);
     }
 
@@ -107,9 +111,6 @@ public class FragmentStoreGoodsThree extends BaseFragment implements View.OnClic
                 });
     }
 
-    private StoreShowOrderAdapter mShowOrderAdapter;
-    private ArrayList<StoreGoods> mShowOrderList = new ArrayList<>();
-
     /**
      * 请求晒单数据
      */
@@ -150,9 +151,6 @@ public class FragmentStoreGoodsThree extends BaseFragment implements View.OnClic
             }
         });
     }
-
-    private List<StoreGoods> mFilterList = new ArrayList<>();
-    private boolean isfirst = true;
 
     @Override
     public void onClick(View v) {

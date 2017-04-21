@@ -24,35 +24,72 @@ import com.woyuce.activity.Controller.Login.LoginActivity;
 import com.woyuce.activity.Utils.LogUtil;
 import com.woyuce.activity.Utils.PreferenceUtil;
 
-import java.io.File;
 import java.util.Map;
 
 /**
  * 全局应用程序类：用于保存和调用全局应用配置及访问网络数据
  *
  * @author LeBang
- * @created 2015-3-22
+ * @created 2016-3-22
  */
 public class AppContext extends Application {
+
     //    private static final String TAG = AppContext.class.getSimpleName();
-//    private static final String APP_CACAHE_DIRNAME = "/webcache";
+    //    private static final String APP_CACAHE_DIRNAME = "/webcache";
     private static String DEVICE_TOKEN;
 
-    //singleton
+    //单例
     private static AppContext appContext = null;
     private Display display;
 
     private static RequestQueue mQueue;
 
+    public static AppContext getInstance() {
+        return appContext;
+    }
+
+    public static RequestQueue getHttpQueue() {
+        return mQueue;
+    }
+
     @Override
     public void onCreate() {
         super.onCreate();
         appContext = this;
+        //volley并发队列
         mQueue = Volley.newRequestQueue(getApplicationContext());
-        init();
 
+        initImageLoader(this);
+
+        initUmengPush();
+
+        //微博社交模块
+        //initWeibo();
+    }
+
+    /**
+     * 配置ImageLoader
+     */
+    public static void initImageLoader(Context context) {
+        ImageLoaderConfiguration.Builder config = new ImageLoaderConfiguration.Builder(context);
+        config.threadPriority(Thread.NORM_PRIORITY);
+        config.denyCacheImageMultipleSizesInMemory();
+        config.memoryCacheSize((int) Runtime.getRuntime().maxMemory() / 4);
+        config.diskCacheFileNameGenerator(new Md5FileNameGenerator());
+        config.diskCacheSize(100 * 1024 * 1024); // 100 MiB
+        config.tasksProcessingOrder(QueueProcessingType.LIFO);
+        //修改连接超时时间5秒，下载超时时间5秒
+        config.imageDownloader(new BaseImageDownloader(appContext, 5 * 1000, 5 * 1000));
+        //		config.writeDebugLogs(); // Remove for release app
+        // Initialize ImageLoader with configuration.
+        ImageLoader.getInstance().init(config.build());
+    }
+
+    /**
+     * 友盟推送的全局初始化，这里包含了业务中的推送逻辑
+     */
+    private void initUmengPush() {
         PushAgent mPushAgent = PushAgent.getInstance(this);
-
         UmengMessageHandler messageHandler = new UmengMessageHandler() {
             /**
              * 自定义消息的回调方法(透传)，用户无感知
@@ -145,18 +182,10 @@ public class AppContext extends Application {
         });
     }
 
-    public static AppContext getInstance() {
-        return appContext;
-    }
-
-    public static RequestQueue getHttpQueue() {
-        return mQueue;
-    }
-
     /**
-     * 初始化
+     * 微博模块相关初始化
      */
-    private void init() {
+    private void initWeibo() {
         //本地图片辅助类初始化(因为6.0后动态权限的原因，将初始化延迟放在MainActivity中做，否则应用无权限时，一打开就崩溃)
 //        LocalImageHelper.init(this);
 
@@ -168,34 +197,19 @@ public class AppContext extends Application {
         }
     }
 
-    public static void initImageLoader(Context context) {
-        ImageLoaderConfiguration.Builder config = new ImageLoaderConfiguration.Builder(context);
-        config.threadPriority(Thread.NORM_PRIORITY);
-        config.denyCacheImageMultipleSizesInMemory();
-        config.memoryCacheSize((int) Runtime.getRuntime().maxMemory() / 4);
-        config.diskCacheFileNameGenerator(new Md5FileNameGenerator());
-        config.diskCacheSize(100 * 1024 * 1024); // 100 MiB
-        config.tasksProcessingOrder(QueueProcessingType.LIFO);
-        //修改连接超时时间5秒，下载超时时间5秒
-        config.imageDownloader(new BaseImageDownloader(appContext, 5 * 1000, 5 * 1000));
-        //		config.writeDebugLogs(); // Remove for release app
-        // Initialize ImageLoader with configuration.
-        ImageLoader.getInstance().init(config.build());
-    }
-
-    public String getCachePath() {
-        File cacheDir;
-        if (android.os.Environment.getExternalStorageState().equals(android.os.Environment.MEDIA_MOUNTED))
-            cacheDir = getExternalCacheDir();
-        else
-            cacheDir = getCacheDir();
-        if (!cacheDir.exists())
-            cacheDir.mkdirs();
-        return cacheDir.getAbsolutePath();
-    }
+//    public String getCachePath() {
+//        File cacheDir;
+//        if (android.os.Environment.getExternalStorageState().equals(android.os.Environment.MEDIA_MOUNTED))
+//            cacheDir = getExternalCacheDir();
+//        else
+//            cacheDir = getCacheDir();
+//        if (!cacheDir.exists())
+//            cacheDir.mkdirs();
+//        return cacheDir.getAbsolutePath();
+//    }
 
     /**
-     * 返回DEVICE_TOKEN
+     * 提供全局获取DEVICE_TOKEN的方法
      */
     public static String getDeviceToken() {
         return DEVICE_TOKEN;

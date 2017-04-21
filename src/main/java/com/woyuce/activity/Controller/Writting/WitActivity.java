@@ -34,14 +34,11 @@ public class WitActivity extends BaseActivity implements OnClickListener, OnItem
     private Button btnSearch;
     private AutoCompleteTextView autoTxt;
 
-    //    private String URL_WITCATEGORY = "http://iphone.ipredicting.com/xzCategoryApi.aspx";
-    private String localid, localname, localkey;
     private List<WitCategory> witcategoryList = new ArrayList<>();
 
     @Override
     protected void onStop() {
         super.onStop();
-//        AppContext.getHttpQueue().cancelAll("writting");
         HttpUtil.removeTag(Constants.ACTIVITY_WIT);
     }
 
@@ -97,10 +94,9 @@ public class WitActivity extends BaseActivity implements OnClickListener, OnItem
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_writting_search:
-                localkey = autoTxt.getText().toString();
-                Intent it_search = new Intent(this, WitSearchActivity.class);
-                it_search.putExtra("localkey", localkey);
-                startActivity(it_search);
+                Intent intent = new Intent(this, WitSearchActivity.class);
+                intent.putExtra("localkey", autoTxt.getText().toString());
+                startActivity(intent);
                 break;
             case R.id.arrow_back:
                 finish();
@@ -110,12 +106,9 @@ public class WitActivity extends BaseActivity implements OnClickListener, OnItem
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        WitCategory witcategory = witcategoryList.get(position);
-        localid = witcategory.id;
-        localname = witcategory.name;
-        Intent it_witSubcategory = new Intent(this, WitSubcategoryActivity.class);
-        it_witSubcategory.putExtra("localid", localid);
-        it_witSubcategory.putExtra("localname", localname);
-        startActivity(it_witSubcategory);
+        Intent intent = new Intent(this, WitSubcategoryActivity.class);
+        intent.putExtra("localid", witcategoryList.get(position).id);
+        intent.putExtra("localname", witcategoryList.get(position).name);
+        startActivity(intent);
     }
 }

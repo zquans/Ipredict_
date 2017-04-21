@@ -35,14 +35,12 @@ public class WitSearchActivity extends BaseActivity implements OnClickListener, 
     private ImageView mImgView;
     private ListView witsearchlistview;
 
-    //    private String URL_SEARCH = "http://iphone.ipredicting.com/xzsubSearch.aspx";
     private String localkey, localid, localsubid;
     private List<WitSearch> witsearchList = new ArrayList<>();
 
     @Override
     protected void onStop() {
         super.onStop();
-//        AppContext.getHttpQueue().cancelAll("witsearch");
         HttpUtil.removeTag(Constants.ACTIVITY_WIT_SEARCH);
     }
 
@@ -56,9 +54,8 @@ public class WitSearchActivity extends BaseActivity implements OnClickListener, 
     }
 
     private void initView() {
-        Intent it_search = getIntent();
-        localkey = it_search.getStringExtra("localkey");
-        localid = it_search.getStringExtra("localid");
+        localkey = getIntent().getStringExtra("localkey");
+        localid = getIntent().getStringExtra("localid");
 
         txtResult = (TextView) findViewById(R.id.txt_witsearch_result);
         btnBack = (Button) findViewById(R.id.btn_witsearch_back);
@@ -123,10 +120,8 @@ public class WitSearchActivity extends BaseActivity implements OnClickListener, 
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        WitSearch witsearch = (WitSearch) witsearchList.get(position);
-        localsubid = witsearch.subid;
-        Intent it_witcontent = new Intent(this, WitContentActivity.class);
-        it_witcontent.putExtra("localsubid", localsubid);
-        startActivity(it_witcontent);
+        Intent intent = new Intent(this, WitContentActivity.class);
+        intent.putExtra("localsubid", witsearchList.get(position).subid);
+        startActivity(intent);
     }
 }

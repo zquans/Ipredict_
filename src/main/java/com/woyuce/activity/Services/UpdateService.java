@@ -8,7 +8,7 @@ import com.woyuce.activity.Utils.LogUtil;
 import com.woyuce.activity.Utils.UpdateManager;
 
 /**
- * Created by Administrator on 2016/9/26.
+ * Created by Administrator on 2016/9/26
  */
 public class UpdateService extends Service {
 

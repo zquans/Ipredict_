@@ -48,8 +48,6 @@ public class FragmentHome extends Fragment implements View.OnClickListener {
     private TextView mTxtTimer, mTxtTimerTitle;
     private String localTimer, localtoken, localuserid;
 
-//    private String URL = "http://api.iyuce.com/v1/exam/setexamtime";
-
     @Override
     public void onStart() {
         super.onStart();
@@ -84,7 +82,6 @@ public class FragmentHome extends Fragment implements View.OnClickListener {
         img_waitting.setOnClickListener(this);
 
         mFrame.setOnClickListener(this);
-//		mTxtTimer.setOnClickListener(this);
     }
 
     /**
@@ -131,7 +128,7 @@ public class FragmentHome extends Fragment implements View.OnClickListener {
     /**
      * 将设定的时间上传
      */
-    private void getJson(final String mTime) {
+    private void postRequest(final String mTime) {
         HashMap<String, String> headers = new HashMap<>();
         headers.put("Authorization", "Bearer " + localtoken);
         HashMap<String, String> params = new HashMap<>();
@@ -205,7 +202,7 @@ public class FragmentHome extends Fragment implements View.OnClickListener {
     }
 
     /**
-     * 时间选择的方法
+     * 触发时间选择器
      */
     private DatePickerDialog.OnDateSetListener timePick() {
         return new DatePickerDialog.OnDateSetListener() {
@@ -216,7 +213,7 @@ public class FragmentHome extends Fragment implements View.OnClickListener {
                 // 如果已设置过，则保存
                 PreferenceUtil.save(getActivity(), "mtimer", mTime);
                 //将mTime上传后台
-                getJson(mTime);
+                postRequest(mTime);
                 dealTimePicker(mTime, mSimpleDate);
             }
         };

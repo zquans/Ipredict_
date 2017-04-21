@@ -32,7 +32,7 @@ import java.util.HashMap;
 import java.util.List;
 
 /**
- * Created by Administrator on 2016/9/22.
+ * Created by Administrator on 2016/9/22
  */
 public class SpeakingStatisActivity extends BaseActivity implements View.OnClickListener, AdapterView.OnItemSelectedListener, AdapterView.OnItemClickListener {
 
@@ -47,8 +47,6 @@ public class SpeakingStatisActivity extends BaseActivity implements View.OnClick
     private TextView txtSearch;
     private AutoCompleteTextView autoTxt;
 
-    //    private String URL_CITY = "http://iphone.ipredicting.com/kyCityApi.aspx";
-    //    private String URL_VOTE = "http://iphone.ipredicting.com/kysubOrder.aspx";
     private int localpartid, localdateid, localcityid;
 
     private ArrayAdapter<String> partAdapter, dateAdapter, cityAdapter;
@@ -66,7 +64,6 @@ public class SpeakingStatisActivity extends BaseActivity implements View.OnClick
     @Override
     protected void onStop() {
         super.onStop();
-//        AppContext.getHttpQueue().cancelAll("statis");
         HttpUtil.removeTag(Constants.ACTIVITY_SPEAKING_STATICS);
     }
 
@@ -246,18 +243,16 @@ public class SpeakingStatisActivity extends BaseActivity implements View.OnClick
                 overridePendingTransition(0, 0);
                 break;
             case R.id.btn_statis_more:
-                Intent it_more = new Intent(this, SpeakingMoreActivity.class);
-                startActivity(it_more);
+                startActivity(new Intent(this, SpeakingMoreActivity.class));
                 overridePendingTransition(0, 0);
                 break;
             case R.id.img_back:
                 startActivity(new Intent(this, MainActivity.class));
                 break;
             case R.id.txt_statis_search:
-                String localsearch = autoTxt.getText().toString();
-                Intent it_search = new Intent(SpeakingStatisActivity.this, SpeakingSearchActivity.class);
-                it_search.putExtra("localsearch", localsearch);
-                startActivity(it_search);
+                Intent intent = new Intent(SpeakingStatisActivity.this, SpeakingSearchActivity.class);
+                intent.putExtra("localsearch", autoTxt.getText().toString());
+                startActivity(intent);
                 overridePendingTransition(0, 0);
                 break;
         }

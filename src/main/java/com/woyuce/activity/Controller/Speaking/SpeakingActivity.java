@@ -35,14 +35,12 @@ public class SpeakingActivity extends BaseActivity implements View.OnClickListen
     private Button btnShare;
     private ListView mListView;
 
-    //    private String URL = "http://iphone.ipredicting.com/getvoteMge.aspx";
     private List<SpeakingBean> speakingList = new ArrayList<>();
     private SpeakingAdapter adapter;
 
     @Override
     protected void onStop() {
         super.onStop();
-//        AppContext.getHttpQueue().cancelAll("speaking");
         HttpUtil.removeTag(Constants.ACTIVITY_SPEAKING);
     }
 
@@ -51,7 +49,7 @@ public class SpeakingActivity extends BaseActivity implements View.OnClickListen
         super.onRestart();
         speakingList.clear();
         adapter.notifyDataSetChanged();
-        getJson();
+        requestJson();
     }
 
     @Override
@@ -60,7 +58,7 @@ public class SpeakingActivity extends BaseActivity implements View.OnClickListen
         setContentView(R.layout.activity_speaking);
 
         initView();
-        getJson();
+        requestJson();
     }
 
     private void initView() {
@@ -75,7 +73,7 @@ public class SpeakingActivity extends BaseActivity implements View.OnClickListen
         mListView.setOnItemClickListener(this);
     }
 
-    private void getJson() {
+    private void requestJson() {
         HttpUtil.get(Constants.URL_POST_SPEAKING, Constants.ACTIVITY_SPEAKING, new RequestInterface() {
             @Override
             public void doSuccess(String result) {
@@ -122,9 +120,8 @@ public class SpeakingActivity extends BaseActivity implements View.OnClickListen
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        SpeakingBean localspeaking = speakingList.get(position);
         Intent intent = new Intent(this, SpeakingDetailActivity.class);
-        intent.putExtra("localspeaking", localspeaking);
+        intent.putExtra("SpeakingBean", speakingList.get(position));
         startActivity(intent);
     }
 }

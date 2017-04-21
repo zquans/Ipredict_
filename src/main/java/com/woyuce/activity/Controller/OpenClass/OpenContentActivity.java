@@ -35,7 +35,6 @@ public class OpenContentActivity extends BaseActivity implements View.OnClickLis
     protected void onDestroy() {
         super.onDestroy();
         mp.release();
-//        AppContext.getHttpQueue().cancelAll("post");
         HttpUtil.removeTag("post");
     }
 

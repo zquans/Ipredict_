@@ -48,8 +48,6 @@ public class FragmentStoreHome extends Fragment implements View.OnClickListener 
     private List<StoreBean> mImgData = new ArrayList<>();
     private List<StoreBean> mList = new ArrayList<>();
 
-//    private String URL = "http://api.iyuce.com/v1/store/homegoodslist";
-
     private static final int FLAG_VIEWFLIPPER = 1;
     private static final int FLAG_RECYCLERVIEW = 2;
 
@@ -227,6 +225,7 @@ public class FragmentStoreHome extends Fragment implements View.OnClickListener 
                 startActivity(new Intent(getActivity(), CustomServiceActivity.class));
                 break;
             case R.id.imgbtn_store_toStoreCar:
+                //判断数据库中是否有数据
                 SQLiteDatabase mDatabase = DbUtil.getHelper(getActivity(), Constants.DATABASE_IYUCE).getWritableDatabase();
                 String isNone = DbUtil.queryToExist(mDatabase, Constants.TABLE_SQLITE_MASTER, Constants.NAME, Constants.TABLE_NAME, Constants.TABLE_CART);
                 mDatabase.close();

@@ -3,7 +3,6 @@ package com.woyuce.activity.Controller.Main;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -51,9 +50,6 @@ public class FragmentMine extends Fragment implements View.OnClickListener {
     private TextView mCourseTable;
 
     private String localroomname;
-    //    private String URL_ROOM = "http://iphone.ipredicting.com/kymyroom.aspx";
-    //    private String URL_SUBJECT = "http://iphone.ipredicting.com/kymyshanesub.aspx";
-    //    private String URL_MONEY_INFO = "http://api.iyuce.com/v1/store/getusermoney?userid=";
     private List<SpeakingRoom> roomList = new ArrayList<>();
     private List<String> subcontentList = new ArrayList<>();
     private List<String> myexamList = new ArrayList<>();
@@ -104,12 +100,11 @@ public class FragmentMine extends Fragment implements View.OnClickListener {
         txtOrderList.setOnClickListener(this);
     }
 
-    // fragment 生命周期，打开时
     private void initEvent() {
-        if (share().getString("userId", "").length() == 0) {
+        if (PreferenceUtil.getSharePre(getActivity()).getString("userId", "").length() == 0) {
             txtRoom.setText("登录后可见");
             txtSubject.setText("登录后可见");
-            txtMoney.setText(share().getString("money", "登录后可见"));
+            txtMoney.setText(PreferenceUtil.getSharePre(getActivity()).getString("money", "登录后可见"));
             myexamList.clear();
         } else {
             roomList.clear();
@@ -120,13 +115,8 @@ public class FragmentMine extends Fragment implements View.OnClickListener {
             getMoney();
             mCourseTable.setText("查看");
         }
-        txtName.setText(share().getString("mUserName", "点击头像切换账号"));
-        txtMoney.setText(share().getString("money", "登录后可见"));
-    }
-
-    // 从initEvent 抽出，方便调用，代码简洁
-    private SharedPreferences share() {
-        return PreferenceUtil.getSharePre(getActivity());
+        txtName.setText(PreferenceUtil.getSharePre(getActivity()).getString("mUserName", "点击头像切换账号"));
+        txtMoney.setText(PreferenceUtil.getSharePre(getActivity()).getString("money", "登录后可见"));
     }
 
     //获取考场
@@ -255,6 +245,7 @@ public class FragmentMine extends Fragment implements View.OnClickListener {
                 startActivity(new Intent(getActivity(), SuggestionActivity.class));
                 break;
             case R.id.txt_to_clearcache:
+                //ImageLoader清除缓存
                 com.nostra13.universalimageloader.core.ImageLoader.getInstance().clearDiskCache();
                 com.nostra13.universalimageloader.core.ImageLoader.getInstance().clearMemoryCache();
                 ToastUtil.showMessage(getActivity(), "清除缓存成功");

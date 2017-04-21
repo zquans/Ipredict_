@@ -32,7 +32,6 @@ import java.util.List;
 public class FragmentPartTwo extends Fragment implements OnItemClickListener {
 
     private ListView listviewPart2;
-    //    private String URL_PART2 = "http://iphone.ipredicting.com/kysubNshare.aspx";
     private List<SpeakingPart> partList = new ArrayList<>();
     private String localsubid, localsubname;
 

@@ -56,7 +56,6 @@ public class WXPayEntryActivity extends Activity implements IWXAPIEventHandler {
     @Override
     protected void onStop() {
         super.onStop();
-//        AppContext.getHttpQueue().cancelAll("validWxPayRequest");
         HttpUtil.removeTag(Constants.ACTIVITY_STORE_ORDER);
     }
 
@@ -84,8 +83,6 @@ public class WXPayEntryActivity extends Activity implements IWXAPIEventHandler {
         validRequest(resp, "{\"out_trade_no\":\"" + for_wx_validate + "\"}");
         LogUtil.d("ping = " + "{\"out_trade_no\":\"" + for_wx_validate + "\"}");
     }
-
-//    private String URL_TO_VALID = "http://api.iyuce.com/v1/store/validpaybyapp?paytype=wxapp";
 
     /**
      * 校验微信支付回调结果

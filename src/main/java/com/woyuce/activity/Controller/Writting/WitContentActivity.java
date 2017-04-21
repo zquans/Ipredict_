@@ -35,13 +35,11 @@ public class WitContentActivity extends BaseActivity implements OnClickListener 
     private ImageView mImgview;
     private PhotoView photoView;
 
-    //    private String URL = "http://iphone.ipredicting.com/xzsubContent.aspx";
     private String localsubCategoryid, localname, localsubid, localimgUrl, localanswerUrl;
 
     @Override
     protected void onStop() {
         super.onStop();
-//        AppContext.getHttpQueue().cancelAll("witcontent");
         HttpUtil.removeTag(Constants.ACTIVITY_WIT_CONTENT);
     }
 
@@ -55,10 +53,9 @@ public class WitContentActivity extends BaseActivity implements OnClickListener 
     }
 
     private void initView() {
-        Intent it = getIntent();
-        localsubCategoryid = it.getStringExtra("localsubCategoryid");
-        localname = it.getStringExtra("localname");
-        localsubid = it.getStringExtra("localsubid");
+        localsubCategoryid = getIntent().getStringExtra("localsubCategoryid");
+        localname = getIntent().getStringExtra("localname");
+        localsubid = getIntent().getStringExtra("localsubid");
 
         mImgview = (ImageView) findViewById(R.id.arrow_back);
         txtTitle = (TextView) findViewById(R.id.txt_witcontent_title);
