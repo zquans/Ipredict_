@@ -3,7 +3,7 @@ package com.woyuce.activity.Model.Weibo;
 import java.util.ArrayList;
 
 /**
- * Created by Administrator on 2016/9/23.
+ * Created by Administrator on 2016/9/23
  */
 public class WeiboBean {
 

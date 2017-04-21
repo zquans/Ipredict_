@@ -2,6 +2,7 @@ package com.woyuce.activity.Controller.Speaking;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -11,14 +12,12 @@ import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
 import com.woyuce.activity.BaseActivity;
+import com.woyuce.activity.Common.Constants;
 import com.woyuce.activity.Controller.Main.MainActivity;
-import com.woyuce.activity.AppContext;
 import com.woyuce.activity.R;
+import com.woyuce.activity.Utils.Http.Volley.HttpUtil;
+import com.woyuce.activity.Utils.Http.Volley.RequestInterface;
 import com.woyuce.activity.Utils.LogUtil;
 import com.woyuce.activity.Utils.PreferenceUtil;
 import com.woyuce.activity.Utils.ToastUtil;
@@ -31,7 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by Administrator on 2016/9/22.
+ * Created by Administrator on 2016/9/22
  */
 public class SpeakingShare1Activity extends BaseActivity implements View.OnClickListener, AdapterView.OnItemSelectedListener {
 
@@ -45,13 +44,12 @@ public class SpeakingShare1Activity extends BaseActivity implements View.OnClick
     private List<String> timeList = new ArrayList<>();
     private ArrayAdapter<String> timeAdapter;
 
-    private String URL_TIME = "http://iphone.ipredicting.com/ksexamtime.aspx";
     private String localRoom, localRoomID, localTime;
 
     @Override
     protected void onStop() {
         super.onStop();
-        AppContext.getHttpQueue().cancelAll("share");
+        HttpUtil.removeTag(Constants.ACTIVITY_SPEAKING_SHARE_ONE);
     }
 
     @Override
@@ -82,7 +80,7 @@ public class SpeakingShare1Activity extends BaseActivity implements View.OnClick
 
     private void initEvent() { // Text 显示用户昵称
         String init = PreferenceUtil.getSharePre(this).getString("mUserName", "").toString();
-        if (init != "") {
+        if (!TextUtils.equals(init, "")) {
             userName.setText(init);
         } else {
             userName.setText("您还没有登陆哦");
@@ -90,37 +88,25 @@ public class SpeakingShare1Activity extends BaseActivity implements View.OnClick
     }
 
     private void getTimeList() {
-        StringRequest strinRequest = new StringRequest(Request.Method.GET, URL_TIME, new Response.Listener<String>() {
+        HttpUtil.get(Constants.URL_GET_SPEAKING_SHARE_ONE, Constants.ACTIVITY_SPEAKING_SHARE_ONE, new RequestInterface() {
             @Override
-            public void onResponse(String response) {
-                JSONObject jsonObject;
-                String examtime;
+            public void doSuccess(String result) {
                 try {
-                    jsonObject = new JSONObject(response);
-                    int result = jsonObject.getInt("code");
-                    if (result == 0) {
+                    JSONObject jsonObject;
+                    jsonObject = new JSONObject(result);
+                    if (jsonObject.getInt("code") == 0) {
                         JSONArray data = jsonObject.getJSONArray("data");
                         for (int i = 0; i < data.length(); i++) {
                             jsonObject = data.getJSONObject(i);
-                            examtime = jsonObject.getString("examtime");
-                            timeList.add(examtime); // 读取考场事件
+                            timeList.add(jsonObject.getString("examtime")); // 考试时间
                         }
-                    } else {
-                        LogUtil.e("code!=0 DATA_BACK", "读取页面失败： " + jsonObject.getString("message"));
                     }
                     setTimeData(); // 数据加载完成后再放入
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
             }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                LogUtil.e("Wrong-BACK", "连接错误原因： " + error.getMessage()); // 做错误处理
-            }
         });
-        strinRequest.setTag("share");
-        AppContext.getHttpQueue().add(strinRequest);
     }
 
     private void setTimeData() {
@@ -133,7 +119,7 @@ public class SpeakingShare1Activity extends BaseActivity implements View.OnClick
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (resultCode) {
-            case 1:
+            case Constants.CODE_START_ACTIVITY_FOR_RESULT:
                 localRoom = data.getExtras().getString("localRoom");
                 localRoomID = data.getExtras().getString("localRoomID");
                 btnRoomChoose.setText(localRoom);
@@ -156,8 +142,7 @@ public class SpeakingShare1Activity extends BaseActivity implements View.OnClick
         switch (v.getId()) {
             case R.id.ll_speaking_stastis:
                 // 但界面看起来无跳转变化
-                Intent it_statis = new Intent(this, SpeakingStatisActivity.class);
-                startActivity(it_statis);
+                startActivity(new Intent(this, SpeakingStatisActivity.class));
                 overridePendingTransition(0, 0);
                 break;
             case R.id.img_back:
@@ -168,18 +153,18 @@ public class SpeakingShare1Activity extends BaseActivity implements View.OnClick
                 overridePendingTransition(0, 0);
                 break;
             case R.id.btn_share_RoomChoose:
-                Intent it_roomid = new Intent(this, SpeakingChooseRoomActivity.class);
-                startActivityForResult(it_roomid, 1);
+                startActivityForResult(new Intent(this, SpeakingChooseRoomActivity.class), Constants.CODE_START_ACTIVITY_FOR_RESULT);
                 break;
-            case R.id.button_share_next: // *** 点击"下一步"按钮,启动下一个"分享"界面
-                if (localRoom == null || localRoom == "") {
+            case R.id.button_share_next:
+                // 点击"下一步"按钮,启动下一个"分享"界面
+                if (TextUtils.isEmpty(localRoom)) {
                     ToastUtil.showMessage(SpeakingShare1Activity.this, "请选择考场");
                 } else {
-                    Intent it_share2 = new Intent(this, SpeakingShare2Activity.class);
-                    it_share2.putExtra("localRoom", localRoom);
-                    it_share2.putExtra("localRoomID", localRoomID);
-                    it_share2.putExtra("localTime", localTime);
-                    startActivity(it_share2);
+                    Intent intent = new Intent(this, SpeakingShare2Activity.class);
+                    intent.putExtra("localRoom", localRoom);
+                    intent.putExtra("localRoomID", localRoomID);
+                    intent.putExtra("localTime", localTime);
+                    startActivity(intent);
                     overridePendingTransition(0, 0);
                 }
                 break;

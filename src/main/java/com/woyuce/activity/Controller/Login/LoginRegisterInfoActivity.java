@@ -14,14 +14,11 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.woyuce.activity.AppContext;
 import com.woyuce.activity.BaseActivity;
+import com.woyuce.activity.Common.Constants;
 import com.woyuce.activity.R;
+import com.woyuce.activity.Utils.Http.Volley.HttpUtil;
+import com.woyuce.activity.Utils.Http.Volley.RequestInterface;
 import com.woyuce.activity.Utils.LogUtil;
 import com.woyuce.activity.Utils.PreferenceUtil;
 import com.woyuce.activity.Utils.ToastUtil;
@@ -30,7 +27,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Created by Administrator on 2016/9/22
@@ -42,9 +38,8 @@ public class LoginRegisterInfoActivity extends BaseActivity implements View.OnCl
     private Button btnfinish, btnCheckUsername, btnCheckEmail;
 
     private String localtoken, localPhoneOrEmail, email_or_phone, localtimer;
-    private String URL = "http://api.iyuce.com/v1/account/register";
-    private String URL_VAILD = "http://api.iyuce.com/v1/account/valid";
-
+    //    private String URL = "http://api.iyuce.com/v1/account/register";
+//    private String URL_VAILD = "http://api.iyuce.com/v1/account/valid";
 
     @Override
     public void onBackPressed() {
@@ -56,9 +51,8 @@ public class LoginRegisterInfoActivity extends BaseActivity implements View.OnCl
     @Override
     protected void onStop() {
         super.onStop();
-        AppContext.getHttpQueue().cancelAll("registerinfo");
+        HttpUtil.removeTag(Constants.ACTIVITY_LOGIN_REGISTER_INFO);
     }
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,6 +63,7 @@ public class LoginRegisterInfoActivity extends BaseActivity implements View.OnCl
     }
 
     private void initView() {
+        localtoken = PreferenceUtil.getSharePre(LoginRegisterInfoActivity.this).getString("localtoken", "");
         Intent intent = getIntent();
         email_or_phone = intent.getStringExtra("email_or_phone");
         localPhoneOrEmail = intent.getStringExtra("local_phone_or_email");
@@ -139,14 +134,39 @@ public class LoginRegisterInfoActivity extends BaseActivity implements View.OnCl
     }
 
     private void RequestToNext() {
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, URL, new Response.Listener<String>() {
+        HashMap<String, String> headers = new HashMap<>();
+        headers.put("Authorization", "Bearer " + localtoken);
+        HashMap<String, String> params = new HashMap<>();
+        if (email_or_phone.equals("phone")) {
+            params.put("mobile", localPhoneOrEmail);
+            params.put("email", edtEmailOrPhone.getText().toString().trim());
+        } else {
+            params.put("mobile", edtEmailOrPhone.getText().toString().trim());
+            params.put("email", localPhoneOrEmail);
+        }
+        //以下参数还是要的
+        params.put("username", edtUsername.getText().toString().trim());
+        params.put("nickname", edtNickname.getText().toString().trim());
+        params.put("password", edtPassword.getText().toString().trim());
+        params.put("name", "");
+        params.put("avatar", "");
+        params.put("sex", "");
+        params.put("province", "");
+        params.put("city", "");
+        params.put("aliwangwang", "");
+        params.put("qq", "");
+        params.put("passwordanswer", "");
+        params.put("passwordquestion", "");
+        params.put("examtime", "");
+        params.put("invite", "");
+        HttpUtil.post(Constants.URL_POST_LOGIN_REGISTER, headers, params, Constants.ACTIVITY_LOGIN_REGISTER_INFO, new RequestInterface() {
             @Override
-            public void onResponse(String response) {
-                JSONObject obj;
+            public void doSuccess(String result) {
                 try {
-                    LogUtil.i("respons = " + response);
+                    JSONObject obj;
+                    LogUtil.i("respons = " + result);
 //                    String parseString = new String(response.getBytes("ISO-8859-1"), "utf-8");
-                    obj = new JSONObject(response);
+                    obj = new JSONObject(result);
                     // 成功则Toast，并返回Login界面
                     if (obj.getString("code").equals("0")) {
                         ToastUtil.showMessage(LoginRegisterInfoActivity.this, "恭喜您,注册成功!");
@@ -163,104 +183,37 @@ public class LoginRegisterInfoActivity extends BaseActivity implements View.OnCl
                     e.printStackTrace();
                 }
             }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                ToastUtil.showMessage(LoginRegisterInfoActivity.this, "网络错误，请稍候重试");
-                LogUtil.e("Wrong-Back", "连接错误原因： " + error.getMessage() + "//" + error);
-            }
-        }) {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<>();
-                localtoken = PreferenceUtil.getSharePre(LoginRegisterInfoActivity.this).getString("localtoken", "");
-                headers.put("Authorization", "Bearer " + localtoken);
-                return headers;
-            }
-
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                HashMap<String, String> map = new HashMap<>();
-                if (email_or_phone.equals("phone")) {
-                    map.put("mobile", localPhoneOrEmail);
-                    map.put("email", edtEmailOrPhone.getText().toString().trim());
-                } else {
-                    map.put("mobile", edtEmailOrPhone.getText().toString().trim());
-                    map.put("email", localPhoneOrEmail);
-                }
-                //TODO 以下参数还是要的
-                map.put("username", edtUsername.getText().toString().trim());
-                map.put("nickname", edtNickname.getText().toString().trim());
-                map.put("password", edtPassword.getText().toString().trim());
-                map.put("name", "");
-                map.put("avatar", "");
-                map.put("sex", "");
-                map.put("province", "");
-                map.put("city", "");
-                map.put("aliwangwang", "");
-                map.put("qq", "");
-                map.put("passwordanswer", "");
-                map.put("passwordquestion", "");
-                map.put("examtime", "");
-                map.put("invite", "");
-                LogUtil.e("mobile = " + localPhoneOrEmail + "," + edtUsername.getText().toString().trim() + ","
-                        + edtNickname.getText().toString().trim() + "," + edtPassword.getText().toString().trim() + ","
-                        + edtEmailOrPhone.getText().toString().trim());
-                return map;
-            }
-        };
-        stringRequest.setTag("registerinfo");
-        AppContext.getHttpQueue().add(stringRequest);
+        });
     }
 
     /**
      * 检查邮箱是否可用
      */
     private void RequestVaild(final String key, final String value) {
-        StringRequest VaildRequest = new StringRequest(Request.Method.POST, URL_VAILD, new Response.Listener<String>() {
+        HashMap<String, String> headers = new HashMap<>();
+        headers.put("Authorization", "Bearer " + localtoken);
+        HashMap<String, String> params = new HashMap<>();
+        params.put("key", key);
+        params.put("value", value);
+        LogUtil.e("key = " + key + ",,value = " + value);
+        HttpUtil.post(Constants.URL_POST_LOGIN_REGISTER, headers, params, Constants.ACTIVITY_LOGIN_REGISTER_INFO, new RequestInterface() {
             @Override
-            public void onResponse(String response) {
-                JSONObject obj;
+            public void doSuccess(String result) {
                 try {
-                    obj = new JSONObject(response);
-                    int result = obj.getInt("data");
-                    if (result == 0) {
+                    JSONObject obj;
+                    obj = new JSONObject(result);
+//                    if (obj.getInt("data") == 0) {
 //                        ToastUtil.showMessage(LoginRegisterInfoActivity.this, obj.getString("message"));
-                    } else {
+//                    } else {
 //                        ToastUtil.showMessage(LoginRegisterInfoActivity.this, obj.getString("message"));
-                    }
+//                    }
                     txtEmailCheckHint.setVisibility(View.VISIBLE);
                     txtEmailCheckHint.setText(obj.getString("message"));
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
             }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                LogUtil.e("Wrong-Back", "连接错误原因： " + error.getMessage());
-                ToastUtil.showMessage(LoginRegisterInfoActivity.this, "发送失败，请稍候再试");
-            }
-        }) {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<>();
-                localtoken = PreferenceUtil.getSharePre(LoginRegisterInfoActivity.this).getString("localtoken", "");
-                headers.put("Authorization", "Bearer " + localtoken);
-                return headers;
-            }
-
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                HashMap<String, String> map = new HashMap<>();
-                map.put("key", key);
-                map.put("value", value);
-                LogUtil.e("key = " + key + ",,value = " + value);
-                return map;
-            }
-        };
-        VaildRequest.setTag("registerinfo");
-        AppContext.getHttpQueue().add(VaildRequest);
+        });
     }
 
     @Override

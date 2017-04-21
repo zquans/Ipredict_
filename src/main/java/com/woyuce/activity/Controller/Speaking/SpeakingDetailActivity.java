@@ -9,12 +9,12 @@ import com.woyuce.activity.Model.Speaking.SpeakingBean;
 import com.woyuce.activity.R;
 
 /**
- * Created by Administrator on 2016/9/22.
+ * Created by Administrator on 2016/9/22
  */
 public class SpeakingDetailActivity extends BaseActivity implements View.OnClickListener {
 
     private TextView txtBack, txtName, txtTime, txtRoom, txtContent;
-    private SpeakingBean localspeaking;
+    private SpeakingBean mSpeakingBean;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,8 +26,8 @@ public class SpeakingDetailActivity extends BaseActivity implements View.OnClick
     }
 
     private void initView() {
-        localspeaking = (SpeakingBean) getIntent().getSerializableExtra("localspeaking");
-        
+        mSpeakingBean = (SpeakingBean) getIntent().getSerializableExtra("SpeakingBean");
+
         txtBack = (TextView) findViewById(R.id.txt_speakingdetail_back);
         txtName = (TextView) findViewById(R.id.txt_speakingdetail_username);
         txtTime = (TextView) findViewById(R.id.txt_speakingdetail_examtime);
@@ -38,10 +38,10 @@ public class SpeakingDetailActivity extends BaseActivity implements View.OnClick
     }
 
     private void initEvent() {
-        txtName.setText(localspeaking.uname);
-        txtTime.setText(localspeaking.vtime);
-        txtRoom.setText(localspeaking.examroom);
-        txtContent.setText(localspeaking.message);
+        txtName.setText(mSpeakingBean.uname);
+        txtTime.setText(mSpeakingBean.vtime);
+        txtRoom.setText(mSpeakingBean.examroom);
+        txtContent.setText(mSpeakingBean.message);
     }
 
     @Override

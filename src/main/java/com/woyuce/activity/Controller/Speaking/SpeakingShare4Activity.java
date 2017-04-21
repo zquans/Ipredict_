@@ -1,6 +1,5 @@
 package com.woyuce.activity.Controller.Speaking;
 
-import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -9,15 +8,12 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
 import com.woyuce.activity.BaseActivity;
+import com.woyuce.activity.Common.Constants;
 import com.woyuce.activity.Controller.Main.MainActivity;
-import com.woyuce.activity.AppContext;
 import com.woyuce.activity.R;
+import com.woyuce.activity.Utils.Http.Volley.HttpUtil;
+import com.woyuce.activity.Utils.Http.Volley.RequestInterface;
 import com.woyuce.activity.Utils.LogUtil;
 import com.woyuce.activity.Utils.PreferenceUtil;
 
@@ -26,20 +22,18 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import cn.sharesdk.framework.ShareSDK;
 import cn.sharesdk.onekeyshare.OnekeyShare;
 
 /**
- * Created by Administrator on 2016/9/22.
+ * Created by Administrator on 2016/9/22
  */
 public class SpeakingShare4Activity extends BaseActivity implements View.OnClickListener {
 
     private Button btnBack;
     private LinearLayout llBack;
 
-    private String URL_REQUEST = "http://iphone.ipredicting.com/kysubshare.aspx";
     private String localRoomID, localTime, localMessage, localsubname, localRoom;
     private List<String> subidList = new ArrayList<>();
     private List<String> subnameList = new ArrayList<>();
@@ -47,7 +41,7 @@ public class SpeakingShare4Activity extends BaseActivity implements View.OnClick
     @Override
     protected void onStop() {
         super.onStop();
-        AppContext.getHttpQueue().cancelAll("share4");
+        HttpUtil.removeTag(Constants.ACTIVITY_SPEAKING_SHARE_FOUR);
     }
 
     @Override
@@ -77,12 +71,32 @@ public class SpeakingShare4Activity extends BaseActivity implements View.OnClick
         btnBack.setOnClickListener(this);
     }
 
-    @SuppressLint("InlinedApi")
     private void dataRequest() {
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, URL_REQUEST, new Response.Listener<String>() {
-            @SuppressWarnings("deprecation")
+        progressdialogshow(this);
+        HashMap<String, String> params = new HashMap<>();
+        params.put("uname", PreferenceUtil.getSharePre(getApplicationContext()).getString("mUserName", ""));
+        params.put("umessage", localMessage);
+        params.put("roomid", localRoomID);
+                /* 按数组长度做判断，传递参数 */
+        switch (subidList.size()) {
+            case 1:
+                params.put("subid", subidList.get(0));
+                break;
+            case 2:
+                params.put("subid", subidList.get(0) + "," + subidList.get(1));
+                break;
+            case 3:
+                params.put("subid", subidList.get(0) + "," + subidList.get(1) + "," + subidList.get(2));
+                break;
+            case 4:
+                params.put("subid", subidList.get(0) + "," + subidList.get(1) + "," + subidList.get(2) + ","
+                        + subidList.get(3));
+                break;
+        }
+        params.put("examtime", localTime);
+        HttpUtil.post(Constants.URL_POST_SPEAKING_SHARE_FOUR, params, Constants.ACTIVITY_SPEAKING_SHARE_FOUR, new RequestInterface() {
             @Override
-            public void onResponse(String response) {
+            public void doSuccess(String result) {
                 new AlertDialog.Builder(SpeakingShare4Activity.this, AlertDialog.THEME_DEVICE_DEFAULT_LIGHT)
                         .setTitle("分享结果")
                         .setCancelable(false)
@@ -100,91 +114,112 @@ public class SpeakingShare4Activity extends BaseActivity implements View.OnClick
                             }
                         }).show();
             }
-        }, new Response.ErrorListener() {
-            @SuppressWarnings("deprecation")
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                LogUtil.e("Wrong-BACK", "联接错误原因： " + error.getMessage());
-                new AlertDialog.Builder(SpeakingShare4Activity.this, AlertDialog.THEME_DEVICE_DEFAULT_LIGHT).setTitle("分享结果")
-                        .setCancelable(false).setPositiveButton("分享失败，请重试 !", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        SpeakingShare4Activity.this.finish();
-                    }
-                }).show();
-            }
-        }) {
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                Map<String, String> hashMap = new HashMap<>();
-                hashMap.put("uname", PreferenceUtil.getSharePre(getApplicationContext()).getString("mUserName", ""));
-                hashMap.put("umessage", localMessage);
-                hashMap.put("roomid", localRoomID);
-                /* 按数组长度做判断，传递参数 */
-                switch (subidList.size()) {
-                    case 1:
-                        hashMap.put("subid", subidList.get(0));
-                        break;
-                    case 2:
-                        hashMap.put("subid", subidList.get(0) + "," + subidList.get(1));
-                        break;
-                    case 3:
-                        hashMap.put("subid", subidList.get(0) + "," + subidList.get(1) + "," + subidList.get(2));
-                        break;
-                    case 4:
-                        hashMap.put("subid", subidList.get(0) + "," + subidList.get(1) + "," + subidList.get(2) + ","
-                                + subidList.get(3));
-                        break;
-                }
-                hashMap.put("examtime", localTime);
-                return hashMap;
-            }
-        };
-        stringRequest.setTag("share4");
-        AppContext.getHttpQueue().add(stringRequest);
+        });
+//        StringRequest stringRequest = new StringRequest(Request.Method.POST, Constants.URL_POST_SPEAKING_SHARE_FOUR, new Response.Listener<String>() {
+//            @SuppressWarnings("deprecation")
+//            @Override
+//            public void onResponse(String response) {
+//                new AlertDialog.Builder(SpeakingShare4Activity.this, AlertDialog.THEME_DEVICE_DEFAULT_LIGHT)
+//                        .setTitle("分享结果")
+//                        .setCancelable(false)
+//                        .setPositiveButton("分享成功 !", new DialogInterface.OnClickListener() {
+//                            @Override
+//                            public void onClick(DialogInterface dialog, int which) {
+//                                Intent it_speaking = new Intent(SpeakingShare4Activity.this, SpeakingActivity.class);
+//                                startActivity(it_speaking);
+//                                SpeakingShare4Activity.this.finish();
+//                                if (subnameList.size() == 0) {
+//                                    showShare("我们不卖答案，我们是试卷的搬运工", "我在" + localRoom + "考到了:" + localsubname);
+//                                } else {
+//                                    showShare("我们不卖答案，我们是试卷的搬运工", "我在" + localRoom + "考到了:" + subnameList.get(0));
+//                                }
+//                            }
+//                        }).show();
+//            }
+//        }, new Response.ErrorListener() {
+//            @SuppressWarnings("deprecation")
+//            @Override
+//            public void onErrorResponse(VolleyError error) {
+//                LogUtil.e("Wrong-BACK", "联接错误原因： " + error.getMessage());
+//                new AlertDialog.Builder(SpeakingShare4Activity.this, AlertDialog.THEME_DEVICE_DEFAULT_LIGHT).setTitle("分享结果")
+//                        .setCancelable(false).setPositiveButton("分享失败，请重试 !", new DialogInterface.OnClickListener() {
+//                    @Override
+//                    public void onClick(DialogInterface dialog, int which) {
+//                        SpeakingShare4Activity.this.finish();
+//                    }
+//                }).show();
+//            }
+//        }) {
+//            @Override
+//            protected Map<String, String> getParams() throws AuthFailureError {
+//                Map<String, String> hashMap = new HashMap<>();
+//                hashMap.put("uname", PreferenceUtil.getSharePre(getApplicationContext()).getString("mUserName", ""));
+//                hashMap.put("umessage", localMessage);
+//                hashMap.put("roomid", localRoomID);
+//                /* 按数组长度做判断，传递参数 */
+//                switch (subidList.size()) {
+//                    case 1:
+//                        hashMap.put("subid", subidList.get(0));
+//                        break;
+//                    case 2:
+//                        hashMap.put("subid", subidList.get(0) + "," + subidList.get(1));
+//                        break;
+//                    case 3:
+//                        hashMap.put("subid", subidList.get(0) + "," + subidList.get(1) + "," + subidList.get(2));
+//                        break;
+//                    case 4:
+//                        hashMap.put("subid", subidList.get(0) + "," + subidList.get(1) + "," + subidList.get(2) + ","
+//                                + subidList.get(3));
+//                        break;
+//                }
+//                hashMap.put("examtime", localTime);
+//                return hashMap;
+//            }
+//        };
+//        stringRequest.setTag("share4");
+//        AppContext.getHttpQueue().add(stringRequest);
     }
 
     //多社交平台分享
     private void showShare(String title, String message) {
         try {
-            String pingjie = null;
+            String temp = null;
             switch (subnameList.size()) {
                 case 0:
-                    pingjie = "";
+                    temp = "";
                     break;
                 case 1:
-                    pingjie = subnameList.get(0);
+                    temp = subnameList.get(0);
                     break;
                 case 2:
-                    pingjie = subnameList.get(0) + "," + subnameList.get(1);
+                    temp = subnameList.get(0) + "," + subnameList.get(1);
                     break;
                 case 3:
-                    pingjie = subnameList.get(0) + "," + subnameList.get(1) + "," + subnameList.get(2);
+                    temp = subnameList.get(0) + "," + subnameList.get(1) + "," + subnameList.get(2);
                     break;
             }
             String encode_collage = URLEncoder.encode(localRoom, "utf-8");
-            String encode_title = URLEncoder.encode(subnameList.get(0), "utf-8");
-            String URLcode = encode_title.replace("+", "%20");
+            String URLcode;
+            if (subnameList.size() > 0) {
+                String encode_title = URLEncoder.encode(subnameList.get(0), "utf-8");
+                URLcode = encode_title.replace("+", "%20");
+            } else {
+                URLcode = "";
+            }
             String url = "http://xm.iyuce.com/app/fenxiang.html?viewid=1&collage=" + encode_collage
-                    + "&title=" + URLcode + "&datetime=" + localTime + "&img=&part1=" + pingjie
+                    + "&title=" + URLcode + "&datetime=" + localTime + "&img=&part1=" + temp
                     + "&part2= " + localsubname + "&message=" + localMessage;
             ShareSDK.initSDK(SpeakingShare4Activity.this);
             OnekeyShare oks = new OnekeyShare();
             oks.setTitle(message);
-            // titleUrl是标题的网络链接，仅在人人网和QQ空间使用
             oks.setTitleUrl(url);
-            // text是分享文本，所有平台都需要这个字段
             oks.setText(title);
-            // url仅在微信（包括好友和朋友圈）中使用
             oks.setUrl(url);
             oks.setImageUrl("http://www.iyuce.com/uploadfiles/app/logo.png");
             oks.setComment("答题超赞");
-            // site是分享此内容的网站名称，仅在QQ空间使用
             oks.setSite(getString(R.string.app_name));
-            // siteUrl是分享此内容的网站地址，仅在QQ空间使用
             oks.setSiteUrl(url);
-            // 启动分享GUI
-            oks.show(SpeakingShare4Activity.this);
+            oks.show(this);
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }

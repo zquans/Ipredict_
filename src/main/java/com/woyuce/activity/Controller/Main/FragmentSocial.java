@@ -12,14 +12,14 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ImageView;
 
+import com.woyuce.activity.Common.Constants;
 import com.woyuce.activity.R;
 
 public class FragmentSocial extends Fragment {
 
     private WebView web;
     private ImageView imgLoading;
-    private String URL = "http://bbs.iyuce.com/bar/bbspullrefresh";
-
+//    private String URL = "http://bbs.iyuce.com/bar/bbspullrefresh";
 
     @Override
     public void onStart() {
@@ -43,8 +43,7 @@ public class FragmentSocial extends Fragment {
 
     @SuppressLint("SetJavaScriptEnabled")
     private void initEvent() {
-
-        web.loadUrl(URL);
+        web.loadUrl(Constants.URL_TAB_BBS);
         web.getSettings().setJavaScriptEnabled(true);
         web.getSettings().setSupportZoom(true);
         web.getSettings().setBuiltInZoomControls(true);

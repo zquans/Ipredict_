@@ -10,18 +10,14 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.woyuce.activity.BaseActivity;
-import com.woyuce.activity.Controller.Main.MainActivity;
 import com.woyuce.activity.Adapter.Speaking.SpeakingSearchAdapter;
-import com.woyuce.activity.AppContext;
+import com.woyuce.activity.BaseActivity;
+import com.woyuce.activity.Common.Constants;
+import com.woyuce.activity.Controller.Main.MainActivity;
 import com.woyuce.activity.Model.Speaking.SpeakingSearch;
 import com.woyuce.activity.R;
-import com.woyuce.activity.Utils.LogUtil;
+import com.woyuce.activity.Utils.Http.Volley.HttpUtil;
+import com.woyuce.activity.Utils.Http.Volley.RequestInterface;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -30,10 +26,9 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
- * Created by Administrator on 2016/9/22.
+ * Created by Administrator on 2016/9/22
  */
 public class SpeakingSearchActivity extends BaseActivity implements AdapterView.OnItemClickListener, View.OnClickListener {
 
@@ -46,13 +41,12 @@ public class SpeakingSearchActivity extends BaseActivity implements AdapterView.
     private TextView txtNull;
 
     private String localsearch;
-    private String URL_SEARCH = "http://iphone.ipredicting.com/kysubSearch.aspx";
     private List<SpeakingSearch> searchList = new ArrayList<>();
 
     @Override
     protected void onStop() {
         super.onStop();
-        AppContext.getHttpQueue().cancelAll("search");
+        HttpUtil.removeTag(Constants.ACTIVITY_SPEAKING_SEARCH);
     }
 
     @Override
@@ -76,8 +70,7 @@ public class SpeakingSearchActivity extends BaseActivity implements AdapterView.
         mTxtToShare.setBackgroundResource(R.drawable.buttonstyle_whitestroke);
 
         //读取数据
-        Intent it_search = getIntent();
-        localsearch = it_search.getStringExtra("localsearch");
+        localsearch = getIntent().getStringExtra("localsearch");
 
         txtNull = (TextView) findViewById(R.id.txt_search_null);
         lvSearch = (ListView) findViewById(R.id.listview_search);
@@ -88,15 +81,16 @@ public class SpeakingSearchActivity extends BaseActivity implements AdapterView.
     }
 
     public void getJson() {
-        StringRequest strinRequest = new StringRequest(Request.Method.POST, URL_SEARCH, new Response.Listener<String>() {
+        HashMap<String, String> params = new HashMap<>();
+        params.put("key", localsearch);
+        HttpUtil.post(Constants.URL_POST_SPEAKING_SEARCH, params, Constants.ACTIVITY_SPEAKING_SEARCH, new RequestInterface() {
             @Override
-            public void onResponse(String response) {
-                JSONObject jsonObject;
-                SpeakingSearch search;
+            public void doSuccess(String result) {
                 try {
-                    jsonObject = new JSONObject(response);
-                    int result = jsonObject.getInt("code");
-                    if (result == 0) {
+                    JSONObject jsonObject;
+                    SpeakingSearch search;
+                    jsonObject = new JSONObject(result);
+                    if (jsonObject.getInt("code") == 0) {
                         JSONArray data = jsonObject.getJSONArray("data");
                         if (data.length() == 0) {
                             txtNull.setText("没有找到您需要的内容呢，亲...");
@@ -109,7 +103,6 @@ public class SpeakingSearchActivity extends BaseActivity implements AdapterView.
                             searchList.add(search);
                         }
                     } else {
-                        LogUtil.e("code!=0 Data-BACK", "读取页面失败： " + jsonObject.getString("message"));
                         txtNull.setText("您没有输入搜索内容哦，亲!");
                     }
                     // 第二步，将数据放到适配器中
@@ -119,21 +112,7 @@ public class SpeakingSearchActivity extends BaseActivity implements AdapterView.
                     e.printStackTrace();
                 }
             }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                LogUtil.e("Wrong_BACK", "联接错误原因： " + error.getMessage());
-            }
-        }) {
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                Map<String, String> hashMap = new HashMap<>();
-                hashMap.put("key", localsearch);
-                return hashMap;
-            }
-        };
-        strinRequest.setTag("search");
-        AppContext.getHttpQueue().add(strinRequest);
+        });
     }
 
     @Override
@@ -154,8 +133,7 @@ public class SpeakingSearchActivity extends BaseActivity implements AdapterView.
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.ll_speaking_share:
-                Intent it_speaking = new Intent(this, SpeakingActivity.class);
-                startActivity(it_speaking);
+                startActivity(new Intent(this, SpeakingActivity.class));
                 overridePendingTransition(0, 0);
                 break;
             case R.id.img_back:

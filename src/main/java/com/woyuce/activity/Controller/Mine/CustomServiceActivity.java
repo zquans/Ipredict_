@@ -17,7 +17,6 @@ public class CustomServiceActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_for_empty_fragment);
 
-
         getFragmentManager().beginTransaction().replace(R.id.ll_activity_empty, new FragmentStore()).commit();
     }
 

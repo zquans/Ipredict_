@@ -8,16 +8,14 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.toolbox.StringRequest;
 import com.woyuce.activity.Adapter.Store.StoreGoodsCommentAdapter;
 import com.woyuce.activity.Adapter.Store.StoreShowOrderAdapter;
-import com.woyuce.activity.AppContext;
-import com.woyuce.activity.Model.Store.StoreGoods;
 import com.woyuce.activity.BaseFragment;
+import com.woyuce.activity.Common.Constants;
+import com.woyuce.activity.Model.Store.StoreGoods;
 import com.woyuce.activity.R;
-import com.woyuce.activity.Utils.LogUtil;
+import com.woyuce.activity.Utils.Http.Volley.HttpUtil;
+import com.woyuce.activity.Utils.Http.Volley.RequestInterface;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -34,14 +32,19 @@ public class FragmentStoreGoodsThree extends BaseFragment implements View.OnClic
     private List<StoreGoods> mDataList = new ArrayList<>();
     private StoreGoodsCommentAdapter mAdapter;
 
+    private StoreShowOrderAdapter mShowOrderAdapter;
+    private ArrayList<StoreGoods> mShowOrderList = new ArrayList<>();
+    private List<StoreGoods> mFilterList = new ArrayList<>();
+    private boolean isfirst = true;
+
     //请求数据
-    private String URL = "http://api.iyuce.com/v1/store/goodscommentsbygoodsid";
+//    private String URL = "http://api.iyuce.com/v1/store/goodscommentsbygoodsid";
     private String URL_ShowOrder = "http://api.iyuce.com/v1/store/showordersbygoodsid";
 
     @Override
     public void onStop() {
         super.onStop();
-        AppContext.getHttpQueue().cancelAll("goodsCommentRequest");
+        HttpUtil.removeTag(Constants.ACTIVITY_STORE_GOODS);
     }
 
     @Override
@@ -77,16 +80,14 @@ public class FragmentStoreGoodsThree extends BaseFragment implements View.OnClic
     }
 
     private void requestData() {
-        StringRequest goodsCommentRequest = new StringRequest(Request.Method.GET,
-                URL + "?goodsid=" + getArguments().getString("goods_id") + "&pageindex=" + "1" + "&pagesize=" + "30",
-                new Response.Listener<String>() {
+        HttpUtil.get(Constants.URL_GET_STORE_GOODS_THREE_COMMENT + "?goodsid=" + getArguments().getString("goods_id") + "&pageindex=" + "1" + "&pagesize=" + "30"
+                , Constants.ACTIVITY_STORE_GOODS, new RequestInterface() {
                     @Override
-                    public void onResponse(String s) {
-                        LogUtil.i(s.toString());
+                    public void doSuccess(String result) {
                         try {
                             JSONObject obj;
                             JSONArray arr;
-                            obj = new JSONObject(s);
+                            obj = new JSONObject(result);
                             if (obj.getString("code").equals("0")) {
                                 obj = obj.getJSONObject("goods_comment");
                                 arr = obj.getJSONArray("goods_comments");
@@ -102,19 +103,13 @@ public class FragmentStoreGoodsThree extends BaseFragment implements View.OnClic
                                 }
                                 mAdapter = new StoreGoodsCommentAdapter(getActivity(), mDataList);
                                 mListView.setAdapter(mAdapter);
-                            } else {
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
                     }
-                }, null);
-        goodsCommentRequest.setTag("goodsCommentRequest");
-        AppContext.getHttpQueue().add(goodsCommentRequest);
+                });
     }
-
-    private StoreShowOrderAdapter mShowOrderAdapter;
-    private ArrayList<StoreGoods> mShowOrderList = new ArrayList<>();
 
     /**
      * 请求晒单数据
@@ -127,44 +122,35 @@ public class FragmentStoreGoodsThree extends BaseFragment implements View.OnClic
         }
         URL_ShowOrder = URL_ShowOrder + "?goodsid=" + getArguments().getString("goods_id");
 //                + "&pageIndex={pageIndex}&pageSize={pageSize}";
-        StringRequest goodsCommentRequest = new StringRequest(Request.Method.GET, URL_ShowOrder,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String s) {
-                        LogUtil.i(s.toString());
-                        try {
-                            JSONObject obj;
-                            JSONArray arr;
-                            obj = new JSONObject(s);
-                            if (obj.getString("code").equals("0")) {
-                                obj = obj.getJSONObject("goods_show_order");
-                                arr = obj.getJSONArray("goods_show_orders");
-                                StoreGoods storegoods;
-                                for (int i = 0; i < arr.length(); i++) {
-                                    storegoods = new StoreGoods();
-                                    obj = arr.getJSONObject(i);
-                                    storegoods.setComment_text(obj.getString("comment_text"));
-                                    storegoods.setCreate_by_name(obj.getString("create_by_name"));
-                                    storegoods.setShow_at(obj.getString("show_at"));
-                                    storegoods.setImg_url(obj.getString("img_url"));
-                                    mShowOrderList.add(storegoods);
-                                }
-                                mShowOrderAdapter = new StoreShowOrderAdapter(getActivity(), mShowOrderList);
-                                mListView.setAdapter(mShowOrderAdapter);
-                            } else {
-                            }
-                        } catch (JSONException e) {
-                            e.printStackTrace();
+        HttpUtil.get(URL_ShowOrder, Constants.ACTIVITY_STORE_GOODS, new RequestInterface() {
+            @Override
+            public void doSuccess(String result) {
+                try {
+                    JSONObject obj;
+                    JSONArray arr;
+                    obj = new JSONObject(result);
+                    if (obj.getString("code").equals("0")) {
+                        obj = obj.getJSONObject("goods_show_order");
+                        arr = obj.getJSONArray("goods_show_orders");
+                        StoreGoods storegoods;
+                        for (int i = 0; i < arr.length(); i++) {
+                            storegoods = new StoreGoods();
+                            obj = arr.getJSONObject(i);
+                            storegoods.setComment_text(obj.getString("comment_text"));
+                            storegoods.setCreate_by_name(obj.getString("create_by_name"));
+                            storegoods.setShow_at(obj.getString("show_at"));
+                            storegoods.setImg_url(obj.getString("img_url"));
+                            mShowOrderList.add(storegoods);
                         }
+                        mShowOrderAdapter = new StoreShowOrderAdapter(getActivity(), mShowOrderList);
+                        mListView.setAdapter(mShowOrderAdapter);
                     }
-                }, null);
-        //TODO 这个Tag应该要设置成和Activity一样的
-        goodsCommentRequest.setTag("goodsCommentRequest");
-        AppContext.getHttpQueue().add(goodsCommentRequest);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
-
-    private List<StoreGoods> mFilterList = new ArrayList<>();
-    private boolean isfirst = true;
 
     @Override
     public void onClick(View v) {
@@ -208,8 +194,6 @@ public class FragmentStoreGoodsThree extends BaseFragment implements View.OnClic
 
     /**
      * 过滤数据，避免再请求网络
-     *
-     * @param comment
      */
     private void doFilter(List<StoreGoods> mList, String comment) {
         if (mList == mDataList) {
@@ -221,8 +205,6 @@ public class FragmentStoreGoodsThree extends BaseFragment implements View.OnClic
         for (int i = 0; i < mDataList.size(); i++) {
             if (mDataList.get(i).getSatisfaction().equals(comment)) {
                 mFilterList.add(mDataList.get(i));
-            } else {
-                continue;
             }
         }
         mAdapter = new StoreGoodsCommentAdapter(getActivity(), mList);

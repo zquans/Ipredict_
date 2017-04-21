@@ -1,9 +1,11 @@
 package com.woyuce.activity.Model.Free;
 
+import java.io.Serializable;
+
 /**
- * Created by Administrator on 2016/9/21.
+ * Created by Administrator on 2016/9/21
  */
-public class FreePage {
+public class FreePage implements Serializable {
 
     public String sub_id;
     public String sub_name;

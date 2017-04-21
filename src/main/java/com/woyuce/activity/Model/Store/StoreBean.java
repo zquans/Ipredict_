@@ -3,7 +3,7 @@ package com.woyuce.activity.Model.Store;
 import java.util.ArrayList;
 
 /**
- * Created by Administrator on 2016/11/2.
+ * Created by Administrator on 2016/11/2
  */
 public class StoreBean {
 

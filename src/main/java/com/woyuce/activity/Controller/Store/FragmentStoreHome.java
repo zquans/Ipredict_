@@ -14,13 +14,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
 import com.jcodecraeer.xrecyclerview.XRecyclerView;
 import com.woyuce.activity.Adapter.Store.StoreHomeAdapter;
-import com.woyuce.activity.AppContext;
 import com.woyuce.activity.Common.Constants;
 import com.woyuce.activity.Controller.Mine.CustomServiceActivity;
 import com.woyuce.activity.Model.Store.StoreBean;
@@ -28,7 +23,8 @@ import com.woyuce.activity.Model.Store.StoreGoods;
 import com.woyuce.activity.R;
 import com.woyuce.activity.Utils.DbUtil;
 import com.woyuce.activity.Utils.GlideImageLoader;
-import com.woyuce.activity.Utils.LogUtil;
+import com.woyuce.activity.Utils.Http.Volley.HttpUtil;
+import com.woyuce.activity.Utils.Http.Volley.RequestInterface;
 import com.woyuce.activity.Utils.ToastUtil;
 import com.youth.banner.Banner;
 import com.youth.banner.BannerConfig;
@@ -51,8 +47,6 @@ public class FragmentStoreHome extends Fragment implements View.OnClickListener 
     private RecyclerView.Adapter mAdapter;
     private List<StoreBean> mImgData = new ArrayList<>();
     private List<StoreBean> mList = new ArrayList<>();
-
-    private String URL = "http://api.iyuce.com/v1/store/homegoodslist";
 
     private static final int FLAG_VIEWFLIPPER = 1;
     private static final int FLAG_RECYCLERVIEW = 2;
@@ -142,8 +136,6 @@ public class FragmentStoreHome extends Fragment implements View.OnClickListener 
 
     /**
      * xrecyclerView设置Banner嵌套
-     *
-     * @param view
      */
     private void setHeadBanner(View view) {
         View header = LayoutInflater.from(getActivity()).inflate(R.layout.header_banner, (ViewGroup) view.findViewById(android.R.id.content), false);
@@ -155,16 +147,16 @@ public class FragmentStoreHome extends Fragment implements View.OnClickListener 
     }
 
     private void requestData() {
-        StringRequest goodsrequest = new StringRequest(Request.Method.GET, URL, new Response.Listener<String>() {
+        HttpUtil.get(Constants.URL_GET_STORE_HOME, null, new RequestInterface() {
             @Override
-            public void onResponse(String s) {
+            public void doSuccess(String result) {
                 try {
                     JSONObject obj, obj_menu;
                     //轮播图数据
                     JSONArray arr_menu, arr_menu_result;
                     //首页商品数据
                     JSONArray arr_data;
-                    obj = new JSONObject(s);
+                    obj = new JSONObject(result);
                     arr_menu = obj.getJSONArray("menudata");
                     arr_data = obj.getJSONArray("data");
                     StoreBean storeBean;
@@ -219,19 +211,11 @@ public class FragmentStoreHome extends Fragment implements View.OnClickListener 
                     msg2.what = FLAG_RECYCLERVIEW;
                     msg2.obj = mList;
                     mHandler.sendMessage(msg2);
-
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
             }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError volleyError) {
-                LogUtil.i("volleyError = " + volleyError.toString());
-            }
         });
-        goodsrequest.setTag("goodsrequest");
-        AppContext.getHttpQueue().add(goodsrequest);
     }
 
     @Override
@@ -241,6 +225,7 @@ public class FragmentStoreHome extends Fragment implements View.OnClickListener 
                 startActivity(new Intent(getActivity(), CustomServiceActivity.class));
                 break;
             case R.id.imgbtn_store_toStoreCar:
+                //判断数据库中是否有数据
                 SQLiteDatabase mDatabase = DbUtil.getHelper(getActivity(), Constants.DATABASE_IYUCE).getWritableDatabase();
                 String isNone = DbUtil.queryToExist(mDatabase, Constants.TABLE_SQLITE_MASTER, Constants.NAME, Constants.TABLE_NAME, Constants.TABLE_CART);
                 mDatabase.close();

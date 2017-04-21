@@ -21,13 +21,12 @@ import com.woyuce.activity.Utils.ActivityManager;
 import com.woyuce.activity.View.NoScrollViewPager;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class MainActivity extends FragmentActivity implements OnClickListener, OnPageChangeListener {
 
     private NoScrollViewPager mViewPager;
     private FragmentPagerAdapter mAdapter;
-    private List<Fragment> mFragments;
+    private ArrayList<Fragment> mFragmentList;
 
     private LinearLayout mLinearlayout1, mLinearlayout2, mLinearlayout3, mLinearlayout4, mLinearlayout5;
     private ImageView mImgtab1, mImgtab2, mImgtab4, mImgtab5;
@@ -40,23 +39,23 @@ public class MainActivity extends FragmentActivity implements OnClickListener, O
                 .setPositiveButton("确定", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+                        //退出时清理WebView的Cookie
                         CookieManager.getInstance().removeAllCookie();
+                        //清除所有Activity，避免退出后还有Activity
                         ActivityManager.getAppManager().finishAllActivity();
                         MainActivity.this.finish();
                     }
                 }).setNegativeButton("返回", null).show();
     }
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        //因为已经集成了FragmentActivity,加入Activity管理栈
+        //因为已经未继承了BaseActivity,所以这里加入Activity管理栈
         ActivityManager.getAppManager().addActivity(this);
 
         initView();
-        initEvent();
         setSelect(0);
 
         //微博相册图片辅助类初始化(这一步必须，开启异步，否则后面相册无法打开，会崩溃)
@@ -69,6 +68,11 @@ public class MainActivity extends FragmentActivity implements OnClickListener, O
         mLinearlayout3 = (LinearLayout) findViewById(R.id.linearlayout_tab3);
         mLinearlayout4 = (LinearLayout) findViewById(R.id.linearlayout_tab4);
         mLinearlayout5 = (LinearLayout) findViewById(R.id.linearlayout_tab5);
+        mLinearlayout1.setOnClickListener(this);
+        mLinearlayout2.setOnClickListener(this);
+        mLinearlayout3.setOnClickListener(this);
+        mLinearlayout4.setOnClickListener(this);
+        mLinearlayout5.setOnClickListener(this);
 
         mImgtab1 = (ImageView) findViewById(R.id.icon_home);
         mImgtab2 = (ImageView) findViewById(R.id.icon_social);
@@ -82,48 +86,62 @@ public class MainActivity extends FragmentActivity implements OnClickListener, O
 
         mViewPager = (NoScrollViewPager) findViewById(R.id.id_viewpager);
         mViewPager.setOnPageChangeListener(this);
-        mFragments = new ArrayList<>();
-        Fragment mTab01 = new FragmentHome();
-        Fragment mTab02 = new FragmentSocial();
-        Fragment mTab03 = new FragmentWeb();
-        Fragment mTab04 = new FragmentStoreHome();
-        Fragment mTab05 = new FragmentMine();
+        mFragmentList = new ArrayList<>();
 
-        mFragments.add(mTab01);
-        mFragments.add(mTab02);
-        mFragments.add(mTab03);
-        mFragments.add(mTab04);
-        mFragments.add(mTab05);
+        mFragmentList.add(new FragmentHome());
+        mFragmentList.add(new FragmentSocial());
+        mFragmentList.add(new FragmentWeb());
+        mFragmentList.add(new FragmentStoreHome());
+        mFragmentList.add(new FragmentMine());
 
+        //主Tab适配器
         mAdapter = new FragmentPagerAdapter(getSupportFragmentManager()) {
             @Override
             public int getCount() {
-                return mFragments.size();
+                return mFragmentList.size();
             }
 
             @Override
             public Fragment getItem(int arg0) {
-                return mFragments.get(arg0);
+                return mFragmentList.get(arg0);
             }
         };
         mViewPager.setAdapter(mAdapter);
         mViewPager.setOffscreenPageLimit(4);
     }
 
-    private void initEvent() {
-        mLinearlayout1.setOnClickListener(this);
-        mLinearlayout2.setOnClickListener(this);
-        mLinearlayout3.setOnClickListener(this);
-        mLinearlayout4.setOnClickListener(this);
-        mLinearlayout5.setOnClickListener(this);
+    //点击切换Tab
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.linearlayout_tab1:
+                setSelect(0);
+                break;
+            case R.id.linearlayout_tab2:
+                setSelect(1);
+                break;
+            case R.id.linearlayout_tab3:
+                setSelect(2);
+                break;
+            case R.id.linearlayout_tab4:
+                setSelect(3);
+                break;
+            case R.id.linearlayout_tab5:
+                setSelect(4);
+                break;
+        }
     }
 
+    /**
+     * 切换到用户选择的Tab
+     */
     private void setSelect(int i) {
         setTab(i);
         mViewPager.setCurrentItem(i);
     }
 
     private void setTab(int i) {
+        //所有Tab复原
         resetImg();
         switch (i) {
             case 0:
@@ -145,7 +163,9 @@ public class MainActivity extends FragmentActivity implements OnClickListener, O
         }
     }
 
-    // 每次点击后,图片及文字回复原状
+    /**
+     * 每次切换后,图片及文字回复初始化
+     */
     private void resetImg() {
         mImgtab1.setImageResource(R.mipmap.icon_home);
         mTxt1.setTextColor(Color.parseColor("#707070"));
@@ -155,27 +175,6 @@ public class MainActivity extends FragmentActivity implements OnClickListener, O
         mTxt4.setTextColor(Color.parseColor("#707070"));
         mImgtab5.setImageResource(R.mipmap.icon_mine);
         mTxt5.setTextColor(Color.parseColor("#707070"));
-    }
-
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.linearlayout_tab1:
-                setSelect(0);
-                break;
-            case R.id.linearlayout_tab2:
-                setSelect(1);
-                break;
-            case R.id.linearlayout_tab3:
-                setSelect(2);
-                break;
-            case R.id.linearlayout_tab4:
-                setSelect(3);
-                break;
-            case R.id.linearlayout_tab5:
-                setSelect(4);
-                break;
-        }
     }
 
     @Override

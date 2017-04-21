@@ -14,19 +14,17 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.toolbox.StringRequest;
+import com.woyuce.activity.Common.Constants;
 import com.woyuce.activity.Controller.Free.FreeRangeActivity;
-import com.woyuce.activity.Controller.OpenClass.OpenTypeActivity;
-import com.woyuce.activity.Controller.Login.LoginActivity;
 import com.woyuce.activity.Controller.Free.Net.NetClassActivity;
+import com.woyuce.activity.Controller.Login.LoginActivity;
+import com.woyuce.activity.Controller.OpenClass.OpenTypeActivity;
 import com.woyuce.activity.Controller.Speaking.SpeakingActivity;
 import com.woyuce.activity.Controller.WebActivity;
 import com.woyuce.activity.Controller.Writting.WitActivity;
-import com.woyuce.activity.AppContext;
 import com.woyuce.activity.R;
+import com.woyuce.activity.Utils.Http.Volley.HttpUtil;
+import com.woyuce.activity.Utils.Http.Volley.RequestInterface;
 import com.woyuce.activity.Utils.LogUtil;
 import com.woyuce.activity.Utils.PreferenceUtil;
 import com.woyuce.activity.Utils.StringUtils;
@@ -40,7 +38,6 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Map;
 
 public class FragmentHome extends Fragment implements View.OnClickListener {
 
@@ -50,8 +47,6 @@ public class FragmentHome extends Fragment implements View.OnClickListener {
     private FrameLayout mFrame;
     private TextView mTxtTimer, mTxtTimerTitle;
     private String localTimer, localtoken, localuserid;
-
-    private String URL = "http://api.iyuce.com/v1/exam/setexamtime";
 
     @Override
     public void onStart() {
@@ -87,7 +82,6 @@ public class FragmentHome extends Fragment implements View.OnClickListener {
         img_waitting.setOnClickListener(this);
 
         mFrame.setOnClickListener(this);
-//		mTxtTimer.setOnClickListener(this);
     }
 
     /**
@@ -97,8 +91,7 @@ public class FragmentHome extends Fragment implements View.OnClickListener {
         localtoken = PreferenceUtil.getSharePre(getActivity()).getString("localtoken", "");
         localuserid = PreferenceUtil.getSharePre(getActivity()).getString("userId", "");
         localTimer = PreferenceUtil.getSharePre(getActivity()).getString("mtimer", "");
-//		LogUtil.e("what? = " + localTimer);
-        if (localTimer.equals("") || localTimer.equals(null)) {
+        if (localTimer.equals("") || localTimer == null) {
             mTxtTimer.setText("设置考试时间");
         } else {
             // mTxtTimer.setText("距离考试时间" + localTimer + "天");
@@ -134,16 +127,19 @@ public class FragmentHome extends Fragment implements View.OnClickListener {
 
     /**
      * 将设定的时间上传
-     *
-     * @param mTime
      */
-    private void getJson(final String mTime) {
-        StringRequest strinRequest = new StringRequest(Request.Method.POST, URL, new Response.Listener<String>() {
+    private void postRequest(final String mTime) {
+        HashMap<String, String> headers = new HashMap<>();
+        headers.put("Authorization", "Bearer " + localtoken);
+        HashMap<String, String> params = new HashMap<>();
+        params.put("user_id", localuserid);
+        params.put("exam_time", mTime);
+        HttpUtil.post(Constants.URL_POST_SET_EXAM_TIME, headers, params, null, new RequestInterface() {
             @Override
-            public void onResponse(String response) {
-                JSONObject obj;
+            public void doSuccess(String result) {
                 try {
-                    obj = new JSONObject(response);
+                    JSONObject obj;
+                    obj = new JSONObject(result);
                     String code = obj.getString("code");
                     if (code.equals("0")) {
                         LogUtil.e("settime,success");
@@ -154,24 +150,7 @@ public class FragmentHome extends Fragment implements View.OnClickListener {
                     e.printStackTrace();
                 }
             }
-        }, null) {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
-                headers.put("Authorization", "Bearer " + localtoken);
-                return headers;
-            }
-
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                HashMap<String, String> map = new HashMap<String, String>();
-                map.put("user_id", localuserid);
-                map.put("exam_time", mTime);
-                return map;
-            }
-        };
-        strinRequest.setTag("post");
-        AppContext.getHttpQueue().add(strinRequest);
+        });
     }
 
     @Override
@@ -214,7 +193,7 @@ public class FragmentHome extends Fragment implements View.OnClickListener {
                 break;
             case R.id.img_waitting:
                 Intent intent = new Intent(getActivity(), WebActivity.class);
-                intent.putExtra("URL", "http://sj.iyuce.com/");
+                intent.putExtra("URL", Constants.URL_EXAM_ANSWER);
                 intent.putExtra("TITLE", "考后笔试答案");
                 intent.putExtra("COLOR", "#408f40");
                 startActivity(intent);
@@ -223,9 +202,7 @@ public class FragmentHome extends Fragment implements View.OnClickListener {
     }
 
     /**
-     * 时间选择的方法
-     *
-     * @return
+     * 触发时间选择器
      */
     private DatePickerDialog.OnDateSetListener timePick() {
         return new DatePickerDialog.OnDateSetListener() {
@@ -236,7 +213,7 @@ public class FragmentHome extends Fragment implements View.OnClickListener {
                 // 如果已设置过，则保存
                 PreferenceUtil.save(getActivity(), "mtimer", mTime);
                 //将mTime上传后台
-                getJson(mTime);
+                postRequest(mTime);
                 dealTimePicker(mTime, mSimpleDate);
             }
         };
@@ -244,9 +221,6 @@ public class FragmentHome extends Fragment implements View.OnClickListener {
 
     /**
      * 根据sharepreference判断如何处理选中的
-     *
-     * @param mTime
-     * @param mSimpleDate
      */
     private void dealTimePicker(String mTime, SimpleDateFormat mSimpleDate) {
         try {

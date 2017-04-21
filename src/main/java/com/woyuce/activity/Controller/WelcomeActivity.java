@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by Administrator on 2016/10/17.
+ * Created by Administrator on 2016/10/17
  */
 public class WelcomeActivity extends BaseActivity {
 
