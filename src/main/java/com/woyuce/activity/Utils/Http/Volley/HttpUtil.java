@@ -6,6 +6,7 @@ import com.android.volley.AuthFailureError;
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.Response;
+import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.woyuce.activity.AppContext;
 
@@ -33,7 +34,14 @@ public class HttpUtil {
             public void onResponse(String response) {
                 requestInterface.doSuccess(response);
             }
-        }, null);
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError volleyError) {
+                //TODO 网络请求错误时可以在这里设置全局回调,其他几个方法同理。
+                //然而实践证明，其实请求失败时一直转圈就好，最终还是取消了这里的事件。
+                //如果要加事件，建议在这里做Toast，告诉用户发生了什么
+            }
+        });
         stringRequest.setTag(tag);
         AppContext.getHttpQueue().add(stringRequest);
     }
