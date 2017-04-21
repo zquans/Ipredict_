@@ -8,6 +8,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.woyuce.activity.BaseActivity;
+import com.woyuce.activity.Common.Constants;
 import com.woyuce.activity.Controller.WebNoCookieActivity;
 import com.woyuce.activity.R;
 
@@ -49,7 +50,7 @@ public class OpenTypeActivity extends BaseActivity implements OnClickListener {
                 break;
             case R.id.ll_gongyi_tencent:
                 Intent intent = new Intent(this, WebNoCookieActivity.class);
-                intent.putExtra("URL", "https://iyuce.ke.qq.com/");
+                intent.putExtra("URL", Constants.URL_WEB_ZHIBO);
                 intent.putExtra("TITLE", "我预测腾讯课堂");
                 intent.putExtra("COLOR", "#366090");
                 startActivity(intent);

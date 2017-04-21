@@ -10,15 +10,17 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import com.woyuce.activity.BaseActivity;
+import com.woyuce.activity.Common.Constants;
 import com.woyuce.activity.Controller.Main.MainActivity;
 import com.woyuce.activity.R;
+import com.woyuce.activity.Utils.Http.Volley.HttpUtil;
 import com.woyuce.activity.Utils.ToastUtil;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by Administrator on 2016/9/22.
+ * Created by Administrator on 2016/9/22
  */
 public class SpeakingShare3Activity extends BaseActivity implements View.OnClickListener {
 
@@ -36,6 +38,12 @@ public class SpeakingShare3Activity extends BaseActivity implements View.OnClick
     private FragmentPartOne fragmentpartone;
     private FragmentPartTwo fragmentparttwo;
     private FragmentManager fragmentManager;
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        HttpUtil.removeTag(Constants.FRAGMENT_SHARE_THREE);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,8 +88,7 @@ public class SpeakingShare3Activity extends BaseActivity implements View.OnClick
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.ll_speaking_stastis: // **** 点击" 高频统计" 启动 Activity-统计，
-                Intent it_statis = new Intent(this, SpeakingStatisActivity.class);
-                startActivity(it_statis);
+                startActivity(new Intent(this, SpeakingStatisActivity.class));
                 overridePendingTransition(0, 0);
                 break;
             case R.id.img_back:
@@ -121,14 +128,17 @@ public class SpeakingShare3Activity extends BaseActivity implements View.OnClick
                 transactionPart2.show(fragmentparttwo);
                 transactionPart2.commit();
                 break;
-            case R.id.button_share3_next: // *** 点击"下一步"按钮,启动下一个"分享"界面
+            case R.id.button_share3_next:
+                // 先判断有无part2,如果没有，则初始化一个，如果有，则直接比较
                 if (fragmentparttwo == null) {
-                    fragmentparttwo = new FragmentPartTwo(); // 先判断有无part2,如果没有，则初始化一个，如果有，则直接比较
+                    fragmentparttwo = new FragmentPartTwo();
                     FragmentTransaction transactionPart = fragmentManager.beginTransaction();
                     transactionPart.add(R.id.framelayout_share3, fragmentparttwo).commit();
                 }
-                subidList = fragmentpartone.returnSubid1(); // initView中已经初始化了part1，无需再初始化,直接调用方法
-                String subid2 = fragmentparttwo.returnSubid2(); // 实例化part2,否则会报空指针异常
+                // initView中已经初始化了part1，无需再初始化,直接调用方法
+                subidList = fragmentpartone.returnSubid1();
+                // 实例化part2,否则会报空指针异常
+                String subid2 = fragmentparttwo.returnSubid2();
 
                 //从Fragment中传给下一级的name
                 subnameList = fragmentpartone.returnSubnameList();
@@ -143,18 +153,18 @@ public class SpeakingShare3Activity extends BaseActivity implements View.OnClick
                 } else if (subidList.size() != 0 && subid2 != null) {
                     subidList.add(subid2);
                 }
-                Intent it_share4 = new Intent(this, SpeakingShare4Activity.class);
-                it_share4.putExtra("localMessage", localMessage);
-                it_share4.putExtra("localTime", localTime);
-                it_share4.putExtra("localRoomID", localRoomID);
-                it_share4.putStringArrayListExtra("subidList", (ArrayList<String>) subidList);
-                it_share4.putExtra("localRoom", localRoom);
+                Intent intent = new Intent(this, SpeakingShare4Activity.class);
+                intent.putExtra("localMessage", localMessage);
+                intent.putExtra("localTime", localTime);
+                intent.putExtra("localRoomID", localRoomID);
+                intent.putStringArrayListExtra("subidList", (ArrayList<String>) subidList);
+                intent.putExtra("localRoom", localRoom);
                 //传入Fragmentpart2中的subname
-                it_share4.putExtra("localsubname", localsubname);
+                intent.putExtra("localsubname", localsubname);
                 //传入Fragmentpart1中的subnameList
-                it_share4.putExtra("localsubname", localsubname);
-                it_share4.putStringArrayListExtra("subnameList", (ArrayList<String>) subnameList);
-                startActivity(it_share4);
+                intent.putExtra("localsubname", localsubname);
+                intent.putStringArrayListExtra("subnameList", (ArrayList<String>) subnameList);
+                startActivity(intent);
                 overridePendingTransition(0, 0);
                 break;
         }

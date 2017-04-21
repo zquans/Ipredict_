@@ -63,6 +63,6 @@ public class FragmentStoreGoodsTwo extends BaseFragment {
                 super.onPageStarted(view, url, favicon);
             }
         });
-        web.loadUrl(getArguments().getString("mImgList").toString().trim());
+        web.loadUrl(getArguments().getString("mImgList").trim());
     }
 }

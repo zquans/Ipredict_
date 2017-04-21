@@ -21,7 +21,7 @@ import com.woyuce.activity.R;
 import com.woyuce.activity.Utils.LogUtil;
 
 /**
- * Created by Administrator on 2016/9/22.
+ * Created by Administrator on 2016/9/22
  */
 public class WebNoCookieActivity extends BaseActivity implements View.OnClickListener {
 

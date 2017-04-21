@@ -26,14 +26,16 @@ import com.tencent.mm.sdk.openapi.IWXAPI;
 import com.tencent.mm.sdk.openapi.WXAPIFactory;
 import com.woyuce.activity.AppContext;
 import com.woyuce.activity.BaseActivity;
+import com.woyuce.activity.Common.Constants;
+import com.woyuce.activity.Controller.Main.MainActivity;
 import com.woyuce.activity.Model.Store.StorePayResult;
 import com.woyuce.activity.R;
-import com.woyuce.activity.Controller.Main.MainActivity;
 import com.woyuce.activity.Utils.DbUtil;
+import com.woyuce.activity.Utils.Http.Volley.HttpUtil;
+import com.woyuce.activity.Utils.Http.Volley.RequestInterface;
 import com.woyuce.activity.Utils.LogUtil;
 import com.woyuce.activity.Utils.PreferenceUtil;
 import com.woyuce.activity.Utils.ToastUtil;
-import com.woyuce.activity.Common.Constants;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -52,11 +54,11 @@ public class StoreOrderActivity extends BaseActivity implements View.OnClickList
     private TextView mTxtGoods;
 
     //生成订单
-    private String URL_TO_ORDER = "http://api.iyuce.com/v1/store/order";
-    private String URL_TO_PAY = "http://api.iyuce.com/v1/store/pay";
-    private String URL_TO_CASH_PAY = "http://api.iyuce.com/v1/store/paywithcash?paytype=alipay&id=";
-    private String URL_TO_WXPAY = "http://api.iyuce.com/v1/store/paywithcash?paytype=wxapp&id=";
-    private String URL_TO_VALID = "http://api.iyuce.com/v1/store/validpaybyapp?paytype=alipay";
+//    private String URL_TO_ORDER = "http://api.iyuce.com/v1/store/order";
+//    private String URL_TO_PAY = "http://api.iyuce.com/v1/store/pay";
+//    private String URL_TO_CASH_PAY = "http://api.iyuce.com/v1/store/paywithcash?paytype=alipay&id=";
+//    private String URL_TO_WXPAY = "http://api.iyuce.com/v1/store/paywithcash?paytype=wxapp&id=";
+//    private String URL_TO_VALID = "http://api.iyuce.com/v1/store/validpaybyapp?paytype=alipay";
 
     private String total_price, local_address_id, local_goods_name, local_skuids, local_store_user_money;
     private String local_user_id, local_order_no, local_order_id, local_alipay_data;
@@ -145,13 +147,18 @@ public class StoreOrderActivity extends BaseActivity implements View.OnClickList
      * 生成订单
      */
     private void requestOrder() {
-        StringRequest addressRequest = new StringRequest(Request.Method.POST, URL_TO_ORDER, new Response.Listener<String>() {
+        HashMap<String, String> params = new HashMap<>();
+        params.put("discount", local_store_user_money);
+        params.put("address", local_address_id);
+        params.put("userid", local_user_id);
+        params.put("skuids", local_skuids);
+        HttpUtil.post(Constants.URL_POST_STORE_ORDER_MAKE_ORDER, params, Constants.ACTIVITY_STORE_ORDER, new RequestInterface() {
             @Override
-            public void onResponse(String s) {
-                LogUtil.i("requestOrder = " + s);
-                JSONObject obj;
+            public void doSuccess(String result) {
+                LogUtil.i("requestOrder = " + result);
                 try {
-                    obj = new JSONObject(s);
+                    JSONObject obj;
+                    obj = new JSONObject(result);
                     if (obj.getString("code").equals("0")) {
                         obj = obj.getJSONObject("data");
                         mEdtOrder.setText(obj.getString("order_no"));
@@ -165,29 +172,8 @@ public class StoreOrderActivity extends BaseActivity implements View.OnClickList
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-
             }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError volleyError) {
-                LogUtil.i("volleyError = " + volleyError.toString());
-            }
-        }) {
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                HashMap<String, String> map = new HashMap<>();
-                map.put("discount", local_store_user_money);
-                map.put("address", local_address_id);
-                map.put("userid", local_user_id);
-                map.put("skuids", local_skuids);
-                LogUtil.i("aaaa = " + local_store_user_money + "," + local_address_id + "," + local_skuids + ","
-                        + local_user_id);
-                return map;
-            }
-        };
-        addressRequest.setTag("StoreOrderActivity");
-//        addressRequest.setRetryPolicy(new DefaultRetryPolicy(1000, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-        AppContext.getHttpQueue().add(addressRequest);
+        });
     }
 
     /**
@@ -196,11 +182,10 @@ public class StoreOrderActivity extends BaseActivity implements View.OnClickList
     public void toPay(final String method, final String url) {
         progressdialogshow(this);
         StringRequest payRequest = new StringRequest(Request.Method.POST,
-                URL_TO_PAY + "?id=" + local_order_id + "&userid=" + local_user_id,
+                Constants.URL_POST_STORE_ORDER_TO_PAY + "?id=" + local_order_id + "&userid=" + local_user_id,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String s) {
-                        LogUtil.i("toPay = " + s);
                         try {
                             JSONObject obj;
                             obj = new JSONObject(s);
@@ -240,7 +225,7 @@ public class StoreOrderActivity extends BaseActivity implements View.OnClickList
                 progressdialogcancel();
             }
         });
-        payRequest.setTag("StoreOrderActivity");
+        payRequest.setTag(Constants.ACTIVITY_STORE_ORDER);
 //        payRequest.setRetryPolicy(new DefaultRetryPolicy(1000, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         AppContext.getHttpQueue().add(payRequest);
     }
@@ -322,7 +307,7 @@ public class StoreOrderActivity extends BaseActivity implements View.OnClickList
                 return map;
             }
         };
-        cashRequest.setTag("StoreOrderActivity");
+        cashRequest.setTag(Constants.ACTIVITY_STORE_ORDER);
 //        cashRequest.setRetryPolicy(new DefaultRetryPolicy(1000, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         AppContext.getHttpQueue().add(cashRequest);
     }
@@ -331,10 +316,9 @@ public class StoreOrderActivity extends BaseActivity implements View.OnClickList
      * 校验支付宝回调结果
      */
     private void validRequest(final String pay_result) {
-        StringRequest validRequest = new StringRequest(Request.Method.POST, URL_TO_VALID, new Response.Listener<String>() {
+        StringRequest validRequest = new StringRequest(Request.Method.POST, Constants.URL_POST_STORE_ORDER_TO_ALI_VALID, new Response.Listener<String>() {
             @Override
             public void onResponse(String s) {
-                LogUtil.i("valid s = " + s);
                 try {
                     JSONObject obj;
                     obj = new JSONObject(s);
@@ -367,12 +351,7 @@ public class StoreOrderActivity extends BaseActivity implements View.OnClickList
                     e.printStackTrace();
                 }
             }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError volleyError) {
-                LogUtil.e("volleyError = " + volleyError.getMessage());
-            }
-        }) {
+        }, null) {
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {
                 HashMap<String, String> map = new HashMap<>();
@@ -381,7 +360,7 @@ public class StoreOrderActivity extends BaseActivity implements View.OnClickList
                 return map;
             }
         };
-        validRequest.setTag("validRequest");
+        validRequest.setTag(Constants.ACTIVITY_STORE_ORDER);
 //        validRequest.setRetryPolicy(new DefaultRetryPolicy(1000, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         AppContext.getHttpQueue().add(validRequest);
     }
@@ -395,29 +374,21 @@ public class StoreOrderActivity extends BaseActivity implements View.OnClickList
         mDatabase.close();
     }
 
-    /**
-     * 检查微信是否支持支付
-     */
-    public void toCheck() {
-//        boolean isPaySupported = api.getWXAppSupportAPI() >= Build.PAY_SUPPORTED_SDK_INT;
-//        ToastUtil.showMessage(this, "该版本微信是否支持支付 = " + String.valueOf(isPaySupported));
-//        startActivity(new Intent(this, WXPayEntryActivity.class));
-    }
-
+    //定义用户所选的微信或者支付宝支付
     private String final_method, final_url;
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.ll_activity_storeorder_payAli:
-                final_url = URL_TO_CASH_PAY;
+                final_url = Constants.URL_POST_STORE_ORDER_TO_ALI_PAY;
                 final_method = "alipay";
                 LogUtil.i(final_url + final_method);
                 mLlayoutAliPay.setBackgroundColor(Color.parseColor("#cccccc"));
                 mLlayoutWxPay.setBackgroundColor(Color.parseColor("#ffffff"));
                 break;
             case R.id.ll_activity_storeorder_payWx:
-                final_url = URL_TO_WXPAY;
+                final_url = Constants.URL_POST_STORE_ORDER_TO_WXPAY_PAY;
                 final_method = "wxapp";
                 LogUtil.i(final_url + final_method);
                 mLlayoutWxPay.setBackgroundColor(Color.parseColor("#cccccc"));

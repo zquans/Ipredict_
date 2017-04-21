@@ -10,7 +10,7 @@ import com.woyuce.activity.R;
 import com.woyuce.activity.Utils.LogUtil;
 
 /**
- * Created by Administrator on 2016/9/23.
+ * Created by Administrator on 2016/9/23
  */
 public class AboutUsActivity extends BaseActivity {
 
@@ -26,7 +26,7 @@ public class AboutUsActivity extends BaseActivity {
         finish();
     }
 
-    /* 两种方式判断最大允许运行内存 */
+    // 两种方式判断最大允许运行内存
     private void initEvent() {
         ActivityManager activityManager = (ActivityManager) AboutUsActivity.this
                 .getSystemService(Context.ACTIVITY_SERVICE);
@@ -39,5 +39,4 @@ public class AboutUsActivity extends BaseActivity {
         LogUtil.e("Runtime获取", "runtimememory = " + Runtime.getRuntime().maxMemory() + ", 即"
                 + Runtime.getRuntime().maxMemory() / 1024 / 1024 + "M");
     }
-
 }

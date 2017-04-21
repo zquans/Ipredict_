@@ -8,24 +8,19 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.woyuce.activity.AppContext;
 import com.woyuce.activity.BaseActivity;
-import com.woyuce.activity.R;
+import com.woyuce.activity.Common.Constants;
 import com.woyuce.activity.Controller.Main.MainActivity;
+import com.woyuce.activity.R;
+import com.woyuce.activity.Utils.Http.Volley.HttpUtil;
+import com.woyuce.activity.Utils.Http.Volley.RequestInterface;
 import com.woyuce.activity.Utils.PreferenceUtil;
 import com.woyuce.activity.Utils.ToastUtil;
-import com.woyuce.activity.Common.Constants;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
-import java.util.Map;
 
 public class LoginThirdChoiceActivity extends BaseActivity implements View.OnClickListener {
 
@@ -34,6 +29,12 @@ public class LoginThirdChoiceActivity extends BaseActivity implements View.OnCli
     private Button mBtnQuickRegister, mBtnToBind;
 
     private String localtoken, type, openId, unionid, accessToken, expiresin, userIcon, userGender, userName, deviceid;
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        HttpUtil.removeTag(Constants.ACTIVITY_LOGIN_REGISTER_THIRD);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,12 +83,25 @@ public class LoginThirdChoiceActivity extends BaseActivity implements View.OnCli
      */
     private void jumpThird() {
         progressdialogshow(this);
-        StringRequest jumpRequest = new StringRequest(Request.Method.POST, Constants.URL_Login_To_Jump, new Response.Listener<String>() {
+        HashMap<String, String> headers = new HashMap<>();
+        localtoken = PreferenceUtil.getSharePre(LoginThirdChoiceActivity.this).getString("localtoken", "");
+        headers.put("Authorization", "Bearer " + localtoken);
+        HashMap<String, String> params = new HashMap<>();
+        params.put("accounttypekey", type);
+        params.put("openid", openId);
+        params.put("unionid", TextUtils.isEmpty(unionid) ? openId : unionid);
+        params.put("accesstoken", accessToken);
+        params.put("expiresin", expiresin);
+        params.put("nickname", userName);
+        params.put("gender", userGender);
+        params.put("useravatarurl", userIcon);
+        params.put("deviceid", deviceid);
+        HttpUtil.post(Constants.URL_Login_To_Jump, headers, params, Constants.ACTIVITY_LOGIN_REGISTER_THIRD, new RequestInterface() {
             @Override
-            public void onResponse(String s) {
+            public void doSuccess(String result) {
                 progressdialogcancel();
                 try {
-                    JSONObject obj = new JSONObject(s);
+                    JSONObject obj = new JSONObject(result);
                     if (obj.getString("code").equals("0")) {
                         //不是第一次登陆，直接进入下一个界面
                         obj = new JSONObject(obj.getString("data"));
@@ -106,37 +120,7 @@ public class LoginThirdChoiceActivity extends BaseActivity implements View.OnCli
                     e.printStackTrace();
                 }
             }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError volleyError) {
-                progressdialogcancel();
-            }
-        }) {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<>();
-                localtoken = PreferenceUtil.getSharePre(LoginThirdChoiceActivity.this).getString("localtoken", "");
-                headers.put("Authorization", "Bearer " + localtoken);
-                return headers;
-            }
-
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                HashMap<String, String> map = new HashMap<>();
-                map.put("accounttypekey", type);
-                map.put("openid", openId);
-                map.put("unionid", TextUtils.isEmpty(unionid) ? openId : unionid);
-                map.put("accesstoken", accessToken);
-                map.put("expiresin", expiresin);
-                map.put("nickname", userName);
-                map.put("gender", userGender);
-                map.put("useravatarurl", userIcon);
-                map.put("deviceid", deviceid);
-                return map;
-            }
-        };
-        jumpRequest.setTag("jumpThird");
-        AppContext.getHttpQueue().add(jumpRequest);
+        });
     }
 
     @Override

@@ -3,7 +3,6 @@ package com.woyuce.activity.Controller.Main;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -15,27 +14,24 @@ import android.webkit.CookieManager;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.toolbox.StringRequest;
-import com.woyuce.activity.AppContext;
-import com.woyuce.activity.Model.Speaking.SpeakingRoom;
-import com.woyuce.activity.R;
+import com.woyuce.activity.Common.Constants;
+import com.woyuce.activity.Controller.Login.LoginActivity;
 import com.woyuce.activity.Controller.Mine.AboutUsActivity;
 import com.woyuce.activity.Controller.Mine.CustomServiceActivity;
 import com.woyuce.activity.Controller.Mine.SuggestionActivity;
-import com.woyuce.activity.Controller.WebActivity;
-import com.woyuce.activity.Controller.Login.LoginActivity;
 import com.woyuce.activity.Controller.Store.StoreCartActivity;
 import com.woyuce.activity.Controller.Store.StoreOrderListActivity;
+import com.woyuce.activity.Controller.WebActivity;
+import com.woyuce.activity.Model.Speaking.SpeakingRoom;
+import com.woyuce.activity.R;
 import com.woyuce.activity.Utils.ActivityManager;
 import com.woyuce.activity.Utils.DbUtil;
+import com.woyuce.activity.Utils.Http.Volley.HttpUtil;
+import com.woyuce.activity.Utils.Http.Volley.RequestInterface;
 import com.woyuce.activity.Utils.LogUtil;
 import com.woyuce.activity.Utils.PreferenceUtil;
 import com.woyuce.activity.Utils.ToastUtil;
 import com.woyuce.activity.Utils.UpdateManager;
-import com.woyuce.activity.Common.Constants;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -44,7 +40,6 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class FragmentMine extends Fragment implements View.OnClickListener {
 
@@ -55,9 +50,6 @@ public class FragmentMine extends Fragment implements View.OnClickListener {
     private TextView mCourseTable;
 
     private String localroomname;
-    private String URL_ROOM = "http://iphone.ipredicting.com/kymyroom.aspx";
-    private String URL_SUBJECT = "http://iphone.ipredicting.com/kymyshanesub.aspx";
-    private String URL_MONEY_INFO = "http://api.iyuce.com/v1/store/getusermoney?userid=";
     private List<SpeakingRoom> roomList = new ArrayList<>();
     private List<String> subcontentList = new ArrayList<>();
     private List<String> myexamList = new ArrayList<>();
@@ -108,12 +100,11 @@ public class FragmentMine extends Fragment implements View.OnClickListener {
         txtOrderList.setOnClickListener(this);
     }
 
-    // fragment 生命周期，打开时
     private void initEvent() {
-        if (share().getString("userId", "").length() == 0) {
+        if (PreferenceUtil.getSharePre(getActivity()).getString("userId", "").length() == 0) {
             txtRoom.setText("登录后可见");
             txtSubject.setText("登录后可见");
-            txtMoney.setText(share().getString("money", "登录后可见"));
+            txtMoney.setText(PreferenceUtil.getSharePre(getActivity()).getString("money", "登录后可见"));
             myexamList.clear();
         } else {
             roomList.clear();
@@ -124,26 +115,22 @@ public class FragmentMine extends Fragment implements View.OnClickListener {
             getMoney();
             mCourseTable.setText("查看");
         }
-        txtName.setText(share().getString("mUserName", "点击头像切换账号"));
-        txtMoney.setText(share().getString("money", "登录后可见"));
-    }
-
-    // 从initEvent 抽出，方便调用，代码简洁
-    private SharedPreferences share() {
-        return PreferenceUtil.getSharePre(getActivity());
+        txtName.setText(PreferenceUtil.getSharePre(getActivity()).getString("mUserName", "点击头像切换账号"));
+        txtMoney.setText(PreferenceUtil.getSharePre(getActivity()).getString("money", "登录后可见"));
     }
 
     //获取考场
     private void getRoomJson() {
-        StringRequest rommRequest = new StringRequest(Request.Method.POST, URL_ROOM, new Response.Listener<String>() {
+        HashMap<String, String> params = new HashMap<>();
+        params.put("uname", PreferenceUtil.getSharePre(getActivity()).getString("username", ""));
+        HttpUtil.post(Constants.URL_POST_TAB_FIVE_MY_ROOM, params, null, new RequestInterface() {
             @Override
-            public void onResponse(String response) {
-                JSONObject jsonObject;
-                SpeakingRoom room;
+            public void doSuccess(String result) {
                 try {
-                    jsonObject = new JSONObject(response);
-                    int result = jsonObject.getInt("code");
-                    if (result == 0) {
+                    SpeakingRoom room;
+                    JSONObject jsonObject;
+                    jsonObject = new JSONObject(result);
+                    if (jsonObject.getInt("code") == 0) {
                         JSONArray data = jsonObject.getJSONArray("data");
                         for (int i = 0; i < data.length(); i++) {
                             jsonObject = data.getJSONObject(i);
@@ -159,30 +146,22 @@ public class FragmentMine extends Fragment implements View.OnClickListener {
                     e.printStackTrace();
                 }
             }
-        }, null) {
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                Map<String, String> hashMap = new HashMap<>();
-                hashMap.put("uname", PreferenceUtil.getSharePre(getActivity()).getString("username", ""));
-                return hashMap;
-            }
-        };
-        rommRequest.setTag("fragmentfive");
-        AppContext.getHttpQueue().add(rommRequest);
+        });
     }
 
     /**
      * 获取考题列表
      */
     private void getSubjectJson() {
-        StringRequest subjectRequest = new StringRequest(Request.Method.POST, URL_SUBJECT, new Response.Listener<String>() {
+        HashMap<String, String> params = new HashMap<>();
+        params.put("uname", PreferenceUtil.getSharePre(getActivity()).getString("username", ""));
+        HttpUtil.post(Constants.URL_POST_TAB_FIVE_MY_SUBJECT, params, null, new RequestInterface() {
             @Override
-            public void onResponse(String response) {
-                JSONObject jsonObject;
+            public void doSuccess(String result) {
                 try {
-                    jsonObject = new JSONObject(response);
-                    int result = jsonObject.getInt("code");
-                    if (result == 0) {
+                    JSONObject jsonObject;
+                    jsonObject = new JSONObject(result);
+                    if (jsonObject.getInt("code") == 0) {
                         JSONArray data = jsonObject.getJSONArray("data");
                         String local_subname;
                         for (int i = 0; i < data.length(); i++) {
@@ -202,16 +181,7 @@ public class FragmentMine extends Fragment implements View.OnClickListener {
                     e.printStackTrace();
                 }
             }
-        }, null) {
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                Map<String, String> hashMap = new HashMap<>();
-                hashMap.put("uname", PreferenceUtil.getSharePre(getActivity()).getString("username", ""));
-                return hashMap;
-            }
-        };
-        subjectRequest.setTag("fragmentfive");
-        AppContext.getHttpQueue().add(subjectRequest);
+        });
     }
 
 
@@ -219,13 +189,12 @@ public class FragmentMine extends Fragment implements View.OnClickListener {
      * 获取金币
      */
     private void getMoney() {
-        StringRequest moneyRequest = new StringRequest(Request.Method.GET,
-                URL_MONEY_INFO + PreferenceUtil.getSharePre(getActivity()).getString("userId", ""), new Response.Listener<String>() {
+        HttpUtil.get(Constants.URL_MONEY_INFO + PreferenceUtil.getSharePre(getActivity()).getString("userId", ""), null, new RequestInterface() {
             @Override
-            public void onResponse(String response) {
+            public void doSuccess(String result) {
                 try {
                     JSONObject obj;
-                    obj = new JSONObject(response);
+                    obj = new JSONObject(result);
                     if (obj.getString("code").equals("0")) {
                         txtMoney.setText(obj.getString("data"));
                     }
@@ -233,9 +202,7 @@ public class FragmentMine extends Fragment implements View.OnClickListener {
                     e.printStackTrace();
                 }
             }
-        }, null);
-        moneyRequest.setTag("fragmentfive");
-        AppContext.getHttpQueue().add(moneyRequest);
+        });
     }
 
     @Override
@@ -278,6 +245,7 @@ public class FragmentMine extends Fragment implements View.OnClickListener {
                 startActivity(new Intent(getActivity(), SuggestionActivity.class));
                 break;
             case R.id.txt_to_clearcache:
+                //ImageLoader清除缓存
                 com.nostra13.universalimageloader.core.ImageLoader.getInstance().clearDiskCache();
                 com.nostra13.universalimageloader.core.ImageLoader.getInstance().clearMemoryCache();
                 ToastUtil.showMessage(getActivity(), "清除缓存成功");

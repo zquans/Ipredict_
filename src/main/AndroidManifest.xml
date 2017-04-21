@@ -267,6 +267,10 @@
             android:name=".Controller.WebNoCookieActivity"
             android:launchMode="standard"
             android:screenOrientation="portrait" />
+        <activity
+            android:name=".Controller.WebGetPushActivity"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait" />
 
         <service
             android:name=".Services.UpdateService"

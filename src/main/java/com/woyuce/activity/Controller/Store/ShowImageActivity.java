@@ -10,7 +10,7 @@ import com.woyuce.activity.R;
 import uk.co.senab.photoview.PhotoView;
 
 /**
- * Created by Administrator on 2016/12/29.
+ * Created by Administrator on 2016/12/29
  */
 public class ShowImageActivity extends BaseActivity {
 

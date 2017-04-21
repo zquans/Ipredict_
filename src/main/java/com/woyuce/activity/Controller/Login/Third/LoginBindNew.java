@@ -8,23 +8,20 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.toolbox.StringRequest;
 import com.woyuce.activity.AppContext;
 import com.woyuce.activity.BaseActivity;
-import com.woyuce.activity.R;
+import com.woyuce.activity.Common.Constants;
 import com.woyuce.activity.Controller.Main.MainActivity;
+import com.woyuce.activity.R;
+import com.woyuce.activity.Utils.Http.Volley.HttpUtil;
+import com.woyuce.activity.Utils.Http.Volley.RequestInterface;
 import com.woyuce.activity.Utils.PreferenceUtil;
 import com.woyuce.activity.Utils.ToastUtil;
-import com.woyuce.activity.Common.Constants;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Created by Administrator on 2017/3/27
@@ -46,7 +43,7 @@ public class LoginBindNew extends BaseActivity implements View.OnClickListener {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        AppContext.getHttpQueue().cancelAll("bindRequest");
+        HttpUtil.removeTag(Constants.ACTIVITY_LOGIN_BIND_NEW);
     }
 
     @Override
@@ -58,6 +55,7 @@ public class LoginBindNew extends BaseActivity implements View.OnClickListener {
     }
 
     private void initView() {
+        localtoken = PreferenceUtil.getSharePre(LoginBindNew.this).getString("localtoken", "");
         type = getIntent().getStringExtra("type");
         openId = getIntent().getStringExtra("openId");
         unionid = getIntent().getStringExtra("unionid");
@@ -92,11 +90,23 @@ public class LoginBindNew extends BaseActivity implements View.OnClickListener {
     }
 
     private void requestBind(final String user, final String password) {
-        StringRequest bindRequest = new StringRequest(Request.Method.POST, Constants.URL_Login_To_Bind, new Response.Listener<String>() {
+        HashMap<String, String> headers = new HashMap<>();
+        headers.put("Authorization", "Bearer " + localtoken);
+        HashMap<String, String> params = new HashMap<>();
+        params.put("accounttypekey", type);
+        params.put("openid", openId);
+        params.put("unionid", unionid);
+        params.put("unionid", TextUtils.isEmpty(unionid) ? openId : unionid);
+        params.put("accesstoken", accessToken);
+        params.put("expiresin", expiresin + "");
+        params.put("username", user);
+        params.put("password", password);
+        params.put("deviceid", AppContext.getDeviceToken());
+        HttpUtil.post(Constants.URL_Login_To_Bind, headers, params, Constants.ACTIVITY_LOGIN, new RequestInterface() {
             @Override
-            public void onResponse(String s) {
+            public void doSuccess(String result) {
                 try {
-                    JSONObject obj = new JSONObject(s);
+                    JSONObject obj = new JSONObject(result);
                     if (obj.getString("code").equals("0")) {
                         ToastUtil.showMessage(LoginBindNew.this, "绑定成功");
                         obj = new JSONObject(obj.getString("data"));
@@ -115,31 +125,6 @@ public class LoginBindNew extends BaseActivity implements View.OnClickListener {
                     e.printStackTrace();
                 }
             }
-        }, null) {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<>();
-                localtoken = PreferenceUtil.getSharePre(LoginBindNew.this).getString("localtoken", "");
-                headers.put("Authorization", "Bearer " + localtoken);
-                return headers;
-            }
-
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                HashMap<String, String> map = new HashMap<>();
-                map.put("accounttypekey", type);
-                map.put("openid", openId);
-                map.put("unionid", unionid);
-                map.put("unionid", TextUtils.isEmpty(unionid) ? openId : unionid);
-                map.put("accesstoken", accessToken);
-                map.put("expiresin", expiresin + "");
-                map.put("username", user);
-                map.put("password", password);
-                map.put("deviceid", AppContext.getDeviceToken());
-                return map;
-            }
-        };
-        bindRequest.setTag("bindRequest");
-        AppContext.getHttpQueue().add(bindRequest);
+        });
     }
 }

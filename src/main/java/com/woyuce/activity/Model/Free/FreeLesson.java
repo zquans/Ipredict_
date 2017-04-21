@@ -1,9 +1,11 @@
 package com.woyuce.activity.Model.Free;
 
+import java.io.Serializable;
+
 /**
- * Created by Administrator on 2016/9/21.
+ * Created by Administrator on 2016/9/21
  */
-public class FreeLesson {
+public class FreeLesson implements Serializable {
 
     public String title;
     public String image;

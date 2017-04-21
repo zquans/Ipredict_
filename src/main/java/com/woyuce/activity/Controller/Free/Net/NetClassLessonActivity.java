@@ -15,23 +15,21 @@ import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.toolbox.StringRequest;
 import com.nostra13.universalimageloader.core.ImageLoader;
+import com.woyuce.activity.Adapter.Free.Net.NetClassLessonAdapter;
 import com.woyuce.activity.BaseActivity;
+import com.woyuce.activity.Common.Constants;
 import com.woyuce.activity.Controller.Free.FreePageActivity;
 import com.woyuce.activity.Controller.Login.LoginActivity;
 import com.woyuce.activity.Controller.Store.StoreGoodsActivity;
 import com.woyuce.activity.Controller.WebNoCookieActivity;
-import com.woyuce.activity.Adapter.Free.Net.NetClassLessonAdapter;
-import com.woyuce.activity.AppContext;
+import com.woyuce.activity.Model.Free.Net.NetBean;
 import com.woyuce.activity.Model.Free.Net.NetLessonBean;
 import com.woyuce.activity.R;
+import com.woyuce.activity.Utils.Http.Volley.HttpUtil;
+import com.woyuce.activity.Utils.Http.Volley.RequestInterface;
 import com.woyuce.activity.Utils.PreferenceUtil;
 import com.woyuce.activity.Utils.ToastUtil;
-import com.woyuce.activity.Common.Constants;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -40,10 +38,9 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
- * Created by Administrator on 2016/9/21.
+ * Created by Administrator on 2016/9/21
  */
 public class NetClassLessonActivity extends BaseActivity implements AdapterView.OnItemClickListener, View.OnClickListener {
 
@@ -54,19 +51,15 @@ public class NetClassLessonActivity extends BaseActivity implements AdapterView.
     private NetClassLessonAdapter wanglessonAdapter;
     private List<NetLessonBean> wanglessonList = new ArrayList<>();
 
-    private static final String URL = "http://api.iyuce.com/v1/exam/examunit";
-    private static final String URL_Check = "http://api.iyuce.com/v1/exam/checkuserforwlb";
-    private static final String URL_CheckCode = "http://api.iyuce.com/v1/exam/activecodeforwlb";
-
     private int localtry = 0;
     private String localtoken;
-    private String localgid, localpid, localmid, localwcg_name;
+    private NetBean mNetBean;
     private String localCheckCode, localunitid, localunitName;
 
     @Override
     protected void onStop() {
         super.onStop();
-        AppContext.getHttpQueue().cancelAll("wangluobanlesson");
+        HttpUtil.removeTag(Constants.ACTIVITY_NET_LESSON);
     }
 
     @Override
@@ -81,10 +74,7 @@ public class NetClassLessonActivity extends BaseActivity implements AdapterView.
     private void initView() {
         localtoken = PreferenceUtil.getSharePre(NetClassLessonActivity.this).getString("localtoken", "");
         Intent intent = getIntent();
-        localgid = intent.getStringExtra("localwcg_id");
-        localpid = intent.getStringExtra("localwcg_pid");
-        localmid = intent.getStringExtra("localwcg_mid");
-        localwcg_name = intent.getStringExtra("localwcg_name");
+        mNetBean = (NetBean) intent.getSerializableExtra("NetBean");
 
         mTitle = (TextView) findViewById(R.id.title_activity_wangluobanlesson);
         mGuide = (ImageView) findViewById(R.id.img_wangluobanlesson_guide);
@@ -96,11 +86,10 @@ public class NetClassLessonActivity extends BaseActivity implements AdapterView.
         mGuide.setOnClickListener(this);
         mBtnClearcache.setOnClickListener(this);
         mGridview.setOnItemClickListener(this);
-        mTitle.setText(localwcg_name);
+        mTitle.setText(mNetBean.getWcg_name());
 
         // 第一次引导的动画
-        boolean b = PreferenceUtil.getSharePre(NetClassLessonActivity.this).contains("imgclearguide_wangluobanlesson");
-        if (b == true) {
+        if (PreferenceUtil.getSharePre(NetClassLessonActivity.this).contains("imgclearguide_wangluobanlesson")) {
             mGuide.setVisibility(View.GONE);
         }
     }
@@ -109,15 +98,19 @@ public class NetClassLessonActivity extends BaseActivity implements AdapterView.
      * 获取spn的数据
      */
     private void getExamUnit() {
-        StringRequest strinrequest = new StringRequest(Request.Method.POST, URL, new Response.Listener<String>() {
+        HashMap<String, String> headers = new HashMap<>();
+        headers.put("Authorization", "Bearer " + localtoken);
+        HashMap<String, String> params = new HashMap<>();
+        params.put("mid", mNetBean.getMonthId());
+        params.put("pid", mNetBean.getWcg_powerid());
+        HttpUtil.post(Constants.URL_POST_NET_LESSON, headers, params, Constants.ACTIVITY_NET_LESSON, new RequestInterface() {
             @Override
-            public void onResponse(String response) {
-                JSONArray arr;
-                JSONObject obj;
+            public void doSuccess(String result) {
                 try {
-                    obj = new JSONObject(response);
-                    int result = obj.getInt("code");
-                    if (result == 0) {
+                    JSONArray arr;
+                    JSONObject obj;
+                    obj = new JSONObject(result);
+                    if (obj.getInt("code") == 0) {
                         arr = obj.getJSONArray("data");
                         NetLessonBean wanglesson;
                         for (int i = 0; i < arr.length(); i++) {
@@ -129,8 +122,6 @@ public class NetClassLessonActivity extends BaseActivity implements AdapterView.
                             wanglesson.setShowTypeId(obj.getString("show_type_id"));
                             wanglessonList.add(wanglesson);
                         }
-                    } else {
-                        // Log.e("Code Error", "code spnTimewrong" + response);
                     }
                     //gridview设置adapter
                     wanglessonAdapter = new NetClassLessonAdapter(NetClassLessonActivity.this, wanglessonList);
@@ -139,24 +130,7 @@ public class NetClassLessonActivity extends BaseActivity implements AdapterView.
                     e.printStackTrace();
                 }
             }
-        }, null) {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<>();
-                headers.put("Authorization", "Bearer " + localtoken);
-                return headers;
-            }
-
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                HashMap<String, String> map = new HashMap<>();
-                map.put("mid", localmid);
-                map.put("pid", localpid);
-                return map;
-            }
-        };
-        strinrequest.setTag("wangluobanlesson");
-        AppContext.getHttpQueue().add(strinrequest);
+        });
     }
 
     /**
@@ -177,23 +151,27 @@ public class NetClassLessonActivity extends BaseActivity implements AdapterView.
                     }).setNegativeButton("取消", null).create().show();
             return;
         }
-        StringRequest checkrequest = new StringRequest(Request.Method.POST, URL_Check, new Response.Listener<String>() {
+
+
+        HashMap<String, String> headers = new HashMap<>();
+        headers.put("Authorization", "Bearer " + localtoken);
+        HashMap<String, String> params = new HashMap<>();
+        params.put("user_id", PreferenceUtil.getSharePre(NetClassLessonActivity.this).getString("userId", ""));
+        params.put("gid", mNetBean.getWcg_id());
+        HttpUtil.post(Constants.URL_POST_NET_LESSON_Check, headers, params, Constants.ACTIVITY_NET_LESSON, new RequestInterface() {
             @Override
-            public void onResponse(String response) {
-                JSONObject obj;
+            public void doSuccess(String result) {
                 try {
-                    obj = new JSONObject(response);
-                    int result = obj.getInt("code");
-                    if (result == 0) {
+                    JSONObject obj;
+                    obj = new JSONObject(result);
+                    if (obj.getInt("code") == 0) {
                         String flag = obj.getString("data");
                         // 判断是否有权限,有则进入下一级
                         if (flag.equals("1")) {
                             Intent intent = new Intent(NetClassLessonActivity.this, FreePageActivity.class);
-                            Bundle bundle = new Bundle();
-                            bundle.putString("localunit_name", localunitName);
-                            bundle.putString("localunit_id", localunitid);
-                            bundle.putString("localshow_type_id", "wangluoban");
-                            intent.putExtras(bundle);
+                            intent.putExtra("localunit_name", localunitName);
+                            intent.putExtra("localunit_id", localunitid);
+                            intent.putExtra("localshow_type_id", "wangluoban");
                             startActivity(intent);
                         } else {
                             // 没有则输入激活码
@@ -244,31 +222,12 @@ public class NetClassLessonActivity extends BaseActivity implements AdapterView.
                                 }
                             }).show();
                         }
-                    } else {
-                        // Log.e("Code Error", "code spnTimewrong" + response);
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
             }
-        }, null) {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<>();
-                headers.put("Authorization", "Bearer " + localtoken);
-                return headers;
-            }
-
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                HashMap<String, String> map = new HashMap<>();
-                map.put("user_id", PreferenceUtil.getSharePre(NetClassLessonActivity.this).getString("userId", ""));
-                map.put("gid", localgid);
-                return map;
-            }
-        };
-        checkrequest.setTag("wangluobanlesson");
-        AppContext.getHttpQueue().add(checkrequest);
+        });
     }
 
 
@@ -276,11 +235,11 @@ public class NetClassLessonActivity extends BaseActivity implements AdapterView.
      * 获取商城商品信息
      */
     private void getactivegoods() {
-        StringRequest getGoodsRequest = new StringRequest(Request.Method.GET, Constants.URL_GetGoods, new Response.Listener<String>() {
+        HttpUtil.get(Constants.URL_GetGoods, Constants.ACTIVITY_NET_LESSON, new RequestInterface() {
             @Override
-            public void onResponse(String s) {
+            public void doSuccess(String result) {
                 try {
-                    JSONObject obj = new JSONObject(s);
+                    JSONObject obj = new JSONObject(result);
                     if (obj.getString("code").equals("0")) {
                         obj = obj.getJSONObject("data");
                         Intent intent = new Intent(NetClassLessonActivity.this, StoreGoodsActivity.class);
@@ -295,9 +254,7 @@ public class NetClassLessonActivity extends BaseActivity implements AdapterView.
                     e.printStackTrace();
                 }
             }
-        }, null);
-        getGoodsRequest.setTag("wangluobanlesson");
-        AppContext.getHttpQueue().add(getGoodsRequest);
+        });
     }
 
 
@@ -318,48 +275,34 @@ public class NetClassLessonActivity extends BaseActivity implements AdapterView.
         localtry++;
 
         // 激活码正确则进入
-        StringRequest checkcoderequest = new StringRequest(Request.Method.POST, URL_CheckCode, new Response.Listener<String>() {
+        HashMap<String, String> headers = new HashMap<>();
+        headers.put("Authorization", "Bearer " + localtoken);
+        HashMap<String, String> params = new HashMap<>();
+        params.put("user_id", PreferenceUtil.getSharePre(NetClassLessonActivity.this).getString("userId", ""));
+        params.put("gid", mNetBean.getWcg_id());
+        params.put("code", localCheckCode);
+        HttpUtil.post(Constants.URL_POST_NET_LESSON_CheckCode, headers, params, Constants.ACTIVITY_NET_LESSON, new RequestInterface() {
             @Override
-            public void onResponse(String response) {
-                JSONObject obj;
+            public void doSuccess(String result) {
                 try {
-                    obj = new JSONObject(response);
+                    JSONObject obj;
+                    obj = new JSONObject(result);
                     int code = obj.getInt("code");
                     if (code == 1) {
                         ToastUtil.showMessage(NetClassLessonActivity.this, obj.getString("message"));
                     } else if (code == 0) {
                         ToastUtil.showMessage(NetClassLessonActivity.this, "恭喜您，验证成功啦!");
                         Intent intent = new Intent(NetClassLessonActivity.this, FreePageActivity.class);
-                        Bundle bundle = new Bundle();
-                        bundle.putString("localunit_name", localunitName);
-                        bundle.putString("localunit_id", localunitid);
-                        bundle.putString("localshow_type_id", "wangluoban");
-                        intent.putExtras(bundle);
+                        intent.putExtra("localunit_name", localunitName);
+                        intent.putExtra("localunit_id", localunitid);
+                        intent.putExtra("localshow_type_id", "wangluoban");
                         startActivity(intent);
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
             }
-        }, null) {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<>();
-                headers.put("Authorization", "Bearer " + localtoken);
-                return headers;
-            }
-
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                HashMap<String, String> map = new HashMap<>();
-                map.put("user_id", PreferenceUtil.getSharePre(NetClassLessonActivity.this).getString("userId", ""));
-                map.put("gid", localgid);
-                map.put("code", localCheckCode);
-                return map;
-            }
-        };
-        checkcoderequest.setTag("wangluobanlesson");
-        AppContext.getHttpQueue().add(checkcoderequest);
+        });
     }
 
     public static boolean isApkInstalled(Context context, String packageName) {

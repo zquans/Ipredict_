@@ -8,19 +8,17 @@ import android.view.View;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.toolbox.StringRequest;
 import com.woyuce.activity.Adapter.Store.StoreCarAdapter;
-import com.woyuce.activity.AppContext;
 import com.woyuce.activity.BaseActivity;
+import com.woyuce.activity.Common.Constants;
 import com.woyuce.activity.Model.Store.StoreMenu;
 import com.woyuce.activity.R;
 import com.woyuce.activity.Utils.DbUtil;
+import com.woyuce.activity.Utils.Http.Volley.HttpUtil;
+import com.woyuce.activity.Utils.Http.Volley.RequestInterface;
 import com.woyuce.activity.Utils.LogUtil;
 import com.woyuce.activity.Utils.MathUtil;
 import com.woyuce.activity.Utils.ToastUtil;
-import com.woyuce.activity.Common.Constants;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -31,7 +29,6 @@ import java.util.ArrayList;
 /**
  * Created by LeBang on 2017/10/3
  */
-
 public class StoreCartActivity extends BaseActivity implements StoreCarAdapter.OnMyClickListener {
 
     private TextView mTxtTotalNum, mTxtTotalPrice, mTxtFinalPrice;
@@ -46,6 +43,12 @@ public class StoreCartActivity extends BaseActivity implements StoreCarAdapter.O
 
     public void back(View view) {
         finish();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        HttpUtil.removeTag(Constants.ACTIVITY_STORE_CART);
     }
 
     @Override
@@ -90,7 +93,7 @@ public class StoreCartActivity extends BaseActivity implements StoreCarAdapter.O
             StoreMenu storemenu;
             while (mCursor.moveToNext()) {
                 storemenu = new StoreMenu();
-                //TODO 优化 目前如果商品数量是0，则不加载进数组
+                //如果商品数量是0，则不加载进数组
                 if (Integer.parseInt(mCursor.getString(mCursor.getColumnIndex(Constants.COLUMN_COUNT))) <= 0) {
                     continue;
                 }
@@ -107,18 +110,21 @@ public class StoreCartActivity extends BaseActivity implements StoreCarAdapter.O
         mDatabase.close();
     }
 
+    /**
+     * 请求当前商品最新信息
+     */
     private void requestRecentInfo() {
         for (int i = 0; i < mStoreList.size(); i++) {
             URL = URL + mStoreList.get(i).getGoodsskuid() + ",";
         }
         progressdialogshow(this);
-        StringRequest requestRecentGoods = new StringRequest(Request.Method.GET, URL, new Response.Listener<String>() {
+        HttpUtil.get(URL, Constants.ACTIVITY_STORE_CART, new RequestInterface() {
             @Override
-            public void onResponse(String s) {
+            public void doSuccess(String result) {
                 try {
                     JSONObject obj;
                     JSONArray arr;
-                    obj = new JSONObject(s);
+                    obj = new JSONObject(result);
                     if (obj.getString("code").equals("0")) {
                         arr = new JSONArray(obj.getString("data"));
                         LogUtil.i("arr = " + arr);
@@ -139,9 +145,7 @@ public class StoreCartActivity extends BaseActivity implements StoreCarAdapter.O
                 }
                 progressdialogcancel();
             }
-        }, null);
-        requestRecentGoods.setTag("requestRecentGoods");
-        AppContext.getHttpQueue().add(requestRecentGoods);
+        });
     }
 
     /**

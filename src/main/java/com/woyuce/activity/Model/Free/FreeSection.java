@@ -1,9 +1,11 @@
 package com.woyuce.activity.Model.Free;
 
+import java.io.Serializable;
+
 /**
- * Created by Administrator on 2016/9/21.
+ * Created by Administrator on 2016/9/21
  */
-public class FreeSection {
+public class FreeSection implements Serializable {
 
     public String sectionid;
     public String sectionname;

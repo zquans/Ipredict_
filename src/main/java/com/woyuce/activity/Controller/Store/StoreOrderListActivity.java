@@ -10,18 +10,16 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
 import com.jcodecraeer.xrecyclerview.ProgressStyle;
 import com.jcodecraeer.xrecyclerview.XRecyclerView;
-import com.woyuce.activity.BaseActivity;
 import com.woyuce.activity.Adapter.Store.StoreOrderListAdapter;
-import com.woyuce.activity.AppContext;
+import com.woyuce.activity.BaseActivity;
+import com.woyuce.activity.Common.Constants;
 import com.woyuce.activity.Model.Store.StoreGoods;
 import com.woyuce.activity.Model.Store.StoreOrder;
 import com.woyuce.activity.R;
+import com.woyuce.activity.Utils.Http.Volley.HttpUtil;
+import com.woyuce.activity.Utils.Http.Volley.RequestInterface;
 import com.woyuce.activity.Utils.LogUtil;
 import com.woyuce.activity.Utils.PreferenceUtil;
 import com.woyuce.activity.Utils.RecyclerItemClickListener;
@@ -34,7 +32,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 
 /**
- * Created by Administrator on 2016/11/25.
+ * Created by Administrator on 2016/11/25
  */
 public class StoreOrderListActivity extends BaseActivity implements XRecyclerView.LoadingListener {
 
@@ -70,7 +68,7 @@ public class StoreOrderListActivity extends BaseActivity implements XRecyclerVie
     @Override
     protected void onStop() {
         super.onStop();
-        AppContext.getHttpQueue().cancelAll("StoreOrderList");
+        HttpUtil.removeTag(Constants.ACTIVITY_STORE_ORDER_LIST);
         local_page_number = 1;
     }
 
@@ -105,10 +103,9 @@ public class StoreOrderListActivity extends BaseActivity implements XRecyclerVie
      * 请求数据列表
      */
     private void requestData(final int code, String url) {
-        StringRequest orderListRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
+        HttpUtil.get(url, Constants.ACTIVITY_STORE_ORDER_LIST, new RequestInterface() {
             @Override
-            public void onResponse(String s) {
-                LogUtil.i("s = " + s);
+            public void doSuccess(String result) {
                 try {
                     JSONObject obj;
                     JSONArray arr;
@@ -116,7 +113,7 @@ public class StoreOrderListActivity extends BaseActivity implements XRecyclerVie
                     JSONArray arr_;
                     StoreOrder order;
                     StoreGoods goods;
-                    obj = new JSONObject(s);
+                    obj = new JSONObject(result);
                     if (obj.getString("code").equals("0")) {
                         obj = obj.getJSONObject("orderlist");
                         arr = obj.getJSONArray("data");
@@ -170,29 +167,19 @@ public class StoreOrderListActivity extends BaseActivity implements XRecyclerVie
                     e.printStackTrace();
                 }
             }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError volleyError) {
-                LogUtil.e("volleyError = " + volleyError.getMessage());
-            }
         });
-        orderListRequest.setTag("StoreOrderList");
-        AppContext.getHttpQueue().add(orderListRequest);
     }
 
     /**
      * 删除订单
-     *
-     * @param position
-     * @param url
      */
     private void delRequest(final int position, String url) {
-        StringRequest delRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
+        HttpUtil.get(url, Constants.ACTIVITY_STORE_ORDER_LIST, new RequestInterface() {
             @Override
-            public void onResponse(String s) {
+            public void doSuccess(String result) {
                 try {
                     JSONObject obj;
-                    obj = new JSONObject(s);
+                    obj = new JSONObject(result);
                     if (obj.getString("code").equals("0")) {
                         mList.remove(position);
                         mAdapter.notifyItemRemoved(position);
@@ -205,9 +192,7 @@ public class StoreOrderListActivity extends BaseActivity implements XRecyclerVie
                     e.printStackTrace();
                 }
             }
-        }, null);
-        delRequest.setTag("StoreOrderList");
-        AppContext.getHttpQueue().add(delRequest);
+        });
     }
 
     /**

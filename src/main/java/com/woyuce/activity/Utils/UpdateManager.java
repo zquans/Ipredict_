@@ -17,11 +17,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ProgressBar;
 
-import com.android.volley.Request.Method;
-import com.android.volley.Response.Listener;
-import com.android.volley.toolbox.StringRequest;
-import com.woyuce.activity.AppContext;
+import com.woyuce.activity.Common.Constants;
 import com.woyuce.activity.R;
+import com.woyuce.activity.Utils.Http.Volley.HttpUtil;
+import com.woyuce.activity.Utils.Http.Volley.RequestInterface;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -42,7 +41,7 @@ public class UpdateManager {
     private ProgressBar pb;
     private Dialog mDownLoadDialog;
 
-    private final String URL_SERVE = "http://www.iyuce.com/Scripts/andoird.json";
+    //    private final String URL_SERVE = "http://www.iyuce.com/Scripts/andoird.json";
     private static final int DOWNLOADING = 1;
     private static final int DOWNLOAD_FINISH = 0;
 
@@ -104,19 +103,20 @@ public class UpdateManager {
     };
 
     public void checkUpdate() {
-        StringRequest request = new StringRequest(Method.GET, URL_SERVE, new Listener<String>() {
+        HttpUtil.get(Constants.URL_GET_UPDATE, null, new RequestInterface() {
             @Override
-            public void onResponse(String response) {
+            public void doSuccess(String result) {
                 Message msg = Message.obtain();
-                msg.obj = response;
+                msg.obj = result;
                 mGetVersionHandler.sendMessage(msg);
             }
-        }, null);
-        request.setTag("updatemanager");
-        AppContext.getHttpQueue().add(request);
+        });
     }
 
-    public boolean isUpdate() {   /*boolean比较本地版本是否需要更新*/
+    /**
+     * boolean比较本地版本是否需要更新
+     */
+    public boolean isUpdate() {
         float serverVersion = Float.parseFloat(mVersion);
         //将该数据保存如sharepreference，留用
         PreferenceUtil.save(mcontext, "serverVersion", String.valueOf(serverVersion));
@@ -137,8 +137,6 @@ public class UpdateManager {
         }
     }
 
-    @SuppressLint("InlinedApi")
-    @SuppressWarnings("deprecation")
     protected void showNoticeDialog() {     //show 弹窗供选择是否更新
         AlertDialog.Builder builder = new Builder(mcontext, AlertDialog.THEME_DEVICE_DEFAULT_LIGHT);
         builder.setTitle("发现新版本");
@@ -159,8 +157,6 @@ public class UpdateManager {
         builder.create().show();
     }
 
-    @SuppressWarnings("deprecation")
-    @SuppressLint({"InflateParams", "InlinedApi"})
     protected void showDownloadDialog() {     //显示下载进度
         AlertDialog.Builder builder = new Builder(mcontext, AlertDialog.THEME_DEVICE_DEFAULT_LIGHT);
         builder.setTitle("下载中");

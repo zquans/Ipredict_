@@ -1,7 +1,7 @@
 package com.woyuce.activity.Model.Free.Net;
 
 /**
- * Created by Administrator on 2016/9/21.
+ * Created by Administrator on 2016/9/21
  */
 public class NetLessonBean {
 

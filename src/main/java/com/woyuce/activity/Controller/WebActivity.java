@@ -41,7 +41,7 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.SecretKeySpec;
 
 /**
- * Created by Administrator on 2016/9/22.
+ * Created by Administrator on 2016/9/22
  */
 public class WebActivity extends BaseActivity implements View.OnClickListener {
 

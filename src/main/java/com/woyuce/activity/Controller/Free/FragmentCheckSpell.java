@@ -12,16 +12,12 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ListView;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request.Method;
-import com.android.volley.Response;
-import com.android.volley.Response.ErrorListener;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
 import com.woyuce.activity.Adapter.Free.FreeSpellAdapter;
-import com.woyuce.activity.AppContext;
+import com.woyuce.activity.Common.Constants;
 import com.woyuce.activity.Model.Free.FreeSpellBean;
 import com.woyuce.activity.R;
+import com.woyuce.activity.Utils.Http.Volley.HttpUtil;
+import com.woyuce.activity.Utils.Http.Volley.RequestInterface;
 import com.woyuce.activity.Utils.LogUtil;
 import com.woyuce.activity.Utils.PreferenceUtil;
 import com.woyuce.activity.Utils.ToastUtil;
@@ -37,7 +33,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import cn.sharesdk.framework.ShareSDK;
 import cn.sharesdk.onekeyshare.OnekeyShare;
@@ -59,9 +54,6 @@ public class FragmentCheckSpell extends Fragment implements OnClickListener {
 
     // 获取需要的subid
     private String localsubid, localtoken, localimgurl, localsectionId, localunitId, localunit_name, localpage_no;
-    private String URL_TOANSWER = "http://api.iyuce.com/v1/exam/answers";
-    private String URL_TAGCAN = "http://api.iyuce.com/v1/exam/completepractice";
-    private String URL_TAGCANT = "http://api.iyuce.com/v1/exam/cancelexams";
 
     //记分用
     private String mShowCount;
@@ -83,8 +75,6 @@ public class FragmentCheckSpell extends Fragment implements OnClickListener {
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         mShowbutton = (IShowButton) activity;
-        // 初始化MOB
-//		ShareSDK.initSDK(getActivity());
     }
 
     @Override
@@ -114,15 +104,18 @@ public class FragmentCheckSpell extends Fragment implements OnClickListener {
     }
 
     private void requestJson() {
-        StringRequest toanswerRequest = new StringRequest(Method.POST, URL_TOANSWER, new Response.Listener<String>() {
+        HashMap<String, String> headers = new HashMap<>();
+        headers.put("Authorization", "Bearer " + localtoken);
+        HashMap<String, String> params = new HashMap<>();
+        params.put("", localsubid);
+        HttpUtil.post(Constants.URL_POST_FREE_TOANSWER, headers, params, Constants.FRAGMENT_CONTENT, new RequestInterface() {
             @Override
-            public void onResponse(String response) {
-                JSONObject obj;
-                JSONArray arr;
+            public void doSuccess(String result) {
                 try {
-                    obj = new JSONObject(response);
-                    int result = obj.getInt("code");
-                    if (result == 0) {
+                    JSONObject obj;
+                    JSONArray arr;
+                    obj = new JSONObject(result);
+                    if (obj.getInt("code") == 0) {
                         arr = obj.getJSONArray("data");
                         FreeSpellBean spellbean;
                         for (int i = 0; i < arr.length(); i++) {
@@ -144,41 +137,31 @@ public class FragmentCheckSpell extends Fragment implements OnClickListener {
                     e.printStackTrace();
                 }
             }
-        }, null) {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<>();
-                localtoken = PreferenceUtil.getSharePre(getActivity()).getString("localtoken", "");
-                headers.put("Authorization", "Bearer " + localtoken);
-                return headers;
-            }
-
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                HashMap<String, String> map = new HashMap<>();
-                map.put("", localsubid);
-                return map;
-            }
-        };
-        toanswerRequest.setTag("post");
-        AppContext.getHttpQueue().add(toanswerRequest);
+        });
     }
 
     /**
      * 修改标记为会做或不会做
-     *
-     * @param url
      */
     private void tagTo(final String url) {
-        StringRequest toTagRequest = new StringRequest(Method.POST, url, new Response.Listener<String>() {
+        HashMap<String, String> headers = new HashMap<>();
+        headers.put("Authorization", "Bearer " + localtoken);
+        HashMap<String, String> params = new HashMap<>();
+        if (url.equals(Constants.URL_POST_FREE_ANSWER_TAGCAN)) {
+            params.put("user_id", PreferenceUtil.getSharePre(getActivity()).getString("userId", ""));
+            params.put("sub_id", localsubid);
+        } else if (url.equals(Constants.URL_POST_FREE_ANSWER_TAGCANT)) {
+            params.put("user_id", PreferenceUtil.getSharePre(getActivity()).getString("userId", ""));
+            params.put("unit_id", localunitId);
+            params.put("section_id", localsectionId);
+        }
+        HttpUtil.post(url, headers, params, Constants.FRAGMENT_CONTENT, new RequestInterface() {
             @Override
-            public void onResponse(String response) {
-                LogUtil.e("can or cant" + response);
-                JSONObject obj;
+            public void doSuccess(String result) {
                 try {
-                    obj = new JSONObject(response);
-                    int result = obj.getInt("code");
-                    if (result == 0) {
+                    JSONObject obj;
+                    obj = new JSONObject(result);
+                    if (obj.getInt("code") == 0) {
                         ToastUtil.showMessage(getActivity(), "标记成功");
                     } else {
                         ToastUtil.showMessage(getActivity(), "标记失败，请稍候再试");
@@ -190,36 +173,7 @@ public class FragmentCheckSpell extends Fragment implements OnClickListener {
                     e.printStackTrace();
                 }
             }
-        }, new ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                LogUtil.e("Wrong_BACK", "联接错误原因： " + error.getMessage());
-            }
-        }) {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<>();
-                localtoken = PreferenceUtil.getSharePre(getActivity()).getString("localtoken", "");
-                headers.put("Authorization", "Bearer " + localtoken);
-                return headers;
-            }
-
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                HashMap<String, String> map = new HashMap<>();
-                if (url.equals(URL_TAGCAN)) {
-                    map.put("user_id", PreferenceUtil.getSharePre(getActivity()).getString("userId", ""));
-                    map.put("sub_id", localsubid);
-                } else if (url.equals(URL_TAGCANT)) {
-                    map.put("user_id", PreferenceUtil.getSharePre(getActivity()).getString("userId", ""));
-                    map.put("unit_id", localunitId);
-                    map.put("section_id", localsectionId);
-                }
-                return map;
-            }
-        };
-        toTagRequest.setTag("post");
-        AppContext.getHttpQueue().add(toTagRequest);
+        });
     }
 
     @Override
@@ -231,14 +185,14 @@ public class FragmentCheckSpell extends Fragment implements OnClickListener {
                 spellbeanList.clear();
                 break;
             case R.id.btn_checkspell_finish:
-                if (FLAG == false) {
+                if (!FLAG) {
                     FLAG = true;
                     // 判断得分
                     ArrayList<FreeSpellBean> spellList = mAdapters.returnSpellList();
                     int mCount = 0;
                     for (int i = 0; i < answerList.size(); i++) {
-                        if (spellList.get(i).spell.toLowerCase().trim().toString()
-                                .equals(answerList.get(i).toLowerCase().trim().toString())) {
+                        if (spellList.get(i).spell.toLowerCase().trim()
+                                .equals(answerList.get(i).toLowerCase().trim())) {
                             mCount = mCount + 10;
                         }
                     }
@@ -250,7 +204,7 @@ public class FragmentCheckSpell extends Fragment implements OnClickListener {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
                                     // 标记本页为会做
-                                    tagTo(URL_TAGCAN);
+                                    tagTo(Constants.URL_POST_FREE_ANSWER_TAGCAN);
                                 }
                             }).setNegativeButton("分享成绩", new DialogInterface.OnClickListener() {
                         @Override
@@ -281,9 +235,9 @@ public class FragmentCheckSpell extends Fragment implements OnClickListener {
      * 定义一个接口供Activity调用,实现showButton方法
      */
     public interface IShowButton {
-        public void showButton();
+        void showButton();
 
-        public void cancelFragment();
+        void cancelFragment();
     }
 
     /**

@@ -7,13 +7,11 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.toolbox.StringRequest;
 import com.woyuce.activity.BaseActivity;
-import com.woyuce.activity.AppContext;
+import com.woyuce.activity.Common.Constants;
 import com.woyuce.activity.R;
+import com.woyuce.activity.Utils.Http.Volley.HttpUtil;
+import com.woyuce.activity.Utils.Http.Volley.RequestInterface;
 import com.woyuce.activity.Utils.LogUtil;
 import com.woyuce.activity.Utils.PreferenceUtil;
 import com.woyuce.activity.Utils.ToastUtil;
@@ -22,10 +20,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
-import java.util.Map;
 
 /**
- * Created by Administrator on 2016/11/21.
+ * Created by Administrator on 2016/11/21
  */
 public class LoginResetActivity extends BaseActivity implements View.OnClickListener {
 
@@ -33,12 +30,12 @@ public class LoginResetActivity extends BaseActivity implements View.OnClickList
     private Button mBtnSubmit;
 
     private String localtoken, local_phone_or_email;
-    private String URL_RESET_PASSWORD = "http://api.iyuce.com/v1/account/reset_password";
+//    private String URL_RESET_PASSWORD = "http://api.iyuce.com/v1/account/reset_password";
 
     @Override
     protected void onStop() {
         super.onStop();
-        AppContext.getHttpQueue().cancelAll("forgetActivityRequest");
+        HttpUtil.removeTag(Constants.ACTIVITY_LOGIN_RESET);
     }
 
     @Override
@@ -67,13 +64,19 @@ public class LoginResetActivity extends BaseActivity implements View.OnClickList
      * 重置密码
      */
     private void resetPassword() {
-        StringRequest resetRequest = new StringRequest(Request.Method.POST, URL_RESET_PASSWORD, new Response.Listener<String>() {
+        HashMap<String, String> headers = new HashMap<>();
+        localtoken = PreferenceUtil.getSharePre(LoginResetActivity.this).getString("localtoken", "");
+        headers.put("Authorization", "Bearer " + localtoken);
+        HashMap<String, String> params = new HashMap<>();
+        params.put("key", local_phone_or_email);
+        params.put("value", mEdtPassword.getText().toString().trim());
+        HttpUtil.post(Constants.URL_POST_LOGIN_RESET_PASSWORD, headers, params, Constants.ACTIVITY_LOGIN, new RequestInterface() {
             @Override
-            public void onResponse(String response) {
-                LogUtil.i("response = " + response);
-                JSONObject obj;
+            public void doSuccess(String result) {
+                LogUtil.i("response = " + result);
                 try {
-                    obj = new JSONObject(response);
+                    JSONObject obj;
+                    obj = new JSONObject(result);
                     if (obj.getString("code").equals("0")) {
                         ToastUtil.showMessage(LoginResetActivity.this, "恭喜您，密码重置成功啦");
                         startActivity(new Intent(LoginResetActivity.this, LoginActivity.class));
@@ -85,25 +88,7 @@ public class LoginResetActivity extends BaseActivity implements View.OnClickList
                     e.printStackTrace();
                 }
             }
-        }, null) {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<>();
-                localtoken = PreferenceUtil.getSharePre(LoginResetActivity.this).getString("localtoken", "");
-                headers.put("Authorization", "Bearer " + localtoken);
-                return headers;
-            }
-
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                HashMap<String, String> map = new HashMap<>();
-                map.put("key", local_phone_or_email);
-                map.put("value", mEdtPassword.getText().toString().trim());
-                return map;
-            }
-        };
-        resetRequest.setTag("forgetActivityRequest");
-        AppContext.getHttpQueue().add(resetRequest);
+        });
     }
 
     @Override
